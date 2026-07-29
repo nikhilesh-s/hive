@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Server-only env vars: never exposed to the client bundle since this file
 // only runs in the Next.js API route handler (Node runtime), not in the browser.
+// Calls the backend's *internal* endpoint (see api/app/routers/internal.py) -
+// this key must match the backend's INTERNAL_API_KEY, not an agent key.
 const BACKEND_URL = process.env.API_BASE_URL;
-const BACKEND_API_KEY = process.env.API_KEY;
+const BACKEND_API_KEY = process.env.INTERNAL_API_KEY;
 
 export async function POST(request: NextRequest) {
   if (!BACKEND_URL) {
