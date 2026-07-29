@@ -1,0 +1,6 @@
+# Each app has its own more specific .gitignore (web/.gitignore, api/.gitignore).
+# This one catches OS/editor cruft at the repo root.
+.DS_Store
+.vscode/
+.idea/
+*.swp
