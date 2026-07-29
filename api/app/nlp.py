@@ -23,7 +23,7 @@ CREATE TABLE {settings.table_name} (
    target TEXT,
    condition TEXT,
    band_detected BOOLEAN,
-   confidence TEXT
+   confidence REAL  -- 0-1 score, not a "high"/"medium"/"low" label
 );
 
 Rules:
@@ -36,7 +36,8 @@ Rules:
 6. A sample, cell line, or tissue term may appear in EITHER sample OR organism. Match against both with OR.
 7. Use only the core root of a term, not the full phrase. For "Nutlin-3" use '%nutlin%'. For "HeLa cells" use '%hela%'. Drop suffixes like numbers, "cells", "treated".
 8. Combine the distinct concepts (target, sample, treatment) with AND, but each concept's column-matching uses OR as above.
-9. Do not explain anything. Return ONLY SQL. Never wrap in markdown.
+9. confidence is a number between 0 and 1, never text. Compare it numerically (confidence >= 0.8), never with ILIKE.
+10. Do not explain anything. Return ONLY SQL. Never wrap in markdown.
 
 User Question:
 """

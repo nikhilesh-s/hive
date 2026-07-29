@@ -18,10 +18,11 @@ class WesternBlotRecord(BaseModel):
     target: str | None = None
     condition: str | None = None
     band_detected: bool | None = None
-    # Numeric confidence (0-1) to match the frontend's DatabaseResult type.
-    # If the western_blot_records.confidence column is TEXT in Supabase,
-    # either cast it in the generated SQL or migrate the column - align
-    # on one type before wiring this up against production data.
+    # Settled: confidence is a 0-1 score everywhere - `real` in
+    # db/schema.sql, REAL in the nlp.py prompt schema, `number` in the
+    # frontend (which renders it as `confidence * 100`%). An extraction
+    # pipeline that produces "high"/"medium"/"low" must map to a score
+    # before insert; don't reintroduce a text column on one side only.
     confidence: float | None = None
 
 

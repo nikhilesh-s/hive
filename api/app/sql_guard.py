@@ -23,7 +23,10 @@ class SQLGuardError(ValueError):
 # ILIKE-based text search. Anything not in this list is rejected, which
 # blocks pg_sleep(), dblink(), pg_read_file(), etc. by construction rather
 # than by trying to enumerate every dangerous function.
-ALLOWED_FUNCTIONS = {"lower", "upper", "coalesce", "count"}
+#
+# Names are matched against sqlglot's canonical name for the node, so the
+# spelling here is the SQL one ("current_user", not "currentuser").
+ALLOWED_FUNCTIONS = {"lower", "upper", "coalesce", "count", "cast"}
 
 # Node types that mean this isn't a plain, single SELECT.
 DISALLOWED_NODE_TYPES = (
@@ -39,6 +42,27 @@ DISALLOWED_NODE_TYPES = (
     exp.Command,
     exp.Into,
 )
+
+
+def _function_name(func: exp.Func) -> str:
+    """
+    The SQL-level name of a function node, lowercased.
+
+    sqlglot parses functions it knows into dedicated node types (version() ->
+    exp.CurrentVersion, md5() -> exp.MD5, ...) and everything else into
+    exp.Anonymous. Checking only Anonymous nodes would let every function
+    sqlglot happens to have a class for straight through the allowlist - and
+    that set grows with each sqlglot release - so both shapes are resolved to
+    a name here and checked the same way.
+    """
+    if isinstance(func, exp.Anonymous):
+        return str(func.this).lower()
+    try:
+        return func.sql_names()[0].lower()
+    except (AttributeError, IndexError):
+        # Unnamed/unexpected node: fall back to the class name, which won't
+        # be in the allowlist, so it gets rejected rather than waved through.
+        return type(func).__name__.lower()
 
 
 def guard_and_limit_sql(raw_sql: str, requested_limit: int) -> str:
@@ -71,8 +95,8 @@ def guard_and_limit_sql(raw_sql: str, requested_limit: int) -> str:
     if tables != {settings.table_name.lower()}:
         raise SQLGuardError(f"Query may only reference {settings.table_name}")
 
-    for func in stmt.find_all(exp.Anonymous):
-        name = str(func.this).lower()
+    for func in stmt.find_all(exp.Func):
+        name = _function_name(func)
         if name not in ALLOWED_FUNCTIONS:
             raise SQLGuardError(f"Function '{name}' is not allowed")
 
