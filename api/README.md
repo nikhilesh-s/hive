@@ -48,6 +48,25 @@ Both `/search` and `/v1/search` are rate-limited (`SEARCH_RATE_LIMIT` /
 4. `pip install -r requirements.txt` (or `pip install -e .` / `uv sync`)
 5. `uvicorn app.main:app --reload`
 
+## Tests
+
+```bash
+pip install pytest
+python -m pytest
+```
+
+No credentials needed - `conftest.py` supplies dummy env vars and nothing here
+talks to Supabase, OpenAI, or Postgres. The suite covers the SQL guard
+(`tests/test_sql_guard.py`), the two auth dependencies and their disjointness
+(`tests/test_auth.py`), and endpoint-level auth/rate-limit/CORS behaviour
+(`tests/test_api_security.py`).
+
+If you add a function to `sql_guard.ALLOWED_FUNCTIONS`, add a test for it. The
+allowlist is deny-by-default and has to stay that way: it resolves a name for
+every `exp.Func` node, not just `exp.Anonymous`, because sqlglot parses
+functions it recognises into dedicated classes that would otherwise skip the
+check entirely.
+
 ## Endpoints
 
 | Method | Path         | Auth | Consumer |
