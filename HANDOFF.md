@@ -6,8 +6,10 @@
 > blocked, and the exact next task.
 
 ## Last Updated
-- **2026-08-12** — Claude Code (Opus 4.8). Migrated Phase 2+3 from the old QBI
-  clone into this canonical `/hive` repo; pushed `feature/bio-context-beta`.
+- **2026-08-12** — Claude Code (Opus 4.8). Migrated Phase 2+3 into `/hive`;
+  wired the Evidence Record engine into `pipeline.py` behind `WBM_EXTRACTION_MODE`;
+  live-validated the UniProt resolver parsing. Real-paper run still blocked
+  (heavy deps + model creds; see Blockers).
 
 ## Product North Star
 HiveBlot is a **biologically accurate Western blot evidence search / context
@@ -26,8 +28,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest implementation commit:** `97cdcf2` (Phase 3 migration). See *Recent Commits*
-  for the current tip including handoff/pipeline commits.
+- **Latest implementation commit:** `2cb2d0c` (pipeline records-mode wiring). This HANDOFF
+  update commits on top; see *Recent Commits* for the current tip.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
 ## Current Architecture
@@ -65,8 +67,15 @@ validation Stage 3 → expensive-model escalation Stage 4 only for ambiguous/con
   abstraction, antibody detection-vs-association, co-IP roles, MW reported-vs-expected,
   validation/anomaly flags. Tests: **test_reconcile 21**, **test_extract_records 10**;
   **eval benchmark 34/34** field-level across 4 seed cases.
-- **Migration → /hive** (this task): engine + migrations + eval brought into the canonical
-  repo; **87 assertions + 34/34 benchmark verified from `/hive`**.
+- **Migration → /hive**: engine + migrations + eval brought into the canonical repo.
+- **Pipeline wiring**: `pipeline.py` now supports `WBM_EXTRACTION_MODE=records`, routing the
+  OpenCV panel candidates through the Evidence Record engine (`run_records_stage`); legacy
+  path preserved. **98 assertions + 34/34 benchmark verified from `/hive`**
+  (test_biology 38, test_reconcile 21, test_loader_enrichment 18, test_extract_records 10,
+  test_pipeline_records 11).
+- **UniProt resolver live-validated**: parsing checked against the live UniProt API via
+  stdlib urllib — STAT3→P40763 (88.1 kDa), AKT1→P31749, TP53→P04637, EGFR→P00533,
+  GAPDH→P04406, all exact. Only the `requests` transport wrapper remains untested (trivial).
 
 ## Current Biological Contract
 Every important field is an **Evidence Field envelope**: `{value, confidence, status,
@@ -96,23 +105,36 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 - **IP-bait heuristic** (`_first_gene_after`) is best-effort; robust for "anti-EGFR", brittle in messy methods.
 
 ## Current Technical Blockers
-- **`pipeline.py` still calls the old `vlm_extract.run_vlm_extraction` path.** The new
-  Evidence Record engine (`extract_records.extract_panel`) is NOT yet wired into the real
-  PDF loop. ← *this is the immediate next task.*
-- **No real paper has completed end-to-end** through the Evidence Record architecture.
-- **Bedrock credentials / model access needed** for live semantic extraction (`boto3` +
-  AWS creds + region + model access for the configured Claude model), or an alternate backend.
-- **UniProt live resolver needs a network smoke test** (only the offline LocalMapResolver
-  has been exercised).
+- **No real paper has completed end-to-end yet.** The `records` path is wired and unit-tested
+  (mock model + offline resolver), but a real run needs the items below.
+- **Heavy ingestion deps not installed** in the current environment: `PyMuPDF` (fitz),
+  `opencv-python-headless` (cv2), `numpy` — required by `pdf_preprocess` to render pages and
+  detect candidates. `pip install -r western_blot_miner/requirements.txt` in a venv.
+- **No model backend available**: `boto3` + AWS Bedrock creds/region/model-access absent
+  (default backend), and no alternate (`anthropic`/`requests` missing, keys unset). Set
+  `WBM_LLM_BACKEND` + the matching creds.
+- **`requests` not installed** (system Python is PEP-668 managed) → live UniProt transport
+  and OpenAI-compatible backend can't run until installed in a venv. UniProt *parsing* is
+  validated; the transport wrapper is not.
+- **No representative PDF** is present in the working tree (QBI `papers/` were intentionally
+  not migrated). Provide a phospho-Western or co-IP open-access PDF for the smoke test.
 - **Supabase migration must be applied** if not already: run `api/db/schema.sql` then
   `migrations/001_evidence_record.sql` against the project.
 
 ## Immediate Next Task
-**Wire `extract_records` into the real PDF ingestion loop, then process ONE real paper
-end-to-end** through: PDF → OpenCV candidate detection → semantic extraction →
-Evidence Record → reconciliation → UniProt normalization → serialized result.
-Preserve the existing OpenCV filtering, caching/resume, low-compute design, and the old
-working path (prefer a config flag). Prefer a phospho-Western or co-IP paper.
+**Run ONE real paper end-to-end in `records` mode** and manually inspect the biology.
+In a venv with the ingestion deps installed and a model backend configured:
+```bash
+pip install -r western_blot_miner/requirements.txt   # PyMuPDF, opencv, numpy, pydantic, requests
+export WBM_LLM_BACKEND=bedrock AWS_REGION=... WBM_BEDROCK_MODEL=...   # or anthropic/openai_compatible
+export WBM_EXTRACTION_MODE=records
+python3 -m western_blot_miner.pipeline path/to/phospho_or_coip_paper.pdf --mode records
+# inspect <out_dir>/evidence_records.json + supabase_rows.json
+```
+Report field-by-field (target, canonical, modification, residue, experiment type, sample,
+treatment, antibody/vendor/catalog, reported vs expected MW, band state, validation status,
+provenance) and flag anything biologically implausible. Do not claim success just because it
+runs. Prefer a phospho-Western or co-IP paper (exercises modification + assay-design logic).
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).
@@ -148,6 +170,7 @@ python3 western_blot_miner/tests/test_biology.py
 python3 western_blot_miner/tests/test_reconcile.py
 python3 western_blot_miner/tests/test_loader_enrichment.py
 python3 western_blot_miner/tests/test_extract_records.py
+python3 western_blot_miner/tests/test_pipeline_records.py   # ingestion wiring (mock model)
 
 # Biological benchmark (offline; writes eval/out/)
 python3 eval/score.py
@@ -161,8 +184,9 @@ cd web && npm install && npm run dev
 # Backend
 cd api && pip install -r requirements.txt && uvicorn app.main:app --reload
 
-# Ingestion (OLD path today; new Evidence Record path being wired)
-python3 -m western_blot_miner.pipeline path/to/paper.pdf
+# Ingestion — legacy VLM path (default) or new Evidence Record path
+python3 -m western_blot_miner.pipeline path/to/paper.pdf                 # legacy
+WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --mode records
 ```
 
 ## Environment Variables / Services  (NAMES ONLY — never put values here)
@@ -201,8 +225,9 @@ python3 -m western_blot_miner.pipeline path/to/paper.pdf
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `2cb2d0c` Wire Evidence Record engine into pipeline.py behind WBM_EXTRACTION_MODE flag
+- `28f1372` Establish HANDOFF.md agent-handoff system + agent instructions
 - `97cdcf2` Migrate HiveBlot Phase 3: Evidence Record engine + resolver + benchmark
 - `6a3140b` Migrate HiveBlot Phase 2: biological schema + phospho fix
 - `4d5df1e` Execute plan steps 1-7: tests, sql_guard fix, verification (pre-existing /hive)
-- `7149172` Split API into internal + external agent-facing /v1/search (pre-existing /hive)
-- `52c7f71` Scaffold clean rebuild of HiveBlot: web/ + api/ (pre-existing /hive)
+- (this HANDOFF update commits on top of `2cb2d0c`)
