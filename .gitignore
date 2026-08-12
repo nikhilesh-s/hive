@@ -4,3 +4,14 @@
 .vscode/
 .idea/
 *.swp
+
+# Python ingestion engine (western_blot_miner) + eval
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+western_blot_miner/data/
+pdf_runs/
+eval/out/
