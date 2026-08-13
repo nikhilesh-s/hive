@@ -228,9 +228,12 @@ _NUMBER_WORDS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
 
 _BAND_DOUBLET = re.compile(r"\bdoublets?\b", re.IGNORECASE)
 _BAND_SMEAR = re.compile(r"\bsmears?\b|\bsmear(?:ed|ing)\b|\bdiffuse\s+(?:band|signal)\b", re.IGNORECASE)
+# high-MW alternation is PLURAL-ONLY: "a higher molecular weight band" is the
+# standard phrasing for a SINGLE upshifted band (phospho/SUMO/mono-Ub/glyco
+# forms) and must never become a "ladder" claim (review finding B2).
 _BAND_LADDER = re.compile(
     r"\bladder[-\s]?like\b|\b(?:poly[-\s]?ubiquitin|polyubiquitin)\s+(?:ladder|smear|species|conjugates?)\b"
-    r"|\bhigh(?:er)?[-\s]molecular[-\s]?weight\s+(?:species|forms?|bands?|conjugates?)\b",
+    r"|\bhigh(?:er)?[-\s]molecular[-\s]?weight\s+(?:species|forms|bands|conjugates)\b",
     re.IGNORECASE,
 )
 # "two bands", "three distinct bands", "2 bands"
@@ -238,6 +241,19 @@ _BAND_COUNT = re.compile(
     r"\b(two|three|four|five|six|\d{1,2})\s+(?:distinct\s+|discrete\s+|separate\s+|major\s+)?bands?\b",
     re.IGNORECASE,
 )
+# Immediately-preceding context that makes a "<number> bands" match NOT a
+# multiplicity statement: figure/panel/lane references ("Fig. 3 bands" ranges
+# like "1-2 bands", "n = 3 bands").
+_COUNT_CONTEXT_GUARD = re.compile(
+    r"(?:fig\.?|figure|panel|lane|lanes)\s*$|n\s*=\s*$|[\d][\s]*[–\-]\s*$", re.IGNORECASE)
+# Negation directly governing a pattern mention: "no smearing", "without
+# additional bands", "did not detect a doublet". Negated multiplicity is the
+# STANDARD antibody-specificity boilerplate; asserting the pattern from it
+# would invert the paper's claim (review finding B1). We ABSTAIN — a negated
+# mention is not read as evidence of "single" either.
+_NEGATION_GUARD = re.compile(
+    r"\b(?:no|not|without|neither|nor|lack(?:s|ed|ing)?|absence\s+of|free\s+of|"
+    r"did\s+not|does\s+not|do\s+not)\b[^.;]{0,40}$", re.IGNORECASE)
 _BAND_MULTIPLE = re.compile(
     r"\bmultiple\s+bands?\b|\bseveral\s+bands?\b|\badditional\s+bands?\b|\bextra\s+bands?\b"
     r"|\bunexpected\s+bands?\b|\bnon[-\s]?specific\s+bands?\b",
@@ -265,36 +281,50 @@ def detect_band_pattern(*texts: str) -> Optional[dict]:
         if not text:
             continue
         hedged = bool(_BAND_HEDGE.search(text))
-        found: list[tuple[str, str, Optional[int]]] = []
-        m = _BAND_SMEAR.search(text)
-        if m:
-            found.append(("smear", m.group(0), None))
-        m = _BAND_LADDER.search(text)
-        if m:
-            found.append(("ladder", m.group(0), None))
-        m = _BAND_DOUBLET.search(text)
-        if m:
-            found.append(("doublet", m.group(0), 2))
-        m = _BAND_COUNT.search(text)
-        if m:
+        # (kind, raw, count, span) — spans let us (a) drop matches whose
+        # wording is negated, and (b) prune a match fully contained inside a
+        # more specific one ("polyubiquitin smear" matches both the smear and
+        # the ladder regex on overlapping text; that is ONE ladder statement,
+        # not two conflicting descriptions).
+        found: list[tuple[str, str, Optional[int], tuple[int, int]]] = []
+
+        def _negated(start: int) -> bool:
+            return bool(_NEGATION_GUARD.search(text[max(0, start - 45): start]))
+
+        for m in _BAND_SMEAR.finditer(text):
+            if not _negated(m.start()):
+                found.append(("smear", m.group(0), None, m.span()))
+        for m in _BAND_LADDER.finditer(text):
+            if not _negated(m.start()):
+                found.append(("ladder", m.group(0), None, m.span()))
+        for m in _BAND_DOUBLET.finditer(text):
+            if not _negated(m.start()):
+                found.append(("doublet", m.group(0), 2, m.span()))
+        for m in _BAND_COUNT.finditer(text):
+            if _negated(m.start()) or _COUNT_CONTEXT_GUARD.search(text[max(0, m.start() - 12): m.start()]):
+                continue
             raw_n = m.group(1).lower()
             n = _NUMBER_WORDS.get(raw_n) or (int(raw_n) if raw_n.isdigit() else None)
             if n is not None and n >= 2:
-                found.append(("doublet" if n == 2 else "multiple", m.group(0), n))
-        m = _BAND_MULTIPLE.search(text)
-        if m:
-            found.append(("multiple", m.group(0), None))
-        m = _BAND_SINGLE.search(text)
-        if m:
-            found.append(("single", m.group(0), 1))
+                found.append(("doublet" if n == 2 else "multiple", m.group(0), n, m.span()))
+        for m in _BAND_MULTIPLE.finditer(text):
+            if not _negated(m.start()):
+                found.append(("multiple", m.group(0), None, m.span()))
+        for m in _BAND_SINGLE.finditer(text):
+            if not _negated(m.start()):
+                found.append(("single", m.group(0), 1, m.span()))
         if not found:
             continue
+        # Containment pruning: keep only matches not inside a longer match.
+        pruned = [f for f in found if not any(
+            g is not f and g[3][0] <= f[3][0] and f[3][1] <= g[3][1]
+            and (g[3][1] - g[3][0]) > (f[3][1] - f[3][0]) for g in found)]
         # Several distinct patterns in one statement -> do not pick a winner.
-        kinds = {k for k, _, _ in found}
+        kinds = {k for k, _, _, _ in pruned}
         if len(kinds) > 1:
-            raw = "; ".join(r for _, r, _ in found)
+            raw = "; ".join(r for _, r, _, _ in pruned)
             return {"pattern": "uncertain", "count": None, "raw": raw, "hedged": True}
-        kind, raw, count = found[0]
+        kind, raw, count, _span = pruned[0]
         return {"pattern": "uncertain" if hedged else kind,
                 "count": None if hedged else count, "raw": raw, "hedged": hedged}
     return None

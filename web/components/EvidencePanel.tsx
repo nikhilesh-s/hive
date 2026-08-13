@@ -259,6 +259,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
   const [missingMode, setMissingMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagMode, setFlagMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagType, setFlagType] = useState('wrong_interpretation');
+  const [cropFailed, setCropFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -314,9 +315,24 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
       {(detail.figure_caption || detail.image_crop_ref) && (
         <div>
           <div style={sect}>FIGURE EVIDENCE</div>
-          {detail.image_crop_ref && (
+          {detail.image_crop_ref && !cropFailed && (
+            // The actual panel this evidence refers to. On any error (crop
+            // archive absent in a deployment) fall back to the filename note.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/record/${recordId}/crop`}
+              alt={`Panel crop for ${detail.raw_target_name ?? 'this record'}`}
+              onError={() => setCropFailed(true)}
+              style={{
+                maxWidth: '520px', width: '100%', borderRadius: '4px',
+                border: '1px solid rgba(255,255,255,.12)', marginBottom: '6px',
+                backgroundColor: '#fff',
+              }}
+            />
+          )}
+          {detail.image_crop_ref && cropFailed && (
             <div style={{ fontFamily: MONO, fontSize: '10px', color: LABEL }}>
-              panel crop: {detail.image_crop_ref.split('/').slice(-1)[0]} (image serving not enabled in local beta)
+              panel crop: {detail.image_crop_ref.split('/').slice(-1)[0]} (image not available in this deployment)
             </div>
           )}
           {detail.figure_caption && (

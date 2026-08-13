@@ -497,7 +497,9 @@ def _pattern_near_core(core: str, text: str) -> Optional[dict]:
     # contrastive conjunctions, so only the clause naming THIS target counts.
     import re as _re
     core_low = core.lower()
-    for clause in _re.split(r"[;.]|,|\bwhile\b|\bwhereas\b", text):
+    # Parentheses and "and" also delimit per-target phrasing: "probed for LC3B
+    # (doublet) and ACTB" must not hand ACTB the doublet (review finding).
+    for clause in _re.split(r"[;.()]|,|\bwhile\b|\bwhereas\b|\band\b", text):
         if clause and core_low in clause.lower():
             hit = biology.detect_band_pattern(clause)
             if hit:
@@ -505,7 +507,8 @@ def _pattern_near_core(core: str, text: str) -> Optional[dict]:
     return None
 
 
-def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str):
+def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str,
+                         n_lanes: int = 1):
     """(pattern, count, notes) EvidenceFields for one band observation.
 
     Precedence: an explicit observer claim on the row, then this lane's own
@@ -513,6 +516,7 @@ def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str):
     the protein's identity or from the number of rows in the panel.
     """
     claim = b.get("band_pattern")
+    caption_derived = False
     if claim and str(claim).lower() in biology.BAND_PATTERNS:
         pattern = str(claim).lower()
         raw = str(b.get("band_notes") or claim)
@@ -521,13 +525,22 @@ def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str):
         conf = 0.75
         hedged = pattern == "uncertain"
     else:
-        hit = biology.detect_band_pattern(lane_text) or _pattern_near_core(core, caption)
+        lane_hit = biology.detect_band_pattern(lane_text)
+        hit = lane_hit or _pattern_near_core(core, caption)
         if not hit:
             return (EvidenceField.missing(), EvidenceField.missing(), EvidenceField.missing())
+        caption_derived = lane_hit is None
         pattern, count, raw = hit["pattern"], hit["count"], hit["raw"]
         hedged = hit["hedged"]
         src = [Source(type="figure_caption", rank=RANK_CAPTION, text=raw)]
         conf = 0.6 if hedged else 0.8
+    # A caption describes the PANEL; on a multi-lane panel it cannot settle any
+    # single lane's pattern ("a doublet appeared after rapamycin" must not
+    # stamp the DMSO lane as SUPPORTED doublet — review finding B3). Same
+    # panel-vs-lane discipline as the dose/duration scalars.
+    if caption_derived and n_lanes > 1:
+        hedged = True
+        conf = min(conf, 0.5)
     pattern_f = (EvidenceField(value=pattern, confidence=conf, status=AMBIGUOUS, sources=src)
                  if hedged or pattern == "uncertain"
                  else EvidenceField.supported(pattern, conf, src))
@@ -557,7 +570,8 @@ def _bands(mc, core: str = "", caption: str = "") -> list[BandObservation]:
         if len(lane_durs) == 1:
             lane_dur_f = EvidenceField.supported(lane_durs[0]["value"], 0.8, lane_src)
             lane_dur_unit_f = EvidenceField.supported(lane_durs[0]["unit"], 0.8, lane_src)
-        pattern_f, count_f, notes_f = _band_pattern_fields(b, core, caption, cond_text)
+        pattern_f, count_f, notes_f = _band_pattern_fields(
+            b, core, caption, cond_text, n_lanes=len(mc.get("bands", [])))
         out.append(BandObservation(
             lane_index=b.get("lane_index", 1),
             lane_condition=EvidenceField.supported(cond, 0.8, lane_src)
@@ -604,6 +618,18 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
         if mtype.status == CONFLICTING:
             flags.append(AnomalyFlag(code="ANTIBODY_TARGET_MISMATCH", severity="med",
                                      detail="Antibody indicates a modification that conflicts with the row label."))
+            break
+
+    # A band reported ABSENT cannot simultaneously show a visible structure
+    # pattern (doublet/multiple/ladder/smear/single) — flag the contradiction
+    # instead of shipping it silently (review finding B4).
+    for band in record.bands:
+        pat = band.band_pattern.value
+        if pat and pat != "uncertain" and band.band_state.value == "absent":
+            flags.append(AnomalyFlag(
+                code="BAND_PATTERN_STATE_MISMATCH", severity="med",
+                detail=f"Lane '{band.lane_condition.value or band.lane_index}' is "
+                       f"absent yet carries band_pattern '{pat}'."))
             break
 
     if record.experiment.experiment_type.status == AMBIGUOUS:

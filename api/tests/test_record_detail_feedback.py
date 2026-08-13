@@ -206,3 +206,46 @@ def test_feedback_scope_rules_direct():
     s = FeedbackSubmission(feedback_scope="search", search_query="x",
                            feedback_type="understood_partially")
     assert s.validate_scope() is None
+
+
+# --- figure-crop endpoint ----------------------------------------------------
+
+def _stub_record(monkeypatch, row):
+    async def fake_fetch(record_id):
+        return row
+    monkeypatch.setattr("app.routers.internal.fetch_record_by_id", fake_fetch)
+
+
+def test_crop_requires_auth(client):
+    assert client.get("/records/1/crop").status_code in (401, 403)
+
+
+def test_crop_404_when_no_ref(client, monkeypatch):
+    _stub_record(monkeypatch, {"id": 1, "image_crop_ref": None})
+    assert client.get("/records/1/crop", headers=AUTH).status_code == 404
+
+
+def test_crop_rejects_paths_outside_base_dir(client, monkeypatch, tmp_path):
+    # A poisoned image_crop_ref outside the allowed base must 404, never serve.
+    secret = tmp_path / "secret.png"
+    secret.write_bytes(b"\x89PNG\r\n\x1a\n")
+    _stub_record(monkeypatch, {"id": 1, "image_crop_ref": str(secret)})
+    assert client.get("/records/1/crop", headers=AUTH).status_code == 404
+
+
+def test_crop_rejects_non_png(client, monkeypatch):
+    from pathlib import Path
+    inside = Path(settings.crop_base_dir) / "x" / "notes.txt"
+    _stub_record(monkeypatch, {"id": 1, "image_crop_ref": str(inside)})
+    assert client.get("/records/1/crop", headers=AUTH).status_code == 404
+
+
+def test_crop_serves_png_inside_base_dir(client, monkeypatch, tmp_path):
+    png = tmp_path / "panel.png"
+    png.write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 16)
+    monkeypatch.setattr(settings, "crop_base_dir", str(tmp_path))
+    _stub_record(monkeypatch, {"id": 1, "image_crop_ref": str(png)})
+    resp = client.get("/records/1/crop", headers=AUTH)
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "image/png"
+    assert resp.content.startswith(b"\x89PNG")

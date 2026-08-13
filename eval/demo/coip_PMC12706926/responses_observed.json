@@ -2292,10 +2292,7 @@
             "lane_index": 2,
             "lane_condition": "siBEX2",
             "band_state": "uncertain",
-            "confidence": "low",
-            "band_pattern": "doublet",
-            "band_count": 2,
-            "band_notes": "two closely spaced bands visible in each lane"
+            "confidence": "low"
           },
           {
             "lane_index": 3,
@@ -2310,10 +2307,7 @@
             "lane_index": 4,
             "lane_condition": "siBEX2 + siPIK3CA",
             "band_state": "uncertain",
-            "confidence": "low",
-            "band_pattern": "doublet",
-            "band_count": 2,
-            "band_notes": "two closely spaced bands visible in each lane"
+            "confidence": "low"
           }
         ]
       },

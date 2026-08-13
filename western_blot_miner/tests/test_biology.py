@@ -409,6 +409,87 @@ def test_band_pattern_absent_means_missing_not_single():
     check("ubiquitin identity alone implies no ladder", ub.band_pattern.value is None)
 
 
+def test_band_pattern_negation_abstains():
+    """Negated multiplicity is antibody-specificity boilerplate; asserting the
+    pattern from it would INVERT the paper's claim (review finding B1). We
+    abstain — a negated mention is not evidence of 'single' either."""
+    d = bio.detect_band_pattern
+    check("'no smearing' abstains", d("No smearing was observed.") is None)
+    check("'without smearing' abstains", d("clean transfer without smearing") is None)
+    check("'no additional bands' abstains",
+          d("The antibody detected no additional bands.") is None)
+    check("'did not detect a doublet' abstains",
+          d("we did not detect a doublet") is None)
+    check("un-negated smear still fires", d("the lane showed a smear")["pattern"] == "smear")
+
+
+def test_band_pattern_high_mw_singular_is_not_ladder():
+    """'a higher molecular weight band' (singular) is the standard phrasing for
+    ONE upshifted band (phospho/SUMO/mono-Ub) — never a ladder claim (B2)."""
+    d = bio.detect_band_pattern
+    check("singular high-MW band -> no pattern",
+          d("STAT3 migrated as a higher molecular weight band upon modification") is None)
+    check("plural high-MW species still ladder",
+          d("higher-molecular-weight species accumulated")["pattern"] == "ladder")
+
+
+def test_band_pattern_polyubiquitin_smear_is_ladder_not_conflict():
+    """'a polyubiquitin smear' matches the smear AND ladder regexes on the same
+    substring — that is ONE statement, not two conflicting descriptions; the
+    longer/more specific match wins (containment pruning)."""
+    got = bio.detect_band_pattern("a polyubiquitin smear was detected")
+    check("polyubiquitin smear -> ladder", got is not None and got["pattern"] == "ladder")
+
+
+def test_band_pattern_count_context_guard():
+    d = bio.detect_band_pattern
+    check("'Fig. 3 bands' does not fire", d("as shown in Fig. 3 bands were compared") is None)
+    check("'n = 3 bands' does not fire", d("quantified (n = 3 bands per group)") is None)
+    check("'1-2 bands' range does not fire", d("we expected 1-2 bands typically") is None)
+    check("plain 'three bands' still fires", d("three bands were observed")["pattern"] == "multiple")
+
+
+def test_band_pattern_caption_cannot_settle_multilane_panel():
+    """A caption describes the PANEL; on a multi-lane panel it cannot settle any
+    single lane's pattern as SUPPORTED (B3 — same panel-vs-lane discipline as
+    the dose/duration scalars). Single-lane panels may settle."""
+    multi = _band_case("LC3B", "LC3B appeared as a doublet after rapamycin treatment.",
+                       ["DMSO", "Rapamycin"])
+    check("multi-lane caption pattern is AMBIGUOUS", multi.band_pattern.status == "AMBIGUOUS")
+    check("multi-lane caption pattern value kept for review",
+          multi.band_pattern.value == "doublet")
+    single = _band_case("LC3B", "LC3B appeared as a doublet.", ["Rapamycin"])
+    check("single-lane caption pattern may settle", single.band_pattern.status == "SUPPORTED")
+
+
+def test_band_pattern_parenthetical_does_not_leak_across_and():
+    """'probed for LC3B (doublet) and ACTB' must not hand ACTB the doublet."""
+    caption = "Blots were probed for LC3B (doublet) and ACTB."
+    actb = _band_case("ACTB", caption, ["DMSO"])
+    check("parenthetical doublet does not leak to ACTB", actb.band_pattern.value is None)
+
+
+def test_absent_band_with_pattern_is_flagged():
+    """band_state=absent + a visible-structure pattern is a contradiction and
+    must surface as an anomaly + needs_review (B4)."""
+    from western_blot_miner.record_builder import build_evidence_record
+    rec = build_evidence_record({
+        "paper": {"doi": "10.x/t"}, "figure": {"page": 1},
+        "raw_target": "LC3B", "texts": {"caption": "", "methods": ""},
+        "model_claims": {
+            "sample": "H1792",
+            "antibodies": [{"target": "LC3B", "vendor": "CST", "catalog": "2775",
+                            "role": "detection", "phospho_specific": False,
+                            "source": {"type": "methods", "rank": 3, "text": "anti-LC3B"}}],
+            "bands": [{"lane_index": 1, "lane_condition": "ctrl", "band_state": "absent",
+                       "confidence": "high", "band_pattern": "doublet", "band_count": 2}],
+        },
+    })
+    codes = [a.code for a in rec.validation.anomaly_flags]
+    check("absent+doublet raises BAND_PATTERN_STATE_MISMATCH",
+          "BAND_PATTERN_STATE_MISMATCH" in codes)
+
+
 def test_band_pattern_hedged_and_conflicting_stay_uncertain():
     d = bio.detect_band_pattern
     check("hedged doublet -> uncertain",

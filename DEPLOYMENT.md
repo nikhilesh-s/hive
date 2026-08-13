@@ -12,14 +12,11 @@ In the Supabase SQL editor (or psql), in order:
 4. Set passwords (SQL editor):
    `ALTER ROLE hive_readonly WITH PASSWORD '<generated>';`
    `ALTER ROLE hive_feedback WITH PASSWORD '<generated>';`
-5. Seed the demo records — from a machine with the repo + network:
-   `SUPABASE URL/KEY not needed for seeding`; use psql/asyncpg with the
-   project's connection string, or temporarily point `scripts/local_db.py`-style
-   loading at it. Simplest: `.venv/bin/python scripts/seed_remote.py` does not
-   exist yet — for now run the INSERTs via `scripts/local_db.py load` pattern
-   against `DATABASE_URL`, or upload `eval/demo/*/supabase_rows.json` with the
-   Supabase table editor import. (TODO: dedicated seed script if the beta
-   deploys before the next session.)
+5. Seed the demo records (dedicated script, idempotent per paper):
+   `export SEED_DATABASE_URL='<owner connection string>'` then
+   `.venv/bin/python scripts/seed_remote.py eval/demo/*/supabase_rows.json`
+   (`--check` prints row counts only; refuses restricted roles; drops keys
+   missing from an older remote schema and says so).
 
 ## 2. API (`api/`, FastAPI)
 Any container/VM host (Fly.io, Railway, Render, EC2…):
@@ -53,8 +50,9 @@ cd web && npm run dev
 ```
 
 ## Known deployment gaps (deliberate, documented)
-- No dedicated remote-seed script yet (workaround above).
-- Figure-crop image serving is not enabled anywhere (panel is text-only,
-  labeled as such in the UI).
+- Figure-crop serving works where the crop archive exists (local runs):
+  `GET /records/{id}/crop` serves the record's own panel PNG, path-validated
+  against `CROP_BASE_DIR` (default: the local pipeline run dir). Deployments
+  without the crop archive gracefully degrade to text-only evidence.
 - `/proteins` and `/` require real Supabase (PostgREST); `/search`,
   `/records/{id}`, `/feedback` run on plain Postgres.

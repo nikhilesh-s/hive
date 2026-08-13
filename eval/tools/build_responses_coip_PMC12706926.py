@@ -103,8 +103,11 @@ g = [
 # here is purely what the blot shows).
 def _doublet(r):
     for b in r["bands"]:
-        b.update({"band_pattern": "doublet", "band_count": 2,
-                  "band_notes": "two closely spaced bands visible in each lane"})
+        # Structure is only claimed for lanes with clear signal; uncertain/
+        # absent lanes carry no pattern (contradiction otherwise).
+        if b["band_state"] == "present":
+            b.update({"band_pattern": "doublet", "band_count": 2,
+                      "band_notes": "two closely spaced bands visible in each lane"})
     return r
 
 

@@ -500,10 +500,7 @@
             "lane_index": 1,
             "lane_condition": "0 min",
             "band_state": "uncertain",
-            "confidence": "low",
-            "band_pattern": "doublet",
-            "band_count": 2,
-            "band_notes": "two closely spaced bands visible in each lane"
+            "confidence": "low"
           },
           {
             "lane_index": 2,
@@ -932,10 +929,7 @@
             "lane_index": 1,
             "lane_condition": "IL-6 - / CL-E -",
             "band_state": "uncertain",
-            "confidence": "low",
-            "band_pattern": "doublet",
-            "band_count": 2,
-            "band_notes": "two closely spaced bands visible in each lane"
+            "confidence": "low"
           },
           {
             "lane_index": 2,
