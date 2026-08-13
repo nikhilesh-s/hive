@@ -27292,14 +27292,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -27456,29 +27454,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -27495,30 +27503,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -27537,18 +27555,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -27778,7 +27794,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -27956,8 +27972,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -27976,8 +28023,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -27988,6 +28066,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -28025,14 +28134,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -28189,29 +28296,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -28228,30 +28345,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -28270,18 +28397,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -28511,7 +28636,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -28689,8 +28814,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -28709,8 +28865,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -28721,6 +28908,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -28758,14 +28976,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -28922,29 +29138,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -28961,30 +29187,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -29003,18 +29239,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -29244,7 +29478,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -29422,8 +29656,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -29442,8 +29707,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -29454,6 +29750,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -29491,14 +29818,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -29655,29 +29980,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -29694,30 +30029,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -29736,18 +30081,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -29977,7 +30320,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -30155,8 +30498,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -30175,8 +30549,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -30187,6 +30592,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -30224,14 +30660,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -30388,29 +30822,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -30427,30 +30871,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -30469,18 +30923,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -30710,7 +31162,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -30888,8 +31340,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -30908,8 +31391,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -30920,6 +31434,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -31121,19 +31666,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -31161,19 +31700,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -31847,19 +32380,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -31887,19 +32414,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -32573,19 +33094,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -32613,19 +33128,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -33299,19 +33808,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -33339,19 +33842,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -34025,19 +34522,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -34065,19 +34556,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -51457,14 +51942,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -51621,29 +52104,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -51660,30 +52153,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -51702,18 +52205,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -51943,7 +52444,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -52121,8 +52622,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -52141,8 +52673,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -52153,6 +52716,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -52190,14 +52784,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -52354,29 +52946,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -52393,30 +52995,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -52435,18 +53047,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -52676,7 +53286,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -52854,8 +53464,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -52874,8 +53515,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -52886,6 +53558,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -52923,14 +53626,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -53087,29 +53788,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -53126,30 +53837,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -53168,18 +53889,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -53409,7 +54128,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -53587,8 +54306,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -53607,8 +54357,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -53619,6 +54400,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -53656,14 +54468,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -53820,29 +54630,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -53859,30 +54679,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -53901,18 +54731,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -54142,7 +54970,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -54320,8 +55148,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -54340,8 +55199,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -54352,6 +55242,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -54389,14 +55310,12 @@
     "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "total",
-    "modification_status": "SUPPORTED",
+    "modification_label": null,
+    "modification_status": "CONFLICTING",
     "phospho_specific_antibody": true,
-    "experiment_type": "standard_western",
-    "experiment_flags": [
-      "standard_western"
-    ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type": null,
+    "experiment_flags": null,
+    "experiment_type_confidence": 0.4,
     "sample": "Hep3B",
     "cell_line": "Hep3B",
     "organism": null,
@@ -54553,29 +55472,39 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "residue": {
           "value": null,
@@ -54592,30 +55521,40 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "total",
-          "confidence": 0.9400000000000001,
-          "status": "SUPPORTED",
-          "sources": [
+          "value": null,
+          "confidence": 0.0,
+          "status": "CONFLICTING",
+          "sources": [],
+          "candidates": [
             {
-              "type": "antibody",
+              "value": "phosphorylation",
+              "source_type": "antibody",
               "rank": 1,
-              "text": "p-ERK (1:1,000; CST #4370)",
-              "locator": null
+              "confidence": 0.6,
+              "evidence": [
+                {
+                  "type": "antibody",
+                  "rank": 1,
+                  "text": "p-ERK (1:1,000; CST #4370)",
+                  "locator": null
+                }
+              ]
             },
             {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
-              "locator": null
-            },
-            {
-              "type": "model_target",
+              "value": "none",
+              "source_type": "model_target",
               "rank": 4,
-              "text": "P-ERK 1/2",
-              "locator": null
+              "confidence": 0.5,
+              "evidence": [
+                {
+                  "type": "model_target",
+                  "rank": 4,
+                  "text": "P-ERK 1/2",
+                  "locator": null
+                }
+              ]
             }
-          ],
-          "candidates": []
+          ]
         },
         "phospho_specific_antibody": {
           "value": true,
@@ -54634,18 +55573,16 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.4,
+          "status": "AMBIGUOUS",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
-          "value": [
-            "standard_western"
-          ],
-          "confidence": 0.55,
-          "status": "SUPPORTED",
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
           "sources": [],
           "candidates": []
         },
@@ -54875,7 +55812,7 @@
             "candidates": []
           },
           "detection_confidence": 0.95,
-          "association_confidence": 0.92
+          "association_confidence": 0.6
         }
       ],
       "molecular_weight": {
@@ -55053,8 +55990,39 @@
         }
       ],
       "validation": {
-        "record_status": "AMBIGUOUS",
+        "record_status": "CONFLICTING",
         "anomaly_flags": [
+          {
+            "code": "MODIFICATION_CONFLICT",
+            "severity": "high",
+            "detail": "Sources disagree on whether this is a modified or total protein.",
+            "evidence": [
+              {
+                "type": "antibody",
+                "rank": 1,
+                "text": "p-ERK (1:1,000; CST #4370)",
+                "locator": null
+              },
+              {
+                "type": "model_target",
+                "rank": 4,
+                "text": "P-ERK 1/2",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "code": "ANTIBODY_TARGET_MISMATCH",
+            "severity": "med",
+            "detail": "Antibody indicates a modification that conflicts with the row label.",
+            "evidence": []
+          },
+          {
+            "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+            "severity": "med",
+            "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+            "evidence": []
+          },
           {
             "code": "PROTEIN_AMBIGUOUS",
             "severity": "med",
@@ -55073,8 +56041,39 @@
       }
     },
     "validation": {
-      "record_status": "AMBIGUOUS",
+      "record_status": "CONFLICTING",
       "anomaly_flags": [
+        {
+          "code": "MODIFICATION_CONFLICT",
+          "severity": "high",
+          "detail": "Sources disagree on whether this is a modified or total protein.",
+          "evidence": [
+            {
+              "type": "antibody",
+              "rank": 1,
+              "text": "p-ERK (1:1,000; CST #4370)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "P-ERK 1/2",
+              "locator": null
+            }
+          ]
+        },
+        {
+          "code": "ANTIBODY_TARGET_MISMATCH",
+          "severity": "med",
+          "detail": "Antibody indicates a modification that conflicts with the row label.",
+          "evidence": []
+        },
+        {
+          "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+          "severity": "med",
+          "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+          "evidence": []
+        },
         {
           "code": "PROTEIN_AMBIGUOUS",
           "severity": "med",
@@ -55085,6 +56084,37 @@
       "needs_review": true
     },
     "anomaly_flags": [
+      {
+        "code": "MODIFICATION_CONFLICT",
+        "severity": "high",
+        "detail": "Sources disagree on whether this is a modified or total protein.",
+        "evidence": [
+          {
+            "type": "antibody",
+            "rank": 1,
+            "text": "p-ERK (1:1,000; CST #4370)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "P-ERK 1/2",
+            "locator": null
+          }
+        ]
+      },
+      {
+        "code": "ANTIBODY_TARGET_MISMATCH",
+        "severity": "med",
+        "detail": "Antibody indicates a modification that conflicts with the row label.",
+        "evidence": []
+      },
+      {
+        "code": "EXPERIMENT_TYPE_AMBIGUOUS",
+        "severity": "med",
+        "detail": "Experiment type is unsettled (often downstream of a modification conflict).",
+        "evidence": []
+      },
       {
         "code": "PROTEIN_AMBIGUOUS",
         "severity": "med",
@@ -55286,19 +56316,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -55326,19 +56350,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -56012,19 +57030,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -56052,19 +57064,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -56738,19 +57744,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -56778,19 +57778,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -57464,19 +58458,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -57504,19 +58492,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -58190,19 +59172,13 @@
       "modification": {
         "modification_type": {
           "value": null,
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {
@@ -58230,19 +59206,13 @@
         },
         "normalized_label": {
           "value": "total",
-          "confidence": 0.9400000000000001,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "t-ERK (1:1,000; CST #4695)",
-              "locator": null
-            },
-            {
-              "type": "methods",
-              "rank": 3,
-              "text": "vity. CL\u2011E enhances ERK1/2 phosphorylation and modulates STAT3 activation via the ERK signaling",
               "locator": null
             },
             {

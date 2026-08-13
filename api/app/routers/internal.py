@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from ..auth import require_internal_key
 from ..config import settings
-from ..db import supabase
+from ..db import get_supabase
 from ..limiter import limiter
 from ..schemas import ProteinSearchResponse, SearchRequest, SearchResponse
 from ..search_service import execute_search
@@ -29,7 +29,7 @@ def health():
 @router.get("/")
 def index():
     try:
-        resp = supabase.table(settings.table_name).select("*").limit(5).execute()
+        resp = get_supabase().table(settings.table_name).select("*").limit(5).execute()
         return {"connected": True, "sample_rows": resp.data}
     except Exception as e:
         logger.exception("Supabase connectivity check failed")
@@ -46,7 +46,7 @@ def search_protein(
 
     try:
         resp = (
-            supabase.table(settings.table_name)
+            get_supabase().table(settings.table_name)
             .select("*")
             .ilike("target", f"%{name}%")
             .limit(limit)

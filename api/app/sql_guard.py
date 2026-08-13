@@ -96,6 +96,12 @@ def guard_and_limit_sql(raw_sql: str, requested_limit: int) -> str:
         raise SQLGuardError(f"Query may only reference {settings.table_name}")
 
     for func in stmt.find_all(exp.Func):
+        # Boolean connectors (AND / OR) subclass exp.Func in sqlglot >= 30
+        # (exp.Connector), but they are operators, not callable functions —
+        # without this skip, EVERY multi-condition WHERE clause (which the
+        # nlp.py prompt explicitly instructs the model to produce) is rejected.
+        if isinstance(func, exp.Connector):
+            continue
         name = _function_name(func)
         if name not in ALLOWED_FUNCTIONS:
             raise SQLGuardError(f"Function '{name}' is not allowed")

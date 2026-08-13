@@ -35,7 +35,7 @@ To reproduce with an automated backend, set `WBM_LLM_BACKEND` and run
 | P-STAT3 (Ser727) | STAT3 | P40763 | phospho / Ser727 | phospho_western | 88.1 kDa | CST #9134 | Supported |
 | T-STAT3 | STAT3 | P40763 | — (total) | standard_western | 88.1 kDa | CST #4904 | Supported |
 | β-actin | — | — | — | **loading_control** | — | CST #4967 | (loading) |
-| P-ERK 1/2 | **MAPK1/MAPK3** | — | — | standard_western | — | CST #4370 | **Needs review** |
+| P-ERK 1/2 | **MAPK1/MAPK3** | — | CONFLICTING (phospho-ab vs no marker; unsettled, value null) | AMBIGUOUS | — | CST #4370 | **Needs review** |
 | T-ERK 1/2 | **MAPK1/MAPK3** | — | — | standard_western | — | CST #4695 | **Needs review** |
 
 Reported MW is **NOT REPORTED** in the source, so it is `null` everywhere — never

@@ -6,6 +6,19 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-12 (session 3)** — Claude Code (Opus 4.8). **LIVE SEARCH LOOP WORKS.**
+  `phospho STAT3 Tyr705`, `phospho AKT Ser473`, `co-IP PIK3CA`, `CST 9145`,
+  `GAPDH mouse` all return real paper-derived Evidence Records in the running
+  HiveBlot frontend. Stood up an **embedded local Postgres** (`scripts/local_db.py`,
+  pgserver — no cloud creds needed) with schema + migration 001 + **452 rows from
+  3 real papers**; added a **deterministic biological SQL generator**
+  (`api/app/bio_query.py`) for the no-OPENAI_KEY path; fixed a latent sql_guard
+  bug (AND/OR rejected with sqlglot≥30); made the Supabase client lazy; processed
+  papers 2+3 (mouse standard PMC9559174, co-IP PMC12706926) agent-in-the-loop;
+  threaded **organism into UniProt** (mouse accessions correct); fixed 4 more
+  structural biology bugs found by real-paper inspection (one-letter phosphosites,
+  page-level co-IP bleed, bare-mention fake total claims, page-blob reported-MW).
+  Tests: biology 77/77, engine suites green, benchmark 34/34, api 95/95.
 - **2026-08-12 (session 2)** — Claude Code (Opus 4.8). **First real paper end-to-end.**
   Built the `.venv` (py3.12) + installed ingestion deps; live UniProt transport
   validated; ran a real phospho-STAT3 paper (PMC12856536) through the full records
@@ -129,6 +142,28 @@ Other invariants: **raw source wording is always preserved** alongside any norma
 travels with each field; a disputed modification keeps its residue **unsettled** too.
 
 ## Known Biological Edge Cases (current gaps)
+- **FIXED (session 3) — one-letter phosphosites in row labels.** `p-AKT (S473)`,
+  `p-RPS6KB1 (T389)`, `p-EIF4EBP1 (S65)` now yield residue+position (the phospho marker
+  and site share one short label, satisfying the one-letter context guard). Bare `S473`
+  without a marker still never claims phospho.
+- **FIXED (session 3) — page-level co-IP bleed.** co_ip now requires panel-scoped
+  evidence (IP-role antibody / co-IP caption / IP:,IgG,input lane labels); a methods-only
+  mention becomes a non-settling `co_ip_context` flag. `ip_bait` extraction follows the
+  same scoping.
+- **FIXED (session 3) — bare mentions are not total claims.** "PI3K/AKT/mTOR signaling"
+  no longer manufactures a `MODIFICATION_CONFLICT` against a phospho row; only explicit
+  `total X` / `T-X` / `pan-X` wording asserts total, and mixed forms still abstain.
+- **FIXED (session 3) — page-blob reported MW.** A kDa figure counts as reported only
+  near a mention of the target's core symbol (caption-only fallback when the core is
+  absent from a short caption). No more "BEX2 reported 70 kDa" from ladder text.
+- **FIXED (session 3) — phospho-specific antibody vs uppercase P- label.** Uppercase
+  `P-` is never a phospho *marker* (P-selectin, P-cadherin), but an explicit
+  `phospho_specific=true` antibody claim now prevents settling the row as total:
+  `P-ERK 1/2` + CST #4370 → modification CONFLICTING, value null, needs_review.
+- **NEW (session 3) — organism threading.** `biology.organism_taxon_id` maps explicit
+  human/mouse/rat wording → taxon id for the UniProt query (default human 9606, as
+  before). Mouse validated live: Stat3→P42227, Gapdh→P16858, Actb→P60710, Tuba1b→P05213.
+  Cell-line→organism inference is still NOT used for resolution (only explicit claims).
 - **FIXED — ERK/family shorthand false-friend.** `P-ERK 1/2` used to resolve to EPHB2
   (P29323); now resolves to the ambiguous **MAPK1/MAPK3** family (status AMBIGUOUS,
   `needs_review=true`, no single accession). Curated ambiguous families now beat a
@@ -157,37 +192,62 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 - **RESOLVED — representative PDFs**: 3 real open-access PDFs in `research/papers/`
   (standard PMC9559174, phospho PMC12856536, co-IP PMC12706926); gitignored (fetch via
   the PMCIDs in `research/real_pipeline_report.md`).
-- **OPEN — no live model backend**: `boto3`+Bedrock creds/region absent; no
-  `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`; no `~/.aws`. The real run used **agent-in-the-loop**
-  Stage-2 (honest, documented). For an automated run set `WBM_LLM_BACKEND` + matching creds.
-  This is the main thing between us and a hands-off `pipeline.py … --mode records` run.
-- **OPEN — Supabase not provisioned here**: no `SUPABASE_URL`/`KEY` in env, so migration 001
-  is unapplied and no rows are loaded → the enriched frontend can't show live data yet.
-  Apply `api/db/schema.sql` then `migrations/001_evidence_record.sql`, then load
-  `eval/demo/phospho_PMC12856536/supabase_rows.json`. This is the last gap to the full
-  success condition (search → real record in the UI).
+- **OPEN — no live model backend** (unchanged, re-verified session 3: no `~/.aws`, no
+  `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`/`WBM_LLM_*`). All three real papers used
+  **agent-in-the-loop** Stage-2 (honest, documented per demo README). For an automated
+  run set `WBM_LLM_BACKEND` + matching creds, then diff against
+  `eval/demo/*/responses_observed.json` + `evidence_records.json` as reference.
+- **WORKED AROUND — cloud Supabase still not provisioned** (`SUPABASE_URL`/`KEY` empty
+  in `api/.env`), but the live loop no longer needs it locally: `scripts/local_db.py`
+  runs an embedded Postgres (pgserver, data in gitignored `.localdb/`), applies the
+  SAME `api/db/schema.sql` + `migrations/001` (pg_trgm index skipped locally — not
+  bundled), creates `hive_readonly`, and loads the demo rows. `api/.env`'s
+  `DB_READONLY_URL` points at it. `/search` runs asyncpg-only, so against this DB the
+  search path is the real production path; PostgREST-only endpoints (`/proteins`, `/`)
+  still need real Supabase. **Cloud Supabase remains a user action for the hosted
+  beta**: create the project, run schema+migration, load `eval/demo/*/supabase_rows.json`,
+  fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`.
+- **NOTE — /search SQL generation without OpenAI**: with `OPENAI_KEY` empty, /search
+  uses the deterministic biological parser (`api/app/bio_query.py`) — protein,
+  phospho-site (Tyr705/S473), vendor+catalog, co-IP, loading-control, needs-review,
+  cell-line terms — through the same `sql_guard` + read-only role. With a key set, the
+  legacy OpenAI NL→SQL path is unchanged (bio parser is the fallback on its failure only
+  when no key; generation errors still 502).
 
 ## Immediate Next Task
-Pick up in priority order (first two unblock the full success condition):
-1. **Get the real records into the live frontend.** Provision/confirm the beta Supabase
-   project, apply `api/db/schema.sql` + `migrations/001_evidence_record.sql`, load
-   `eval/demo/phospho_PMC12856536/supabase_rows.json`, run `api` + `web`, and confirm a
-   search for `phospho STAT3 Tyr705` returns the real card (the new
-   `DatabaseResultCard` is ready; API model already passes the fields through).
-2. **Thread organism into the UniProt query** (resolver defaults to human 9606). Needed
-   before the mouse standard-Western demo (PMC9559174) resolves correctly. Then run the
-   remaining two downloaded papers (standard PMC9559174, co-IP PMC12706926) the same way
-   to reach 5–10 diverse demo records.
-3. **When a live model backend exists**, re-run PMC12856536 hands-off
-   (`WBM_LLM_BACKEND=… WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline
-   research/papers/phospho_PMC12856536.pdf --mode records`) and diff against the
-   agent-in-the-loop records in `eval/demo/` to validate the automated backend.
+~~1. Get the real records into the live frontend~~ — **DONE (session 3, locally)**.
+~~2. Thread organism into UniProt; run papers 2+3~~ — **DONE (session 3)**.
 
-Reproduce the agent-in-the-loop run:
+Next, in priority order:
+1. **USER ACTION — provision cloud Supabase** for the hosted beta: create project, run
+   `api/db/schema.sql` + `migrations/001_evidence_record.sql`, load the three
+   `eval/demo/*/supabase_rows.json` files, fill `SUPABASE_URL`/`SUPABASE_KEY`/
+   `DB_READONLY_URL` in `api/.env`. Everything downstream already works against it.
+2. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic/OpenAI). Then
+   run hands-off (`WBM_LLM_BACKEND=… WBM_EXTRACTION_MODE=records python3 -m
+   western_blot_miner.pipeline research/papers/phospho_PMC12856536.pdf --mode records`)
+   and produce the field-level comparison (correct / partial / wrong / missing /
+   hallucinated) against `eval/demo/phospho_PMC12856536/` as reference.
+3. Researcher feedback affordances (per-field correct/incorrect, missing-field asks) on
+   the result card; record-detail endpoint serving the full `provenance` envelope
+   ("Why did HiveBlot say this?" with per-field sources).
+4. Remaining Tier-1 schema gaps from `research/RESEARCH_SYNTHESIS.md`: antibody
+   validation trust block, controls block, loading-control→target linkage.
+
+Local dev bring-up (all one-time steps already done in this repo):
 ```bash
-PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py preprocess research/papers/phospho_PMC12856536.pdf
-# inspect panel_candidates/*.png, write observed rows, then:
-PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py run <out_dir> eval/demo/phospho_PMC12856536/responses_observed.json
+.venv/bin/python scripts/local_db.py up      # embedded Postgres + schema + migration
+.venv/bin/python scripts/local_db.py load eval/demo/*/supabase_rows.json
+cd api && .venv/bin/python -m uvicorn app.main:app --port 8000   # api/.venv
+cd web && npm run dev                                            # port 3000
+# search: phospho STAT3 Tyr705 · phospho AKT Ser473 · co-IP PIK3CA · CST 9145
+```
+
+Reproduce an agent-in-the-loop paper run:
+```bash
+PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py preprocess research/papers/<paper>.pdf
+# inspect panel_candidates/*.png, write observed rows (see eval/tools/build_responses_*.py), then:
+PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py run <out_dir> eval/demo/<paper>/responses_observed.json
 ```
 
 ## Next After That
@@ -214,6 +274,10 @@ PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py run <out_dir> eval/d
 | `migrations/001_evidence_record.sql` | Additive Evidence Record columns (+ rollback). |
 | `eval/score.py`, `eval/cases.json`, `eval/gold.json` | Biological benchmark (seed gold). |
 | `api/app/` | FastAPI backend (routers, sql_guard, auth, search_service). |
+| `api/app/bio_query.py` | Deterministic biological query→SQL (no-OPENAI_KEY path; same guard). |
+| `scripts/local_db.py` | Embedded local Postgres (pgserver): up / load / status / stop. |
+| `eval/tools/` | Agent-in-the-loop harness + per-paper observation builders. |
+| `eval/demo/` | 3 real papers: Evidence Records + Supabase rows + observations + READMEs. |
 | `api/db/schema.sql` | Base `western_blot_records` table + `hive_readonly` role. |
 | `web/app/`, `web/components/` | Next.js frontend. |
 
