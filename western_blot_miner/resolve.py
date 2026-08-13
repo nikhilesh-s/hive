@@ -114,9 +114,10 @@ class UniProtResolver(ProteinResolver):
         chosen_pool = exact or parsed
         if len(chosen_pool) == 1:
             p = chosen_pool[0]
+            organism_name = {9606: "human", 10090: "mouse", 10116: "rat"}.get(organism_id)
             return ProteinResolution(
                 raw=raw_name, canonical=p.get("gene") or core, uniprot_id=p["accession"],
-                expected_mass_kda=p.get("mass_kda"), organism="human" if organism_id == 9606 else None,
+                expected_mass_kda=p.get("mass_kda"), organism=organism_name,
                 status=SUPPORTED, source="uniprot",
             )
         # Multiple reviewed hits -> ambiguous; list candidates, choose nothing.

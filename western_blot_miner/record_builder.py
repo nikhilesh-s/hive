@@ -76,15 +76,31 @@ def build_evidence_record(
     ip_abs = [a for a in antibodies_in if a.get("role") == "immunoprecipitation"]
 
     # ---- protein identity (real resolver; never guessed) -------------------
-    res = resolver.resolve(core)
+    # Scope the UniProt query to the paper's claimed organism (default human,
+    # the previous unconditional behavior) so e.g. mouse Stat3 resolves to the
+    # mouse accession and expected MW, not the human one.
+    organism_id = biology.organism_taxon_id(mc.get("organism"))
+    res = resolver.resolve(core, organism_id=organism_id)
     target_info = _target_info(raw_target, core, res, mc)
 
     # ---- modification: gather claims from every source, then reconcile -----
     mod_claims: list[ModClaim] = []
     for ab in detection_abs:
         m = biology.antibody_modification(ab.get("target", ""))
+        conf = 0.9
+        if m["modification_type"] is None and ab.get("phospho_specific"):
+            # The extractor explicitly claimed this antibody is phospho-specific
+            # even though its target string carries no parseable marker — e.g.
+            # uppercase "P-ERK 1/2" (uppercase P- must NEVER be read as a
+            # phospho marker by itself: P-selectin / P-cadherin are protein
+            # names). The explicit flag is real evidence; without it the row
+            # would falsely SETTLE as total against a phospho-specific
+            # antibody. No site is invented; reconciliation decides.
+            m = {"modification_type": "phosphorylation", "residue": None,
+                 "residue_position": None}
+            conf = 0.6
         mod_claims.append(ModClaim(m["modification_type"], m["residue"], m["residue_position"],
-                                   "antibody", RANK_ANTIBODY, 0.9,
+                                   "antibody", RANK_ANTIBODY, conf,
                                    ab.get("source", {}).get("text", ab.get("target", ""))))
     cap_m = biology.caption_modification_for_core(core, caption)
     if cap_m is not None:
@@ -109,7 +125,9 @@ def build_evidence_record(
     )
 
     # ---- experiment type ---------------------------------------------------
-    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs)
+    lane_text = " | ".join(
+        str(b.get("lane_condition") or "") for b in mc.get("bands", []))
+    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text=lane_text)
 
     # ---- sample ------------------------------------------------------------
     sample = _sample_info(mc, caption)
@@ -121,7 +139,7 @@ def build_evidence_record(
     antibodies = [_antibody_info(ab, core, mod_fields) for ab in antibodies_in]
 
     # ---- molecular weight: reported (text) vs expected (UniProt) -----------
-    molecular_weight = _mw_info(caption, methods, res)
+    molecular_weight = _mw_info(caption, methods, res, core=core)
 
     # ---- bands -------------------------------------------------------------
     bands = _bands(mc)
@@ -188,16 +206,38 @@ def _phospho_specific_field(detection_abs, mod_fields) -> EvidenceField:
     return EvidenceField.missing()
 
 
-def _experiment_info(core, caption, methods, mod_fields, ip_abs) -> ExperimentInfo:
+def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str = "") -> ExperimentInfo:
     text_blob = f"{caption}\n{methods}"
     flags: list[str] = []
     sources: list[Source] = []
 
-    co_ip = biology._CO_IP.search(text_blob)
-    if co_ip:
+    # co-IP requires PANEL-SCOPED evidence: an IP-role antibody claim, co-IP
+    # wording in this panel's caption, or IP:/IgG/input markers printed on the
+    # panel's own lanes. A methods paragraph mentioning immunoprecipitation is
+    # page-level context — real papers discuss their co-IP next to unrelated
+    # expression blots, and that wording must NOT reclassify every panel on the
+    # page (it mislabeled whole autophagy/mTOR panels as co_ip). Methods-only
+    # mentions are preserved as a non-settling "co_ip_context" flag.
+    panel_scoped = f"{caption}\n{lane_text}"
+    if ip_abs:
         flags.append("co_ip")
-        sources.append(Source(type="methods" if biology._CO_IP.search(methods) else "figure_caption",
-                              rank=RANK_METHODS, text=_around(text_blob, co_ip.start())))
+        ab0 = ip_abs[0]
+        sources.append(Source(type="antibody", rank=RANK_ANTIBODY,
+                              text=ab0.get("source", {}).get("text", ab0.get("target", "IP antibody"))))
+    elif biology._CO_IP.search(panel_scoped):
+        m = biology._CO_IP.search(panel_scoped)
+        flags.append("co_ip")
+        sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
+                              text=_around(panel_scoped, m.start())))
+    elif biology._IP_LANE.search(lane_text):
+        m = biology._IP_LANE.search(lane_text)
+        flags.append("co_ip")
+        sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
+                              text=_around(lane_text, m.start())))
+    elif biology._CO_IP.search(methods):
+        m = biology._CO_IP.search(methods)
+        flags.append("co_ip_context")
+        sources.append(Source(type="methods", rank=RANK_METHODS, text=_around(methods, m.start())))
     if biology._PURIFIED.search(text_blob):
         flags.append("purified_protein")
     if biology.is_loading_control(core):
@@ -233,13 +273,20 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs) -> ExperimentIn
     ip_bait = EvidenceField.missing()
     if "co_ip" in flags:
         bait = None
+        bait_src = None
+        panel_co_ip = biology._CO_IP.search(panel_scoped)
         if ip_abs:
             bait = biology.core_symbol(ip_abs[0].get("target", ""))
-        elif co_ip:
-            bait = _first_gene_after(text_blob, co_ip.end())
+            bait_src = Source(type="antibody", rank=RANK_ANTIBODY,
+                              text=ip_abs[0].get("source", {}).get("text", ip_abs[0].get("target", "")))
+        elif panel_co_ip:
+            # best-effort bait from the panel-scoped text only (same scoping
+            # rule as the classification itself).
+            bait = _first_gene_after(panel_scoped, panel_co_ip.end())
+            bait_src = Source(type="figure_caption", rank=RANK_CAPTION,
+                              text=_around(panel_scoped, panel_co_ip.start()))
         if bait:
-            ip_bait = EvidenceField.supported(
-                bait, 0.75, [Source(type="methods", rank=RANK_METHODS, text=_around(text_blob, co_ip.start()))])
+            ip_bait = EvidenceField.supported(bait, 0.75, [bait_src])
     return ExperimentInfo(experiment_type=exp_type, experiment_flags=exp_flags, ip_bait_protein=ip_bait)
 
 
@@ -336,8 +383,34 @@ def _association_confidence(ab, row_core, mod_fields) -> float:
     return 0.5                           # same protein, modification mismatch
 
 
-def _mw_info(caption, methods, res) -> MolecularWeightInfo:
-    reported = extract_kda(caption) or extract_kda(methods)
+def _kda_near_core(core: str, text: str) -> float | None:
+    """A kDa figure counts as REPORTED for this target only when it appears
+    near a mention of the target's core symbol. A page blob's first kDa number
+    (ladder descriptions, other rows' masses) must never be attributed to every
+    row on the page — that fabricated e.g. 'BEX2 reported 70 kDa' (vs expected
+    15.3) and flagged false MW discrepancies on the co-IP paper."""
+    if not core or not text:
+        return None
+    low, core_low = text.lower(), core.lower()
+    idx = low.find(core_low)
+    while idx != -1:
+        window = text[max(0, idx - 30): idx + len(core) + 60]
+        val = extract_kda(window)
+        if val is not None:
+            return val
+        idx = low.find(core_low, idx + 1)
+    return None
+
+
+def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
+    reported = _kda_near_core(core, caption)
+    if reported is None:
+        reported = _kda_near_core(core, methods)
+    if reported is None and caption and core and core.lower() not in caption.lower():
+        # Core absent from a short caption -> the caption is plausibly about
+        # this single target row anyway (same fallback rule as _scoped_site).
+        # Applies to the CAPTION only, never the page-level methods blob.
+        reported = extract_kda(caption)
     reported_f = EvidenceField.supported(
         reported, 0.8, [Source(type="figure_caption", rank=RANK_CAPTION, text=f"{reported} kDa")]) \
         if reported is not None else EvidenceField.missing()

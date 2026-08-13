@@ -103,6 +103,25 @@ PROTEIN_ALIASES: dict[str, tuple[str, Optional[str]]] = {
     "parp1": ("PARP1", "P09874"),
 }
 
+# Organism wording -> NCBI taxonomy id, for scoping the UniProt query. Only
+# explicit, unambiguous wordings map; anything else falls back to human (9606),
+# which was the previous unconditional behavior. Never used to *invent* an
+# organism claim — the claimed organism string is preserved separately.
+ORGANISM_TAXON: dict[str, int] = {
+    "human": 9606, "homo sapiens": 9606,
+    "mouse": 10090, "mus musculus": 10090, "murine": 10090, "mice": 10090,
+    "rat": 10116, "rattus norvegicus": 10116, "rats": 10116,
+}
+DEFAULT_TAXON = 9606
+
+
+def organism_taxon_id(organism: Optional[str]) -> int:
+    """Taxon id for an explicitly claimed organism string (default: human)."""
+    if not organism:
+        return DEFAULT_TAXON
+    return ORGANISM_TAXON.get(_norm(organism).lower(), DEFAULT_TAXON)
+
+
 # Proteins whose name legitimately starts with "p" + digits and must NEVER be
 # auto-classified as phospho. (Documented guard; the regex handles the general
 # case, this is belt-and-suspenders for the well-known ones.)
@@ -145,6 +164,11 @@ _CO_IP = re.compile(
     r"co[-\s]?immunoprecipitat|co[-\s]?ip\b|\bpull[-\s]?down|pulled\s+down|immunoprecipitat",
     re.IGNORECASE,
 )
+# Panel-scoped IP markers as printed ON the figure itself: "IP: PIK3CA" column
+# headers and IgG-control lanes. Used to scope co-IP classification to the
+# panel, so a methods paragraph about a co-IP elsewhere in the paper does not
+# reclassify every unrelated panel on the page.
+_IP_LANE = re.compile(r"\bIP\s*[:.]|\bIgG\b|\binput\b", re.IGNORECASE)
 _PURIFIED = re.compile(
     r"\brecombinant\b|purified\s+protein|in\s+vitro\s+(?:binding|kinase|translat)|GST[-\s]?tag|His[-\s]?tag",
     re.IGNORECASE,
@@ -386,6 +410,13 @@ def detect_modification(
 
     # Target is phospho: enrich the site (scoped) and phospho-antibody flag.
     if site is None:
+        # One-letter site inside the SAME phospho-marked label — "p-AKT (S473)",
+        # "p-RPS6KB1 (T389)" — is trustworthy: the phospho marker and the site
+        # travel together in one short row label, which satisfies the phospho-
+        # context guard that one-letter forms require. (Guarded from cell-line
+        # tokens like T47D because \b never splits digit->letter.)
+        site = _one_letter_site_in_context(target)
+    if site is None:
         site = _scoped_site(core, caption, methods, antibody_text)
     phospho_ab_ev = _first_snippet(
         _PHOSPHO_AB, ("methods", methods), ("antibody", antibody_text), ("figure_caption", caption)
@@ -497,7 +528,18 @@ def _looks_like_western(caption: str, methods: str) -> bool:
 # --------------------------------------------------------------------------- #
 
 def _mention_state(pre: str, post: str) -> dict:
-    """Classify a single mention of a core symbol from its surrounding chars."""
+    """Classify a single mention of a core symbol from its surrounding chars.
+
+    Three states, not two:
+      * "phosphorylation" — explicit phospho marker / site at this mention.
+      * "total"           — explicit total/pan marker ("total STAT3", "T-STAT3",
+                            "pan-AKT"): the text really asserts unmodified.
+      * "bare"            — the symbol alone ("PI3K/AKT/mTOR signaling"). A bare
+                            mention asserts NOTHING about modification state; it
+                            must never be read as a total-protein claim, or any
+                            pathway sentence in page text would manufacture a
+                            fake conflict against a phospho row.
+    """
     pre_l = pre.lower()
     is_phospho = False
     if pre_l.rstrip().endswith("phospho") or pre_l.rstrip().endswith("phospho-") or pre_l.rstrip().endswith("phospho "):
@@ -509,7 +551,11 @@ def _mention_state(pre: str, post: str) -> dict:
     site = parse_phospho_site(post) or parse_phospho_site(pre)
     if site:
         is_phospho = True
-    return {"type": "phosphorylation" if is_phospho else "none", "site": site}
+    if is_phospho:
+        return {"type": "phosphorylation", "site": site}
+    if re.search(r"(total\s*-?\s*|pan\s*-\s*|\bt-\s*)$", pre, re.IGNORECASE):
+        return {"type": "total", "site": None}
+    return {"type": "bare", "site": None}
 
 
 def caption_modification_for_core(core: str, text: str) -> Optional[dict]:
@@ -540,7 +586,13 @@ def caption_modification_for_core(core: str, text: str) -> Optional[dict]:
             site_found = st["site"]
         idx = low.find(core_low, idx + 1)
 
-    if len(states) != 1:            # 0 mentions, or conflicting mentions -> abstain
+    # A bare mention either asserts nothing (alone: "PI3K/AKT/mTOR signaling"
+    # must not become a total-protein claim) or signals the text spans multiple
+    # rows (mixed with an explicit form: "pSTAT3 ... STAT3 ..." is about both a
+    # phospho row and a total row) -> abstain either way.
+    if "bare" in states:
+        return None
+    if len(states) != 1:            # no explicit claim, or conflicting -> abstain
         return None
     state = states.pop()
     if state == "phosphorylation":

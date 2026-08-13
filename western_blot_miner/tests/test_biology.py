@@ -161,6 +161,132 @@ def test_core_symbol_prefix_and_isoform():
     check("T-ERK 1/2 -> ERK1/2", cs("T-ERK 1/2") == "ERK1/2")
 
 
+def test_one_letter_site_in_phospho_marked_label():
+    """'p-AKT (S473)' style labels (extremely common) must yield the site: the
+    phospho marker and one-letter site travel in the same short label, which
+    satisfies the phospho-context guard. Surfaced by the second real paper
+    (PMC12706926) where residue came back empty."""
+    for label, res_, pos in [("p-AKT (S473)", "Ser", 473),
+                             ("p-RPS6KB1 (T389)", "Thr", 389),
+                             ("p-EIF4EBP1 (S65)", "Ser", 65)]:
+        m = bio.detect_modification(label)
+        check(f"{label} is phospho", m["modification_type"] == "phosphorylation")
+        check(f"{label} residue {res_}{pos}",
+              m["residue"] == res_ and m["residue_position"] == pos)
+    # bare one-letter forms WITHOUT a phospho marker still never claim a site
+    m = bio.detect_modification("AKT S473")
+    check("no phospho marker -> no phospho from bare S473",
+          m["modification_type"] is None)
+
+
+def test_phospho_specific_antibody_flag_prevents_false_total():
+    """Uppercase 'P-' is never a phospho MARKER (P-selectin, P-cadherin are
+    protein names) — but an explicit phospho_specific antibody claim is real
+    evidence. 'P-ERK 1/2' + phospho-specific CST #4370 must NOT settle as
+    total; it stays unsettled (CONFLICTING, value null, needs_review)."""
+    from western_blot_miner.record_builder import build_evidence_record
+    case = {
+        "paper": {"doi": "10.x/t"}, "figure": {"page": 1},
+        "raw_target": "P-ERK 1/2", "texts": {"caption": "", "methods": ""},
+        "model_claims": {
+            "sample": "Hep3B",
+            "antibodies": [{"target": "P-ERK 1/2", "vendor": "CST", "catalog": "4370",
+                            "role": "detection", "phospho_specific": True,
+                            "source": {"type": "methods", "rank": 3,
+                                       "text": "p-ERK (1:1,000; CST #4370)"}}],
+            "bands": [{"lane_index": 1, "lane_condition": "x",
+                       "band_state": "present", "confidence": "high"}],
+        },
+    }
+    rec = build_evidence_record(case)
+    mt = rec.modification.modification_type
+    check("P-ERK + phospho-ab does not settle as total",
+          not (mt.status == "SUPPORTED" and mt.value is None))
+    check("P-ERK + phospho-ab unsettled -> value null + review",
+          mt.value is None and rec.validation.needs_review)
+    # A genuinely total antibody (phospho_specific False) still settles total.
+    case2 = dict(case, raw_target="T-ERK 1/2")
+    case2["model_claims"] = dict(case["model_claims"])
+    case2["model_claims"]["antibodies"] = [{
+        "target": "T-ERK 1/2", "vendor": "CST", "catalog": "4695",
+        "role": "detection", "phospho_specific": False,
+        "source": {"type": "methods", "rank": 3, "text": "t-ERK (CST #4695)"}}]
+    rec2 = build_evidence_record(case2)
+    mt2 = rec2.modification.modification_type
+    check("T-ERK + total-ab settles total",
+          mt2.status == "SUPPORTED" and mt2.value is None)
+
+
+def test_bare_mention_is_not_a_total_claim():
+    """A pathway sentence ('PI3K/AKT/mTOR signaling') must not be read as an
+    explicit 'AKT is unmodified' claim — that manufactured fake MODIFICATION_
+    CONFLICTs against real phospho rows (PMC12706926, page 10). Explicit
+    'total X' wording still asserts total; mixed forms still abstain."""
+    cm = bio.caption_modification_for_core
+    check("bare pathway mention -> abstain",
+          cm("AKT", "BEX2 impairs PI3K/AKT/mTOR signaling in NSCLC.") is None)
+    check("explicit total -> none-claim",
+          cm("STAT3", "Total STAT3 levels remained constant.")["modification_type"] is None)
+    check("T- prefix -> none-claim",
+          cm("STAT3", "T-STAT3 was blotted.")["modification_type"] is None)
+    check("phospho-only mention -> phospho claim",
+          cm("STAT3", "pSTAT3 blot.")["modification_type"] == "phosphorylation")
+    check("mixed phospho + bare forms -> abstain",
+          cm("STAT3", "pSTAT3 and STAT3 were blotted.") is None)
+
+
+def test_co_ip_requires_panel_scoped_evidence():
+    """A methods paragraph about immunoprecipitation must not reclassify every
+    panel on the page as co_ip; panel-scoped evidence (IP-role antibody, co-IP
+    caption, or IP:/IgG lane labels) is required. Surfaced by PMC12706926 where
+    autophagy/mTOR expression panels all came back co_ip."""
+    from western_blot_miner.record_builder import build_evidence_record
+    methods_blob = ("Cells were lysed... For co-immunoprecipitation, lysates were "
+                    "immunoprecipitated with anti-PIK3CA... antibodies: anti-LC3B (2775)...")
+    base = {
+        "paper": {"doi": "10.x/test"},
+        "figure": {"page": 1},
+        "texts": {"caption": "", "methods": methods_blob},
+    }
+    # Expression panel: NO panel-scoped IP evidence -> NOT co_ip.
+    case = dict(base, raw_target="LC3B", model_claims={
+        "sample": "H1299",
+        "antibodies": [{"target": "LC3B", "vendor": "CST", "catalog": "2775",
+                        "role": "detection", "phospho_specific": False,
+                        "source": {"type": "methods", "rank": 3, "text": "anti-LC3B (2775)"}}],
+        "bands": [{"lane_index": 1, "lane_condition": "DMSO", "band_state": "present",
+                   "confidence": "high"}],
+    })
+    rec = build_evidence_record(case)
+    check("methods-only co-IP mention does not settle co_ip",
+          rec.experiment.experiment_type.value != "co_ip")
+    check("methods mention preserved as co_ip_context flag",
+          "co_ip_context" in (rec.experiment.experiment_flags.value or []))
+    # Same page, but the panel's lanes say IP:/IgG -> IS co_ip.
+    case2 = dict(base, raw_target="BEX2", model_claims={
+        "sample": "H1299",
+        "antibodies": [{"target": "BEX2", "vendor": "Santa Cruz", "catalog": "SC-398486",
+                        "role": "detection", "phospho_specific": False,
+                        "source": {"type": "methods", "rank": 3, "text": "anti-BEX2"}}],
+        "bands": [{"lane_index": 1, "lane_condition": "Input", "band_state": "present", "confidence": "high"},
+                  {"lane_index": 2, "lane_condition": "IgG", "band_state": "absent", "confidence": "high"},
+                  {"lane_index": 3, "lane_condition": "IP:PIK3CA", "band_state": "present", "confidence": "high"}],
+    })
+    rec2 = build_evidence_record(case2)
+    check("IP:/IgG lane labels settle co_ip", rec2.experiment.experiment_type.value == "co_ip")
+
+
+def test_organism_taxon_mapping():
+    """Explicit organism wording scopes the UniProt query; anything else keeps
+    the previous human default. The map must never invent an organism."""
+    check("human -> 9606", bio.organism_taxon_id("human") == 9606)
+    check("Mouse -> 10090", bio.organism_taxon_id("Mouse") == 10090)
+    check("Mus musculus -> 10090", bio.organism_taxon_id("Mus musculus") == 10090)
+    check("rat -> 10116", bio.organism_taxon_id("rat") == 10116)
+    check("None -> default 9606", bio.organism_taxon_id(None) == 9606)
+    check("unknown wording -> default 9606", bio.organism_taxon_id("zebrafish-ish") == 9606)
+
+
 def test_erk_family_not_a_false_friend_offline():
     """The curated map must mark ERK-family shorthand ambiguous (ERK1/ERK2), so
     it is never collapsed to a single accession -- offline resolver check."""
