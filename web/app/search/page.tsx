@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/SearchInput';
-import ResultsCard from '@/components/ResultsCard';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
+import FiltersBar from '@/components/FiltersBar';
+import SearchFeedback from '@/components/SearchFeedback';
+import BetaFeedback from '@/components/BetaFeedback';
 
 interface DatabaseResult {
   id: number;
@@ -33,6 +35,14 @@ export default function SearchPage() {
   const [results, setResults] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Support /search?q=… (home-page searches route here so there is ONE
+  // results surface — the Evidence Record card, not the legacy table).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) handleSearch(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
@@ -70,11 +80,14 @@ export default function SearchPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '40px' }}>
       {/* Search Bar */}
-      <div style={{ padding: '40px 56px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+      <div style={{ padding: '40px 56px 24px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
         <SearchInput
-          placeholder="Search for a protein or experimental condition (e.g., 'Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.')"
+          placeholder="Search for a protein or experimental condition (e.g., 'phospho STAT3 Tyr705' or 'co-IP PIK3CA')"
           onSearch={handleSearch}
         />
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+          <FiltersBar onSearch={handleSearch} />
+        </div>
       </div>
 
       {/* Results Section */}
@@ -122,11 +135,14 @@ export default function SearchPage() {
 
             {/* Results Cards */}
             {!loading && results.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {results.map((result) => (
-                  <DatabaseResultCard key={result.id} data={result} />
-                ))}
-              </div>
+              <>
+                <SearchFeedback query={query} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {results.map((result) => (
+                    <DatabaseResultCard key={result.id} data={result} />
+                  ))}
+                </div>
+              </>
             )}
 
             {/* No Results */}
@@ -149,6 +165,7 @@ export default function SearchPage() {
           </div>
         )}
       </div>
+      <BetaFeedback query={query} />
     </div>
   );
 }

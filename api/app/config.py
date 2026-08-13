@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     # service-role key.
     db_readonly_url: str
 
+    # Connection string for the hive_feedback role (migration 002): INSERT +
+    # SELECT on hiveblot_feedback ONLY. Separate from db_readonly_url so the
+    # feedback write path physically cannot touch western_blot_records —
+    # researcher corrections are stored beside, never over, the AI extraction.
+    # Optional: when empty, the feedback endpoints return 503 instead of the
+    # whole API failing to boot.
+    db_feedback_url: str = ""
+
     # Shared secret the web/ frontend's server-side API route uses to call
     # the internal endpoints (/search, /proteins). Only ever sent server-to-
     # server (Next.js route handler -> this API), never to the browser.

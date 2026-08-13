@@ -6,6 +6,28 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-13 (session 4)** — Claude Code (Opus 4.8). **SCIENTIST-REVIEW BETA COMPLETE.**
+  Full provenance + researcher-feedback loop live end-to-end locally:
+  `GET /records/{id}` serves curated field-level evidence envelopes (value /
+  status / source snippets / competing candidates); the card's evidence panel is
+  now a full-width accordion with the normalization chain (raw → canonical →
+  UniProt), per-field audit rows + ✓/✗/not-useful/suggest-correction controls,
+  equal-weight CONFLICTING candidate display ("Which is right?"), antibody
+  roles, lane strip, `+ Missing information?`, result flagging, post-search
+  "did HiveBlot understand?" prompt, and a general BETA FEEDBACK widget.
+  **Migration 002** adds `hiveblot_feedback` + insert-only `hive_feedback` role:
+  human corrections persist BESIDE the AI extraction (model_value snapshot),
+  never over it. Verified in the real browser: feedback rows land in Postgres
+  from UI clicks. Also: home-page search now routes to /search (legacy table
+  retired); advanced-filters bar; `eval/model_comparison/compare_records.py`
+  harness (self-test 100% EXACT on all 3 papers); boto3 installed → Bedrock
+  path ready pending creds; `DEPLOYMENT.md`; `research/HACKATHON_DEMO_FLOW.md`;
+  scientific QA self-audit (`research/demo_scientific_qa.md`: 0 critical open,
+  2 major representational). Tests: engine 138 assertions green, benchmark
+  34/34, **api 104/104**, web tsc clean. NOTE: two of three planned sub-agents
+  (independent QA, eval design) were killed by session limits; QA was done as a
+  self-audit and the eval harness written directly — re-run independent QA
+  before UCSF.
 - **2026-08-12 (session 3)** — Claude Code (Opus 4.8). **LIVE SEARCH LOOP WORKS.**
   `phospho STAT3 Tyr705`, `phospho AKT Ser473`, `co-IP PIK3CA`, `CST 9145`,
   `GAPDH mouse` all return real paper-derived Evidence Records in the running
@@ -74,6 +96,26 @@ comparable evidence in the literature.
 
 Cascade (low-compute by design): deterministic Stage 1 → cheap hosted model Stage 2 →
 validation Stage 3 → expensive-model escalation Stage 4 only for ambiguous/conflicting.
+
+## Provenance & Feedback (session 4)
+- **Record detail**: `GET /records/{id}` (internal auth) → curated `RecordDetail`:
+  source identity, biological scalars, `fields{name → {value, confidence, status,
+  sources[{type,text}], candidates[]}}` extracted from the provenance JSONB,
+  antibodies (role + detection vs association confidence), per-lane bands,
+  validation. Shaping: `api/app/record_detail.py`. Web proxy: `/api/record/[id]`.
+- **Feedback**: `POST /feedback` (internal auth) → `hiveblot_feedback`
+  (**migration 002**) via the **insert-only `hive_feedback` role**
+  (`DB_FEEDBACK_URL`) — physically cannot touch `western_blot_records`.
+  Scopes: `field` (correct/incorrect/not_useful/missing_context + suggested_value),
+  `record` (9 flag types), `missing_field`, `search` (understood yes/partially/no),
+  `ui`. `model_value` snapshots the AI claim at feedback time → every row is an
+  auditable "AI claim → human correction" pair; corrections are NEVER auto-applied.
+  Web proxy: `/api/feedback` (key-allowlisted); anonymous localStorage session id.
+- **Frontend**: `EvidencePanel.tsx` (full-width accordion: normalization chain,
+  per-field audit + feedback, conflict candidates "Which is right?", antibodies,
+  lane strip, missing-info + flag-result forms, DOI link), `SearchFeedback.tsx`,
+  `BetaFeedback.tsx`, `FiltersBar.tsx` (composes queries for the deterministic
+  parser). Home-page search now routes to `/search?q=…` (legacy table retired).
 
 ## Completed Work
 - **Phase 1 — Repository audit / canonical architecture.** Identified the real system
@@ -215,24 +257,34 @@ travels with each field; a disputed modification keeps its residue **unsettled**
   when no key; generation errors still 502).
 
 ## Immediate Next Task
-~~1. Get the real records into the live frontend~~ — **DONE (session 3, locally)**.
-~~2. Thread organism into UniProt; run papers 2+3~~ — **DONE (session 3)**.
+~~Provenance detail endpoint + researcher feedback system + evidence UI~~ — **DONE (session 4)**.
 
 Next, in priority order:
-1. **USER ACTION — provision cloud Supabase** for the hosted beta: create project, run
-   `api/db/schema.sql` + `migrations/001_evidence_record.sql`, load the three
-   `eval/demo/*/supabase_rows.json` files, fill `SUPABASE_URL`/`SUPABASE_KEY`/
-   `DB_READONLY_URL` in `api/.env`. Everything downstream already works against it.
-2. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic/OpenAI). Then
-   run hands-off (`WBM_LLM_BACKEND=… WBM_EXTRACTION_MODE=records python3 -m
-   western_blot_miner.pipeline research/papers/phospho_PMC12856536.pdf --mode records`)
-   and produce the field-level comparison (correct / partial / wrong / missing /
-   hallucinated) against `eval/demo/phospho_PMC12856536/` as reference.
-3. Researcher feedback affordances (per-field correct/incorrect, missing-field asks) on
-   the result card; record-detail endpoint serving the full `provenance` envelope
-   ("Why did HiveBlot say this?" with per-field sources).
-4. Remaining Tier-1 schema gaps from `research/RESEARCH_SYNTHESIS.md`: antibody
-   validation trust block, controls block, loading-control→target linkage.
+1. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic). Everything
+   is staged for a one-command evaluation. Bedrock:
+   ```bash
+   export AWS_ACCESS_KEY_ID=… AWS_SECRET_ACCESS_KEY=… AWS_REGION=us-east-1
+   export WBM_LLM_BACKEND=bedrock            # optional: WBM_BEDROCK_MODEL / WBM_BEDROCK_ESCALATION_MODEL
+   WBM_EXTRACTION_MODE=records .venv/bin/python -m western_blot_miner.pipeline \
+       research/papers/phospho_PMC12856536.pdf --mode records --no-cache
+   .venv/bin/python eval/model_comparison/compare_records.py \
+       western_blot_miner/data/pdf_runs/10.3892_br.2026.2108/evidence_records.json \
+       eval/demo/phospho_PMC12856536/evidence_records.json
+   ```
+   Anthropic direct: `export ANTHROPIC_API_KEY=… WBM_LLM_BACKEND=anthropic` (same
+   pipeline + compare commands). Protocol: `research/automated_extraction_eval_protocol.md`.
+   Repeat for `standard_PMC9559174` (run dir `10.3892_ijmm.2022.5188`) and
+   `coip_PMC12706926` (`10.1186_s12964-025-02385-8`). boto3 + anthropic are installed.
+2. **USER ACTION — provision cloud Supabase** for the hosted beta: run
+   `api/db/schema.sql` + `migrations/001` + **`migrations/002_feedback.sql`**, set
+   `hive_readonly`/`hive_feedback` passwords, seed `eval/demo/*/supabase_rows.json`,
+   fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`/`DB_FEEDBACK_URL`.
+   Full steps: `DEPLOYMENT.md`.
+3. Independent scientific QA re-run (session-4 QA was a self-audit) + the two open
+   Major findings: scalar dose/duration on time-course panels → AMBIGUOUS-with-
+   candidates; band multiplicity/smear representation (LC3B doublet, poly-Ub).
+4. Results-list lane grouping (15 near-identical lane cards per panel today — UX
+   review has verified grouping keys) + figure-crop image serving.
 
 Local dev bring-up (all one-time steps already done in this repo):
 ```bash

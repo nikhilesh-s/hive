@@ -118,8 +118,14 @@ def cmd_up() -> None:
         print("NOTE: pg_trgm unavailable locally — trigram index skipped "
               "(cloud Supabase still gets it from schema.sql).")
     run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_readonly')
-    run_sql(uri, (REPO / "migrations/001_evidence_record.sql").read_text())
-    print("schema + migration 001 applied (idempotent).")
+    migrations = sorted((REPO / "migrations").glob("[0-9]*.sql"))
+    for mig in migrations:
+        if mig.name.endswith(".down.sql"):
+            continue
+        run_sql(uri, mig.read_text())
+        print(f"applied {mig.name}")
+    run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_feedback')
+    print("schema + migrations applied (idempotent).")
     cmd_status()
 
 
