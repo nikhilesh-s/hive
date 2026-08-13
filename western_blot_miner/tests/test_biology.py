@@ -355,6 +355,102 @@ def test_multi_condition_scalar_is_never_settled():
           single.bands[0].lane_duration.value is None)
 
 
+def _band_case(raw_target, caption, lanes, **band_extra):
+    """Build a record and return its first band (band-pattern test helper)."""
+    from western_blot_miner.record_builder import build_evidence_record
+    rec = build_evidence_record({
+        "paper": {"doi": "10.x/t"}, "figure": {"page": 1},
+        "raw_target": raw_target, "texts": {"caption": caption, "methods": ""},
+        "model_claims": {
+            "sample": "H1792",
+            "antibodies": [{"target": raw_target, "vendor": "CST", "catalog": "2775",
+                            "role": "detection", "phospho_specific": False,
+                            "source": {"type": "methods", "rank": 3, "text": "anti-LC3B (2775)"}}],
+            "bands": [dict({"lane_index": i + 1, "lane_condition": c,
+                            "band_state": "present", "confidence": "high"}, **band_extra)
+                      for i, c in enumerate(lanes)],
+        },
+    })
+    return rec.bands[0]
+
+
+def test_band_pattern_from_explicit_wording():
+    """Descriptive multiplicity is read ONLY from explicit wording. band_state
+    stays independent: a smeared or doublet band is still `present`."""
+    d = bio.detect_band_pattern
+    check("doublet wording", d("LC3B resolved as a doublet")["pattern"] == "doublet")
+    check("doublet implies count 2", d("resolved as a doublet")["count"] == 2)
+    check("'two bands' -> doublet/2", d("two distinct bands were detected")["count"] == 2)
+    check("'three bands' -> multiple", d("three bands were observed")["pattern"] == "multiple")
+    check("smear wording", d("the signal appeared as a smear")["pattern"] == "smear")
+    check("smeared wording", d("a smeared high background")["pattern"] == "smear")
+    check("polyubiquitin ladder", d("a polyubiquitin ladder was detected")["pattern"] == "ladder")
+    check("high-MW species", d("higher-molecular-weight species accumulated")["pattern"] == "ladder")
+    check("multiple bands", d("multiple bands were present")["pattern"] == "multiple")
+    check("non-specific extra band", d("an additional band was seen")["pattern"] == "multiple")
+    check("single band", d("a single band was detected")["pattern"] == "single")
+    # band_state is untouched by pattern
+    b = _band_case("LC3B", "LC3B was detected as a doublet in H1792 cells.", ["DMSO"])
+    check("doublet band is still present", b.band_state.value == "present")
+    check("doublet pattern recorded", b.band_pattern.value == "doublet")
+    check("doublet count recorded", b.band_count.value == 2)
+    check("doublet keeps verbatim wording", "doublet" in (b.band_notes.value or ""))
+
+
+def test_band_pattern_absent_means_missing_not_single():
+    """No multiplicity wording => MISSING. Never guess 'single', and never
+    infer a pattern from protein identity (LC3B does not imply a doublet;
+    ubiquitin does not imply a ladder)."""
+    b = _band_case("LC3B", "LC3B levels were analyzed by western blotting.", ["DMSO", "Rapamycin"])
+    check("no wording -> pattern MISSING", b.band_pattern.status == "MISSING"
+          and b.band_pattern.value is None)
+    check("no wording -> count MISSING", b.band_count.value is None)
+    ub = _band_case("Ubiquitin", "Ubiquitin was analyzed by western blotting.", ["E14.5"])
+    check("ubiquitin identity alone implies no ladder", ub.band_pattern.value is None)
+
+
+def test_band_pattern_hedged_and_conflicting_stay_uncertain():
+    d = bio.detect_band_pattern
+    check("hedged doublet -> uncertain",
+          d("the signal may represent a doublet")["pattern"] == "uncertain")
+    check("hedged doublet drops the count",
+          d("this could be a doublet")["count"] is None)
+    check("two competing descriptions -> uncertain",
+          d("a doublet or possibly a smear was observed")["pattern"] == "uncertain")
+    b = _band_case("LC3B", "LC3B may appear as a doublet here.", ["DMSO"])
+    check("hedged pattern is AMBIGUOUS, not settled", b.band_pattern.status == "AMBIGUOUS")
+
+
+def test_band_pattern_is_target_scoped():
+    """A sibling target's doublet must not leak onto this row (same scoping
+    discipline as reported-MW and co-IP classification)."""
+    caption = "LC3B resolved as a doublet, while ACTB was used as a loading control."
+    actb = _band_case("ACTB", caption, ["DMSO"])
+    check("sibling doublet does not leak to ACTB", actb.band_pattern.value is None)
+    lc3b = _band_case("LC3B", caption, ["DMSO"])
+    check("scoped doublet still found for LC3B", lc3b.band_pattern.value == "doublet")
+
+
+def test_band_pattern_explicit_observer_claim():
+    """An extractor may REPORT an observed pattern (like band_state); it is
+    recorded as a claim with image provenance. Unknown vocabulary is ignored."""
+    b = _band_case("LC3B", "", ["DMSO"], band_pattern="doublet", band_count=2,
+                   band_notes="two closely spaced bands")
+    check("observer doublet recorded", b.band_pattern.value == "doublet")
+    check("observer count recorded", b.band_count.value == 2)
+    bad = _band_case("LC3B", "", ["DMSO"], band_pattern="isoform-resolved")
+    check("unknown pattern vocabulary ignored", bad.band_pattern.value is None)
+
+
+def test_multiple_rows_are_not_multiplicity():
+    """Multiplicity belongs to ONE band observation. A panel with several
+    target rows (phospho + total + loading control) is not a 'doublet'."""
+    caption = "P-STAT3 (Tyr705), total STAT3 and beta-actin were blotted."
+    for tgt in ("P-STAT3 (Tyr705)", "T-STAT3", "β-actin"):
+        b = _band_case(tgt, caption, ["IL-6 -", "IL-6 +"])
+        check(f"{tgt}: multiple rows != multiplicity", b.band_pattern.value is None)
+
+
 def test_organism_taxon_mapping():
     """Explicit organism wording scopes the UniProt query; anything else keeps
     the previous human default. The map must never invent an organism."""

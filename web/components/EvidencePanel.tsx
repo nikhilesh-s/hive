@@ -57,6 +57,7 @@ interface RecordDetailData {
   bands: {
     lane_index?: number | null; lane_condition?: string | null; band_state?: string | null;
     lane_dose?: string | null; lane_duration?: string | null;
+    band_pattern?: string | null; band_count?: number | null; band_notes?: string | null;
   }[];
   record_status?: string | null;
   needs_review?: boolean | null;
@@ -368,6 +369,11 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
       {detail.bands.length > 0 && (
         <div>
           <div style={sect}>LANES (band presence — categorical, not densitometry)</div>
+          {detail.bands.some((b) => b.band_pattern) && (
+            <div style={{ fontFamily: SERIF, fontSize: '11px', color: DIM, marginBottom: '6px', fontStyle: 'italic' }}>
+              Pattern is descriptive (what the blot shows{detail.bands.find((b) => b.band_notes)?.band_notes ? `: “${detail.bands.find((b) => b.band_notes)?.band_notes}”` : ''}) — no isoform or cleavage interpretation is implied.
+            </div>
+          )}
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {detail.bands.map((b, i) => (
               <span key={i} style={{
@@ -376,6 +382,9 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
                 color: b.band_state === 'present' ? TEAL : b.band_state === 'absent' ? RED : GOLD,
               }}>
                 {b.lane_condition || `lane ${b.lane_index}`}: {b.band_state || '?'}
+                {b.band_pattern && (
+                  <span style={{ color: TEXT }}>{' · '}{b.band_pattern}</span>
+                )}
                 {(b.lane_dose || b.lane_duration) && (
                   <span style={{ color: LABEL }}>
                     {' · '}{[b.lane_dose, b.lane_duration].filter(Boolean).join(' · ')}

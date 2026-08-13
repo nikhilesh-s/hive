@@ -60,7 +60,10 @@ Return JSON of this exact shape:
       ],
       "bands": [
         {"lane_index": 1, "lane_condition": "<condition or null>", "band_state": "present|absent|uncertain",
-         "confidence": "high|medium|low"}
+         "confidence": "high|medium|low",
+         "band_pattern": "single|doublet|multiple|smear|ladder|uncertain (OMIT unless clearly visible or stated)",
+         "band_count": "<integer, ONLY if the bands are clearly countable, else omit>",
+         "band_notes": "<verbatim wording supporting the pattern, else omit>"}
       ]
     }
   ]
@@ -69,6 +72,12 @@ Rules:
 - One row per distinct target label shown in the panel.
 - band_state must be present, absent, or uncertain -- use uncertain for faint/ambiguous.
 - Do not estimate intensity or fold change.
+- band_pattern is DESCRIPTIVE only: report it when the panel/text clearly shows or
+  states multiple bands, a doublet, a smear, or a ladder. Omit it when in doubt --
+  omission means "not reported", which is correct and preferred. NEVER derive it
+  from what the protein is known to do (e.g. do not call LC3B a doublet, or
+  ubiquitin a ladder, unless THIS blot shows/says so). Do not interpret bands as
+  isoforms, cleavage products, dimers or degradation products.
 - If a value is not stated, use "" (or null for lane_condition). Never guess.
 """.strip()
 

@@ -114,22 +114,36 @@ fig2b = [
 ]
 
 # --- Fig 3A: P-ERK1/2 IL-6 time course -------------------------------------
+# Observer note: both ERK rows visibly resolve as two closely spaced bands
+# (the p44/p42 pair) in the panel crop. Recorded as a DESCRIPTIVE doublet
+# observation only — no isoform assignment is made from the image.
+ERK_DOUBLET = {"band_pattern": "doublet", "band_count": 2,
+               "band_notes": "two closely spaced bands visible in each lane"}
+
+
+def erk_row(label, tctx, band_states):
+    r = row(label, HEP3B, "IL-6", tctx, band_states)
+    for b in r["bands"]:
+        b.update(ERK_DOUBLET)
+    return r
+
+
 fig3a = [
-    row("P-ERK 1/2", HEP3B, "IL-6", tc_ctx,
+    erk_row("P-ERK 1/2", tc_ctx,
         [(1, "0 min", "uncertain", "low"), (2, "5 min", "present", "high"),
          (3, "10 min", "present", "high"), (4, "30 min", "present", "high"),
          (5, "60 min", "present", "high")]),
-    row("T-ERK 1/2", HEP3B, "IL-6", tc_ctx, [(i, f"lane{i}", "present", "high") for i in range(1, 6)]),
+    erk_row("T-ERK 1/2", tc_ctx, [(i, f"lane{i}", "present", "high") for i in range(1, 6)]),
     row("β-actin", HEP3B, "IL-6", tc_ctx, [(i, f"lane{i}", "present", "high") for i in range(1, 6)]),
 ]
 
 # --- Fig 3B: P-ERK1/2 CL-E dose response -----------------------------------
 fig3b = [
-    row("P-ERK 1/2", HEP3B, "IL-6", dr_ctx,
+    erk_row("P-ERK 1/2", dr_ctx,
         [(1, dr_lanes[0], "uncertain", "low"), (2, dr_lanes[1], "present", "high"),
          (3, dr_lanes[2], "present", "high"), (4, dr_lanes[3], "present", "high"),
          (5, dr_lanes[4], "present", "high")]),
-    row("T-ERK 1/2", HEP3B, "IL-6", dr_ctx, [(i, c, "present", "high") for i, c in enumerate(dr_lanes, 1)]),
+    erk_row("T-ERK 1/2", dr_ctx, [(i, c, "present", "high") for i, c in enumerate(dr_lanes, 1)]),
     row("β-actin", HEP3B, "IL-6", dr_ctx, [(i, c, "present", "high") for i, c in enumerate(dr_lanes, 1)]),
 ]
 

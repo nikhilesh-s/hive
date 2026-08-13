@@ -177,6 +177,17 @@ class BandObservation(BaseModel):
     lane_dose_unit: EvidenceField = EvidenceField.missing()
     lane_duration: EvidenceField = EvidenceField.missing()
     lane_duration_unit: EvidenceField = EvidenceField.missing()
+    # DESCRIPTIVE band multiplicity -- additive to band_state, never a
+    # replacement for it (a smeared band is still `present`). Populated only
+    # from explicit source wording or an explicit observer claim; MISSING means
+    # "the source did not say", NOT "single band". Deliberately carries no
+    # isoform / cleavage / dimer interpretation and no intensity: this is what
+    # the blot is reported to SHOW, not what it biochemically means.
+    # `band_count` is filled only when a count is literally stated; the
+    # EvidenceField envelope supplies status + candidates for both fields.
+    band_pattern: EvidenceField = EvidenceField.missing()   # single|doublet|multiple|smear|ladder|uncertain
+    band_count: EvidenceField = EvidenceField.missing()     # int, only when explicitly stated
+    band_notes: EvidenceField = EvidenceField.missing()     # verbatim supporting wording
 
 
 class AnomalyFlag(BaseModel):

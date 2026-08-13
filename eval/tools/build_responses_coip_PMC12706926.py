@@ -96,14 +96,26 @@ g = [
             tctx="H1299 treated with DMSO or LY294002; siCTRL/siBEX2#1/siBEX2#2"),
     uniform("ACTB", "H1299", SI6),
 ]
+# Observer note (panel crops): LC3B in Fig 1C and BEX2 in Fig 7A visibly
+# resolve as two closely spaced bands. Recorded as DESCRIPTIVE doublet
+# observations only — no LC3B-I/II or isoform assignment is made from the
+# image (the paper's own text discusses LC3B-II levels, but the pattern claim
+# here is purely what the blot shows).
+def _doublet(r):
+    for b in r["bands"]:
+        b.update({"band_pattern": "doublet", "band_count": 2,
+                  "band_notes": "two closely spaced bands visible in each lane"})
+    return r
+
+
 # [1] p5 Fig C — H1299, siBEX2 x Rapamycin; BEX2 / P62 / LC3B / ACTB
 c5 = [
     row("BEX2", "H1299", RAPA6, KD + KD, KDC + KDC, "Rapamycin",
         "H1299 treated with DMSO or Rapamycin; siCTRL/siBEX2#1/siBEX2#2"),
     uniform("P62", "H1299", RAPA6, tname="Rapamycin",
             tctx="H1299 treated with DMSO or Rapamycin"),
-    uniform("LC3B", "H1299", RAPA6, conf="medium", tname="Rapamycin",
-            tctx="H1299 treated with DMSO or Rapamycin"),
+    _doublet(uniform("LC3B", "H1299", RAPA6, conf="medium", tname="Rapamycin",
+                     tctx="H1299 treated with DMSO or Rapamycin")),
     uniform("ACTB", "H1299", RAPA6),
 ]
 # [2] p7 Fig D — H1792 co-IP: Input(-/+BEX2) | IP:PIK3CA(-/+BEX2)
@@ -172,8 +184,8 @@ d10 = [
 ]
 # [9] p10 Fig A — H1299 siBEX2 / siPIK3CA
 a10 = [
-    row("BEX2", "H1299", SIP4, ["present", "uncertain", "present", "uncertain"],
-        ["high", "low", "high", "low"], "", "H1299 transfected with siBEX2 and/or siPIK3CA"),
+    _doublet(row("BEX2", "H1299", SIP4, ["present", "uncertain", "present", "uncertain"],
+        ["high", "low", "high", "low"], "", "H1299 transfected with siBEX2 and/or siPIK3CA")),
     uniform("PIK3CA", "H1299", SIP4, conf="medium"),
     uniform("p-AKT (S473)", "H1299", SIP4, conf="medium"),
     uniform("AKT", "H1299", SIP4),

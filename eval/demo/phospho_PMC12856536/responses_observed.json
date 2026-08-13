@@ -500,31 +500,46 @@
             "lane_index": 1,
             "lane_condition": "0 min",
             "band_state": "uncertain",
-            "confidence": "low"
+            "confidence": "low",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 2,
             "lane_condition": "5 min",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 3,
             "lane_condition": "10 min",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 4,
             "lane_condition": "30 min",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 5,
             "lane_condition": "60 min",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           }
         ]
       },
@@ -556,31 +571,46 @@
             "lane_index": 1,
             "lane_condition": "lane1",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 2,
             "lane_condition": "lane2",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 3,
             "lane_condition": "lane3",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 4,
             "lane_condition": "lane4",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 5,
             "lane_condition": "lane5",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           }
         ]
       },
@@ -902,31 +932,46 @@
             "lane_index": 1,
             "lane_condition": "IL-6 - / CL-E -",
             "band_state": "uncertain",
-            "confidence": "low"
+            "confidence": "low",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 2,
             "lane_condition": "IL-6 + / CL-E -",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 3,
             "lane_condition": "IL-6 + / CL-E 10",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 4,
             "lane_condition": "IL-6 + / CL-E 30",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 5,
             "lane_condition": "IL-6 + / CL-E 60",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           }
         ]
       },
@@ -958,31 +1003,46 @@
             "lane_index": 1,
             "lane_condition": "IL-6 - / CL-E -",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 2,
             "lane_condition": "IL-6 + / CL-E -",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 3,
             "lane_condition": "IL-6 + / CL-E 10",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 4,
             "lane_condition": "IL-6 + / CL-E 30",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           },
           {
             "lane_index": 5,
             "lane_condition": "IL-6 + / CL-E 60",
             "band_state": "present",
-            "confidence": "high"
+            "confidence": "high",
+            "band_pattern": "doublet",
+            "band_count": 2,
+            "band_notes": "two closely spaced bands visible in each lane"
           }
         ]
       },

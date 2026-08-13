@@ -6,6 +6,36 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-13 (session 6)** — Claude Code. **M2 CLOSED: descriptive band
+  multiplicity / smear representation.** Additive `BandObservation` fields
+  `band_pattern` (single|doublet|multiple|smear|ladder|uncertain) + `band_count`
+  (only when literally countable/stated) + `band_notes` (verbatim wording), each
+  a full EvidenceField envelope. **Additive to `band_state`, never a replacement**
+  (a smeared/doublet band is still `present`); null pattern = "source didn't
+  say", NOT "single band". Two evidence channels only: (1) deterministic parsing
+  of explicit wording (`biology.detect_band_pattern`: doublet, "two/three
+  bands", smear(ed), ladder-like, polyubiquitin ladder/conjugates, high-MW
+  species, multiple/additional/non-specific bands, single band; hedged wording →
+  AMBIGUOUS; conflicting descriptions → uncertain), **clause-scoped to the
+  target** so "LC3B resolved as a doublet, while ACTB…" never marks ACTB; and
+  (2) explicit observer claims in Stage-2 output (contract updated with strict
+  omit-when-in-doubt + no-identity-inference rules). **False-positive audit on
+  the real 452-band set: with text-only evidence, zero patterns asserted**
+  (correct — no paper states multiplicity wording); observer doublet claims
+  were then added ONLY for the 4 targets visibly resolving as two bands in the
+  inspected crops (LC3B, BEX2, P-ERK 1/2, T-ERK 1/2 → 30 lanes), each carrying
+  image provenance + verbatim note. Phospho+total pairs, loading controls and
+  multi-row panels remain pattern-free (multiplicity belongs to ONE band
+  observation, never to row count). Exposed in `GET /records/{id}` + evidence-
+  panel lane strip with an explicit "descriptive only — no isoform/cleavage
+  interpretation" note. LIMITATIONS: no image-based smear/multiplicity detection
+  (text/observer evidence only); no isoform/cleavage/dimer assignment ever; the
+  no-creds automated model has not been tested against the new contract fields.
+  Tests: **biology 124/124** (+30), api 106/106, benchmark 34/34, harness
+  self-test 100% EXACT, tsc clean. Demo artifacts + DB regenerated (452 rows).
+  Model creds re-checked: still absent. Optional QA sub-agent not spawned (the
+  empirical zero-FP audit on all real bands stood in for it; flag for the
+  independent pre-UCSF QA pass).
 - **2026-08-13 (session 5, hackathon day)** — Claude Code. **RESULT GROUPING + MULTI-DOSE
   REPRESENTATION.** (1) Search results now group into one card per EXPERIMENT
   (paper + panel + target + experiment type + **cell line** + **modification label**)
@@ -308,12 +338,9 @@ Next, in priority order:
    `hive_readonly`/`hive_feedback` passwords, seed `eval/demo/*/supabase_rows.json`,
    fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`/`DB_FEEDBACK_URL`.
    Full steps: `DEPLOYMENT.md`.
-3. Independent scientific QA re-run (session-4 QA was a self-audit). Of its two open
-   Major findings, **M1 (scalar dose/duration) is now CLOSED (session 5)**; **M2
-   remains open**: band multiplicity / smear representation (LC3B-I/II doublet,
-   poly-Ub conjugate ladder) — `BandObservation` still has no band-count or
-   multiplicity concept. Descriptive only when the source supports it: never fake
-   densitometry, never infer isoforms/cleavage products without evidence.
+3. Independent scientific QA re-run (session-4 QA was a self-audit; session-6 skipped
+   the optional band-pattern review agent). Both former Major findings are now closed:
+   **M1 (session 5)**, **M2 (session 6)**.
 4. Figure-crop image serving (the evidence panel currently prints the crop filename
    and says image serving is not enabled locally).
 

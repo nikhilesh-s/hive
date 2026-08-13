@@ -132,6 +132,11 @@ def build_record_detail(row: dict) -> RecordDetail:
             confidence=state_env.get("confidence") if isinstance(state_env, dict) else None,
             lane_dose=f"{dose}{f' {dose_u}' if dose_u else ''}" if dose is not None else None,
             lane_duration=f"{dur}{f' {dur_u}' if dur_u else ''}" if dur is not None else None,
+            band_pattern=_v(b.get("band_pattern")),
+            band_pattern_status=(b.get("band_pattern") or {}).get("status")
+            if isinstance(b.get("band_pattern"), dict) else None,
+            band_count=_v(b.get("band_count")),
+            band_notes=_v(b.get("band_notes")),
         ))
 
     validation = row.get("validation") or {}
