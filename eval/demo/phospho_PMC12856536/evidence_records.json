@@ -319,9 +319,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -330,7 +330,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -499,6 +584,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 0.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -526,6 +653,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 5.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
               "locator": null
             }
           ],
@@ -561,6 +730,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 10.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -588,6 +799,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 20.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
               "locator": null
             }
           ],
@@ -623,6 +876,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 30.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -650,6 +945,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 60.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
               "locator": null
             }
           ],
@@ -990,9 +1327,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -1001,7 +1338,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -1170,6 +1592,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 0.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1197,6 +1661,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 5.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
               "locator": null
             }
           ],
@@ -1232,6 +1738,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 10.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1259,6 +1807,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 20.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
               "locator": null
             }
           ],
@@ -1294,6 +1884,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 30.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1321,6 +1953,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 60.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
               "locator": null
             }
           ],
@@ -1628,9 +2302,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -1639,7 +2313,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -1808,6 +2567,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 0.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1835,6 +2636,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 5.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
               "locator": null
             }
           ],
@@ -1870,6 +2713,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 10.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1897,6 +2782,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 20.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
               "locator": null
             }
           ],
@@ -1932,6 +2859,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 30.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -1959,6 +2928,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 60.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
               "locator": null
             }
           ],
@@ -2252,9 +3263,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -2263,7 +3274,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -2425,6 +3521,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 0.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -2452,6 +3590,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 5.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
               "locator": null
             }
           ],
@@ -2487,6 +3667,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 10.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -2514,6 +3736,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 20.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "20 min",
               "locator": null
             }
           ],
@@ -2549,6 +3813,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 30.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -2576,6 +3882,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 60.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
               "locator": null
             }
           ],
@@ -2888,9 +4236,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -2899,12 +4247,55 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 uM \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -2913,7 +4304,29 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "uM",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
         "value": null,
@@ -3081,6 +4494,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3113,6 +4554,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3144,6 +4613,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3174,6 +4671,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -3483,9 +5008,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -3494,12 +5019,55 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 uM \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -3508,7 +5076,29 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "uM",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
         "value": null,
@@ -3677,6 +5267,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3707,6 +5325,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3739,6 +5385,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3769,6 +5443,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -4045,9 +5747,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -4056,12 +5758,55 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 uM \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -4070,7 +5815,29 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "uM",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
         "value": null,
@@ -4239,6 +6006,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4269,6 +6064,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -4301,6 +6124,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4331,6 +6182,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -4593,9 +6472,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -4604,12 +6483,55 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 uM \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), with IL-6 (10 ng/ml) stimulat",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -4618,7 +6540,29 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "uM",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
         "value": null,
@@ -4780,6 +6724,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4810,6 +6782,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -4842,6 +6842,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4872,6 +6900,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -5243,9 +7299,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -5254,7 +7310,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -5416,6 +7557,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 0.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "0 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -5443,6 +7626,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 5.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "5 min",
               "locator": null
             }
           ],
@@ -5478,6 +7703,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 10.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "10 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -5509,6 +7776,48 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 30.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "30 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
         }
       },
       {
@@ -5536,6 +7845,48 @@
               "type": "image",
               "rank": 5,
               "text": "image",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": 60.0,
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
+              "locator": null
+            }
+          ],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": "min",
+          "confidence": 0.8,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "figure_caption",
+              "rank": 2,
+              "text": "60 min",
               "locator": null
             }
           ],
@@ -5911,9 +8262,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -5922,7 +8273,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -6084,6 +8520,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6114,6 +8578,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6146,6 +8638,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6177,6 +8697,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6207,6 +8755,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -6504,9 +9080,9 @@
         "candidates": []
       },
       "duration": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -6515,7 +9091,92 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 0.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "0.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 5.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "5.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 20.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "20.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 min \u2014 Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times (0, 5, 10, 20, 30, 60 min)",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
         "value": "min",
@@ -6677,6 +9338,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6707,6 +9396,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6739,6 +9456,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6770,6 +9515,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6800,6 +9573,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -7109,9 +9910,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7120,12 +9921,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7134,12 +9992,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7148,12 +10021,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7162,7 +10064,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -7317,6 +10234,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7347,6 +10292,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -7379,6 +10352,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7410,6 +10411,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7440,6 +10469,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -7749,9 +10806,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7760,12 +10817,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7774,12 +10888,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7788,12 +10917,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -7802,7 +10960,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -7957,6 +11130,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7987,6 +11188,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -8019,6 +11248,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8050,6 +11307,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8080,6 +11365,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -8356,9 +11669,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8367,12 +11680,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8381,12 +11751,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8395,12 +11780,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8409,7 +11823,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -8564,6 +11993,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8594,6 +12051,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -8626,6 +12111,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8657,6 +12170,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8687,6 +12228,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -8949,9 +12518,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8960,12 +12529,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8974,12 +12600,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -8988,12 +12629,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -9002,7 +12672,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -9150,6 +12835,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9180,6 +12893,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -9212,6 +12953,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9243,6 +13012,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9273,6 +13070,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -9616,9 +13441,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -9627,12 +13452,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -9641,12 +13523,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -9655,12 +13552,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -9669,7 +13595,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -9817,6 +13758,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9847,6 +13816,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -9879,6 +13876,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9910,6 +13935,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9940,6 +13993,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -10284,9 +14365,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10295,12 +14376,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10309,12 +14447,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10323,12 +14476,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10337,7 +14519,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -10485,6 +14682,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10515,6 +14740,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -10547,6 +14800,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10578,6 +14859,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10608,6 +14917,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -10877,9 +15214,9 @@
         "candidates": []
       },
       "dose": {
-        "value": 60.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10888,12 +15225,69 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 60.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "60.0 ug/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 10.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "10.0 ng/ml \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "dose_unit": {
-        "value": "ug/ml",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10902,12 +15296,27 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "ng/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "ug/ml",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "duration": {
-        "value": 1.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10916,12 +15325,41 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": 1.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "1.0 h \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          },
+          {
+            "value": 30.0,
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": [
+              {
+                "type": "deterministic",
+                "rank": 2,
+                "text": "30.0 min \u2014 Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
+                "locator": null
+              }
+            ]
+          }
+        ]
       },
       "duration_unit": {
-        "value": "h",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
+        "value": null,
+        "confidence": 0.0,
+        "status": "AMBIGUOUS",
         "sources": [
           {
             "type": "deterministic",
@@ -10930,7 +15368,22 @@
             "locator": null
           }
         ],
-        "candidates": []
+        "candidates": [
+          {
+            "value": "h",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          },
+          {
+            "value": "min",
+            "source_type": "deterministic",
+            "rank": 2,
+            "confidence": 0.5,
+            "evidence": []
+          }
+        ]
       },
       "treatment_context": {
         "value": "Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, then stimulated with IL-6 (10 ng/ml) for 30 min",
@@ -11078,6 +15531,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11108,6 +15589,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11140,6 +15649,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11171,6 +15708,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11201,6 +15766,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }

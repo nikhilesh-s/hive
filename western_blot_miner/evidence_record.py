@@ -169,6 +169,14 @@ class BandObservation(BaseModel):
     lane_index: int
     lane_condition: EvidenceField = EvidenceField.missing()
     band_state: EvidenceField = EvidenceField.missing()        # present | absent | uncertain
+    # Lane-specific design, parsed ONLY from this lane's own printed condition
+    # text (never inferred from the panel blob). A dose-response or time course
+    # keeps its per-lane values here while the panel-level scalar stays
+    # AMBIGUOUS/null -- multiple conditions are never collapsed into one scalar.
+    lane_dose: EvidenceField = EvidenceField.missing()
+    lane_dose_unit: EvidenceField = EvidenceField.missing()
+    lane_duration: EvidenceField = EvidenceField.missing()
+    lane_duration_unit: EvidenceField = EvidenceField.missing()
 
 
 class AnomalyFlag(BaseModel):

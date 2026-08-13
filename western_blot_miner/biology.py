@@ -192,6 +192,29 @@ _DOSE = re.compile(
 )
 # Duration: "30 min", "24 h", "48 hours".
 _DURATION = re.compile(r"\b(\d+(?:\.\d+)?)\s?(h|hr|hrs|hour|hours|min|mins|minute|minutes|d|day|days)\b", re.IGNORECASE)
+# Enumerated series that share ONE trailing unit: "10, 30 and 60 ug/ml",
+# "0, 5, 10, 20, 30, 60 min". The plain _DOSE/_DURATION regexes only match the
+# final value (the earlier numbers carry no adjacent unit), which silently
+# collapses a dose-response or time course to a single scalar.
+_DOSE_SERIES = re.compile(
+    r"((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
+    r"(ng/ml|ug/ml|mg/ml|nmol/l|umol/l|mmol/l|nm|um|mm|mg/kg|ng/kg|%)\b",
+    re.IGNORECASE,
+)
+_DURATION_SERIES = re.compile(
+    r"((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
+    r"(h|hr|hrs|hour|hours|min|mins|minute|minutes|d|day|days)\b",
+    re.IGNORECASE,
+)
+# Explicit "this figure varies it per lane" phrasing. Presence means a single
+# scalar is NOT attributable to the panel even if only one value is parseable.
+# Kind-specific: "for the indicated times" must not make the (single, settled)
+# stimulus CONCENTRATION ambiguous, and vice versa.
+_INDICATED_TIME = re.compile(
+    r"\bindicated\s+(times?|time\s*points?|durations?|intervals?)\b", re.IGNORECASE)
+_INDICATED_DOSE = re.compile(
+    r"\bindicated\s+(doses?|concentrations?|amounts?)\b", re.IGNORECASE)
+
 # Identifiers.
 _DOI = re.compile(r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+", re.IGNORECASE)
 _PMID = re.compile(r"\bPMID:?\s*(\d{6,9})\b", re.IGNORECASE)

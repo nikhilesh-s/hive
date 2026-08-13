@@ -276,6 +276,85 @@ def test_co_ip_requires_panel_scoped_evidence():
     check("IP:/IgG lane labels settle co_ip", rec2.experiment.experiment_type.value == "co_ip")
 
 
+def test_dose_duration_series_expansion():
+    """Enumerated series sharing one unit must expand, not collapse to the last
+    value. Real contexts from PMC12856536."""
+    from western_blot_miner.supabase_loader import extract_dose_series, extract_duration_series
+    tc = ("Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times "
+          "(0, 5, 10, 20, 30, 60 min)")
+    durs = [d["value"] for d in extract_duration_series(tc)]
+    check("time course expands to 6 timepoints", durs == [0.0, 5.0, 10.0, 20.0, 30.0, 60.0])
+    check("time course keeps single stimulus dose",
+          [d["value"] for d in extract_dose_series(tc)] == [10.0])
+    dr = ("Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, "
+          "then stimulated with IL-6 (10 ng/ml) for 30 min")
+    doses = extract_dose_series(dr)
+    check("dose response expands to 10/30/60 ug/ml",
+          [d["value"] for d in doses if d["unit"].lower() == "ug/ml"] == [10.0, 30.0, 60.0])
+    check("dose response still sees the second agent's ng/ml dose",
+          any(d["unit"].lower() == "ng/ml" for d in doses))
+    # single-value text is unchanged
+    single = extract_dose_series("IL-6 (10 ng/ml) for 30 min")
+    check("single dose unchanged", len(single) == 1 and single[0]["value"] == 10.0)
+
+
+def test_multi_condition_scalar_is_never_settled():
+    """A dose-response / time-course panel must NOT report one lane's value as
+    THE dose/duration. Before this fix the CL-E dose (60 ug/ml) was reported as
+    the IL-6 dose, and 60 min as THE duration of a 0-60 min course. Scalars go
+    null+AMBIGUOUS with every stated value preserved as a candidate; per-lane
+    values live on the bands."""
+    from western_blot_miner.record_builder import build_evidence_record
+
+    def rec(ctx, lanes):
+        return build_evidence_record({
+            "paper": {"doi": "10.x/t"}, "figure": {"page": 1},
+            "raw_target": "P-STAT3 (Tyr705)", "texts": {"caption": "", "methods": ""},
+            "model_claims": {
+                "sample": "Hep3B", "treatment_name": "IL-6", "treatment_context": ctx,
+                "antibodies": [{"target": "p-STAT3 (Tyr705)", "vendor": "CST", "catalog": "9145",
+                                "role": "detection", "phospho_specific": True,
+                                "source": {"type": "methods", "rank": 3, "text": "CST #9145"}}],
+                "bands": [{"lane_index": i + 1, "lane_condition": c, "band_state": "present",
+                           "confidence": "high"} for i, c in enumerate(lanes)],
+            },
+        })
+
+    tc = rec("Hep3B cells treated with IL-6 (10 ng/ml) for the indicated times "
+             "(0, 5, 10, 20, 30, 60 min)",
+             ["0 min", "5 min", "10 min", "20 min", "30 min", "60 min"])
+    check("time course duration not settled",
+          tc.treatment.duration.value is None and tc.treatment.duration.status == "AMBIGUOUS")
+    check("time course keeps all 6 timepoints as candidates",
+          [c.value for c in tc.treatment.duration.candidates] == [0.0, 5.0, 10.0, 20.0, 30.0, 60.0])
+    check("time course stimulus dose stays SETTLED (kind-specific marker)",
+          tc.treatment.dose.value == 10.0 and tc.treatment.dose.status == "SUPPORTED")
+    check("lane-level durations preserved",
+          [b.lane_duration.value for b in tc.bands] == [0.0, 5.0, 10.0, 20.0, 30.0, 60.0])
+
+    dr = rec("Hep3B cells pretreated with CL-E at 10, 30 and 60 ug/ml for 1 h, "
+             "then stimulated with IL-6 (10 ng/ml) for 30 min",
+             ["IL-6 - / CL-E -", "IL-6 + / CL-E 10", "IL-6 + / CL-E 30"])
+    check("dose-response dose not settled (no cross-treatment misattribution)",
+          dr.treatment.dose.value is None and dr.treatment.dose.status == "AMBIGUOUS")
+    check("dose-response never reports 60 ug/ml as THE IL-6 dose",
+          dr.treatment.dose.value != 60.0)
+    check("dose-response candidates preserved",
+          {c.value for c in dr.treatment.dose.candidates} >= {10.0, 30.0, 60.0})
+    check("two different duration claims stay unsettled",
+          dr.treatment.duration.value is None)
+
+    single = rec("Hep3B cells stimulated with IL-6 (10 ng/ml) for 30 min",
+                 ["untreated", "IL-6 30 min"])
+    check("single-condition dose still settled",
+          single.treatment.dose.value == 10.0 and single.treatment.dose.status == "SUPPORTED")
+    check("single-condition duration still settled",
+          single.treatment.duration.value == 30.0)
+    check("lane parses its own duration", single.bands[1].lane_duration.value == 30.0)
+    check("lane with no stated value stays MISSING",
+          single.bands[0].lane_duration.value is None)
+
+
 def test_organism_taxon_mapping():
     """Explicit organism wording scopes the UniProt query; anything else keeps
     the previous human default. The map must never invent an organism."""
