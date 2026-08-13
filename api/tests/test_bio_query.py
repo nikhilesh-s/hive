@@ -95,3 +95,23 @@ def test_injection_attempt_is_neutralized():
 
 def test_settled_evidence_ordered_first():
     assert "ORDER BY needs_review ASC" in generate_bio_sql("STAT3")
+
+
+def test_p_prefix_term_does_not_add_phospho_filter():
+    # Regression: "P-ERK" used to add modification_type ILIKE '%phospho%',
+    # which EXCLUDED the P-ERK rows whose modification is honestly
+    # CONFLICTING (null scalar). The prefix term matches the printed label;
+    # no modification filter may be inferred from it.
+    sql = generate_bio_sql("needs review P-ERK")
+    assert "modification_type" not in sql
+    assert "%P-ERK%" in sql and "needs_review = true" in sql
+    _guarded("needs review P-ERK")
+
+
+def test_phospho_word_filter_includes_unsettled():
+    # An explicit phospho search must SURFACE disputed phospho-vs-total rows
+    # (status CONFLICTING/AMBIGUOUS), not hide them behind the null scalar.
+    sql = generate_bio_sql("phospho ERK")
+    assert "modification_type ILIKE '%phospho%'" in sql
+    assert "CONFLICTING" in sql and "AMBIGUOUS" in sql
+    _guarded("phospho ERK")
