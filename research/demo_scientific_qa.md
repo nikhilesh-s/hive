@@ -1,3 +1,11 @@
+> **CORRECTION (2026-08-13, after independent QA):** this self-audit contains
+> errors — see `research/independent_scientific_qa.md` (finding C3). Its M2
+> claim that ubiquitin rows carried `MODIFICATION_CONFLICT`/`needs_review` was
+> wrong (they were SUPPORTED with no flags until fixed); its Minor #1
+> misattributed the two-experiments-in-one-crop problem (that was Critical C1,
+> fixed); and one catalog it lists as verified (SC-293172) does not appear in
+> the records. Treat the independent QA as authoritative.
+
 # Scientific QA — 3-paper demo dataset (91 records / 452 rows)
 
 **Method note:** the planned independent Opus QA agent was killed by session

@@ -165,7 +165,9 @@ def rapa_panel(cell):
         row("BEX2", cell, RAPA4, ["absent", "present", "absent", "present"], None,
             "Rapamycin", f"{cell} treated with DMSO or Rapamycin; ± BEX2 overexpression"),
         uniform("P62", cell, RAPA4, tname="Rapamycin"),
-        uniform("LC3B", cell, RAPA4, conf="medium", tname="Rapamycin"),
+        # LC3B doublet independently confirmed "unmistakable" in this panel
+        # (Fig 1C) by the QA re-inspection of the crop.
+        _doublet(uniform("LC3B", cell, RAPA4, conf="medium", tname="Rapamycin")),
         uniform("ACTB", cell, RAPA4),
     ]
 # [7] p6 Fig E — H1792 DMSO/BafA1 x BEX2-/+; BEX2 / LC3B / ACTB
@@ -186,9 +188,12 @@ d10 = [
     uniform("ACTB", "H1792", BP4),
 ]
 # [9] p10 Fig A — H1299 siBEX2 / siPIK3CA
+# (BEX2 doublet annotation REMOVED after independent QA: BEX2 runs as a single
+# band everywhere else in this paper and the knockdown lanes are too faint to
+# support a structure claim — abstention is the safe state.)
 a10 = [
-    _doublet(row("BEX2", "H1299", SIP4, ["present", "uncertain", "present", "uncertain"],
-        ["high", "low", "high", "low"], "", "H1299 transfected with siBEX2 and/or siPIK3CA")),
+    row("BEX2", "H1299", SIP4, ["present", "uncertain", "present", "uncertain"],
+        ["high", "low", "high", "low"], "", "H1299 transfected with siBEX2 and/or siPIK3CA"),
     uniform("PIK3CA", "H1299", SIP4, conf="medium"),
     uniform("p-AKT (S473)", "H1299", SIP4, conf="medium"),
     uniform("AKT", "H1299", SIP4),

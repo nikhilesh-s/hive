@@ -91,8 +91,8 @@
     },
     "modification": {
       "modification_type": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": null,
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -125,14 +125,20 @@
         "candidates": []
       },
       "normalized_label": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": "total",
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
             "type": "antibody",
             "rank": 1,
             "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "Ubiquitin",
             "locator": null
           }
         ],
@@ -878,17 +884,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -2352,17 +2358,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -3012,8 +3018,8 @@
     },
     "modification": {
       "modification_type": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": null,
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -3046,14 +3052,20 @@
         "candidates": []
       },
       "normalized_label": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": "total",
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
             "type": "antibody",
             "rank": 1,
             "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "Ubiquitin",
             "locator": null
           }
         ],
@@ -3959,17 +3971,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -5753,17 +5765,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -6573,8 +6585,8 @@
     },
     "modification": {
       "modification_type": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": null,
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -6607,14 +6619,20 @@
         "candidates": []
       },
       "normalized_label": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": "total",
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
             "type": "antibody",
             "rank": 1,
             "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "Ubiquitin",
             "locator": null
           }
         ],
@@ -7680,17 +7698,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -9794,17 +9812,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -10774,8 +10792,8 @@
     },
     "modification": {
       "modification_type": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": null,
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -10808,14 +10826,20 @@
         "candidates": []
       },
       "normalized_label": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": "total",
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
             "type": "antibody",
             "rank": 1,
             "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "Ubiquitin",
             "locator": null
           }
         ],
@@ -11641,17 +11665,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -13275,17 +13299,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -14015,8 +14039,8 @@
     },
     "modification": {
       "modification_type": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": null,
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -14049,14 +14073,20 @@
         "candidates": []
       },
       "normalized_label": {
-        "value": "ubiquitination",
-        "confidence": 0.9,
+        "value": "total",
+        "confidence": 0.92,
         "status": "SUPPORTED",
         "sources": [
           {
             "type": "antibody",
             "rank": 1,
             "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+            "locator": null
+          },
+          {
+            "type": "model_target",
+            "rank": 4,
+            "text": "Ubiquitin",
             "locator": null
           }
         ],
@@ -15122,17 +15152,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
@@ -17236,17 +17266,17 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []
       },
       "experiment_flags": {
         "value": [
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [],
         "candidates": []

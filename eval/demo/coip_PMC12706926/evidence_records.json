@@ -2958,8 +2958,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -2974,9 +2974,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -6690,8 +6690,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -6706,9 +6706,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -9886,7 +9886,8 @@
       },
       "experiment_flags": {
         "value": [
-          "co_ip"
+          "co_ip",
+          "loading_control"
         ],
         "confidence": 0.9,
         "status": "SUPPORTED",
@@ -13231,8 +13232,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -13247,9 +13248,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -18315,8 +18316,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -18331,9 +18332,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -20969,24 +20970,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -21049,24 +21071,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -21129,24 +21172,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -21209,24 +21273,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       }
@@ -21413,8 +21498,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -21429,9 +21514,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -23907,24 +23992,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -23987,24 +24093,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -24067,24 +24194,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       },
@@ -24147,24 +24295,45 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "doublet",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_count": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": 2,
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         },
         "band_notes": {
-          "value": null,
-          "confidence": 0.0,
-          "status": "MISSING",
-          "sources": [],
+          "value": "two closely spaced bands visible in each lane",
+          "confidence": 0.75,
+          "status": "SUPPORTED",
+          "sources": [
+            {
+              "type": "image",
+              "rank": 5,
+              "text": "two closely spaced bands visible in each lane",
+              "locator": null
+            }
+          ],
           "candidates": []
         }
       }
@@ -24351,8 +24520,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -24367,9 +24536,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -26579,8 +26748,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -26595,9 +26764,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -31068,8 +31237,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -31084,9 +31253,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -32121,45 +32290,24 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": "doublet",
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "band_count": {
-          "value": 2,
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "band_notes": {
-          "value": "two closely spaced bands visible in each lane",
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -32302,45 +32450,24 @@
           "candidates": []
         },
         "band_pattern": {
-          "value": "doublet",
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "band_count": {
-          "value": 2,
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "band_notes": {
-          "value": "two closely spaced bands visible in each lane",
-          "confidence": 0.75,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "image",
-              "rank": 5,
-              "text": "two closely spaced bands visible in each lane",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -35599,8 +35726,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -35615,9 +35742,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -41611,8 +41738,8 @@
     },
     "experiment": {
       "experiment_type": {
-        "value": "standard_western",
-        "confidence": 0.55,
+        "value": "loading_control",
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {
@@ -41627,9 +41754,9 @@
       "experiment_flags": {
         "value": [
           "co_ip_context",
-          "standard_western"
+          "loading_control"
         ],
-        "confidence": 0.55,
+        "confidence": 0.9,
         "status": "SUPPORTED",
         "sources": [
           {

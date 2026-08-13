@@ -55,3 +55,11 @@ conflated with the UniProt-derived expected MW.
 - `evidence_records.json` — full Evidence Records (field envelopes + provenance).
 - `supabase_rows.json` — flat migration-001 projection (one row per band).
 - `responses_observed.json` — the agent's Stage-2 observations (input to the run).
+
+## Correction (independent QA, C1)
+The crop `page_005_cand_0034.png` contains TWO experiments (Fig 3C and 3D).
+The original observation collapsed them into one 4-lane panel and wrongly
+asserted IL-6 treatment on the Ser727 arm — the paper's legend states Fig 3C
+was run in the ABSENCE of IL-6. Fixed 2026-08-13: the arms are now separate
+records with the printed 6- and 7-lane condition matrices; band states not
+confidently re-verifiable were recorded as `uncertain`, never guessed.

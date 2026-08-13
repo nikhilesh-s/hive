@@ -29,10 +29,12 @@ from typing import Iterable, Optional
 # normalized target token, so "beta-actin" and "b-actin" both hit "actin".
 LOADING_CONTROLS: tuple[str, ...] = (
     "actin",
+    "actb",        # gene symbol — "β-actin" matched but "ACTB" did not (QA M7)
     "b-actin",
     "beta-actin",
     "gapdh",
     "tubulin",
+    "tuba1b",      # alpha-tubulin 1B gene symbol
     "alpha-tubulin",
     "vinculin",
     "hsp90",
@@ -187,7 +189,7 @@ _DILUTION = re.compile(r"\b1\s?:\s?(\d{2,6})\b")
 _KDA = re.compile(r"(~?\s?\d{1,4}(?:\.\d+)?)\s?kDa", re.IGNORECASE)
 # Dose: "20 ng/mL", "10 uM", "0.2 umol/L".
 _DOSE = re.compile(
-    r"\b(\d+(?:\.\d+)?)\s?(ng/ml|ug/ml|mg/ml|nmol/l|umol/l|mmol/l|nm|um|mm|mg/kg|ng/kg|%)\b",
+    r"\b(\d+(?:\.\d+)?)\s?(ng/ml|[uµμ]g/ml|mg/ml|nmol/l|[uµμ]mol/l|mmol/l|nm|[uµμ]m|mm|mg/kg|ng/kg|%)\b",
     re.IGNORECASE,
 )
 # Duration: "30 min", "24 h", "48 hours".
@@ -196,13 +198,16 @@ _DURATION = re.compile(r"\b(\d+(?:\.\d+)?)\s?(h|hr|hrs|hour|hours|min|mins|minut
 # "0, 5, 10, 20, 30, 60 min". The plain _DOSE/_DURATION regexes only match the
 # final value (the earlier numbers carry no adjacent unit), which silently
 # collapses a dose-response or time course to a single scalar.
+# Leading (?<![\w.]) guard: without it the series regex started matching INSIDE
+# an identifier — "BafA1, 20 nM" captured "1, 20 nM" and fabricated a 1 nM dose
+# candidate from the trailing digit of the drug's NAME (independent QA, M6).
 _DOSE_SERIES = re.compile(
-    r"((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
-    r"(ng/ml|ug/ml|mg/ml|nmol/l|umol/l|mmol/l|nm|um|mm|mg/kg|ng/kg|%)\b",
+    r"(?<![\w.])((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
+    r"(ng/ml|[uµμ]g/ml|mg/ml|nmol/l|[uµμ]mol/l|mmol/l|nm|[uµμ]m|mm|mg/kg|ng/kg|%)\b",
     re.IGNORECASE,
 )
 _DURATION_SERIES = re.compile(
-    r"((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
+    r"(?<![\w.])((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
     r"(h|hr|hrs|hour|hours|min|mins|minute|minutes|d|day|days)\b",
     re.IGNORECASE,
 )
@@ -428,6 +433,9 @@ def _core_symbol(target: str) -> str:
     ``gene:ERK`` resolves to EPHB2, whose gene synonym is literally "ERK").
     """
     s = _norm(target)
+    # Greek letters -> spelled-out forms so "β-actin" reaches the alias map /
+    # UniProt as "beta-actin" (raw wording is preserved elsewhere).
+    s = s.replace("β", "beta").replace("α", "alpha")
     # phospho word, or a p-/t- prefix with a REQUIRED separator.
     s = re.sub(r"^(phospho[-\s]?|[pt][-\s])", "", s, flags=re.IGNORECASE)
     # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
@@ -521,6 +529,17 @@ def detect_modification(
     for mod_type, pat in _MOD_WORDS.items():
         m = pat.search(target)
         if m:
+            # The mod word being essentially the ENTIRE target means the row's
+            # analyte IS that protein: an anti-ubiquitin blot detects the
+            # protein ubiquitin; it does not establish that some other target
+            # is ubiquitinated. Asserting a modification from the antibody's
+            # own antigen name is the same failure class as the banned
+            # startswith("p") phospho rule (independent QA finding C2).
+            # "ubiquitinated EGFR" keeps the claim: a real target remains.
+            rest = target[:m.start()] + target[m.end():]
+            rest = re.sub(r"(?i)\b(?:ated|ation|ylation)\b|[-()\s]+", " ", rest)
+            if not re.search(r"[A-Za-z]{2}", rest):
+                continue
             label = m.group(0).lower() if mod_type == "cleavage" else mod_type
             return {
                 "modification_type": mod_type,
