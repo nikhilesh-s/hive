@@ -215,6 +215,91 @@ _INDICATED_TIME = re.compile(
 _INDICATED_DOSE = re.compile(
     r"\bindicated\s+(doses?|concentrations?|amounts?)\b", re.IGNORECASE)
 
+# --------------------------------------------------------------------------- #
+# Band multiplicity / pattern (DESCRIPTIVE ONLY)
+# --------------------------------------------------------------------------- #
+# What the source SAYS the blot shows. This is not densitometry, not image
+# segmentation, and never an inference from protein identity: "LC3B" does not
+# imply a doublet, and "ubiquitin" does not imply a ladder -- only explicit
+# wording (or an explicit observer claim) counts. Isoform / cleavage-product /
+# dimer interpretation is deliberately NOT derived here; those are biochemical
+# claims the wording alone does not license.
+_NUMBER_WORDS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
+
+_BAND_DOUBLET = re.compile(r"\bdoublets?\b", re.IGNORECASE)
+_BAND_SMEAR = re.compile(r"\bsmears?\b|\bsmear(?:ed|ing)\b|\bdiffuse\s+(?:band|signal)\b", re.IGNORECASE)
+_BAND_LADDER = re.compile(
+    r"\bladder[-\s]?like\b|\b(?:poly[-\s]?ubiquitin|polyubiquitin)\s+(?:ladder|smear|species|conjugates?)\b"
+    r"|\bhigh(?:er)?[-\s]molecular[-\s]?weight\s+(?:species|forms?|bands?|conjugates?)\b",
+    re.IGNORECASE,
+)
+# "two bands", "three distinct bands", "2 bands"
+_BAND_COUNT = re.compile(
+    r"\b(two|three|four|five|six|\d{1,2})\s+(?:distinct\s+|discrete\s+|separate\s+|major\s+)?bands?\b",
+    re.IGNORECASE,
+)
+_BAND_MULTIPLE = re.compile(
+    r"\bmultiple\s+bands?\b|\bseveral\s+bands?\b|\badditional\s+bands?\b|\bextra\s+bands?\b"
+    r"|\bunexpected\s+bands?\b|\bnon[-\s]?specific\s+bands?\b",
+    re.IGNORECASE,
+)
+_BAND_SINGLE = re.compile(r"\b(?:a\s+)?single\s+band\b|\bone\s+band\b", re.IGNORECASE)
+# Hedged wording keeps multiplicity UNCERTAIN rather than asserting a pattern.
+_BAND_HEDGE = re.compile(
+    r"\b(?:may|might|could|possibly|possible|appears?\s+to|seem(?:s|ed)?\s+to|"
+    r"unclear|ambiguous|difficult\s+to)\b", re.IGNORECASE)
+
+# Recognized pattern vocabulary (order = precedence when several co-occur).
+BAND_PATTERNS = ("smear", "ladder", "doublet", "multiple", "single", "uncertain")
+
+
+def detect_band_pattern(*texts: str) -> Optional[dict]:
+    """Descriptive band pattern from EXPLICIT source wording, or None.
+
+    Returns ``{"pattern", "count", "raw", "hedged"}`` where ``count`` is filled
+    only when the text literally states one ("two bands" -> 2). Returns None
+    when the text says nothing about multiplicity -- callers must then leave the
+    field MISSING rather than assume "single".
+    """
+    for text in texts:
+        if not text:
+            continue
+        hedged = bool(_BAND_HEDGE.search(text))
+        found: list[tuple[str, str, Optional[int]]] = []
+        m = _BAND_SMEAR.search(text)
+        if m:
+            found.append(("smear", m.group(0), None))
+        m = _BAND_LADDER.search(text)
+        if m:
+            found.append(("ladder", m.group(0), None))
+        m = _BAND_DOUBLET.search(text)
+        if m:
+            found.append(("doublet", m.group(0), 2))
+        m = _BAND_COUNT.search(text)
+        if m:
+            raw_n = m.group(1).lower()
+            n = _NUMBER_WORDS.get(raw_n) or (int(raw_n) if raw_n.isdigit() else None)
+            if n is not None and n >= 2:
+                found.append(("doublet" if n == 2 else "multiple", m.group(0), n))
+        m = _BAND_MULTIPLE.search(text)
+        if m:
+            found.append(("multiple", m.group(0), None))
+        m = _BAND_SINGLE.search(text)
+        if m:
+            found.append(("single", m.group(0), 1))
+        if not found:
+            continue
+        # Several distinct patterns in one statement -> do not pick a winner.
+        kinds = {k for k, _, _ in found}
+        if len(kinds) > 1:
+            raw = "; ".join(r for _, r, _ in found)
+            return {"pattern": "uncertain", "count": None, "raw": raw, "hedged": True}
+        kind, raw, count = found[0]
+        return {"pattern": "uncertain" if hedged else kind,
+                "count": None if hedged else count, "raw": raw, "hedged": hedged}
+    return None
+
+
 # Identifiers.
 _DOI = re.compile(r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+", re.IGNORECASE)
 _PMID = re.compile(r"\bPMID:?\s*(\d{6,9})\b", re.IGNORECASE)

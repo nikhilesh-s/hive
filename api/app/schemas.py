@@ -138,6 +138,12 @@ class RecordBand(BaseModel):
     # the panel-level scalar stays AMBIGUOUS (never collapsed to one value).
     lane_dose: str | None = None
     lane_duration: str | None = None
+    # Descriptive multiplicity, additive to band_state (a smeared band is still
+    # `present`). Null = the source did not say, NOT "single band".
+    band_pattern: str | None = None
+    band_pattern_status: str | None = None
+    band_count: int | None = None
+    band_notes: str | None = None
 
 
 class RecordDetail(BaseModel):

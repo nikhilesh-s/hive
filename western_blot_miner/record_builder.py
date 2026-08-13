@@ -148,7 +148,9 @@ def build_evidence_record(
     molecular_weight = _mw_info(caption, methods, res, core=core)
 
     # ---- bands -------------------------------------------------------------
-    bands = _bands(mc)
+    # `core` + `caption` let band-pattern wording be scoped to THIS target so a
+    # sibling row's doublet never leaks onto this one.
+    bands = _bands(mc, core=core, caption=caption)
 
     record = EvidenceRecord(
         record_id=_record_id(case, raw_target),
@@ -478,7 +480,64 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
     return MolecularWeightInfo(reported_kda=reported_f, expected_kda=expected_f, reconciliation=recon)
 
 
-def _bands(mc) -> list[BandObservation]:
+def _pattern_near_core(core: str, text: str) -> Optional[dict]:
+    """Band-pattern wording that belongs to THIS target, not to the page.
+
+    Same scoping discipline as reported-MW and co-IP classification: a caption
+    sentence like "LC3B resolved as a doublet" must not mark the ACTB row on the
+    same panel as a doublet. Only wording within a window around a mention of
+    this target's core symbol counts; if the core is never mentioned, no
+    page-level pattern is adopted at all.
+    """
+    if not core or not text:
+        return None
+    # Clause-scoped, not window-scoped: a sliding character window bleeds across
+    # "LC3B resolved as a doublet, while ACTB was the loading control" and marks
+    # ACTB a doublet. Captions delimit targets with clause punctuation and
+    # contrastive conjunctions, so only the clause naming THIS target counts.
+    import re as _re
+    core_low = core.lower()
+    for clause in _re.split(r"[;.]|,|\bwhile\b|\bwhereas\b", text):
+        if clause and core_low in clause.lower():
+            hit = biology.detect_band_pattern(clause)
+            if hit:
+                return hit
+    return None
+
+
+def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str):
+    """(pattern, count, notes) EvidenceFields for one band observation.
+
+    Precedence: an explicit observer claim on the row, then this lane's own
+    printed text, then target-scoped caption wording. Nothing is inferred from
+    the protein's identity or from the number of rows in the panel.
+    """
+    claim = b.get("band_pattern")
+    if claim and str(claim).lower() in biology.BAND_PATTERNS:
+        pattern = str(claim).lower()
+        raw = str(b.get("band_notes") or claim)
+        count = b.get("band_count")
+        src = [Source(type="image", rank=5, text=raw)]
+        conf = 0.75
+        hedged = pattern == "uncertain"
+    else:
+        hit = biology.detect_band_pattern(lane_text) or _pattern_near_core(core, caption)
+        if not hit:
+            return (EvidenceField.missing(), EvidenceField.missing(), EvidenceField.missing())
+        pattern, count, raw = hit["pattern"], hit["count"], hit["raw"]
+        hedged = hit["hedged"]
+        src = [Source(type="figure_caption", rank=RANK_CAPTION, text=raw)]
+        conf = 0.6 if hedged else 0.8
+    pattern_f = (EvidenceField(value=pattern, confidence=conf, status=AMBIGUOUS, sources=src)
+                 if hedged or pattern == "uncertain"
+                 else EvidenceField.supported(pattern, conf, src))
+    count_f = (EvidenceField.supported(int(count), conf, src)
+               if isinstance(count, int) else EvidenceField.missing())
+    notes_f = EvidenceField.supported(raw, conf, src) if raw else EvidenceField.missing()
+    return pattern_f, count_f, notes_f
+
+
+def _bands(mc, core: str = "", caption: str = "") -> list[BandObservation]:
     out = []
     for b in mc.get("bands", []):
         cond = b.get("lane_condition")
@@ -498,6 +557,7 @@ def _bands(mc) -> list[BandObservation]:
         if len(lane_durs) == 1:
             lane_dur_f = EvidenceField.supported(lane_durs[0]["value"], 0.8, lane_src)
             lane_dur_unit_f = EvidenceField.supported(lane_durs[0]["unit"], 0.8, lane_src)
+        pattern_f, count_f, notes_f = _band_pattern_fields(b, core, caption, cond_text)
         out.append(BandObservation(
             lane_index=b.get("lane_index", 1),
             lane_condition=EvidenceField.supported(cond, 0.8, lane_src)
@@ -509,6 +569,9 @@ def _bands(mc) -> list[BandObservation]:
             lane_dose_unit=lane_dose_unit_f,
             lane_duration=lane_dur_f,
             lane_duration_unit=lane_dur_unit_f,
+            band_pattern=pattern_f,
+            band_count=count_f,
+            band_notes=notes_f,
         ))
     return out
 
