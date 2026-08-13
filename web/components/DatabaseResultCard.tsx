@@ -48,8 +48,18 @@ interface DatabaseResult {
   title?: string | null;
 }
 
+export interface LaneSummary {
+  condition: string | null;
+  band_state: string | null;
+}
+
 interface DatabaseResultCardProps {
   data: DatabaseResult;
+  // When search results are grouped into one card per experiment (paper +
+  // panel + target), `lanes` carries every lane of the group so a researcher
+  // reads ONE experiment instead of N near-identical rows. Optional: a card
+  // without it renders the single row exactly as before.
+  lanes?: LaneSummary[];
 }
 
 const MONO = '"IBM Plex Mono", monospace';
@@ -87,7 +97,7 @@ function Field({ label, value, mono, color }: { label: string; value: ReactNode;
   );
 }
 
-export default function DatabaseResultCard({ data }: DatabaseResultCardProps) {
+export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const headline = data.canonical_target || data.target;
@@ -172,7 +182,31 @@ export default function DatabaseResultCard({ data }: DatabaseResultCardProps) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {treatment && <Field label="TREATMENT" value={treatment} />}
-            {bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />}
+            {lanes && lanes.length > 1 ? (
+              <Field
+                label={`LANES (${lanes.length})`}
+                value={
+                  <span style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                    {lanes.slice(0, 8).map((l, i) => (
+                      <span key={i} style={{
+                        fontFamily: MONO, fontSize: '10px', padding: '2px 7px', borderRadius: '4px',
+                        border: '1px solid rgba(255,255,255,.1)',
+                        color: l.band_state === 'present' ? TEAL : l.band_state === 'absent' ? RED : GOLD,
+                      }}>
+                        {l.condition || `lane ${i + 1}`}
+                      </span>
+                    ))}
+                    {lanes.length > 8 && (
+                      <span style={{ fontFamily: MONO, fontSize: '10px', color: LABEL }}>
+                        +{lanes.length - 8} more
+                      </span>
+                    )}
+                  </span>
+                }
+              />
+            ) : (
+              bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
+            )}
             {mw && <Field label="MOLECULAR WEIGHT" value={mw} mono />}
           </div>
         </div>
