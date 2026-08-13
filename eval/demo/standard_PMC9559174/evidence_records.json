@@ -404,6 +404,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -434,6 +462,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -466,6 +522,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -496,6 +580,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -945,6 +1057,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -975,6 +1115,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -1007,6 +1175,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -1037,6 +1233,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -1486,6 +1710,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -1516,6 +1768,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -1548,6 +1828,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -1578,6 +1886,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -2027,6 +2363,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -2057,6 +2421,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -2089,6 +2481,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -2119,6 +2539,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -2541,6 +2989,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -2571,6 +3047,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -2603,6 +3107,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -2633,6 +3165,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -2665,6 +3225,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -2695,6 +3283,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -3144,6 +3760,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3174,6 +3818,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3206,6 +3878,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3236,6 +3936,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3268,6 +3996,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3298,6 +4054,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -3747,6 +4531,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3777,6 +4589,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3809,6 +4649,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3839,6 +4707,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -3871,6 +4767,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -3901,6 +4825,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -4350,6 +5302,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4380,6 +5360,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -4412,6 +5420,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4442,6 +5478,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -4474,6 +5538,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4504,6 +5596,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -4926,6 +6046,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -4956,6 +6104,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -4988,6 +6164,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5018,6 +6222,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -5050,6 +6282,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5081,6 +6341,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5111,6 +6399,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -5143,6 +6459,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       }
     ],
@@ -5591,6 +6935,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5621,6 +6993,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -5653,6 +7053,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5683,6 +7111,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -5715,6 +7171,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5745,6 +7229,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -5777,6 +7289,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -5807,6 +7347,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -6256,6 +7824,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6286,6 +7882,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6318,6 +7942,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6348,6 +8000,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6380,6 +8060,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6410,6 +8118,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6442,6 +8178,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6472,6 +8236,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -6921,6 +8713,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -6951,6 +8771,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -6983,6 +8831,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7013,6 +8889,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -7045,6 +8949,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7075,6 +9007,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -7107,6 +9067,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7137,6 +9125,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -7559,6 +9575,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7589,6 +9633,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -7621,6 +9693,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7652,6 +9752,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -7682,6 +9810,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -8131,6 +10287,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8161,6 +10345,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -8193,6 +10405,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8224,6 +10464,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8254,6 +10522,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -8703,6 +10999,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8733,6 +11057,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -8765,6 +11117,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8796,6 +11176,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -8826,6 +11234,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -9275,6 +11711,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9305,6 +11769,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -9337,6 +11829,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9368,6 +11888,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9398,6 +11946,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -9820,6 +12396,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9850,6 +12454,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -9882,6 +12514,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9912,6 +12572,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -9944,6 +12632,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -9974,6 +12690,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -10006,6 +12750,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10036,6 +12808,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -10485,6 +13285,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10515,6 +13343,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -10547,6 +13403,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10577,6 +13461,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -10609,6 +13521,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10639,6 +13579,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -10671,6 +13639,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -10701,6 +13697,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -11150,6 +14174,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11180,6 +14232,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11212,6 +14292,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11242,6 +14350,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11274,6 +14410,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11304,6 +14468,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11336,6 +14528,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11366,6 +14586,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }
@@ -11815,6 +15063,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11845,6 +15121,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11877,6 +15181,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11907,6 +15239,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -11939,6 +15299,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -11969,6 +15357,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       },
@@ -12001,6 +15417,34 @@
             }
           ],
           "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
         }
       },
       {
@@ -12031,6 +15475,34 @@
               "locator": null
             }
           ],
+          "candidates": []
+        },
+        "lane_dose": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_dose_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
+          "candidates": []
+        },
+        "lane_duration_unit": {
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         }
       }

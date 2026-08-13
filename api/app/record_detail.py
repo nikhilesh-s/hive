@@ -121,11 +121,17 @@ def build_record_detail(row: dict) -> RecordDetail:
         if not isinstance(b, dict):
             continue
         state_env = b.get("band_state")
+        # Lane-specific design values (dose-response / time course). These carry
+        # the real per-lane numbers when the panel-level scalar is AMBIGUOUS.
+        dose, dose_u = _v(b.get("lane_dose")), _v(b.get("lane_dose_unit"))
+        dur, dur_u = _v(b.get("lane_duration")), _v(b.get("lane_duration_unit"))
         bands.append(RecordBand(
             lane_index=b.get("lane_index"),
             lane_condition=_v(b.get("lane_condition")),
             band_state=_v(state_env),
             confidence=state_env.get("confidence") if isinstance(state_env, dict) else None,
+            lane_dose=f"{dose}{f' {dose_u}' if dose_u else ''}" if dose is not None else None,
+            lane_duration=f"{dur}{f' {dur_u}' if dur_u else ''}" if dur is not None else None,
         ))
 
     validation = row.get("validation") or {}

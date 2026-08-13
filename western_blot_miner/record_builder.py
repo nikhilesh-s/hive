@@ -49,7 +49,13 @@ from .evidence_record import (
 )
 from .reconcile import Claim, ModClaim, reconcile_field, reconcile_modification
 from .resolve import ProteinResolver, LocalMapResolver
-from .supabase_loader import extract_dose, extract_duration, extract_kda
+from .supabase_loader import (
+    extract_dose,
+    extract_dose_series,
+    extract_duration,
+    extract_duration_series,
+    extract_kda,
+)
 
 CELL_LINE_ORGANISM = {
     "hek293": "human", "hek293t": "human", "hela": "human", "a549": "human",
@@ -313,19 +319,66 @@ def _sample_info(mc, caption) -> SampleInfo:
                       tissue=EvidenceField.missing(), genotype=EvidenceField.missing())
 
 
+def _series_fields(values: list[dict], ctx: str, det: list[Source],
+                   multi_marker: bool) -> tuple[EvidenceField, EvidenceField]:
+    """(value_field, unit_field) for a dose or duration series.
+
+    ONE stated value -> SUPPORTED scalar, as before.
+    MORE THAN ONE (a dose-response / time course, or two agents at different
+    units) -> the panel-level scalar is NOT attributable to any single lane, so
+    it becomes **value=None, status=AMBIGUOUS** with every stated value kept as
+    a candidate. Taking values[0] used to report the CL-E dose (60 ug/ml) as the
+    IL-6 dose, and 60 min as THE duration of a 0-60 min time course. The
+    lane-level values live on each BandObservation; the DB scalar goes NULL
+    rather than asserting a wrong one (null > misleading value).
+    """
+    if not values:
+        return EvidenceField.missing(), EvidenceField.missing()
+    distinct = {(v["value"], v["unit"].lower()) for v in values}
+    if len(distinct) == 1 and not multi_marker:
+        return (EvidenceField.supported(values[0]["value"], 0.85, det),
+                EvidenceField.supported(values[0]["unit"], 0.85, det))
+    cands = [
+        Candidate(value=v["value"], source_type="deterministic", rank=RANK_DETERMINISTIC,
+                  confidence=0.5,
+                  evidence=[Source(type="deterministic", rank=RANK_DETERMINISTIC,
+                                   text=f'{v["value"]} {v["unit"]} — {ctx[:160]}')])
+        for v in values
+    ]
+    units = {v["unit"] for v in values}
+    value_f = EvidenceField(value=None, confidence=0.0, status=AMBIGUOUS,
+                            sources=det, candidates=cands)
+    unit_f = (EvidenceField.supported(next(iter(units)), 0.85, det) if len(units) == 1
+              else EvidenceField(value=None, confidence=0.0, status=AMBIGUOUS,
+                                 sources=det,
+                                 candidates=[Candidate(value=u, source_type="deterministic",
+                                                       rank=RANK_DETERMINISTIC, confidence=0.5)
+                                             for u in sorted(units)]))
+    return value_f, unit_f
+
+
 def _treatment_info(mc) -> TreatmentInfo:
     ctx = mc.get("treatment_context") or ""
     name = mc.get("treatment_name")
-    doses = extract_dose(ctx)
-    durs = extract_duration(ctx)
+    # Series-aware: enumerations ("10, 30 and 60 ug/ml", "0, 5, 10, 30, 60 min")
+    # are expanded so multiplicity is visible instead of silently collapsed.
+    doses = extract_dose_series(ctx)
+    durs = extract_duration_series(ctx)
+    # "for the indicated times/doses" says the panel varies THAT quantity per
+    # lane even when only one value is parseable -> never settle that scalar.
+    # Kind-specific: a time course's single stimulus concentration stays settled.
     src = [Source(type="figure_caption", rank=RANK_CAPTION, text=ctx)] if ctx else []
     det = [Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if ctx else []
+    dose_f, dose_unit_f = _series_fields(
+        doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)))
+    dur_f, dur_unit_f = _series_fields(
+        durs, ctx, det, bool(biology._INDICATED_TIME.search(ctx)))
     return TreatmentInfo(
         treatment_name=EvidenceField.supported(name, 0.8, src) if name else EvidenceField.missing(),
-        dose=EvidenceField.supported(doses[0]["value"], 0.85, det) if doses else EvidenceField.missing(),
-        dose_unit=EvidenceField.supported(doses[0]["unit"], 0.85, det) if doses else EvidenceField.missing(),
-        duration=EvidenceField.supported(durs[0]["value"], 0.85, det) if durs else EvidenceField.missing(),
-        duration_unit=EvidenceField.supported(durs[0]["unit"], 0.85, det) if durs else EvidenceField.missing(),
+        dose=dose_f,
+        dose_unit=dose_unit_f,
+        duration=dur_f,
+        duration_unit=dur_unit_f,
         treatment_context=EvidenceField.supported(ctx, 0.8, src) if ctx else EvidenceField.missing(),
     )
 
@@ -428,15 +481,34 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
 def _bands(mc) -> list[BandObservation]:
     out = []
     for b in mc.get("bands", []):
+        cond = b.get("lane_condition")
+        cond_text = str(cond or "")
+        # Lane-specific dose/duration, read ONLY from this lane's own printed
+        # condition ("30 min", "IL-6 + / CL-E 30"). Ambiguous within one lane
+        # (>1 value) -> leave MISSING rather than pick one. Never inferred from
+        # the panel-level blob.
+        lane_src = [Source(type="figure_caption", rank=RANK_CAPTION, text=cond_text)]
+        lane_doses = extract_dose_series(cond_text)
+        lane_durs = extract_duration_series(cond_text)
+        lane_dose_f = lane_dose_unit_f = EvidenceField.missing()
+        lane_dur_f = lane_dur_unit_f = EvidenceField.missing()
+        if len(lane_doses) == 1:
+            lane_dose_f = EvidenceField.supported(lane_doses[0]["value"], 0.8, lane_src)
+            lane_dose_unit_f = EvidenceField.supported(lane_doses[0]["unit"], 0.8, lane_src)
+        if len(lane_durs) == 1:
+            lane_dur_f = EvidenceField.supported(lane_durs[0]["value"], 0.8, lane_src)
+            lane_dur_unit_f = EvidenceField.supported(lane_durs[0]["unit"], 0.8, lane_src)
         out.append(BandObservation(
             lane_index=b.get("lane_index", 1),
-            lane_condition=EvidenceField.supported(
-                b.get("lane_condition"), 0.8,
-                [Source(type="figure_caption", rank=RANK_CAPTION, text=str(b.get("lane_condition") or ""))])
-            if b.get("lane_condition") else EvidenceField.missing(),
+            lane_condition=EvidenceField.supported(cond, 0.8, lane_src)
+            if cond else EvidenceField.missing(),
             band_state=EvidenceField.supported(
                 b.get("band_state"), _band_conf(b.get("confidence")),
                 [Source(type="image", rank=5, text="image")]) if b.get("band_state") else EvidenceField.missing(),
+            lane_dose=lane_dose_f,
+            lane_dose_unit=lane_dose_unit_f,
+            lane_duration=lane_dur_f,
+            lane_duration_unit=lane_dur_unit_f,
         ))
     return out
 

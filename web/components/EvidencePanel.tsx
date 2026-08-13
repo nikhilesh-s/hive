@@ -54,7 +54,10 @@ interface RecordDetailData {
     phospho_specific?: boolean | null; association_confidence?: number | null;
     source_text?: string | null;
   }[];
-  bands: { lane_index?: number | null; lane_condition?: string | null; band_state?: string | null }[];
+  bands: {
+    lane_index?: number | null; lane_condition?: string | null; band_state?: string | null;
+    lane_dose?: string | null; lane_duration?: string | null;
+  }[];
   record_status?: string | null;
   needs_review?: boolean | null;
   anomaly_flags: { code?: string | null; message?: string | null }[];
@@ -373,6 +376,11 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
                 color: b.band_state === 'present' ? TEAL : b.band_state === 'absent' ? RED : GOLD,
               }}>
                 {b.lane_condition || `lane ${b.lane_index}`}: {b.band_state || '?'}
+                {(b.lane_dose || b.lane_duration) && (
+                  <span style={{ color: LABEL }}>
+                    {' · '}{[b.lane_dose, b.lane_duration].filter(Boolean).join(' · ')}
+                  </span>
+                )}
               </span>
             ))}
           </div>

@@ -133,6 +133,11 @@ class RecordBand(BaseModel):
     lane_condition: str | None = None
     band_state: str | None = None    # present / absent / uncertain — categorical, not densitometry
     confidence: float | None = None
+    # Lane-specific design, parsed only from this lane's own printed condition.
+    # A dose-response / time course keeps its real per-lane values here while
+    # the panel-level scalar stays AMBIGUOUS (never collapsed to one value).
+    lane_dose: str | None = None
+    lane_duration: str | None = None
 
 
 class RecordDetail(BaseModel):

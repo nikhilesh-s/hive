@@ -271,6 +271,47 @@ def extract_duration(text: str) -> list[dict[str, Any]]:
     ]
 
 
+def _expand_series(text: str, series_re, single_re) -> list[dict[str, Any]]:
+    """Every value a text states, INCLUDING enumerated series sharing one unit.
+
+    "10, 30 and 60 ug/ml" -> three values, not one; "0, 5, 10, 20, 30, 60 min"
+    -> six timepoints. Order is preserved and duplicates are kept out; nothing
+    is inferred that the text does not literally state.
+    """
+    text = text or ""
+    out: list[dict[str, Any]] = []
+    consumed: list[tuple[int, int]] = []
+    for m in series_re.finditer(text):
+        unit = m.group(2)
+        # group(1) is the whole enumeration INCLUDING its final value.
+        for num in re.findall(r"\d+(?:\.\d+)?", m.group(1)):
+            out.append({"value": float(num), "unit": unit})
+        consumed.append(m.span())
+    # Singles outside any series span.
+    for m in single_re.finditer(text):
+        if any(s <= m.start() < e for s, e in consumed):
+            continue
+        out.append({"value": float(m.group(1)), "unit": m.group(2)})
+    # De-duplicate, preserving first-seen order.
+    seen, uniq = set(), []
+    for d in out:
+        k = (d["value"], d["unit"].lower())
+        if k not in seen:
+            seen.add(k)
+            uniq.append(d)
+    return uniq
+
+
+def extract_dose_series(text: str) -> list[dict[str, Any]]:
+    """All doses stated, expanding enumerations (dose-response aware)."""
+    return _expand_series(text, biology._DOSE_SERIES, biology._DOSE)
+
+
+def extract_duration_series(text: str) -> list[dict[str, Any]]:
+    """All durations/timepoints stated, expanding enumerations (time-course aware)."""
+    return _expand_series(text, biology._DURATION_SERIES, biology._DURATION)
+
+
 def extract_antibody(text: str) -> dict[str, Any]:
     """Best-effort antibody metadata from a text blob. Nulls, never inventions."""
     text = text or ""

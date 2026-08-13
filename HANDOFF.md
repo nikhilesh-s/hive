@@ -6,6 +6,29 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-13 (session 5, hackathon day)** — Claude Code. **RESULT GROUPING + MULTI-DOSE
+  REPRESENTATION.** (1) Search results now group into one card per EXPERIMENT
+  (paper + panel + target + experiment type + **cell line** + **modification label**)
+  instead of one card per lane row: `phospho STAT3 Tyr705` reads "3 experiments
+  (15 lane records)". The cell-line component is load-bearing — one real crop
+  (PMC12706926 `page_004_cand_0025`) prints **H1792 | A549 side by side**, and the
+  first key merged them. Verified against all 374 demo rows: 77 groups, **zero**
+  groups containing >1 distinct target / canonical target / modification / residue /
+  experiment type / UniProt / figure / cell line / catalog / organism.
+  (2) **Multi-dose / time-course representation (QA finding M1 closed).** The old
+  scalar took `values[0]`, which reported the **CL-E dose (60 µg/ml) as the IL-6
+  dose** and **60 min as THE duration of a 0–60 min time course**. Now:
+  enumerations sharing one unit expand (`extract_dose_series` /
+  `extract_duration_series`: "10, 30 and 60 µg/ml" → 3 values; "(0, 5, 10, 20, 30,
+  60 min)" → 6 timepoints); >1 distinct value ⇒ the panel scalar becomes
+  **value=null, status=AMBIGUOUS with every value preserved as a candidate**
+  (DB scalar NULL, never a wrong number); per-lane values are parsed from each
+  lane's own printed condition into new `BandObservation.lane_dose/lane_duration`
+  and served by `GET /records/{id}`. "for the indicated times/doses" is
+  kind-specific, so a time course keeps its settled single stimulus concentration.
+  Tests: **biology 94/94** (+17), api 106/106, benchmark 34/34, harness self-test
+  100% EXACT, tsc clean. Demo artifacts + local DB regenerated (452 rows).
+  **Model backend still blocked — no credentials present (re-verified).**
 - **2026-08-13 (session 4)** — Claude Code (Opus 4.8). **SCIENTIST-REVIEW BETA COMPLETE.**
   Full provenance + researcher-feedback loop live end-to-end locally:
   `GET /records/{id}` serves curated field-level evidence envelopes (value /
@@ -222,7 +245,11 @@ travels with each field; a disputed modification keeps its residue **unsettled**
   dense reagents paragraph is *flagged* via `association_confidence`, not fully solved.
 - **Dual modifications** (e.g. cleaved AND phospho on one target) → treated as a conflict,
   not yet represented as co-occurring.
-- **Multi-dose lane extraction** — only the first dose/duration per row is captured deterministically.
+- **FIXED (session 5) — multi-dose / time-course collapse.** Enumerated series now
+  expand; a panel with >1 distinct dose/duration keeps `value=null` + AMBIGUOUS +
+  candidates instead of asserting one lane's value (which had cross-attributed the
+  CL-E dose to IL-6). Per-lane values live on `BandObservation.lane_dose` /
+  `lane_duration`, parsed only from that lane's own printed condition.
 - **IP-bait heuristic** (`_first_gene_after`) is best-effort; robust for "anti-EGFR", brittle in messy methods.
 
 ## Current Technical Blockers
@@ -258,6 +285,7 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 
 ## Immediate Next Task
 ~~Provenance detail endpoint + researcher feedback system + evidence UI~~ — **DONE (session 4)**.
+~~Result grouping + multi-dose/time-course representation~~ — **DONE (session 5)**.
 
 Next, in priority order:
 1. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic). Everything
@@ -280,11 +308,14 @@ Next, in priority order:
    `hive_readonly`/`hive_feedback` passwords, seed `eval/demo/*/supabase_rows.json`,
    fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`/`DB_FEEDBACK_URL`.
    Full steps: `DEPLOYMENT.md`.
-3. Independent scientific QA re-run (session-4 QA was a self-audit) + the two open
-   Major findings: scalar dose/duration on time-course panels → AMBIGUOUS-with-
-   candidates; band multiplicity/smear representation (LC3B doublet, poly-Ub).
-4. Results-list lane grouping (15 near-identical lane cards per panel today — UX
-   review has verified grouping keys) + figure-crop image serving.
+3. Independent scientific QA re-run (session-4 QA was a self-audit). Of its two open
+   Major findings, **M1 (scalar dose/duration) is now CLOSED (session 5)**; **M2
+   remains open**: band multiplicity / smear representation (LC3B-I/II doublet,
+   poly-Ub conjugate ladder) — `BandObservation` still has no band-count or
+   multiplicity concept. Descriptive only when the source supports it: never fake
+   densitometry, never infer isoforms/cleavage products without evidence.
+4. Figure-crop image serving (the evidence panel currently prints the crop filename
+   and says image serving is not enabled locally).
 
 Local dev bring-up (all one-time steps already done in this repo):
 ```bash
