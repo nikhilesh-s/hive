@@ -22,13 +22,21 @@ measured MW**.
 
 ## 2. Why HiveBlot says this (60s)
 Click **EVIDENCE**. Walk down:
+- **the actual panel crop renders at the top** (real blot image from the paper)
 - normalization chain `P-STAT3 (Tyr705) → STAT3 → UniProt P40763`
 - field-level evidence with the actual methods/caption snippets
   ("p-STAT3 (Tyr705; 1:1,000; CST #9145)" — via antibody)
 - reported MW: *not reported* — "null is better than hallucination"
+- the lane strip: a 6-lane time course grouped into ONE experiment card,
+  each lane carrying its own timepoint (0–60 min)
+
+Bonus beat: search **`LC3B H1299`**, expand — lanes read
+"present · doublet" with the descriptive note (no isoform interpretation).
 
 ## 3. Honest uncertainty (45s)
-Search: **`ERK`** → open a `P-ERK 1/2` record's evidence.
+Search: **`needs review P-ERK`** → open a `P-ERK 1/2` record's evidence.
+(Do NOT search bare `ERK` — the conflict cards sort last behind β-actin/STAT3
+cards that match "MEK/ERK inhibitor" in their treatment context.)
 Say: the paper printed "P-ERK 1/2" with a phospho-specific antibody but no
 site. HiveBlot does NOT guess: modification = **CONFLICTING**, both claims
 shown (phospho via antibody vs total via row label), protein = the ambiguous
@@ -49,9 +57,17 @@ Say: corrections are stored **beside** the AI extraction, never over it —
 every AI claim → human correction pair becomes future evaluation data.
 
 ## 6. Close (15s)
-"Three real papers, 91 records, every claim auditable to its sentence in the
-paper. The extraction model is swappable; the biology layer — normalization,
-conflict handling, provenance — is the product."
+"Three real papers, 91 experiments, 452 lane records — every claim auditable
+to its sentence in the paper, down to the blot image itself. The extraction
+model is swappable; the biology layer — normalization, conflict handling,
+provenance — is the product."
+
+## Reliability notes (from the live dry-run)
+- Search shares ONE rate-limit bucket: 20/min then 429. The scripted ~7
+  searches are safe; cap audience-driven searching.
+- Keep audience queries inside the 3-paper vocabulary (`p53` → zero results).
+- Evidence panels and crop images are NOT rate-limited — expand freely.
+- Start web + API before the demo; DB (452 rows) persists across restarts.
 
 ## Do NOT demo
 - The home-page legacy table path (removed, but don't improvise there).

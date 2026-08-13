@@ -124,7 +124,11 @@ ERK_DOUBLET = {"band_pattern": "doublet", "band_count": 2,
 def erk_row(label, tctx, band_states):
     r = row(label, HEP3B, "IL-6", tctx, band_states)
     for b in r["bands"]:
-        b.update(ERK_DOUBLET)
+        # The doublet was observed on lanes with clear signal; an uncertain/
+        # absent lane gets no structure claim (a pattern on an absent band is
+        # a contradiction the engine now flags).
+        if b["band_state"] == "present":
+            b.update(ERK_DOUBLET)
     return r
 
 

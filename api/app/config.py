@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -48,6 +50,13 @@ class Settings(BaseSettings):
 
     table_name: str = "western_blot_records"
     max_search_limit: int = 500
+
+    # Base directory the figure-crop endpoint may serve PNGs from. Records
+    # store absolute crop paths (image_crop_ref); only paths resolving inside
+    # this directory are ever served. Default = the local pipeline's run dir.
+    crop_base_dir: str = str(
+        Path(__file__).resolve().parents[2] / "western_blot_miner" / "data" / "pdf_runs"
+    )
 
     openai_model: str = "gpt-4.1-mini"
 

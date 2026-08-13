@@ -91,6 +91,38 @@ async def record_detail(record_id: int):
     return build_record_detail(row)
 
 
+@router.get("/records/{record_id}/crop", dependencies=[Depends(require_internal_key)])
+async def record_crop(record_id: int):
+    """The record's own panel crop (the actual blot the evidence refers to).
+
+    The path comes from the record's `image_crop_ref` column — never from the
+    client — and is additionally required to resolve inside the configured
+    crops base directory and be a .png, so a poisoned DB value cannot read
+    arbitrary files. 404 (not 500) when the file isn't present: deployments
+    without the crop archive degrade to the text-only evidence panel.
+    """
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse
+
+    try:
+        row = await fetch_record_by_id(record_id)
+    except Exception as e:
+        logger.exception("record crop lookup failed")
+        raise HTTPException(500, "Record lookup failed") from e
+    if row is None or not row.get("image_crop_ref"):
+        raise HTTPException(404, "No figure crop for this record")
+    base = Path(settings.crop_base_dir).resolve()
+    try:
+        crop = Path(str(row["image_crop_ref"])).resolve()
+        crop.relative_to(base)  # raises ValueError if outside the allowed dir
+    except ValueError:
+        raise HTTPException(404, "Crop path not servable")
+    if crop.suffix.lower() != ".png" or not crop.is_file():
+        raise HTTPException(404, "Crop file not available")
+    return FileResponse(crop, media_type="image/png")
+
+
 @router.post("/feedback", response_model=FeedbackResponse,
              dependencies=[Depends(require_internal_key)])
 @limiter.limit(settings.search_rate_limit)
