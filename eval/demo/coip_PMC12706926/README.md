@@ -36,3 +36,10 @@
 - **p62 trap held:** `P62` (SQSTM1 alias) is never treated as phospho; its
   antibody has no vendor/catalog in the methods list → fields stay empty
   (never guessed).
+
+## Coverage note (independent QA, M10)
+The "11 real WB panels" above is the POST-CV-FILTER count. Two additional
+full Western panels in this paper (Fig 5A and 5B — three phospho/total pairs
+across two cell lines) scored below the OpenCV candidate threshold and never
+reached Stage-2 extraction. Absence from the record set means "not extracted",
+not "not in the paper".

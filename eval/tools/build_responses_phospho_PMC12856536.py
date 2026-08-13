@@ -39,7 +39,9 @@ AB = {
 
 
 def ab_for(label):
-    a = AB[label]
+    # Case-insensitive: the paper prints "T-STAT3" in Fig 2 but "T-Stat3" in
+    # Fig 3C/D; both map to the same CST #4904 antibody.
+    a = AB.get(label) or {k.upper(): v for k, v in AB.items()}[label.upper()]
     return [{
         "target": label,
         "vendor": VENDOR,
@@ -151,19 +153,50 @@ fig3b = [
     row("β-actin", HEP3B, "IL-6", dr_ctx, [(i, c, "present", "high") for i, c in enumerate(dr_lanes, 1)]),
 ]
 
-# --- Fig 3C/D: P-STAT3 with PKC (Bisindolylmaleimide II) / ERK (U0126) inhibitors
-inh_ctx = ("Hep3B cells treated with CL-E (60 ug/ml), the PKC inhibitor "
-           "Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor U0126 (20 uM), "
-           "with IL-6 (10 ng/ml) stimulation")
+# --- Fig 3C + Fig 3D: TWO experiments sharing one CV crop (cand_0034) --------
+# Independent QA finding C1: the original observation collapsed both into one
+# 4-lane panel and asserted IL-6 treatment on the Ser727 rows, although the
+# paper's legend states Fig 3C was run IN THE ABSENCE of IL-6. Corrected here
+# to the printed lane matrices. Band states not confidently re-verifiable from
+# the session notes are recorded as `uncertain` (never guessed).
+#
+# Fig 3C (6 lanes, NO IL-6): Bis II  - - + - + -
+#                            U0126   - - - + - +
+#                            CL-E    - + + + - -
+ctx_3c = ("Fig 3C: Hep3B cells treated with CL-E (60 ug/ml) with or without the "
+          "PKC inhibitor Bisindolylmaleimide II (20 uM) or the MEK/ERK inhibitor "
+          "U0126 (20 uM), in the absence of IL-6")
+LANES_3C = ["ctrl", "CL-E", "CL-E + Bis II", "CL-E + U0126", "Bis II", "U0126"]
+# Fig 3D (7 lanes, IL-6 matrix): Bis II - - - + - + -
+#                                U0126  - - - - + - +
+#                                CL-E   - - + + + - -
+#                                IL-6   - + + + + - -
+ctx_3d = ("Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without "
+          "CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)")
+LANES_3D = ["ctrl", "IL-6", "IL-6 + CL-E", "IL-6 + CL-E + Bis II",
+            "IL-6 + CL-E + U0126", "Bis II", "U0126"]
 fig3cd = [
-    row("P-STAT3 (Tyr705)", HEP3B, "IL-6", inh_ctx,
-        [(1, "IL-6 -", "absent", "high"), (2, "IL-6 +", "present", "high"),
-         (3, "IL-6 + CL-E", "present", "medium"), (4, "IL-6 + CL-E + U0126", "present", "medium")]),
-    row("P-STAT3 (Ser727)", HEP3B, "IL-6", inh_ctx,
-        [(1, "IL-6 -", "present", "medium"), (2, "IL-6 + CL-E", "present", "medium"),
-         (3, "IL-6 + CL-E + Bis II", "uncertain", "low"), (4, "IL-6 + CL-E + U0126", "present", "medium")]),
-    row("T-STAT3", HEP3B, "IL-6", inh_ctx, [(i, f"lane{i}", "present", "high") for i in range(1, 5)]),
-    row("β-actin", HEP3B, "IL-6", inh_ctx, [(i, f"lane{i}", "present", "high") for i in range(1, 5)]),
+    # Fig 3C — Ser727 arm, no IL-6. CL-E is the treatment.
+    row("P-STAT3 (Ser727)", HEP3B, "CL-E", ctx_3c,
+        [(1, LANES_3C[0], "present", "medium"), (2, LANES_3C[1], "present", "medium"),
+         (3, LANES_3C[2], "uncertain", "low"), (4, LANES_3C[3], "uncertain", "low"),
+         (5, LANES_3C[4], "uncertain", "low"), (6, LANES_3C[5], "uncertain", "low")]),
+    row("T-Stat3", HEP3B, "CL-E", ctx_3c,
+        [(i, c, "present", "high") for i, c in enumerate(LANES_3C, 1)]),
+    row("β-actin", HEP3B, "CL-E", ctx_3c,
+        [(i, c, "present", "high") for i, c in enumerate(LANES_3C, 1)]),
+    # Fig 3D — Tyr705 arm, IL-6 matrix.
+    row("P-STAT3 (Tyr705)", HEP3B, "IL-6", ctx_3d,
+        [(1, LANES_3D[0], "absent", "high"), (2, LANES_3D[1], "present", "high"),
+         (3, LANES_3D[2], "uncertain", "low"), (4, LANES_3D[3], "uncertain", "low"),
+         (5, LANES_3D[4], "present", "medium"), (6, LANES_3D[5], "uncertain", "low"),
+         (7, LANES_3D[6], "uncertain", "low")]),
+    # Same printed labels as the 3C strips (raw wording preserved); the lane
+    # conditions distinguish the two arms.
+    row("T-Stat3", HEP3B, "IL-6", ctx_3d,
+        [(i, c, "present", "high") for i, c in enumerate(LANES_3D, 1)]),
+    row("β-actin", HEP3B, "IL-6", ctx_3d,
+        [(i, c, "present", "high") for i, c in enumerate(LANES_3D, 1)]),
 ]
 
 # Candidate paths in order (from extraction_requests.json).

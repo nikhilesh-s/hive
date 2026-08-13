@@ -17913,12 +17913,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -18107,8 +18107,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -18123,9 +18123,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -18858,7 +18858,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -18882,12 +18882,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -19076,8 +19076,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -19092,9 +19092,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -19827,7 +19827,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -19851,12 +19851,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -20045,8 +20045,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -20061,9 +20061,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -20796,7 +20796,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -20820,12 +20820,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -21014,8 +21014,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -21030,9 +21030,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -21765,7 +21765,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -21789,12 +21789,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -21983,8 +21983,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -21999,9 +21999,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -22734,7 +22734,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -22758,12 +22758,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -22952,8 +22952,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -22968,9 +22968,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -23703,7 +23703,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -41841,12 +41841,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -42035,8 +42035,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -42051,9 +42051,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -42786,7 +42786,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -42810,12 +42810,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -43004,8 +43004,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -43020,9 +43020,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -43755,7 +43755,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -43779,12 +43779,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -43973,8 +43973,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -43989,9 +43989,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -44724,7 +44724,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -44748,12 +44748,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -44942,8 +44942,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -44958,9 +44958,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -45693,7 +45693,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -45717,12 +45717,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -45911,8 +45911,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -45927,9 +45927,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -46662,7 +46662,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -46686,12 +46686,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -46880,8 +46880,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -46896,9 +46896,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -47631,7 +47631,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -56073,7 +56073,8 @@
     "phospho_specific_antibody": null,
     "experiment_type": "co_ip",
     "experiment_flags": [
-      "co_ip"
+      "co_ip",
+      "loading_control"
     ],
     "experiment_type_confidence": 0.9,
     "sample": "H1792",
@@ -56279,7 +56280,8 @@
         },
         "experiment_flags": {
           "value": [
-            "co_ip"
+            "co_ip",
+            "loading_control"
           ],
           "confidence": 0.9,
           "status": "SUPPORTED",
@@ -56795,7 +56797,8 @@
     "phospho_specific_antibody": null,
     "experiment_type": "co_ip",
     "experiment_flags": [
-      "co_ip"
+      "co_ip",
+      "loading_control"
     ],
     "experiment_type_confidence": 0.9,
     "sample": "H1792",
@@ -57001,7 +57004,8 @@
         },
         "experiment_flags": {
           "value": [
-            "co_ip"
+            "co_ip",
+            "loading_control"
           ],
           "confidence": 0.9,
           "status": "SUPPORTED",
@@ -74873,12 +74877,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -75067,8 +75071,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -75083,9 +75087,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -75818,7 +75822,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -75842,12 +75846,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -76036,8 +76040,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -76052,9 +76056,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -76787,7 +76791,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -76811,12 +76815,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -77005,8 +77009,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -77021,9 +77025,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -77756,7 +77760,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -77780,12 +77784,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -77974,8 +77978,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -77990,9 +77994,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -78725,7 +78729,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -78749,12 +78753,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -78943,8 +78947,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -78959,9 +78963,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -79694,7 +79698,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -79718,12 +79722,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -79912,8 +79916,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -79928,9 +79932,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -80663,7 +80667,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -102857,12 +102861,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -103051,8 +103055,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -103067,9 +103071,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -103802,7 +103806,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -103826,12 +103830,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -104020,8 +104024,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -104036,9 +104040,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -104771,7 +104775,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -104795,12 +104799,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -104989,8 +104993,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -105005,9 +105009,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -105740,7 +105744,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -105764,12 +105768,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -105958,8 +105962,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -105974,9 +105978,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -106709,7 +106713,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -106733,12 +106737,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -106927,8 +106931,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -106943,9 +106947,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -107678,7 +107682,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -107702,12 +107706,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -107896,8 +107900,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -107912,9 +107916,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -108647,7 +108651,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -115533,24 +115537,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -115613,24 +115638,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -115693,24 +115739,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -115773,24 +115840,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -116321,24 +116409,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -116401,24 +116510,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -116481,24 +116611,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -116561,24 +116712,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -117109,24 +117281,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -117189,24 +117382,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -117269,24 +117483,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -117349,24 +117584,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -117897,24 +118153,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -117977,24 +118254,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -118057,24 +118355,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -118137,24 +118456,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -118211,12 +118551,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -118405,8 +118745,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -118421,9 +118761,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -118996,7 +119336,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -119020,12 +119360,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -119214,8 +119554,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -119230,9 +119570,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -119805,7 +120145,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -119829,12 +120169,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -120023,8 +120363,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -120039,9 +120379,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -120614,7 +120954,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -120638,12 +120978,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -120832,8 +121172,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -120848,9 +121188,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -121423,7 +121763,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -128309,24 +128649,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -128389,24 +128750,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -128469,24 +128851,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -128549,24 +128952,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -129097,24 +129521,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -129177,24 +129622,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -129257,24 +129723,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -129337,24 +129824,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -129885,24 +130393,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -129965,24 +130494,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -130045,24 +130595,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -130125,24 +130696,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -130673,24 +131265,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -130753,24 +131366,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -130833,24 +131467,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         },
@@ -130913,24 +131568,45 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "doublet",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_count": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": 2,
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           },
           "band_notes": {
-            "value": null,
-            "confidence": 0.0,
-            "status": "MISSING",
-            "sources": [],
+            "value": "two closely spaced bands visible in each lane",
+            "confidence": 0.75,
+            "status": "SUPPORTED",
+            "sources": [
+              {
+                "type": "image",
+                "rank": 5,
+                "text": "two closely spaced bands visible in each lane",
+                "locator": null
+              }
+            ],
             "candidates": []
           }
         }
@@ -130987,12 +131663,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -131181,8 +131857,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -131197,9 +131873,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -131772,7 +132448,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -131796,12 +132472,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -131990,8 +132666,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -132006,9 +132682,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -132581,7 +133257,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -132605,12 +133281,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -132799,8 +133475,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -132815,9 +133491,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -133390,7 +134066,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -133414,12 +134090,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "A549",
     "cell_line": "A549",
     "organism": "human",
@@ -133608,8 +134284,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -133624,9 +134300,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -134199,7 +134875,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -140667,12 +141343,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -140861,8 +141537,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -140877,9 +141553,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -141452,7 +142128,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -141476,12 +142152,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -141670,8 +142346,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -141686,9 +142362,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -142261,7 +142937,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -142285,12 +142961,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -142479,8 +143155,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -142495,9 +143171,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -143070,7 +143746,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -143094,12 +143770,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -143288,8 +143964,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -143304,9 +143980,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -143879,7 +144555,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -160159,12 +160835,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -160353,8 +161029,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -160369,9 +161045,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -160944,7 +161620,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -160968,12 +161644,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -161162,8 +161838,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -161178,9 +161854,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -161753,7 +162429,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -161777,12 +162453,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -161971,8 +162647,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -161987,9 +162663,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -162562,7 +163238,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -162586,12 +163262,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -162780,8 +163456,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -162796,9 +163472,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -163371,7 +164047,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -163897,45 +164573,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -164078,45 +164733,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -164755,45 +165389,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -164936,45 +165549,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -165613,45 +166205,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -165794,45 +166365,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -166471,45 +167021,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -166652,45 +167181,24 @@
             "candidates": []
           },
           "band_pattern": {
-            "value": "doublet",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_count": {
-            "value": 2,
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           },
           "band_notes": {
-            "value": "two closely spaced bands visible in each lane",
-            "confidence": 0.75,
-            "status": "SUPPORTED",
-            "sources": [
-              {
-                "type": "image",
-                "rank": 5,
-                "text": "two closely spaced bands visible in each lane",
-                "locator": null
-              }
-            ],
+            "value": null,
+            "confidence": 0.0,
+            "status": "MISSING",
+            "sources": [],
             "candidates": []
           }
         },
@@ -179819,12 +180327,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -180013,8 +180521,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -180029,9 +180537,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -180604,7 +181112,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -180628,12 +181136,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -180822,8 +181330,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -180838,9 +181346,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -181413,7 +181921,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -181437,12 +181945,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -181631,8 +182139,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -181647,9 +182155,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -182222,7 +182730,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -182246,12 +182754,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1299",
     "cell_line": "H1299",
     "organism": "human",
@@ -182440,8 +182948,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -182456,9 +182964,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -183031,7 +183539,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -205915,12 +206423,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -206109,8 +206617,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -206125,9 +206633,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -206700,7 +207208,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -206724,12 +207232,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -206918,8 +207426,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -206934,9 +207442,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -207509,7 +208017,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -207533,12 +208041,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -207727,8 +208235,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -207743,9 +208251,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -208318,7 +208826,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.1186/s12964-025-02385-8",
@@ -208342,12 +208850,12 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
       "co_ip_context",
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "H1792",
     "cell_line": "H1792",
     "organism": "human",
@@ -208536,8 +209044,8 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -208552,9 +209060,9 @@
         "experiment_flags": {
           "value": [
             "co_ip_context",
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -209127,6 +209635,6 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   }
 ]

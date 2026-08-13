@@ -409,6 +409,51 @@ def test_band_pattern_absent_means_missing_not_single():
     check("ubiquitin identity alone implies no ladder", ub.band_pattern.value is None)
 
 
+def test_antibody_antigen_name_is_not_a_modification_claim():
+    """An anti-ubiquitin blot detects the PROTEIN ubiquitin; it does not
+    establish that some target is ubiquitinated. Asserting a modification from
+    the antibody's own antigen name is the same failure class as the banned
+    startswith('p') rule (independent QA, C2). A real modified-target label
+    keeps the claim."""
+    check("'Ubiquitin' target -> no modification claim",
+          bio.detect_modification("Ubiquitin")["modification_type"] is None)
+    check("'ubiquitin' antibody -> no modification claim",
+          bio.antibody_modification("ubiquitin")["modification_type"] is None)
+    check("'SUMO' target -> no modification claim",
+          bio.detect_modification("SUMO")["modification_type"] is None)
+    check("'ubiquitinated EGFR' keeps the claim",
+          bio.detect_modification("ubiquitinated EGFR")["modification_type"] == "ubiquitination")
+    check("'cleaved PARP' keeps the claim",
+          bio.detect_modification("cleaved PARP")["modification_type"] == "cleavage")
+
+
+def test_loading_control_gene_symbols():
+    """'β-actin' matched but 'ACTB' did not (QA M7 — 81 rows misclassified)."""
+    check("ACTB is a loading control", bio.is_loading_control("ACTB"))
+    check("TUBA1B is a loading control", bio.is_loading_control("TUBA1B"))
+    check("β-actin still matches", bio.is_loading_control("β-actin"))
+    check("STAT3 is not", not bio.is_loading_control("STAT3"))
+
+
+def test_greek_beta_normalizes_in_core_symbol():
+    check("β-actin core -> beta-actin", bio.core_symbol("β-actin") == "beta-actin")
+
+
+def test_dose_micro_sign_and_identifier_guard():
+    """QA M6: 'µ' doses were silently dropped, and the series regex matched
+    INSIDE identifiers — 'BafA1, 20 nM' fabricated a 1 nM candidate from the
+    trailing digit of the drug name."""
+    from western_blot_miner.supabase_loader import extract_dose
+    d = extract_dose("cells treated with 10 µM LY294002")
+    check("µM dose captured", any(x["value"] == 10.0 for x in d))
+    d = extract_dose("CL-E at 60 µg/ml")
+    check("µg/ml dose captured", any(x["value"] == 60.0 for x in d))
+    d = extract_dose("incubated with BafA1, 20 nM, for 4 h")
+    check("BafA1 does not fabricate a 1 nM dose",
+          all(x["value"] != 1.0 for x in d))
+    check("real 20 nM dose kept", any(x["value"] == 20.0 for x in d))
+
+
 def test_band_pattern_negation_abstains():
     """Negated multiplicity is antibody-specificity boilerplate; asserting the
     pattern from it would INVERT the paper's claim (review finding B1). We

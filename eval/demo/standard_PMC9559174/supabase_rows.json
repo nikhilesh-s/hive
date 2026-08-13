@@ -15,10 +15,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -137,8 +137,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -171,14 +171,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -788,10 +794,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -910,8 +916,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -944,14 +950,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -1561,10 +1573,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -1683,8 +1695,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -1717,14 +1729,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -2334,10 +2352,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -2456,8 +2474,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -2490,14 +2508,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -3113,11 +3137,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -3306,17 +3330,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -3889,7 +3913,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -3913,11 +3937,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -4106,17 +4130,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -4689,7 +4713,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -4713,11 +4737,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -4906,17 +4930,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -5489,7 +5513,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -5513,11 +5537,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -5706,17 +5730,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -6289,7 +6313,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -9513,11 +9537,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -9706,17 +9730,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -10289,7 +10313,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -10313,11 +10337,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -10506,17 +10530,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -11089,7 +11113,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -11113,11 +11137,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -11306,17 +11330,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -11889,7 +11913,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -11913,11 +11937,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -12106,17 +12130,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -12689,7 +12713,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -12707,10 +12731,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -12829,8 +12853,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -12863,14 +12887,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -13640,10 +13670,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -13762,8 +13792,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -13796,14 +13826,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -14573,10 +14609,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -14695,8 +14731,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -14729,14 +14765,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -15506,10 +15548,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -15628,8 +15670,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -15662,14 +15704,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -16439,10 +16487,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -16561,8 +16609,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -16595,14 +16643,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -17372,10 +17426,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -17494,8 +17548,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -17528,14 +17582,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -18311,11 +18371,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -18504,17 +18564,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -19247,7 +19307,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -19271,11 +19331,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -19464,17 +19524,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -20207,7 +20267,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -20231,11 +20291,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -20424,17 +20484,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -21167,7 +21227,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -21191,11 +21251,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -21384,17 +21444,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -22127,7 +22187,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -22151,11 +22211,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -22344,17 +22404,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -23087,7 +23147,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -23111,11 +23171,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -23304,17 +23364,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -24047,7 +24107,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -29831,11 +29891,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -30024,17 +30084,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -30767,7 +30827,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -30791,11 +30851,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -30984,17 +31044,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -31727,7 +31787,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -31751,11 +31811,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -31944,17 +32004,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -32687,7 +32747,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -32711,11 +32771,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -32904,17 +32964,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -33647,7 +33707,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -33671,11 +33731,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -33864,17 +33924,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -34607,7 +34667,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -34631,11 +34691,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -34824,17 +34884,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -35567,7 +35627,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -35585,10 +35645,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -35707,8 +35767,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -35741,14 +35801,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -36678,10 +36744,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -36800,8 +36866,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -36834,14 +36900,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -37771,10 +37843,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -37893,8 +37965,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -37927,14 +37999,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -38864,10 +38942,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -38986,8 +39064,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -39020,14 +39098,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -39957,10 +40041,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -40079,8 +40163,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -40113,14 +40197,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -41050,10 +41140,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -41172,8 +41262,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -41206,14 +41296,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -42143,10 +42239,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -42265,8 +42361,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -42299,14 +42395,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -43236,10 +43338,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -43358,8 +43460,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -43392,14 +43494,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -44335,11 +44443,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -44528,17 +44636,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -45431,7 +45539,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -45455,11 +45563,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -45648,17 +45756,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -46551,7 +46659,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -46575,11 +46683,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -46768,17 +46876,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -47671,7 +47779,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -47695,11 +47803,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -47888,17 +47996,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -48791,7 +48899,7 @@
     "band_state": "uncertain",
     "band_detected": false,
     "confidence": 0.3,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -48815,11 +48923,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -49008,17 +49116,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -49911,7 +50019,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -49935,11 +50043,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -50128,17 +50236,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -51031,7 +51139,7 @@
     "band_state": "uncertain",
     "band_detected": false,
     "confidence": 0.3,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -51055,11 +51163,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -51248,17 +51356,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -52151,7 +52259,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -52175,11 +52283,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -52368,17 +52476,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -53271,7 +53379,7 @@
     "band_state": "uncertain",
     "band_detected": false,
     "confidence": 0.3,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -62255,11 +62363,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -62448,17 +62556,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -63351,7 +63459,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -63375,11 +63483,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -63568,17 +63676,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -64471,7 +64579,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -64495,11 +64603,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -64688,17 +64796,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -65591,7 +65699,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -65615,11 +65723,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -65808,17 +65916,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -66711,7 +66819,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -66735,11 +66843,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -66928,17 +67036,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -67831,7 +67939,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -67855,11 +67963,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -68048,17 +68156,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -68951,7 +69059,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -68975,11 +69083,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -69168,17 +69276,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -70071,7 +70179,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -70095,11 +70203,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -70288,17 +70396,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -71191,7 +71299,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -71209,10 +71317,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -71331,8 +71439,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -71365,14 +71473,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -72062,10 +72176,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -72184,8 +72298,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -72218,14 +72332,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -72915,10 +73035,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -73037,8 +73157,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -73071,14 +73191,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -73768,10 +73894,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -73890,8 +74016,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -73924,14 +74050,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -74621,10 +74753,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -74743,8 +74875,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -74777,14 +74909,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -75480,11 +75618,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -75673,17 +75811,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -76336,7 +76474,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -76360,11 +76498,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -76553,17 +76691,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -77216,7 +77354,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -77240,11 +77378,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -77433,17 +77571,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -78096,7 +78234,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -78120,11 +78258,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -78313,17 +78451,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -78976,7 +79114,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -79000,11 +79138,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -79193,17 +79331,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -79856,7 +79994,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -84280,11 +84418,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -84473,17 +84611,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -85136,7 +85274,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -85160,11 +85298,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -85353,17 +85491,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -86016,7 +86154,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -86040,11 +86178,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -86233,17 +86371,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -86896,7 +87034,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -86920,11 +87058,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -87113,17 +87251,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -87776,7 +87914,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -87800,11 +87938,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -87993,17 +88131,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -88656,7 +88794,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -88674,10 +88812,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -88796,8 +88934,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -88830,14 +88968,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -89767,10 +89911,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -89889,8 +90033,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -89923,14 +90067,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -90860,10 +91010,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -90982,8 +91132,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -91016,14 +91166,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -91953,10 +92109,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -92075,8 +92231,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -92109,14 +92265,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -93046,10 +93208,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -93168,8 +93330,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -93202,14 +93364,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -94139,10 +94307,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -94261,8 +94429,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -94295,14 +94463,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -95232,10 +95406,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -95354,8 +95528,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -95388,14 +95562,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -96325,10 +96505,10 @@
     "canonical_target": null,
     "uniprot_id": null,
     "protein_status": "MISSING",
-    "modification_type": "ubiquitination",
+    "modification_type": null,
     "residue": null,
     "residue_position": null,
-    "modification_label": "ubiquitination",
+    "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
     "experiment_type": "standard_western",
@@ -96447,8 +96627,8 @@
       },
       "modification": {
         "modification_type": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": null,
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
@@ -96481,14 +96661,20 @@
           "candidates": []
         },
         "normalized_label": {
-          "value": "ubiquitination",
-          "confidence": 0.9,
+          "value": "total",
+          "confidence": 0.92,
           "status": "SUPPORTED",
           "sources": [
             {
               "type": "antibody",
               "rank": 1,
               "text": "anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen Biosystems LLC)",
+              "locator": null
+            },
+            {
+              "type": "model_target",
+              "rank": 4,
+              "text": "Ubiquitin",
               "locator": null
             }
           ],
@@ -97424,11 +97610,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -97617,17 +97803,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -98520,7 +98706,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -98544,11 +98730,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -98737,17 +98923,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -99640,7 +99826,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -99664,11 +99850,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -99857,17 +100043,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -100760,7 +100946,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -100784,11 +100970,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -100977,17 +101163,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -101880,7 +102066,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -101904,11 +102090,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -102097,17 +102283,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -103000,7 +103186,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -103024,11 +103210,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -103217,17 +103403,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -104120,7 +104306,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -104144,11 +104330,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -104337,17 +104523,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -105240,7 +105426,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -105264,11 +105450,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -105457,17 +105643,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -106360,7 +106546,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -115344,11 +115530,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -115537,17 +115723,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -116440,7 +116626,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -116464,11 +116650,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -116657,17 +116843,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -117560,7 +117746,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -117584,11 +117770,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -117777,17 +117963,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -118680,7 +118866,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -118704,11 +118890,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -118897,17 +119083,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -119800,7 +119986,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -119824,11 +120010,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -120017,17 +120203,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -120920,7 +121106,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -120944,11 +121130,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -121137,17 +121323,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -122040,7 +122226,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -122064,11 +122250,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -122257,17 +122443,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -123160,7 +123346,7 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   },
   {
     "paper_id": "10.3892/ijmm.2022.5188",
@@ -123184,11 +123370,11 @@
     "modification_label": "total",
     "modification_status": "SUPPORTED",
     "phospho_specific_antibody": null,
-    "experiment_type": "standard_western",
+    "experiment_type": "loading_control",
     "experiment_flags": [
-      "standard_western"
+      "loading_control"
     ],
-    "experiment_type_confidence": 0.55,
+    "experiment_type_confidence": 0.9,
     "sample": "mouse submandibular gland (SMG) tissue",
     "cell_line": "mouse submandibular gland (SMG) tissue",
     "organism": "mouse",
@@ -123377,17 +123563,17 @@
       },
       "experiment": {
         "experiment_type": {
-          "value": "standard_western",
-          "confidence": 0.55,
+          "value": "loading_control",
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
         },
         "experiment_flags": {
           "value": [
-            "standard_western"
+            "loading_control"
           ],
-          "confidence": 0.55,
+          "confidence": 0.9,
           "status": "SUPPORTED",
           "sources": [],
           "candidates": []
@@ -124280,6 +124466,6 @@
     "band_state": "present",
     "band_detected": true,
     "confidence": 0.9,
-    "loading_control": false
+    "loading_control": true
   }
 ]

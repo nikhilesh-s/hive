@@ -6,6 +6,52 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-13 (session 7)** — Claude Fable 5. **REVIEW SWEEP + CROP SERVING +
+  RULE HARDENING.** Three parallel review agents ran; main agent implemented.
+  (1) **Figure crops now render in the evidence panel**: `GET /records/{id}/crop`
+  serves the record's own panel PNG (path from the DB column only, validated
+  inside `CROP_BASE_DIR`, .png-only; 404→text fallback in deployments without
+  the archive; 5 new API tests incl. traversal). Verified live end-to-end.
+  (2) **Band-pattern rules hardened** — the independent probe-driven review
+  (`research/band_pattern_scientific_review.md`) found 4 ship-blockers, all
+  fixed with regressions: negation now abstains ("no smearing" no longer
+  asserts smear); singular "higher-MW band" is not a ladder; caption-derived
+  patterns on multi-lane panels are AMBIGUOUS, never per-lane SUPPORTED;
+  absent+pattern contradictions raise BAND_PATTERN_STATE_MISMATCH (+ eval
+  stamps corrected to present lanes only → 26 doublet lanes). Plus:
+  "polyubiquitin smear"→ladder via containment pruning; count guard for
+  "Fig. 3 bands"/"n = 3"/"1-2 bands"; parenthetical patterns no longer leak
+  across "and".
+  (3) **Demo dry-run** (`research/demo_readiness_review.md`): every scripted
+  query verified live against the API; demo doc fixed (`needs review P-ERK`
+  step, crop beat, 91-experiments close line, 20/min rate-limit warning).
+  (4) **`scripts/seed_remote.py`** closes the DEPLOYMENT.md remote-seed TODO.
+  (5) **Independent scientific QA delivered and acted on**
+  (`research/independent_scientific_qa.md`: 3 Critical / 12 Major / 8 Minor /
+  12 verified-correct). All three Criticals FIXED + regression-tested:
+  **C1** — one CV crop (phospho paper cand_0034) held TWO experiments (Fig 3C
+  + 3D); the collapsed observation asserted IL-6 on the Ser727 arm although
+  the legend says Fig 3C ran WITHOUT IL-6. Reference data corrected to the
+  printed 6-/7-lane matrices (unverifiable band states → `uncertain`); README
+  correction note added. Phospho paper now 20 records / 113 rows; DB 475.
+  **C2** — engine bug: an anti-ubiquitin antibody's own antigen name asserted
+  `modification_type=ubiquitination` SUPPORTED (same failure class as the
+  banned p-prefix rule). detect_modification now treats a mod-word that IS the
+  whole target as protein identity; "ubiquitinated EGFR" still claims.
+  **C3** — the session-4 self-audit contained false claims; correction banner
+  added, independent QA is authoritative. Majors fixed: **M6** (µ-sign doses
+  were dropped; series regex fabricated "1 nM" from "BafA1" — both fixed),
+  **M7** (ACTB/TUBA1B now loading controls — 81 rows were misclassified),
+  **M9** (doubtful BEX2 doublet removed; QA-confirmed Fig 1C LC3B doublet
+  added; β-actin Greek-letter now resolves via beta-normalization), **M10**
+  (README coverage note: Fig 5A/5B fell below the CV threshold — post-filter
+  count ≠ paper content). Still open (documented, next-queue): M5 per-lane
+  dose coverage (lane labels carry bare numbers, unit lives in the axis
+  label), remaining Majors/Minors listed in the QA file.
+  Creds RE-CHECKED: model backend + cloud Supabase both still absent — those
+  two user actions remain the only blockers to automated extraction and
+  hosted deployment. Tests: **biology 155/155**, api 111/111, benchmark 34/34,
+  harness self-test 100% EXACT, tsc clean.
 - **2026-08-13 (session 6)** — Claude Code. **M2 CLOSED: descriptive band
   multiplicity / smear representation.** Additive `BandObservation` fields
   `band_pattern` (single|doublet|multiple|smear|ladder|uncertain) + `band_count`
