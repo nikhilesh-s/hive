@@ -159,9 +159,15 @@ def _target_info(raw_target, core, res, mc) -> TargetInfo:
         cands = [Candidate(value=c.get("uniprot_id"), source_type="uniprot_reference", rank=RANK_REFERENCE,
                            confidence=0.5, evidence=[Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                                             text=str(c))]) for c in (res.candidates or [{}])]
-        canonical = EvidenceField.supported(res.canonical, 0.6,
-                                            [Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous")]) \
-            if res.canonical else EvidenceField.ambiguous(cands)
+        # An ambiguous resolution keeps a best-effort family LABEL (e.g.
+        # "MAPK1/MAPK3" for ERK1/2) as the value, but MUST stay AMBIGUOUS -- a
+        # multi-gene family is not a settled canonical value (invariant #3), so
+        # it never renders as SUPPORTED and surfaces for review.
+        canonical = EvidenceField(
+            value=res.canonical, confidence=0.5, status=AMBIGUOUS,
+            sources=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous_family")],
+            candidates=cands,
+        ) if res.canonical else EvidenceField.ambiguous(cands)
         uniprot = EvidenceField.ambiguous(cands)   # accession NOT chosen
     else:
         canonical = EvidenceField.missing()

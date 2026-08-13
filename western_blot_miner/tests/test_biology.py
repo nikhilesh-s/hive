@@ -139,6 +139,42 @@ def test_deterministic_extractors_exist():
     check("pS473 parse", bio.parse_phospho_site("pS473")["residue"] == "Ser")
 
 
+def test_core_symbol_prefix_and_isoform():
+    """core_symbol must strip real modification/total prefixes WITHOUT eating a
+    letter that is part of the protein name, and must preserve isoform suffixes.
+    Regressions here caused P-ERK 1/2 -> "ERK" -> EPHB2 (a false UniProt friend),
+    and p53/p38/PARP -> 53/38/ARP (unresolvable). Surfaced by the first real
+    paper (Jang et al., 10.3892/br.2026.2108).
+    """
+    cs = bio.core_symbol
+    # phospho / total prefixes are stripped
+    check("p-STAT3 -> STAT3", cs("P-STAT3 (Tyr705)") == "STAT3")
+    check("t-STAT3 -> STAT3", cs("T-STAT3") == "STAT3")
+    check("pSTAT3 glued -> STAT3", cs("pSTAT3") == "STAT3")
+    check("phospho-STAT3 -> STAT3", cs("phospho-STAT3 (Tyr705)") == "STAT3")
+    # p<number> and P-initial proteins keep their leading letter
+    check("p53 kept", cs("p53") == "p53")
+    check("p38 kept", cs("p38") == "p38")
+    check("PARP kept", cs("PARP") == "PARP")
+    # isoform designation preserved (not collapsed to family false-friend)
+    check("P-ERK 1/2 -> ERK1/2", cs("P-ERK 1/2") == "ERK1/2")
+    check("T-ERK 1/2 -> ERK1/2", cs("T-ERK 1/2") == "ERK1/2")
+
+
+def test_erk_family_not_a_false_friend_offline():
+    """The curated map must mark ERK-family shorthand ambiguous (ERK1/ERK2), so
+    it is never collapsed to a single accession -- offline resolver check."""
+    from western_blot_miner import resolve
+    r = resolve.LocalMapResolver()
+    for label in ("P-ERK 1/2", "T-ERK 1/2", "ERK", "p44/42 MAPK"):
+        res = r.resolve(label)
+        check(f"{label} ambiguous ERK1/2", res.status == "AMBIGUOUS"
+              and res.canonical == "MAPK1/MAPK3" and res.uniprot_id is None)
+    # p53 / PARP must resolve to the right protein via the curated map
+    check("p53 -> TP53 offline", r.resolve("p53").uniprot_id == "P04637")
+    check("PARP -> PARP1 offline", r.resolve("PARP").uniprot_id == "P09874")
+
+
 def run() -> int:
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in fns:

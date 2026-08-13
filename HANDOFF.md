@@ -6,10 +6,16 @@
 > blocked, and the exact next task.
 
 ## Last Updated
-- **2026-08-12** — Claude Code (Opus 4.8). Migrated Phase 2+3 into `/hive`;
-  wired the Evidence Record engine into `pipeline.py` behind `WBM_EXTRACTION_MODE`;
-  live-validated the UniProt resolver parsing. Real-paper run still blocked
-  (heavy deps + model creds; see Blockers).
+- **2026-08-12 (session 2)** — Claude Code (Opus 4.8). **First real paper end-to-end.**
+  Built the `.venv` (py3.12) + installed ingestion deps; live UniProt transport
+  validated; ran a real phospho-STAT3 paper (PMC12856536) through the full records
+  path via **agent-in-the-loop** Stage-2 extraction (no live model backend available).
+  Field-by-field inspection found + fixed a **structural identity bug** (`P-ERK 1/2`→
+  EPHB2 false-friend; p53/p38/PARP prefix mangling; ambiguous-family-as-SUPPORTED),
+  with regression tests. Widened the API model additively; rebuilt the result card;
+  wrote `research/RESEARCH_SYNTHESIS.md`. Demo run committed under `eval/demo/`.
+- **2026-08-12 (session 1)** — Migrated Phase 2+3 into `/hive`; wired the Evidence
+  Record engine into `pipeline.py` behind `WBM_EXTRACTION_MODE`; validated UniProt parsing.
 
 ## Product North Star
 HiveBlot is a **biologically accurate Western blot evidence search / context
@@ -70,12 +76,42 @@ validation Stage 3 → expensive-model escalation Stage 4 only for ambiguous/con
 - **Migration → /hive**: engine + migrations + eval brought into the canonical repo.
 - **Pipeline wiring**: `pipeline.py` now supports `WBM_EXTRACTION_MODE=records`, routing the
   OpenCV panel candidates through the Evidence Record engine (`run_records_stage`); legacy
-  path preserved. **98 assertions + 34/34 benchmark verified from `/hive`**
-  (test_biology 38, test_reconcile 21, test_loader_enrichment 18, test_extract_records 10,
-  test_pipeline_records 11).
+  path preserved. **113 assertions + 34/34 benchmark verified from `/hive`**
+  (test_biology 53, test_reconcile 21, test_loader_enrichment 18, test_extract_records 10,
+  test_pipeline_records 11) + **api pytest 81/81**.
 - **UniProt resolver live-validated**: parsing checked against the live UniProt API via
   stdlib urllib — STAT3→P40763 (88.1 kDa), AKT1→P31749, TP53→P04637, EGFR→P00533,
-  GAPDH→P04406, all exact. Only the `requests` transport wrapper remains untested (trivial).
+  GAPDH→P04406, all exact. **`requests` transport now also live-validated** in the venv.
+- **Session 2 — first real paper end-to-end** (`eval/demo/phospho_PMC12856536/`):
+  Jang et al. 2026, DOI 10.3892/br.2026.2108, PMC12856536 (phospho-STAT3, Hep3B, IL-6).
+  PDF → PyMuPDF → OpenCV (55→9 candidates) → **agent-in-the-loop** Stage-2 → build →
+  reconcile → **live UniProt** → validation → **18 Evidence Records / 90 Supabase rows**;
+  the 4 bar-chart candidates correctly produced 0 records. Verified correct: phospho vs
+  total split, Tyr705/Ser727 residues, loading-control (β-actin), treatment parse
+  (IL-6 10 ng/ml, 60 min), expected-MW 88.1 kDa, reported-MW null (never conflated).
+  *Transport note:* no live model backend was available, so Stage-2 was performed by
+  the agent (real observations in `responses_observed.json`); ALL downstream biology is
+  the real production path. Reproducible via `eval/tools/manual_pipeline.py`.
+- **Structural bug fixes (session 2, with tests):** `biology._core_symbol` rewritten —
+  it stripped a lone `p`/`P` from any p-word (`p53`→`53`, `p38`→`38`, `PARP`→`ARP`),
+  ignored total-protein `T-`, and dropped isoform suffixes (`P-ERK 1/2`→`ERK`→ UniProt
+  **EPHB2**, a gene-synonym false-friend). Now: separators required for p-/t- stripping,
+  glued lowercase-`p` only before uppercase, isoform preserved (`ERK 1/2`→`ERK1/2`).
+  Resolver: curated **ambiguous families win over UniProt** (ERK→MAPK1/MAPK3, never one
+  wrong accession). `record_builder`: an ambiguous-with-family resolution stays AMBIGUOUS
+  (was falsely SUPPORTED) → flips `needs_review`. Tests: **test_biology now 53** (added 15).
+- **API widened (additive):** `api/app/schemas.py::WesternBlotRecord` gained the
+  migration-001 Evidence Record fields as Optional (Pydantic was silently dropping DB
+  columns the frontend never received). The giant `provenance`/`validation` JSONB blobs
+  are intentionally kept OUT of list responses. **api pytest 81/81.**
+- **Frontend result card rebuilt** (`web/components/DatabaseResultCard.tsx`): biological
+  headline (`STAT3 · phospho-Tyr705`) + review badge (Supported / Needs review /
+  Conflicting) + antibody/treatment/band/MW (reported≠expected) + an evidence panel
+  ("Why HiveBlot says this"). Additive + guarded (legacy rows still render); `tsc` clean.
+- **Research tracks delivered** (`research/`): `biologist_western_workflow.md`,
+  `biopharma_workflows.md`, `frontend_integration_plan.md`, `benchmark_candidates.md`
+  (+ `eval/candidates.json`, 26 verified papers), `real_pipeline_report.md`, and the
+  integration `RESEARCH_SYNTHESIS.md`.
 
 ## Current Biological Contract
 Every important field is an **Evidence Field envelope**: `{value, confidence, status,
@@ -93,6 +129,14 @@ Other invariants: **raw source wording is always preserved** alongside any norma
 travels with each field; a disputed modification keeps its residue **unsettled** too.
 
 ## Known Biological Edge Cases (current gaps)
+- **FIXED — ERK/family shorthand false-friend.** `P-ERK 1/2` used to resolve to EPHB2
+  (P29323); now resolves to the ambiguous **MAPK1/MAPK3** family (status AMBIGUOUS,
+  `needs_review=true`, no single accession). Curated ambiguous families now beat a
+  UniProt synonym hit.
+- **P-ERK 1/2 is NOT classified as phospho** (mod=`-`, experiment=`standard_western`)
+  because there is no explicit site and `P-` alone isn't accepted as phospho evidence.
+  Conservative-correct, but the phospho-specific antibody (rank-1) is a hint we don't yet
+  use for site-less phospho labels — candidate improvement.
 - **Non-human UniProt resolution ordering** — resolver defaults to `organism_id=9606`;
   mouse/rat targets can resolve wrong or expected-MW wrong until organism is threaded in.
 - **Unusual phospho notation** far from the target mention (e.g. glued `STAT3(pY705)`, or
@@ -105,36 +149,46 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 - **IP-bait heuristic** (`_first_gene_after`) is best-effort; robust for "anti-EGFR", brittle in messy methods.
 
 ## Current Technical Blockers
-- **No real paper has completed end-to-end yet.** The `records` path is wired and unit-tested
-  (mock model + offline resolver), but a real run needs the items below.
-- **Heavy ingestion deps not installed** in the current environment: `PyMuPDF` (fitz),
-  `opencv-python-headless` (cv2), `numpy` — required by `pdf_preprocess` to render pages and
-  detect candidates. `pip install -r western_blot_miner/requirements.txt` in a venv.
-- **No model backend available**: `boto3` + AWS Bedrock creds/region/model-access absent
-  (default backend), and no alternate (`anthropic`/`requests` missing, keys unset). Set
-  `WBM_LLM_BACKEND` + the matching creds.
-- **`requests` not installed** (system Python is PEP-668 managed) → live UniProt transport
-  and OpenAI-compatible backend can't run until installed in a venv. UniProt *parsing* is
-  validated; the transport wrapper is not.
-- **No representative PDF** is present in the working tree (QBI `papers/` were intentionally
-  not migrated). Provide a phospho-Western or co-IP open-access PDF for the smoke test.
-- **Supabase migration must be applied** if not already: run `api/db/schema.sql` then
-  `migrations/001_evidence_record.sql` against the project.
+- **RESOLVED — real paper end-to-end**: done (session 2, `eval/demo/phospho_PMC12856536/`).
+- **RESOLVED — ingestion deps**: `.venv` (py3.12) at repo root has PyMuPDF, opencv-headless,
+  numpy, requests, pydantic, anthropic. Recreate with
+  `python3.12 -m venv .venv && .venv/bin/pip install -r western_blot_miner/requirements.txt`.
+- **RESOLVED — `requests` / UniProt transport**: installed + live-validated in the venv.
+- **RESOLVED — representative PDFs**: 3 real open-access PDFs in `research/papers/`
+  (standard PMC9559174, phospho PMC12856536, co-IP PMC12706926); gitignored (fetch via
+  the PMCIDs in `research/real_pipeline_report.md`).
+- **OPEN — no live model backend**: `boto3`+Bedrock creds/region absent; no
+  `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`; no `~/.aws`. The real run used **agent-in-the-loop**
+  Stage-2 (honest, documented). For an automated run set `WBM_LLM_BACKEND` + matching creds.
+  This is the main thing between us and a hands-off `pipeline.py … --mode records` run.
+- **OPEN — Supabase not provisioned here**: no `SUPABASE_URL`/`KEY` in env, so migration 001
+  is unapplied and no rows are loaded → the enriched frontend can't show live data yet.
+  Apply `api/db/schema.sql` then `migrations/001_evidence_record.sql`, then load
+  `eval/demo/phospho_PMC12856536/supabase_rows.json`. This is the last gap to the full
+  success condition (search → real record in the UI).
 
 ## Immediate Next Task
-**Run ONE real paper end-to-end in `records` mode** and manually inspect the biology.
-In a venv with the ingestion deps installed and a model backend configured:
+Pick up in priority order (first two unblock the full success condition):
+1. **Get the real records into the live frontend.** Provision/confirm the beta Supabase
+   project, apply `api/db/schema.sql` + `migrations/001_evidence_record.sql`, load
+   `eval/demo/phospho_PMC12856536/supabase_rows.json`, run `api` + `web`, and confirm a
+   search for `phospho STAT3 Tyr705` returns the real card (the new
+   `DatabaseResultCard` is ready; API model already passes the fields through).
+2. **Thread organism into the UniProt query** (resolver defaults to human 9606). Needed
+   before the mouse standard-Western demo (PMC9559174) resolves correctly. Then run the
+   remaining two downloaded papers (standard PMC9559174, co-IP PMC12706926) the same way
+   to reach 5–10 diverse demo records.
+3. **When a live model backend exists**, re-run PMC12856536 hands-off
+   (`WBM_LLM_BACKEND=… WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline
+   research/papers/phospho_PMC12856536.pdf --mode records`) and diff against the
+   agent-in-the-loop records in `eval/demo/` to validate the automated backend.
+
+Reproduce the agent-in-the-loop run:
 ```bash
-pip install -r western_blot_miner/requirements.txt   # PyMuPDF, opencv, numpy, pydantic, requests
-export WBM_LLM_BACKEND=bedrock AWS_REGION=... WBM_BEDROCK_MODEL=...   # or anthropic/openai_compatible
-export WBM_EXTRACTION_MODE=records
-python3 -m western_blot_miner.pipeline path/to/phospho_or_coip_paper.pdf --mode records
-# inspect <out_dir>/evidence_records.json + supabase_rows.json
+PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py preprocess research/papers/phospho_PMC12856536.pdf
+# inspect panel_candidates/*.png, write observed rows, then:
+PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py run <out_dir> eval/demo/phospho_PMC12856536/responses_observed.json
 ```
-Report field-by-field (target, canonical, modification, residue, experiment type, sample,
-treatment, antibody/vendor/catalog, reported vs expected MW, band state, validation status,
-provenance) and flag anything biologically implausible. Do not claim success just because it
-runs. Prefer a phospho-Western or co-IP paper (exercises modification + assay-design logic).
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).

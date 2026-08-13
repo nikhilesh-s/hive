@@ -89,8 +89,10 @@ PROTEIN_ALIASES: dict[str, tuple[str, Optional[str]]] = {
     "p53": ("TP53", "P04637"),
     "tp53": ("TP53", "P04637"),
     "trp53": ("TP53", "P04637"),
-    "erk": ("MAPK1", None),          # ERK is ambiguous (ERK1/ERK2) -> no single UniProt
+    "erk": ("MAPK1/MAPK3", None),    # ERK is ambiguous (ERK1/ERK2) -> no single UniProt
     "erk1/2": ("MAPK1/MAPK3", None),
+    "p44/42": ("MAPK1/MAPK3", None), # CST's name for total ERK1/2 (p44/42 MAPK)
+    "mapk1/2": ("MAPK1/MAPK3", None),
     "p38": ("MAPK14", "Q16539"),
     "gapdh": ("GAPDH", "P04406"),
     "actin": ("ACTB", "P60709"),
@@ -249,9 +251,30 @@ def _one_letter_site_in_context(*texts: str) -> Optional[dict]:
 # --------------------------------------------------------------------------- #
 
 def _core_symbol(target: str) -> str:
-    """Gene symbol with a leading phospho/p- marker and any site stripped."""
-    core = re.sub(r"^(phospho[-\s]?|p[-\s]?)", "", _norm(target), flags=re.IGNORECASE)
-    core = re.split(r"[\s(]", core)[0]
+    """Gene symbol with a leading phospho/total marker and any site stripped.
+
+    Strips ONLY genuine modification/expression prefixes, and never a "p"/"P"
+    that is part of the protein's own name:
+      * "phospho-" / "phospho " (any case).
+      * "p-" / "p " and total-protein "t-" / "t " -- a separator is REQUIRED, so
+        p53, p38, PARP keep their leading letter (the old ``p[-\\s]?`` stripped a
+        lone "p"/"P", mangling p53->53, p38->38, PARP->ARP, and left "t-" alone).
+      * a glued *lowercase* "p" before an UPPERCASE run (pSTAT3, pERK) -- but not
+        uppercase "P" (PARP) and not "p"+digits (p53).
+    A trailing isoform designation is preserved and glued ("ERK 1/2" -> "ERK1/2")
+    so a family label does not collapse to a bare-symbol false-friend (UniProt
+    ``gene:ERK`` resolves to EPHB2, whose gene synonym is literally "ERK").
+    """
+    s = _norm(target)
+    # phospho word, or a p-/t- prefix with a REQUIRED separator.
+    s = re.sub(r"^(phospho[-\s]?|[pt][-\s])", "", s, flags=re.IGNORECASE)
+    # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
+    s = re.sub(r"^p([A-Z]{2,})", r"\1", s)
+    tokens = re.split(r"[\s(]+", s.strip())
+    core = tokens[0] if tokens else ""
+    # Glue a trailing pure-isoform token (digits / slashes): "ERK 1/2" -> "ERK1/2".
+    if len(tokens) > 1 and re.fullmatch(r"[0-9/]+", tokens[1] or ""):
+        core = core + tokens[1]
     return core.strip(" -()")
 
 

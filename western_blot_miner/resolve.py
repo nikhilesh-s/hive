@@ -176,6 +176,17 @@ class CachingResolver(ProteinResolver):
             data["raw"] = raw_name
             return ProteinResolution(**data)
 
+        # Curated ambiguity is AUTHORITATIVE and short-circuits the live query.
+        # A family shorthand the curated map marks ambiguous (e.g. "ERK" ->
+        # MAPK1/MAPK3, uniprot=None) must NOT be collapsed to a single UniProt
+        # synonym false-friend: `gene:ERK` returns EPHB2 (whose gene synonym is
+        # literally "ERK") as one confident hit. Trust the expert map here.
+        curated = self.fallback.resolve(raw_name, organism_id)
+        if curated.status == AMBIGUOUS:
+            self._cache[cache_key] = {k: v for k, v in curated.__dict__.items() if k != "raw"}
+            self._save()
+            return curated
+
         res = self.primary.resolve(raw_name, organism_id)
         # If the primary couldn't resolve (e.g. offline), try the fallback but
         # keep it clearly labeled; never fabricate an accession.
