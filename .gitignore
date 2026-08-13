@@ -15,3 +15,6 @@ venv/
 western_blot_miner/data/
 pdf_runs/
 eval/out/
+
+# Large open-access PDFs (fetch via PMCID in research/real_pipeline_report.md)
+research/papers/*.pdf
