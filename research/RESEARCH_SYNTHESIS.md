@@ -117,6 +117,28 @@ Deferred to post-beta and gated behind ladder calibration (never fabricate):
 - **Rebuilt the result card** around the biological headline + review badge +
   evidence panel.
 
+## Session-4 delta (scientist-review sprint — what materially changed)
+1. **Most valuable feedback fields** (per the UX review + what we instrumented):
+   per-field ✓/✗ with suggested correction on canonical_target, experiment_type,
+   cell_line, phosphosite, antibody catalog; the **conflict "Which is right?"
+   candidate picker** is the single highest-yield signal and is now built.
+2. **Evidence that must be prominent:** the normalization chain
+   (raw → canonical → UniProt), per-field source snippets, and CONFLICTING
+   candidates rendered equal-weight. All shipped in the evidence accordion.
+   A CONFLICTING field must never render as silent emptiness (UX finding #4).
+3. **Fields researchers care about most** (unchanged from Tier-1): antibody
+   catalog/vendor, phosphosite, cell line, experiment type — now each
+   individually correctable.
+4. **Remaining trust-critical failure modes** (open, ranked):
+   scalar dose/duration on time-course/dose-response panels (QA finding M1 →
+   should become AMBIGUOUS-with-candidates); band multiplicity/smear not
+   representable (M2, LC3B doublet / poly-Ub); antibody↔panel association
+   still heuristic; automated Stage-2 completely unvalidated.
+5. **Before UCSF beta:** independent scientific QA re-run (this session's QA
+   was a self-audit); the automated-model comparison (blocked on creds);
+   figure-crop serving so researchers see the blot; lane-grouping in the
+   results list (15 near-identical cards per panel today).
+
 ## Deferred (next, in priority order)
 1. Organism threading into UniProt (unblocks the mouse standard-Western demo).
 2. Tier-1 schema additions: antibody validation trust + controls block (+ surface

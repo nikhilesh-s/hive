@@ -100,6 +100,143 @@ class SearchResponse(BaseModel):
     results: list[WesternBlotRecord]
 
 
+# --- record detail ("Why does HiveBlot say this?") --------------------------
+
+class FieldEvidence(BaseModel):
+    """One biological field with its evidence envelope. This is the unit of
+    the trust story: value + status + the actual source snippets, plus the
+    competing candidates whenever the field is AMBIGUOUS/CONFLICTING (a
+    disputed field keeps value=null and shows both claims — disagreement is
+    never hidden)."""
+    value: object = None
+    confidence: float | None = None
+    status: str | None = None       # SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING
+    sources: list[dict] = []        # [{type, text}] — provenance snippets
+    candidates: list[dict] = []     # [{value, source_type, confidence}] when unsettled
+
+
+class RecordAntibody(BaseModel):
+    target: str | None = None
+    vendor: str | None = None
+    catalog_number: str | None = None
+    clone: str | None = None
+    dilution: str | None = None
+    role: str | None = None          # detection | immunoprecipitation
+    phospho_specific: bool | None = None
+    detection_confidence: float | None = None
+    association_confidence: float | None = None
+    source_text: str | None = None
+
+
+class RecordBand(BaseModel):
+    lane_index: int | None = None
+    lane_condition: str | None = None
+    band_state: str | None = None    # present / absent / uncertain — categorical, not densitometry
+    confidence: float | None = None
+
+
+class RecordDetail(BaseModel):
+    """Full provenance view of ONE record. List responses stay lean; this is
+    where the complete evidence story lives."""
+    id: int
+    # source identity
+    paper_id: str | None = None
+    title: str | None = None
+    doi: str | None = None
+    pmcid: str | None = None
+    pmid: str | None = None
+    figure_label: str | None = None
+    panel_label: str | None = None
+    page: int | None = None
+    figure_caption: str | None = None
+    image_crop_ref: str | None = None
+    # biological scalars (settled values; null when disputed/missing)
+    raw_target_name: str | None = None
+    canonical_target: str | None = None
+    uniprot_id: str | None = None
+    modification_label: str | None = None
+    experiment_type: str | None = None
+    cell_line: str | None = None
+    organism: str | None = None
+    sample: str | None = None
+    band_state: str | None = None
+    lane_condition: str | None = None
+    reported_molecular_weight_kda: float | None = None
+    expected_molecular_weight_kda: float | None = None
+    molecular_weight_source: str | None = None
+    # field-level evidence envelopes for the important fields
+    fields: dict[str, FieldEvidence] = {}
+    antibodies: list[RecordAntibody] = []
+    bands: list[RecordBand] = []
+    # validation
+    record_status: str | None = None
+    needs_review: bool | None = None
+    anomaly_flags: list[dict] = []
+
+
+# --- researcher feedback -----------------------------------------------------
+
+FEEDBACK_SCOPES = {"field", "record", "missing_field", "search", "ui"}
+FIELD_FEEDBACK_TYPES = {"correct", "incorrect", "not_useful", "missing_context"}
+RECORD_FEEDBACK_TYPES = {
+    "wrong_interpretation", "wrong_experiment_type", "wrong_target_modification",
+    "wrong_phosphosite", "wrong_antibody_association", "wrong_figure_association",
+    "missing_methods_context", "irrelevant_result", "other",
+}
+SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no"}
+
+
+class FeedbackSubmission(BaseModel):
+    """One piece of researcher feedback. Stored in hiveblot_feedback (migration
+    002) beside — never over — the AI extraction. suggested_value is a human
+    CORRECTION CLAIM for audit + future eval; it is never auto-applied."""
+    feedback_scope: str
+    record_id: int | None = None
+    paper_id: str | None = Field(default=None, max_length=200)
+    figure_label: str | None = Field(default=None, max_length=100)
+    search_query: str | None = Field(default=None, max_length=500)
+    field_name: str | None = Field(default=None, max_length=100)
+    model_value: str | None = Field(default=None, max_length=1000)
+    feedback_type: str | None = Field(default=None, max_length=50)
+    suggested_value: str | None = Field(default=None, max_length=1000)
+    comment: str | None = Field(default=None, max_length=4000)
+    ui_location: str | None = Field(default=None, max_length=200)
+    session_id: str | None = Field(default=None, max_length=64)
+
+    def validate_scope(self) -> str | None:
+        """Scope-specific requirements; returns an error string or None."""
+        s = self.feedback_scope
+        if s not in FEEDBACK_SCOPES:
+            return f"feedback_scope must be one of {sorted(FEEDBACK_SCOPES)}"
+        if s == "field":
+            if self.record_id is None or not self.field_name:
+                return "field feedback requires record_id and field_name"
+            if self.feedback_type not in FIELD_FEEDBACK_TYPES:
+                return f"field feedback_type must be one of {sorted(FIELD_FEEDBACK_TYPES)}"
+        elif s == "record":
+            if self.record_id is None:
+                return "record feedback requires record_id"
+            if self.feedback_type not in RECORD_FEEDBACK_TYPES:
+                return f"record feedback_type must be one of {sorted(RECORD_FEEDBACK_TYPES)}"
+        elif s == "missing_field":
+            if not self.field_name:
+                return "missing_field feedback requires field_name (the requested field)"
+        elif s == "search":
+            if not self.search_query:
+                return "search feedback requires search_query"
+            if self.feedback_type not in SEARCH_FEEDBACK_TYPES:
+                return f"search feedback_type must be one of {sorted(SEARCH_FEEDBACK_TYPES)}"
+        elif s == "ui":
+            if not self.comment:
+                return "ui feedback requires a comment"
+        return None
+
+
+class FeedbackResponse(BaseModel):
+    feedback_id: int
+    stored: bool = True
+
+
 class ProteinSearchResponse(BaseModel):
     protein: str
     count: int

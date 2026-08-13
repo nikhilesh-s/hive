@@ -95,34 +95,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (!query.trim()) {
-      setShowResults(false);
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setShowResults(true);
-
-    try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!response.ok) throw new Error('Search failed');
-      const data: SearchResponse = await response.json();
-      setResults(data.results || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+  // One results surface: home searches route to /search, which renders the
+  // biological Evidence Record cards (the legacy ResultsTable on this page
+  // showed only the 6 base columns and none of the Evidence Record biology).
+  const handleSearch = (query: string) => {
+    if (!query.trim()) return;
+    window.location.href = `/search?q=${encodeURIComponent(query)}`;
   };
 
   return (
