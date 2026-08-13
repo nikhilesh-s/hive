@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/SearchInput';
-import DatabaseResultCard from '@/components/DatabaseResultCard';
+import DatabaseResultCard, { type LaneSummary } from '@/components/DatabaseResultCard';
 import FiltersBar from '@/components/FiltersBar';
 import SearchFeedback from '@/components/SearchFeedback';
 import BetaFeedback from '@/components/BetaFeedback';
@@ -21,6 +21,35 @@ interface DatabaseResult {
   condition: string;
   band_detected: boolean;
   confidence: number | null;
+  // Evidence Record extras used for grouping / lane display (optional —
+  // legacy rows simply lack them).
+  image_crop_ref?: string | null;
+  lane_condition?: string | null;
+  band_state?: string | null;
+  experiment_type?: string | null;
+}
+
+// One card per EXPERIMENT (paper + panel + target), not per lane row: a
+// 6-lane time course reads as one result with a lane strip, not 6 near-
+// identical cards. Genuinely different targets/panels are never merged.
+interface ResultGroup {
+  first: DatabaseResult;
+  lanes: LaneSummary[];
+}
+
+function groupResults(rows: DatabaseResult[]): ResultGroup[] {
+  const groups = new Map<string, ResultGroup>();
+  for (const r of rows) {
+    const key = [r.paper_id, r.image_crop_ref ?? `p${r.page}`, r.target, r.experiment_type ?? ''].join('|');
+    const lane: LaneSummary = {
+      condition: r.lane_condition ?? r.condition ?? null,
+      band_state: r.band_state ?? (r.band_detected == null ? null : r.band_detected ? 'present' : 'absent'),
+    };
+    const g = groups.get(key);
+    if (g) g.lanes.push(lane);
+    else groups.set(key, { first: r, lanes: [lane] });
+  }
+  return [...groups.values()];
 }
 
 interface SearchResponse {
@@ -102,7 +131,12 @@ export default function SearchPage() {
                 <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Western Blot Evidence</span>
               </div>
               <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
-                {loading ? 'Searching database...' : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`}
+                {loading
+                  ? 'Searching database...'
+                  : (() => {
+                      const n = groupResults(results).length;
+                      return `Found ${n} experiment${n !== 1 ? 's' : ''} (${results.length} lane record${results.length !== 1 ? 's' : ''})`;
+                    })()}
               </p>
             </div>
 
@@ -138,8 +172,8 @@ export default function SearchPage() {
               <>
                 <SearchFeedback query={query} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {results.map((result) => (
-                    <DatabaseResultCard key={result.id} data={result} />
+                  {groupResults(results).map((g) => (
+                    <DatabaseResultCard key={g.first.id} data={g.first} lanes={g.lanes} />
                   ))}
                 </div>
               </>
