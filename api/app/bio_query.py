@@ -66,7 +66,12 @@ STOPWORDS = {
 }
 
 _SITE_RE = re.compile(r"\b(tyr|ser|thr|y|s|t)\s?-?(\d{2,4})\b", re.IGNORECASE)
-_PHOSPHO_RE = re.compile(r"\bphospho\w*|\bp-(?=[a-z0-9])", re.IGNORECASE)
+# Only the explicit WORD "phospho" adds a modification filter. A "p-" prefix
+# ("P-ERK", "p-AKT") stays a plain term: the printed row label matches it
+# directly, and adding a phospho filter would EXCLUDE rows whose modification
+# is honestly CONFLICTING (value null) — hiding exactly the records that most
+# need review.
+_PHOSPHO_RE = re.compile(r"\bphospho\w*", re.IGNORECASE)
 _COIP_RE = re.compile(r"\bco-?ip\b|\bimmunoprecipitat\w*", re.IGNORECASE)
 _LOADING_RE = re.compile(r"\bloading[\s-]?controls?\b", re.IGNORECASE)
 _NEEDS_REVIEW_RE = re.compile(r"\bneeds?[\s-]?review\b", re.IGNORECASE)
@@ -102,9 +107,13 @@ def generate_bio_sql(question: str) -> str:
 
     # Modification / experiment-type keywords.
     if _PHOSPHO_RE.search(q):
-        clauses.append("modification_type ILIKE '%phospho%'")
-        # strip only the standalone word; 'p-stat3' stays a term ('%p-stat3%'
-        # matches the printed row label directly).
+        # Unsettled modifications (CONFLICTING/AMBIGUOUS) stay INCLUDED: a
+        # phospho search must surface a disputed phospho-vs-total row for
+        # review, not silently hide it (its scalar modification_type is null
+        # by design). Settled rows rank first via ORDER BY needs_review.
+        clauses.append("(modification_type ILIKE '%phospho%' OR "
+                       "modification_status ILIKE 'CONFLICTING' OR "
+                       "modification_status ILIKE 'AMBIGUOUS')")
         q = re.sub(r"\bphospho\w*", " ", q, flags=re.IGNORECASE)
     if _COIP_RE.search(q):
         clauses.append("experiment_type ILIKE 'co_ip'")
