@@ -69,10 +69,43 @@ const TEXT = '#e7f0ee';
 const TEAL = '#4ad6b0';
 const GOLD = '#e0b23c';
 const RED = '#ff6b6b';
+const DIMTEXT = '#a9bdb5';
 
 function titleCase(s?: string | null): string {
   if (!s) return '';
   return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Display-only lane-label formatting (semantics untouched): " / " separators
+// become interpuncts and a TRAILING +/− state marker gets a colon, so
+// "IL-6 + / CL-E -" reads "IL-6: + · CL-E: −". A "+" that joins a drug name
+// ("CL-E + Bis II") is a conjunction and is left alone.
+export function formatLaneLabel(c?: string | null): string {
+  if (!c) return '';
+  return c
+    .replace(/(\S+) ([+-])(?=$| \/ )/g, (_m, name, sign) => `${name}: ${sign === '-' ? '−' : '+'}`)
+    .replace(/ \/ /g, ' · ');
+}
+
+// Deterministic experiment-design tag derived ONLY from the group's own lane
+// labels (data-backed, never invented): ≥3 pure-timepoint lanes = a time
+// course; ≥3 lanes sharing a prefix with distinct trailing numbers = a dose
+// series. Anything else: no tag.
+export function deriveDesignTag(lanes?: LaneSummary[]): string | null {
+  if (!lanes || lanes.length < 3) return null;
+  const conds = lanes.map((l) => (l.condition || '').trim()).filter(Boolean);
+  if (conds.length < 3) return null;
+  const timepoints = conds.filter((c) => /^\d+(\.\d+)?\s*(min|mins|h|hr|hrs|d)$/i.test(c));
+  if (timepoints.length >= 3) return 'time course';
+  const trailing = conds
+    .map((c) => /^(.*?)(\d+(?:\.\d+)?)$/.exec(c))
+    .filter((m): m is RegExpExecArray => !!m && m[1].trim().length > 0);
+  if (trailing.length >= 3) {
+    const prefixes = new Set(trailing.map((m) => m[1].trim()));
+    const numbers = new Set(trailing.map((m) => m[2]));
+    if (prefixes.size === 1 && numbers.size >= 3) return 'dose series';
+  }
+  return null;
 }
 
 // Supported / Needs review / Conflicting -- derived, never asserted beyond evidence.
@@ -109,15 +142,18 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
   const antibody = [data.antibody_vendor, data.antibody_catalog_number ? `#${data.antibody_catalog_number}` : null]
     .filter(Boolean)
     .join(' · ');
+  // Structured name·dose·duration only. The verbatim treatment_context now has
+  // its own identity line under the headline — falling back to it here printed
+  // the same sentence twice on cards with no parsed treatment name.
   const treatment =
-    data.treatment_name || data.dose != null || data.treatment_context
+    data.treatment_name || data.dose != null
       ? [
           data.treatment_name,
           data.dose != null ? `${data.dose}${data.dose_unit || ''}` : null,
           data.duration != null ? `${data.duration}${data.duration_unit || ''}` : null,
         ]
           .filter(Boolean)
-          .join(' · ') || data.treatment_context
+          .join(' · ')
       : null;
   const mw =
     data.reported_molecular_weight_kda != null || data.expected_molecular_weight_kda != null
@@ -173,6 +209,24 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
         {data.canonical_target && data.target && data.canonical_target !== data.target && (
           <div style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, marginTop: '-12px' }}>as printed: {data.target}</div>
         )}
+        {/* Experiment identity: WHY this card is distinct from its siblings.
+            Design tag is derived only from this group's own lane labels; the
+            context text is the reviewed record's treatment_context verbatim
+            (truncated). Nothing here is invented. */}
+        {(deriveDesignTag(lanes) || data.treatment_context) && (
+          <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIMTEXT, marginTop: '-8px', fontStyle: 'italic' }}>
+            {deriveDesignTag(lanes) && (
+              <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, fontStyle: 'normal', letterSpacing: '0.4px', marginRight: '8px' }}>
+                {deriveDesignTag(lanes)!.toUpperCase()}
+              </span>
+            )}
+            {data.treatment_context && (
+              data.treatment_context.length > 110
+                ? data.treatment_context.slice(0, 110) + '…'
+                : data.treatment_context
+            )}
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -193,7 +247,7 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
                         border: '1px solid rgba(255,255,255,.1)',
                         color: l.band_state === 'present' ? TEAL : l.band_state === 'absent' ? RED : GOLD,
                       }}>
-                        {l.condition || `lane ${i + 1}`}
+                        {formatLaneLabel(l.condition) || `lane ${i + 1}`}
                       </span>
                     ))}
                     {lanes.length > 8 && (

@@ -439,6 +439,34 @@ def test_greek_beta_normalizes_in_core_symbol():
     check("β-actin core -> beta-actin", bio.core_symbol("β-actin") == "beta-actin")
 
 
+def test_figure_references_are_not_durations():
+    """Manual-test issue 3 ('IL-6 · 3D'): 'Fig 3D' was parsed as a 3-day
+    duration and rendered as a treatment. Figure/panel references and glued
+    UPPERCASE single-letter units ('3D culture', 'Fig. 3H') are never
+    durations; real lowercase durations still parse."""
+    from western_blot_miner.supabase_loader import extract_duration, extract_duration_series
+    check("'Fig 3D:' yields no duration",
+          extract_duration("Fig 3D: Hep3B cells stimulated with IL-6") == [])
+    check("'Fig. 3H' yields no duration",
+          extract_duration("as shown in Fig. 3H for this blot") == [])
+    check("'3D culture' yields no duration",
+          extract_duration("grown in a 3D culture model") == [])
+    check("'panel 4h' figure ref guarded",
+          extract_duration("quantified in panel 4h") == [])
+    check("'Figs. 2, 3 and 4' is not a series",
+          extract_duration_series("see Figs. 2, 3 and 4 d") == [])
+    check("real '3 d' still parses",
+          extract_duration("treated for 3 d")[0]["value"] == 3.0)
+    check("real '24h' glued lowercase still parses",
+          extract_duration("stimulated for 24h")[0]["value"] == 24.0)
+    check("real '30 min' unaffected",
+          extract_duration("IL-6 for 30 min")[0]["value"] == 30.0)
+    check("'Figure 2, 4 h exposure' keeps the real 4 h",
+          extract_duration("Figure 2, 4 h exposure")[0]["value"] == 4.0)
+    check("time-course series still expands",
+          len(extract_duration_series("times (0, 5, 10, 20, 30, 60 min)")) == 6)
+
+
 def test_dose_micro_sign_and_identifier_guard():
     """QA M6: 'µ' doses were silently dropped, and the series regex matched
     INSIDE identifiers — 'BafA1, 20 nM' fabricated a 1 nM candidate from the

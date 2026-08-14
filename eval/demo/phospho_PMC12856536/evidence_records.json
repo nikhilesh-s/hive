@@ -7773,31 +7773,17 @@
         ]
       },
       "duration": {
-        "value": 3.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "duration_unit": {
-        "value": "D",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "treatment_context": {
@@ -8850,31 +8836,17 @@
         ]
       },
       "duration": {
-        "value": 3.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "duration_unit": {
-        "value": "D",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "treatment_context": {
@@ -9927,31 +9899,17 @@
         ]
       },
       "duration": {
-        "value": 3.0,
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "duration_unit": {
-        "value": "D",
-        "confidence": 0.85,
-        "status": "SUPPORTED",
-        "sources": [
-          {
-            "type": "deterministic",
-            "rank": 2,
-            "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-            "locator": null
-          }
-        ],
+        "value": null,
+        "confidence": 0.0,
+        "status": "MISSING",
+        "sources": [],
         "candidates": []
       },
       "treatment_context": {

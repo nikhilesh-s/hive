@@ -6,6 +6,50 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-13 (session 8, night sprint)** — Claude Fable 5. **MANUAL-TEST FIXES +
+  SUPABASE READINESS.**
+  (1) **Search is explicit-submit only** (manual issue 1): typing never fires a
+  request; Enter or the new SEARCH button submits; submitted queries land in the
+  URL via replaceState (shareable/refresh-safe); `?q=` auto-load unchanged and
+  now also populates the input box. Browser-verified: 12 chars typed + 2 s wait
+  → zero /api/search requests; button + real-KeyboardEvent Enter both submit.
+  (2) **Experiment-card identity** (manual issue 2): each grouped card shows an
+  identity line — a deterministic design tag derived ONLY from the group's own
+  lane labels (≥3 pure timepoints → TIME COURSE; ≥3 shared-prefix distinct
+  trailing numbers → DOSE SERIES) plus the reviewed record's verbatim
+  `treatment_context` (truncated). Nothing invented; the Fig 3C/3D records
+  carry their figure labels because the reviewed context text starts with them.
+  The flagship query's three cards now read: TIME COURSE / "Fig 3D: …
+  inhibitor matrix" / DOSE SERIES. Also removed the TREATMENT-field fallback to
+  treatment_context (was duplicating the new identity line on co-IP cards).
+  (3) **`IL-6 · 3D` RESOLVED — it was a fabricated duration** (manual issue 3):
+  the paper never states a 3-day treatment; the case-insensitive duration regex
+  parsed the FIGURE REFERENCE "Fig 3D" in the treatment context as "3 D(ays)"
+  (same trap: "Fig. 3H" → 3 hours, "3D culture" → 3 days). Engine fix, two
+  layers: single-letter units h/d must be lowercase (multi-letter units stay
+  case-insensitive via scoped (?i:)), and `is_figure_reference_number()` guards
+  every dose/duration/series match against a preceding fig/figure/panel
+  reference (a rejected figure-list span is also consumed so its trailing
+  number cannot leak back as a single). "Figure 2, 4 h exposure" keeps its real
+  4 h. Phospho paper regenerated: Fig 3D records now duration=MISSING (the
+  captured context states no duration). 10 new regressions.
+  (4) **Lane readability** (manual issue 4): display-only formatter — trailing
+  +/− state markers get colons and " / " becomes " · " ("IL-6: + · CL-E: −");
+  conjunction "+" ("CL-E + Bis II") untouched; semantics unchanged.
+  (5) **Supabase CLI readiness**: `supabase/config.toml` + timestamped
+  `supabase/migrations/` copies of the canonical SQL, `scripts/
+  sync_supabase_migrations.py`, and a pytest drift guard (byte-equality) so
+  `supabase db push` and the SQL-editor flow can never diverge. Role grants
+  audited: hive_feedback = INSERT+SELECT on hiveblot_feedback only, zero grants
+  on western_blot_records. DEPLOYMENT.md rewritten: exact CLI sequence (login →
+  link → db push --dry-run → push → role passwords → seed_remote.py, expect 475
+  rows), exact env-var NAMES from api/app/config.py, 8-step smoke checklist.
+  Browser-verified end-to-end: flagship query → 3 experiments (18 lanes) with
+  distinct identities; co-IP PIK3CA → 4 grouped co-IP experiments, bait/IgG/
+  Input intact; evidence panel + crop (1153 px PNG) + 33 feedback controls on
+  grouped cards. Tests: **biology 165/165**, api **112/112**, benchmark 34/34,
+  harness self-test 100% EXACT, tsc clean. Model creds + cloud Supabase:
+  re-checked, still absent (user actions below).
 - **2026-08-13 (session 7)** — Claude Fable 5. **REVIEW SWEEP + CROP SERVING +
   RULE HARDENING.** Three parallel review agents ran; main agent implemented.
   (1) **Figure crops now render in the evidence panel**: `GET /records/{id}/crop`
@@ -362,8 +406,21 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 ## Immediate Next Task
 ~~Provenance detail endpoint + researcher feedback system + evidence UI~~ — **DONE (session 4)**.
 ~~Result grouping + multi-dose/time-course representation~~ — **DONE (session 5)**.
+~~Manual-test fixes (search submit, card identity, IL-6·3D, lanes) + Supabase CLI prep~~ — **DONE (session 8)**.
 
-Next, in priority order:
+**TOMORROW MORNING (user), in order:**
+1. Create the Supabase project in the dashboard, then run the exact flow in
+   `DEPLOYMENT.md` §1: `supabase login` → `supabase link --project-ref <REF>` →
+   `supabase db push --dry-run` → `supabase db push` → set the two role
+   passwords → `seed_remote.py` (expect **475 rows** via `--check`).
+2. Fill `api/.env`: `DB_READONLY_URL` + `DB_FEEDBACK_URL` (the two restricted
+   DSNs), `SUPABASE_URL`/`SUPABASE_KEY`, `ALLOWED_ORIGINS`; web host gets
+   `API_BASE_URL` + `INTERNAL_API_KEY`. Then run the 8-step smoke checklist
+   (DEPLOYMENT.md §4).
+3. Model creds when available (Bedrock `AWS_*` or `ANTHROPIC_API_KEY`) →
+   automated-extraction evaluation below.
+
+Then, in priority order:
 1. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic). Everything
    is staged for a one-command evaluation. Bedrock:
    ```bash

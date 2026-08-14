@@ -97,6 +97,13 @@ export default function SearchPage() {
       return;
     }
 
+    // Submitted searches are shareable/refreshable: reflect the query in the
+    // URL (replaceState — no history spam; only SUBMITTED queries land here,
+    // typing never does).
+    const url = new URL(window.location.href);
+    url.searchParams.set('q', searchQuery);
+    window.history.replaceState(null, '', url.toString());
+
     setLoading(true);
     setError(null);
     setShowResults(true);
@@ -129,6 +136,7 @@ export default function SearchPage() {
         <SearchInput
           placeholder="Search for a protein or experimental condition (e.g., 'phospho STAT3 Tyr705' or 'co-IP PIK3CA')"
           onSearch={handleSearch}
+          initialValue={query}
         />
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
           <FiltersBar onSearch={handleSearch} />
