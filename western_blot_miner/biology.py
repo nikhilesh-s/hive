@@ -192,8 +192,26 @@ _DOSE = re.compile(
     r"\b(\d+(?:\.\d+)?)\s?(ng/ml|[uµμ]g/ml|mg/ml|nmol/l|[uµμ]mol/l|mmol/l|nm|[uµμ]m|mm|mg/kg|ng/kg|%)\b",
     re.IGNORECASE,
 )
-# Duration: "30 min", "24 h", "48 hours".
-_DURATION = re.compile(r"\b(\d+(?:\.\d+)?)\s?(h|hr|hrs|hour|hours|min|mins|minute|minutes|d|day|days)\b", re.IGNORECASE)
+# Duration: "30 min", "24 h", "48 hours". NOT case-insensitive for the
+# single-letter units: "Fig 3D" / "Fig. 3H" are FIGURE PANEL references and
+# "3D culture" is a dimensionality, yet a global IGNORECASE read them as
+# 3 days / 3 hours — a fabricated duration rendered as "IL-6 · 3D" in the UI
+# (manual-test issue 3). Durations in papers are written lowercase ("3 d",
+# "24 h", "30 min"); multi-letter units stay case-insensitive via (?i:...).
+_DURATION = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s?((?i:hrs?|hours?|mins?|minutes?|days?)|[hd])\b")
+
+# A number immediately preceded by a figure/panel reference is a FIGURE
+# NUMBER, never a dose or duration ("Fig 3D", "Figure 2, 4 h exposure" keeps
+# the 4 h — only the number the reference points at is guarded).
+_FIG_REF_BEFORE = re.compile(
+    r"(?i)\b(?:fig(?:ure)?s?\.?|panels?|supp(?:lementary)?\.?(?:\s+fig(?:ure)?s?\.?)?)\s*$")
+
+
+def is_figure_reference_number(text: str, num_start: int) -> bool:
+    """True when the number starting at ``num_start`` follows a figure/panel
+    reference and must not be read as a dose/duration value."""
+    return bool(_FIG_REF_BEFORE.search(text[max(0, num_start - 20):num_start]))
 # Enumerated series that share ONE trailing unit: "10, 30 and 60 ug/ml",
 # "0, 5, 10, 20, 30, 60 min". The plain _DOSE/_DURATION regexes only match the
 # final value (the earlier numbers carry no adjacent unit), which silently
@@ -207,9 +225,8 @@ _DOSE_SERIES = re.compile(
     re.IGNORECASE,
 )
 _DURATION_SERIES = re.compile(
-    r"(?<![\w.])((?:\d+(?:\.\d+)?\s*(?:,|;|/|\bor\b|\band\b)\s*)+\d+(?:\.\d+)?)\s*"
-    r"(h|hr|hrs|hour|hours|min|mins|minute|minutes|d|day|days)\b",
-    re.IGNORECASE,
+    r"(?<![\w.])((?:\d+(?:\.\d+)?\s*(?:,|;|/|(?i:\bor\b)|(?i:\band\b))\s*)+\d+(?:\.\d+)?)\s*"
+    r"((?i:hrs?|hours?|mins?|minutes?|days?)|[hd])\b",
 )
 # Explicit "this figure varies it per lane" phrasing. Presence means a single
 # scalar is NOT attributable to the panel even if only one value is parseable.

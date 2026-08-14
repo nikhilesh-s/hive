@@ -9,6 +9,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { formatLaneLabel } from '@/components/DatabaseResultCard';
 import { submitFeedback } from '@/lib/feedback';
 
 const MONO = '"IBM Plex Mono", monospace';
@@ -397,7 +398,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
                 border: '1px solid rgba(255,255,255,.1)',
                 color: b.band_state === 'present' ? TEAL : b.band_state === 'absent' ? RED : GOLD,
               }}>
-                {b.lane_condition || `lane ${b.lane_index}`}: {b.band_state || '?'}
+                {formatLaneLabel(b.lane_condition) || `lane ${b.lane_index}`}: {b.band_state || '?'}
                 {b.band_pattern && (
                   <span style={{ color: TEXT }}>{' · '}{b.band_pattern}</span>
                 )}

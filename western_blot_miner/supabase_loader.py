@@ -258,16 +258,20 @@ def extract_kda(text: str) -> float | None:
 
 
 def extract_dose(text: str) -> list[dict[str, Any]]:
+    text = text or ""
     return [
         {"value": float(m.group(1)), "unit": m.group(2)}
-        for m in biology._DOSE.finditer(text or "")
+        for m in biology._DOSE.finditer(text)
+        if not biology.is_figure_reference_number(text, m.start(1))
     ]
 
 
 def extract_duration(text: str) -> list[dict[str, Any]]:
+    text = text or ""
     return [
         {"value": float(m.group(1)), "unit": m.group(2)}
-        for m in biology._DURATION.finditer(text or "")
+        for m in biology._DURATION.finditer(text)
+        if not biology.is_figure_reference_number(text, m.start(1))
     ]
 
 
@@ -282,6 +286,11 @@ def _expand_series(text: str, series_re, single_re) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     consumed: list[tuple[int, int]] = []
     for m in series_re.finditer(text):
+        if biology.is_figure_reference_number(text, m.start(1)):
+            # "Figs. 2, 3 and 4" is a FIGURE LIST, not a value series — and its
+            # trailing number must not leak back in through the singles pass.
+            consumed.append(m.span())
+            continue
         unit = m.group(2)
         # group(1) is the whole enumeration INCLUDING its final value.
         for num in re.findall(r"\d+(?:\.\d+)?", m.group(1)):
@@ -290,6 +299,8 @@ def _expand_series(text: str, series_re, single_re) -> list[dict[str, Any]]:
     # Singles outside any series span.
     for m in single_re.finditer(text):
         if any(s <= m.start() < e for s, e in consumed):
+            continue
+        if biology.is_figure_reference_number(text, m.start(1)):
             continue
         out.append({"value": float(m.group(1)), "unit": m.group(2)})
     # De-duplicate, preserving first-seen order.

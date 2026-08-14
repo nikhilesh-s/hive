@@ -1,43 +1,43 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SearchInputProps {
   placeholder: string;
   onSearch: (query: string) => void;
-  debounceMs?: number;
+  // Populates the box for ?q= deep links / programmatic searches (filters).
+  initialValue?: string;
 }
 
-export function SearchInput({ placeholder, onSearch, debounceMs = 400 }: SearchInputProps) {
-  const [query, setQuery] = useState('');
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+// EXPLICIT SUBMIT ONLY. Typing never triggers a search: partial biological
+// queries change meaning with every token ("phospho STAT3" vs "phospho STAT3
+// Tyr705"), so firing mid-typing showed wrong results and burned the shared
+// rate limit. Search runs on Enter or the Search button.
+export function SearchInput({ placeholder, onSearch, initialValue = '' }: SearchInputProps) {
+  const [query, setQuery] = useState(initialValue);
 
+  // Keep the box in sync when the page sets the query programmatically
+  // (?q= auto-load, advanced-filter searches).
   useEffect(() => {
-    return () => clearTimeout(debounceTimer.current);
-  }, []);
+    if (initialValue) setQuery(initialValue);
+  }, [initialValue]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => onSearch(value), debounceMs);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      clearTimeout(debounceTimer.current);
-      onSearch(query);
-    }
+  const submit = () => {
+    const q = query.trim();
+    if (q) onSearch(q);
   };
 
   return (
-    <div style={{ display: 'flex', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ display: 'flex', width: '100%', maxWidth: '600px', margin: '0 auto', gap: '8px' }}>
       <input
         type="text"
         placeholder={placeholder}
         value={query}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') submit();
+        }}
+        aria-label="Search query"
         style={{
           flex: 1,
           padding: '16px 24px',
@@ -57,6 +57,24 @@ export function SearchInput({ placeholder, onSearch, debounceMs = 400 }: SearchI
           e.currentTarget.style.borderColor = 'rgba(255,255,255,.14)';
         }}
       />
+      <button
+        onClick={submit}
+        aria-label="Search"
+        style={{
+          padding: '0 22px',
+          background: 'transparent',
+          border: '1px solid rgba(74,214,176,.5)',
+          borderRadius: '8px',
+          color: '#4ad6b0',
+          fontSize: '13px',
+          fontFamily: '"IBM Plex Mono", monospace',
+          fontWeight: 600,
+          letterSpacing: '0.5px',
+          cursor: 'pointer',
+        }}
+      >
+        SEARCH
+      </button>
     </div>
   );
 }

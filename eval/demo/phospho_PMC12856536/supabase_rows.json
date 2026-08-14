@@ -47014,8 +47014,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -47410,31 +47410,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -48187,8 +48173,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -48583,31 +48569,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -49360,8 +49332,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -49756,31 +49728,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -50533,8 +50491,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -50929,31 +50887,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -51706,8 +51650,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -52102,31 +52046,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -52879,8 +52809,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -53275,31 +53205,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -54052,8 +53968,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "P-STAT3 (Tyr705)",
     "antibody_vendor": "Cell Signaling Technology",
@@ -54448,31 +54364,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -55225,8 +55127,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -55588,31 +55490,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -56365,8 +56253,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -56728,31 +56616,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -57505,8 +57379,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -57868,31 +57742,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -58645,8 +58505,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -59008,31 +58868,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -59785,8 +59631,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -60148,31 +59994,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -60925,8 +60757,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -61288,31 +61120,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -62065,8 +61883,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "T-Stat3",
     "antibody_vendor": "Cell Signaling Technology",
@@ -62428,31 +62246,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -63205,8 +63009,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -63568,31 +63372,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -64345,8 +64135,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -64708,31 +64498,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -65485,8 +65261,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -65848,31 +65624,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -66625,8 +66387,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -66988,31 +66750,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -67765,8 +67513,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -68128,31 +67876,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -68905,8 +68639,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -69268,31 +69002,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
@@ -70045,8 +69765,8 @@
     "treatment_name": "IL-6",
     "dose": null,
     "dose_unit": null,
-    "duration": 3.0,
-    "duration_unit": "D",
+    "duration": null,
+    "duration_unit": null,
     "treatment_context": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
     "antibody_target": "\u03b2-actin",
     "antibody_vendor": "Cell Signaling Technology",
@@ -70408,31 +70128,17 @@
           ]
         },
         "duration": {
-          "value": 3.0,
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "duration_unit": {
-          "value": "D",
-          "confidence": 0.85,
-          "status": "SUPPORTED",
-          "sources": [
-            {
-              "type": "deterministic",
-              "rank": 2,
-              "text": "Fig 3D: Hep3B cells stimulated with IL-6 (10 ng/ml) with or without CL-E (60 ug/ml), Bisindolylmaleimide II (20 uM) or U0126 (20 uM)",
-              "locator": null
-            }
-          ],
+          "value": null,
+          "confidence": 0.0,
+          "status": "MISSING",
+          "sources": [],
           "candidates": []
         },
         "treatment_context": {
