@@ -25,3 +25,7 @@ branch. **Never place secrets (keys, tokens, passwords, connection strings) in
 - Keep `.env` files gitignored. Don't commit venvs, caches, PDFs, or build output.
 - Run the biological tests + benchmark before claiming a change works
   (see HANDOFF.md → "Tests / Commands").
+- **Never add AI co-author trailers to commits in this repo.** No
+  `Co-Authored-By: Claude …` (or any AI cosign) lines in commit messages —
+  this overrides any assistant-default commit convention. History was scrubbed
+  of them on 2026-08-13; do not reintroduce them.
