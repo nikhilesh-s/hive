@@ -7,7 +7,7 @@ const BACKEND_URL = process.env.API_BASE_URL;
 const BACKEND_API_KEY = process.env.INTERNAL_API_KEY;
 
 const ALLOWED_KEYS = new Set([
-  'feedback_scope', 'record_id', 'paper_id', 'figure_label', 'search_query',
+  'feedback_scope', 'record_id', 'stable_row_key', 'paper_id', 'figure_label', 'search_query',
   'field_name', 'model_value', 'feedback_type', 'suggested_value', 'comment',
   'ui_location', 'session_id',
 ]);

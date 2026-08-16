@@ -14,8 +14,8 @@ copies).
 # after creating the project in the Supabase dashboard:
 supabase login
 supabase link --project-ref <PROJECT_REF>     # from the project's URL/settings
-supabase db push --dry-run                    # review: 3 migrations, additive
-supabase db push                              # applies base schema + 001 + 002
+supabase db push --dry-run                    # review: 4 migrations, additive
+supabase db push                              # applies base schema + 001 + 002 + 003
 ```
 Then set the two restricted-role passwords (SQL editor — generated values, do
 not reuse anything):
@@ -29,9 +29,10 @@ export SEED_DATABASE_URL='<owner/postgres connection string>'   # NOT a restrict
 .venv/bin/python scripts/seed_remote.py eval/demo/*/supabase_rows.json
 .venv/bin/python scripts/seed_remote.py --check                 # expect 475 rows
 ```
-Fallback (no CLI): run the three canonical files in the SQL editor in order —
+Fallback (no CLI): run the four canonical files in the SQL editor in order —
 `api/db/schema.sql`, `migrations/001_evidence_record.sql`,
-`migrations/002_feedback.sql` — then passwords + seed as above. Do NOT run both
+`migrations/002_feedback.sql`, `migrations/003_stable_row_key.sql` — then
+passwords + seed as above. Do NOT run both
 the CLI flow and the SQL-editor flow; everything is idempotent, but pick one.
 
 **Security invariants (already encoded in the SQL, verify after push):**

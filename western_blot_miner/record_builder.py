@@ -340,8 +340,12 @@ def _series_fields(values: list[dict], ctx: str, det: list[Source],
     if len(distinct) == 1 and not multi_marker:
         return (EvidenceField.supported(values[0]["value"], 0.85, det),
                 EvidenceField.supported(values[0]["unit"], 0.85, det))
+    # source_type "lane_series": these are per-lane values of a varied design
+    # (time course / dose series), NOT mutually competing claims about one
+    # scalar. Consumers must render them as "varies by lane", never as a
+    # pick-a-winner candidate list (manual-beta P0 finding).
     cands = [
-        Candidate(value=v["value"], source_type="deterministic", rank=RANK_DETERMINISTIC,
+        Candidate(value=v["value"], source_type="lane_series", rank=RANK_DETERMINISTIC,
                   confidence=0.5,
                   evidence=[Source(type="deterministic", rank=RANK_DETERMINISTIC,
                                    text=f'{v["value"]} {v["unit"]} — {ctx[:160]}')])
@@ -705,10 +709,20 @@ def _first_gene_after(text: str, pos: int) -> Optional[str]:
 
 
 def _record_id(case: dict, raw_target: str) -> str:
+    """Deterministic experiment identity. Includes the panel crop and the
+    treatment context so two experiments that share one crop and one target
+    label (e.g. Fig 3C vs 3D total-STAT3 strips in PMC12856536) get DISTINCT
+    ids. Every input comes from the reviewed observation data — never from DB
+    serials — so the id is stable across reseeds; researcher feedback keys on
+    it (via stable_row_key) and must survive a reload."""
     paper = case.get("paper", {})
     fig = case.get("figure", {})
+    mc = case.get("model_claims", {})
+    crop = fig.get("image_crop_ref")
+    crop_name = str(crop).rsplit("/", 1)[-1] if crop else None
     key = "|".join(str(x) for x in [
         paper.get("doi") or paper.get("pmcid") or paper.get("pmid"),
-        fig.get("figure_label"), fig.get("panel_label"), raw_target,
+        fig.get("figure_label"), fig.get("panel_label"), crop_name,
+        raw_target, mc.get("treatment_context") or "",
     ])
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]

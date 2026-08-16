@@ -92,6 +92,26 @@ async def close_feedback_pool() -> None:
         _feedback_pool = None
 
 
+async def fetch_feedback_for_record(record_id: int,
+                                    stable_row_key: str | None = None) -> list[dict]:
+    """All researcher feedback rows for one record (rehydration). Matches the
+    volatile serial id OR the reseed-proof stable_row_key (migration 003) —
+    a DB reload replaces serial ids, and feedback keyed only to them orphaned
+    (manual-beta P0 finding). Read via the feedback role's own SELECT grant;
+    the Evidence Record itself is never touched."""
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT feedback_id, created_at, feedback_scope, stable_row_key, "
+            "field_name, model_value, feedback_type, suggested_value, comment, "
+            "session_id FROM hiveblot_feedback "
+            "WHERE record_id = $1 OR (stable_row_key IS NOT NULL AND stable_row_key = $2) "
+            "ORDER BY feedback_id",
+            record_id, stable_row_key,
+        )
+        return [dict(r) for r in rows]
+
+
 async def insert_feedback(fields: dict) -> int:
     """Insert one feedback row; returns feedback_id. Human feedback lives in
     hiveblot_feedback ONLY — the hive_feedback role has no grants on

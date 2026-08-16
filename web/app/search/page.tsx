@@ -207,7 +207,9 @@ export default function SearchPage() {
             {!loading && results.length === 0 && !error && (
               <div style={{ textAlign: 'center', paddingTop: '40px', color: '#a9bdb5' }}>
                 <p style={{ fontFamily: '"Newsreader", serif', fontSize: '16px', lineHeight: 1.6 }}>
-                  No results found for your query.
+                  No matching Western blot evidence was found in the current HiveBlot
+                  beta dataset (3 reviewed papers). This does not mean no such evidence
+                  exists in the literature — the beta corpus is deliberately small.
                 </p>
               </div>
             )}

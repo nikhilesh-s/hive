@@ -143,6 +143,7 @@ def build_record_detail(row: dict) -> RecordDetail:
 
     return RecordDetail(
         id=row["id"],
+        stable_row_key=row.get("stable_row_key"),
         paper_id=row.get("paper_id"),
         title=row.get("title"),
         doi=row.get("doi"),

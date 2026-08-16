@@ -29,8 +29,20 @@ interface FieldEvidence {
   candidates: { value?: unknown; source_type?: string; confidence?: number }[];
 }
 
+interface PriorFeedback {
+  feedback_id: number;
+  created_at: string;
+  feedback_scope: string;
+  field_name?: string | null;
+  model_value?: string | null;
+  feedback_type?: string | null;
+  suggested_value?: string | null;
+  comment?: string | null;
+}
+
 interface RecordDetailData {
   id: number;
+  stable_row_key?: string | null;
   paper_id?: string | null;
   title?: string | null;
   doi?: string | null;
@@ -168,9 +180,46 @@ function Ack() {
 
 // --- one auditable field row --------------------------------------------------
 
-function FieldRow({ name, label, fe, all, recordId, paperId }: {
+// Prior researcher feedback for one field — rendered as a clearly separated
+// annotation. It NEVER alters the HiveBlot extraction shown above it.
+function PriorFeedbackNote({ items }: { items: PriorFeedback[] }) {
+  if (!items.length) return null;
+  return (
+    <div style={{
+      marginTop: '5px', padding: '5px 10px', borderLeft: `2px solid ${GOLD}`,
+      background: 'rgba(224,178,60,.05)',
+    }}>
+      <div style={{ fontFamily: MONO, fontSize: '9px', fontWeight: 600, color: GOLD, letterSpacing: '0.5px' }}>
+        RESEARCHER FEEDBACK (stored beside the extraction — does not change it)
+      </div>
+      {items.map((f) => (
+        <div key={f.feedback_id} style={{ fontFamily: SERIF, fontSize: '11px', color: TEXT, marginTop: '2px' }}>
+          {f.feedback_type === 'correct' ? '✓ marked correct'
+            : f.feedback_type === 'not_useful' ? 'marked not useful'
+            : f.feedback_type === 'missing_context' ? 'flagged missing context'
+            : `✗ marked incorrect${f.suggested_value ? ` — suggested: “${f.suggested_value}”` : ''}`}
+          {f.comment ? <span style={{ color: DIM }}> · “{f.comment}”</span> : null}
+          <span style={{ fontFamily: MONO, fontSize: '9px', color: LABEL }}> · {f.created_at.slice(0, 10)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Human-readable reason a field is CONFLICTING, generated ONLY from the
+// structured candidates (never selects a winner).
+function conflictSummary(label: string, fe: FieldEvidence): string | null {
+  if (fe.status !== 'CONFLICTING' || fe.candidates.length < 2) return null;
+  const parts = fe.candidates.map((c) =>
+    `“${String(c.value ?? 'none')}” via ${SOURCE_NAMES[c.source_type || ''] || c.source_type || 'unknown source'}`);
+  return `Why unresolved: the sources make different claims about ${label.toLowerCase()} — ${parts.join(' vs ')}. ` +
+    `Neither independently settles it, so HiveBlot records no value rather than choosing.`;
+}
+
+function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey }: {
   name: string; label: string; fe: FieldEvidence;
   all: Record<string, FieldEvidence>; recordId: number; paperId?: string | null;
+  prior?: PriorFeedback[]; stableRowKey?: string | null;
 }) {
   const [mode, setMode] = useState<'idle' | 'correcting' | 'done'>('idle');
   const glyph = statusGlyph(fe.status);
@@ -182,7 +231,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId }: {
 
   const send = (feedback_type: string, suggested?: string, comment?: string) => {
     submitFeedback({
-      feedback_scope: 'field', record_id: recordId, paper_id: paperId,
+      feedback_scope: 'field', record_id: recordId, stable_row_key: stableRowKey, paper_id: paperId,
       field_name: name, model_value: value || null, feedback_type,
       suggested_value: suggested || null, comment: comment || null,
       ui_location: 'evidence_panel',
@@ -190,14 +239,30 @@ function FieldRow({ name, label, fe, all, recordId, paperId }: {
     setMode('done');
   };
 
+  // Lane-series fields (time course / dose response): the per-lane values are
+  // NOT competing candidates for one scalar — the experiment-level value
+  // genuinely varies by lane. Render as a range pointing to the lane strip.
+  const isLaneSeries =
+    fe.status === 'AMBIGUOUS' && fe.candidates.length >= 2 &&
+    fe.candidates.every((c) => c.source_type === 'lane_series');
+  const seriesText = isLaneSeries
+    ? (() => {
+        const nums = fe.candidates.map((c) => Number(c.value)).filter((n) => !Number.isNaN(n));
+        const unit = all[`${name}_unit`]?.value ? ` ${all[`${name}_unit`]!.value}` : '';
+        return nums.length
+          ? `varies by lane: ${Math.min(...nums)}–${Math.max(...nums)}${unit} (see lanes below)`
+          : 'varies by lane (see lanes below)';
+      })()
+    : null;
+
   return (
     <div style={{ padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,.05)' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
         <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL, letterSpacing: '0.4px', minWidth: '180px' }}>
           {label.toUpperCase()}
         </span>
-        <span style={{ fontFamily: SERIF, fontSize: '13px', color: value ? TEXT : LABEL }}>
-          {value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : 'not reported')}
+        <span style={{ fontFamily: SERIF, fontSize: '13px', color: value || seriesText ? TEXT : LABEL }}>
+          {seriesText || value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : 'not reported')}
         </span>
         {glyph && (
           <span title={glyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: glyph.color, fontWeight: 700 }}>
@@ -222,7 +287,12 @@ function FieldRow({ name, label, fe, all, recordId, paperId }: {
           “{snippet.length > 180 ? snippet.slice(0, 180) + '…' : snippet}”
         </div>
       )}
-      {(fe.status === 'CONFLICTING' || fe.status === 'AMBIGUOUS') && fe.candidates.length > 0 && (
+      {fe.status === 'CONFLICTING' && conflictSummary(label, fe) && (
+        <div style={{ fontFamily: SERIF, fontSize: '11.5px', color: DIM, marginTop: '4px', lineHeight: 1.45 }}>
+          {conflictSummary(label, fe)}
+        </div>
+      )}
+      {!isLaneSeries && (fe.status === 'CONFLICTING' || fe.status === 'AMBIGUOUS') && fe.candidates.length > 0 && (
         <div style={{ marginTop: '6px' }}>
           <div style={{ fontFamily: MONO, fontSize: '9px', color: fe.status === 'CONFLICTING' ? RED : GOLD, marginBottom: '4px' }}>
             {fe.status === 'CONFLICTING' ? 'COMPETING CLAIMS — HiveBlot did not pick one. Which is right?' : 'CANDIDATES — unsettled. Which is right?'}
@@ -248,6 +318,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId }: {
         <CorrectionForm placeholder={`Corrected ${label.toLowerCase()}`}
           onSubmit={(v, c) => send('incorrect', v, c)} onCancel={() => setMode('idle')} />
       )}
+      <PriorFeedbackNote items={prior || []} />
     </div>
   );
 }
@@ -262,14 +333,31 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
   const [flagType, setFlagType] = useState('wrong_interpretation');
   const [cropFailed, setCropFailed] = useState(false);
 
+  const [priorFeedback, setPriorFeedback] = useState<PriorFeedback[]>([]);
+
   useEffect(() => {
     let alive = true;
     fetch(`/api/record/${recordId}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => { if (alive) setDetail(d); })
       .catch((e) => { if (alive) setError(String(e.message || e)); });
+    // Prior researcher feedback (rehydration). Failure is non-fatal: the
+    // evidence still renders; only the annotations are absent.
+    fetch(`/api/record/${recordId}/feedback`)
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((d) => { if (alive) setPriorFeedback(d.items || []); })
+      .catch(() => {});
     return () => { alive = false; };
   }, [recordId]);
+
+  const priorByField = new Map<string, PriorFeedback[]>();
+  for (const f of priorFeedback) {
+    if (f.feedback_scope === 'field' && f.field_name) {
+      const k = f.field_name;
+      priorByField.set(k, [...(priorByField.get(k) || []), f]);
+    }
+  }
+  const priorRecordScope = priorFeedback.filter((f) => f.feedback_scope !== 'field');
 
   if (error) {
     return <div style={{ padding: '16px', fontFamily: SERIF, fontSize: '12px', color: DIM }}>
@@ -349,6 +437,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
       <div>
         {FIELD_LABELS.filter(([k]) => detail.fields[k]).map(([k, label]) => (
           <FieldRow key={k} name={k} label={label} fe={detail.fields[k]} all={detail.fields}
+                    prior={priorByField.get(k)} stableRowKey={detail.stable_row_key}
                     recordId={detail.id} paperId={detail.paper_id} />
         ))}
       </div>
@@ -433,6 +522,11 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
         {flagMode === 'done' ? <Ack /> : flagMode === 'idle' ? (
           <Btn color={GOLD} onClick={() => setFlagMode('open')}>⚑ Flag this result</Btn>
         ) : null}
+        {priorRecordScope.length > 0 && (
+          <span style={{ fontFamily: MONO, fontSize: '9px', color: GOLD }}>
+            {priorRecordScope.length} prior record-level feedback item{priorRecordScope.length > 1 ? 's' : ''} on file
+          </span>
+        )}
         {detail.doi && (
           <a href={`https://doi.org/${detail.doi}`} target="_blank" rel="noreferrer"
              style={{ fontFamily: MONO, fontSize: '10px', color: DIM, marginLeft: 'auto' }}>
@@ -449,7 +543,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
           <CorrectionForm placeholder="Field you need (e.g. antibody dilution)"
             onSubmit={(v, c) => {
               submitFeedback({
-                feedback_scope: 'missing_field', record_id: detail.id, paper_id: detail.paper_id,
+                feedback_scope: 'missing_field', record_id: detail.id, stable_row_key: detail.stable_row_key, paper_id: detail.paper_id,
                 field_name: v || 'unspecified', comment: c || null, ui_location: 'evidence_panel',
               });
               setMissingMode('done');
@@ -467,7 +561,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
           <CorrectionForm placeholder="" askValue={false}
             onSubmit={(_v, c) => {
               submitFeedback({
-                feedback_scope: 'record', record_id: detail.id, paper_id: detail.paper_id,
+                feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key, paper_id: detail.paper_id,
                 feedback_type: flagType, comment: c || null, ui_location: 'evidence_panel',
               });
               setFlagMode('done');
