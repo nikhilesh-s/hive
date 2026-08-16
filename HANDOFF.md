@@ -6,6 +6,38 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-16 (session 9)** — Claude Fable 5. **FINAL INTERNAL-BETA FIX PASS.**
+  All reproducible manual-beta findings fixed; no scientific regressions.
+  **P0 feedback persistence/rehydration — diagnosed, fixed durably.** The
+  manual P-ERK correction HAD persisted (row 6); the gap was (a) no retrieval
+  path and (b) a worse latent hazard: reseeds regenerate serial ids, orphaning
+  ALL feedback (verified: every stored row pointed at a dead id). Fix at the
+  data layer: **migration 003** adds `stable_row_key` (= record-hash:lane_index,
+  computed from reviewed observation data, reseed-proof) to both tables;
+  `_record_id` strengthened with crop + treatment context so the Fig 3C/3D twin
+  records no longer collide (20/20 distinct; 113/113 unique row keys).
+  `GET /records/{id}/feedback` rehydrates by serial id OR stable key; the
+  evidence panel shows prior feedback as a clearly-labeled RESEARCHER FEEDBACK
+  annotation beside (never inside) the extraction. **Proven live: feedback
+  submitted on id 4019 rehydrated on id 4494 after a full reseed.** Pre-003
+  feedback rows (1–6) lack stable keys and stay orphaned-but-preserved.
+  **P0 lane-series representation:** series-derived treatment candidates are
+  now tagged `lane_series`; the UI renders "varies by lane: 0–60 min (see
+  lanes below)" instead of a false "not reported" + pick-a-winner candidate
+  list. **P0 design-tag false positives:** DOSE SERIES now requires explicit
+  dose semantics (unit in lanes or context); developmental-stage lanes
+  (E14.5/P0/P7/P28M) get their own DEVELOPMENTAL SERIES tag; ligation labels
+  (L5d/DL14d) abstain. Verified on GAPDH mouse. **P0 multi-condition summary:**
+  TREATMENT now reads e.g. "IL-6 (± CL-E, Bis II, U0126)" — co-conditions taken
+  verbatim from the group's own lane labels. **P0 conflict explanation:** a
+  generated "Why unresolved: …" sentence built only from the structured
+  candidates (never picks a winner). **P1:** co-IP cards render "co-IP" + an
+  IP BAIT field (from the panel's printed IP: lane); "DOI:" label; scoped
+  zero-result copy ("…in the current HiveBlot beta dataset… does not mean no
+  such evidence exists in the literature"). Supabase flow is now 4 migrations
+  (docs + CLI copies + drift guard updated). Tests: engine suites green,
+  benchmark 34/34, harness 100% EXACT, **api 113/113**, tsc clean. All seven
+  flagship queries verified in-browser incl. zero-result and reseed-survival.
 - **2026-08-13 (session 8, night sprint)** — Claude Fable 5. **MANUAL-TEST FIXES +
   SUPABASE READINESS.**
   (1) **Search is explicit-submit only** (manual issue 1): typing never fires a

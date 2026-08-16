@@ -10,14 +10,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from ..auth import require_internal_key
 from ..config import settings
-from ..db import fetch_record_by_id, get_supabase, insert_feedback
+from ..db import fetch_feedback_for_record, fetch_record_by_id, get_supabase, insert_feedback
 from ..limiter import limiter
 from ..record_detail import build_record_detail
 from ..schemas import (
+    FeedbackItem,
     FeedbackResponse,
     FeedbackSubmission,
     ProteinSearchResponse,
     RecordDetail,
+    RecordFeedbackResponse,
     SearchRequest,
     SearchResponse,
 )
@@ -123,6 +125,39 @@ async def record_crop(record_id: int):
     return FileResponse(crop, media_type="image/png")
 
 
+@router.get("/records/{record_id}/feedback", response_model=RecordFeedbackResponse,
+            dependencies=[Depends(require_internal_key)])
+async def record_feedback(record_id: int):
+    """Prior researcher feedback for one record (rehydration after refresh).
+    Reads hiveblot_feedback only; the Evidence Record is immutable here."""
+    if not settings.db_feedback_url:
+        raise HTTPException(503, "Feedback storage is not configured (DB_FEEDBACK_URL)")
+    srk = None
+    try:
+        rec = await fetch_record_by_id(record_id)
+        srk = (rec or {}).get("stable_row_key")
+    except Exception:
+        pass  # rehydration still works by serial id alone
+    try:
+        rows = await fetch_feedback_for_record(record_id, srk)
+    except Exception as e:
+        logger.exception("feedback fetch failed")
+        raise HTTPException(500, "Feedback lookup failed") from e
+    items = [FeedbackItem(
+        feedback_id=r["feedback_id"],
+        stable_row_key=r.get("stable_row_key"),
+        created_at=str(r["created_at"]),
+        feedback_scope=r["feedback_scope"],
+        field_name=r["field_name"],
+        model_value=r["model_value"],
+        feedback_type=r["feedback_type"],
+        suggested_value=r["suggested_value"],
+        comment=r["comment"],
+        session_id=r["session_id"],
+    ) for r in rows]
+    return RecordFeedbackResponse(record_id=record_id, items=items)
+
+
 @router.post("/feedback", response_model=FeedbackResponse,
              dependencies=[Depends(require_internal_key)])
 @limiter.limit(settings.search_rate_limit)
@@ -141,6 +176,7 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         "app_version": "beta-local",
         "feedback_scope": body.feedback_scope,
         "record_id": body.record_id,
+        "stable_row_key": body.stable_row_key,
         "paper_id": body.paper_id,
         "figure_label": body.figure_label,
         "search_query": body.search_query,

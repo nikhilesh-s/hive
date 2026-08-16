@@ -1,6 +1,6 @@
 [
   {
-    "record_id": "e31011d758606b47",
+    "record_id": "b528b04f1b395c41",
     "paper": {
       "pmid": {
         "value": null,
@@ -333,7 +333,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -347,7 +347,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -361,7 +361,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -375,7 +375,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -389,7 +389,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -403,7 +403,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1134,7 +1134,7 @@
     }
   },
   {
-    "record_id": "5eb7a96908f62ee1",
+    "record_id": "034fbf2aece889c8",
     "paper": {
       "pmid": {
         "value": null,
@@ -1467,7 +1467,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1481,7 +1481,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1495,7 +1495,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1509,7 +1509,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1523,7 +1523,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -1537,7 +1537,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2268,7 +2268,7 @@
     }
   },
   {
-    "record_id": "952877a29c3def7a",
+    "record_id": "f7adb36920b1dd68",
     "paper": {
       "pmid": {
         "value": null,
@@ -2568,7 +2568,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2582,7 +2582,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2596,7 +2596,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2610,7 +2610,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2624,7 +2624,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -2638,7 +2638,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3369,7 +3369,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "fa63c41c904afff0",
     "paper": {
       "pmid": {
         "value": null,
@@ -3669,7 +3669,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3683,7 +3683,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3697,7 +3697,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3711,7 +3711,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3725,7 +3725,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -3739,7 +3739,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -4470,7 +4470,7 @@
     }
   },
   {
-    "record_id": "5eb7a96908f62ee1",
+    "record_id": "15e106a6f0194e85",
     "paper": {
       "pmid": {
         "value": null,
@@ -4775,7 +4775,7 @@
         "candidates": [
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -4789,7 +4789,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -5465,7 +5465,7 @@
     }
   },
   {
-    "record_id": "0eb8cbef48e3f9bf",
+    "record_id": "dcc68827095c2cc0",
     "paper": {
       "pmid": {
         "value": null,
@@ -5737,7 +5737,7 @@
         "candidates": [
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -5751,7 +5751,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -6427,7 +6427,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "0182dc4090e73910",
     "paper": {
       "pmid": {
         "value": null,
@@ -6699,7 +6699,7 @@
         "candidates": [
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -6713,7 +6713,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -7389,7 +7389,7 @@
     }
   },
   {
-    "record_id": "e31011d758606b47",
+    "record_id": "9f90743f4cce1110",
     "paper": {
       "pmid": {
         "value": null,
@@ -7694,7 +7694,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -7708,7 +7708,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -7722,7 +7722,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -8485,7 +8485,7 @@
     }
   },
   {
-    "record_id": "0eb8cbef48e3f9bf",
+    "record_id": "e3484f4028fecc9c",
     "paper": {
       "pmid": {
         "value": null,
@@ -8757,7 +8757,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -8771,7 +8771,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -8785,7 +8785,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -9548,7 +9548,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "d5b1b8b65cef8681",
     "paper": {
       "pmid": {
         "value": null,
@@ -9820,7 +9820,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -9834,7 +9834,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -9848,7 +9848,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -10611,7 +10611,7 @@
     }
   },
   {
-    "record_id": "53817ee52469c12d",
+    "record_id": "34a18f36c1fe4c62",
     "paper": {
       "pmid": {
         "value": null,
@@ -10978,7 +10978,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -10992,7 +10992,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -11006,7 +11006,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -11020,7 +11020,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -11034,7 +11034,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -11048,7 +11048,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -11800,7 +11800,7 @@
     }
   },
   {
-    "record_id": "79d1450adc1a89b9",
+    "record_id": "3cb6b4dcf49e8e18",
     "paper": {
       "pmid": {
         "value": null,
@@ -12130,7 +12130,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12144,7 +12144,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12158,7 +12158,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12172,7 +12172,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12186,7 +12186,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12200,7 +12200,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -12872,7 +12872,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "1529fc56d501cc6c",
     "paper": {
       "pmid": {
         "value": null,
@@ -13172,7 +13172,7 @@
         "candidates": [
           {
             "value": 0.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13186,7 +13186,7 @@
           },
           {
             "value": 5.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13200,7 +13200,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13214,7 +13214,7 @@
           },
           {
             "value": 20.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13228,7 +13228,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13242,7 +13242,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -13809,7 +13809,7 @@
     }
   },
   {
-    "record_id": "e31011d758606b47",
+    "record_id": "f1286813bdfd9336",
     "paper": {
       "pmid": {
         "value": null,
@@ -14114,7 +14114,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14128,7 +14128,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14142,7 +14142,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14156,7 +14156,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14214,7 +14214,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14228,7 +14228,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -14810,7 +14810,7 @@
     }
   },
   {
-    "record_id": "5eb7a96908f62ee1",
+    "record_id": "bd75ae500c7dec05",
     "paper": {
       "pmid": {
         "value": null,
@@ -15115,7 +15115,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15129,7 +15129,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15143,7 +15143,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15157,7 +15157,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15215,7 +15215,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15229,7 +15229,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -15811,7 +15811,7 @@
     }
   },
   {
-    "record_id": "952877a29c3def7a",
+    "record_id": "eac89f8a9b42ed48",
     "paper": {
       "pmid": {
         "value": null,
@@ -16083,7 +16083,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16097,7 +16097,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16111,7 +16111,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16125,7 +16125,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16183,7 +16183,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16197,7 +16197,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -16779,7 +16779,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "f70f92b6141332e2",
     "paper": {
       "pmid": {
         "value": null,
@@ -17051,7 +17051,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17065,7 +17065,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17079,7 +17079,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17093,7 +17093,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17151,7 +17151,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17165,7 +17165,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -17747,7 +17747,7 @@
     }
   },
   {
-    "record_id": "53817ee52469c12d",
+    "record_id": "a18e744faece3ee0",
     "paper": {
       "pmid": {
         "value": null,
@@ -18086,7 +18086,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18100,7 +18100,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18114,7 +18114,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18128,7 +18128,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18186,7 +18186,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18200,7 +18200,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -18897,7 +18897,7 @@
     }
   },
   {
-    "record_id": "79d1450adc1a89b9",
+    "record_id": "d92a35248be5e21b",
     "paper": {
       "pmid": {
         "value": null,
@@ -19199,7 +19199,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -19213,7 +19213,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -19227,7 +19227,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -19241,7 +19241,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -19299,7 +19299,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -19313,7 +19313,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20000,7 +20000,7 @@
     }
   },
   {
-    "record_id": "443243276be4aff9",
+    "record_id": "280d6ef7342147ff",
     "paper": {
       "pmid": {
         "value": null,
@@ -20272,7 +20272,7 @@
         "candidates": [
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20286,7 +20286,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20300,7 +20300,7 @@
           },
           {
             "value": 60.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20314,7 +20314,7 @@
           },
           {
             "value": 10.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20372,7 +20372,7 @@
         "candidates": [
           {
             "value": 1.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [
@@ -20386,7 +20386,7 @@
           },
           {
             "value": 30.0,
-            "source_type": "deterministic",
+            "source_type": "lane_series",
             "rank": 2,
             "confidence": 0.5,
             "evidence": [

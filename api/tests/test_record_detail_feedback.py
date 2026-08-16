@@ -199,6 +199,56 @@ def test_feedback_503_when_unconfigured(client, monkeypatch):
     assert client.post("/feedback", json=good, headers=AUTH).status_code == 503
 
 
+def test_feedback_rehydration_endpoint(client, monkeypatch):
+    """P0 regression (manual beta): submitted feedback must be retrievable for
+    a record so the UI can rehydrate after refresh. Persistence was verified in
+    the DB; the missing piece was retrieval. The payload keeps feedback clearly
+    separate from the extraction (its own endpoint/shape) and is read-only."""
+    import datetime
+
+    import app.routers.internal as internal
+
+    async def fake_record(record_id):
+        # The record's reseed-proof identity, resolved server-side.
+        return {"id": record_id, "stable_row_key": "abc123def456:1"}
+
+    async def fake_fetch(record_id, stable_row_key=None):
+        assert record_id == 673
+        # The OR-match key must be passed through: this is what makes
+        # feedback survive a reseed (serial ids change; the hash does not).
+        assert stable_row_key == "abc123def456:1"
+        return [{
+            "feedback_id": 3,
+            "created_at": datetime.datetime(2026, 8, 13, 7, 27, 2),
+            "feedback_scope": "field",
+            "stable_row_key": "abc123def456:1",
+            "field_name": "modification_type",
+            "model_value": None,
+            "feedback_type": "incorrect",
+            "suggested_value": "phosphorylation",
+            "comment": "picked from candidates",
+            "session_id": "abc",
+        }]
+    monkeypatch.setattr(internal, "fetch_record_by_id", fake_record)
+    monkeypatch.setattr(internal, "fetch_feedback_for_record", fake_fetch)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+
+    r = client.get("/records/673/feedback", headers=AUTH)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["record_id"] == 673
+    item = body["items"][0]
+    # The AI claim (model_value) and the human correction (suggested_value)
+    # both survive the round trip — the auditable pair, never a merge.
+    assert item["model_value"] is None
+    assert item["suggested_value"] == "phosphorylation"
+    assert item["field_name"] == "modification_type"
+    # auth required; unconfigured -> 503
+    assert client.get("/records/673/feedback").status_code in (401, 403)
+    monkeypatch.setattr(settings, "db_feedback_url", "")
+    assert client.get("/records/673/feedback", headers=AUTH).status_code == 503
+
+
 def test_feedback_scope_rules_direct():
     ok = FeedbackSubmission(feedback_scope="missing_field", field_name="antibody dilution")
     assert ok.validate_scope() is None

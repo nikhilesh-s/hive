@@ -290,6 +290,10 @@ class EvidenceRecord(BaseModel):
         rows = []
         for band in self.bands or [BandObservation(lane_index=1)]:
             row = dict(base)
+            # Stable per-lane identity (record hash + lane index): survives
+            # DB reseeds, unlike the serial `id`. Researcher feedback keys on
+            # this so corrections rehydrate after any reload (migration 003).
+            row["stable_row_key"] = f"{self.record_id}:{band.lane_index}"
             row["lane_condition"] = _v(band.lane_condition)
             row["condition"] = _v(band.lane_condition)
             row["band_state"] = _v(band.band_state)
