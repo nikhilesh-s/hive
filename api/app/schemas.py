@@ -150,6 +150,7 @@ class RecordDetail(BaseModel):
     """Full provenance view of ONE record. List responses stay lean; this is
     where the complete evidence story lives."""
     id: int
+    stable_row_key: str | None = None  # reseed-proof identity for feedback
     # source identity
     paper_id: str | None = None
     title: str | None = None
@@ -203,6 +204,9 @@ class FeedbackSubmission(BaseModel):
     CORRECTION CLAIM for audit + future eval; it is never auto-applied."""
     feedback_scope: str
     record_id: int | None = None
+    # Reseed-proof identity (migration 003): survives DB reloads where the
+    # serial record_id does not. Sent by the evidence panel when available.
+    stable_row_key: str | None = Field(default=None, max_length=100)
     paper_id: str | None = Field(default=None, max_length=200)
     figure_label: str | None = Field(default=None, max_length=100)
     search_query: str | None = Field(default=None, max_length=500)
@@ -246,6 +250,27 @@ class FeedbackSubmission(BaseModel):
 class FeedbackResponse(BaseModel):
     feedback_id: int
     stored: bool = True
+
+
+class FeedbackItem(BaseModel):
+    """One prior researcher-feedback row, for rehydration in the evidence
+    panel. Rendered clearly as RESEARCHER FEEDBACK, never mixed into the
+    HiveBlot extraction."""
+    feedback_id: int
+    created_at: str
+    feedback_scope: str
+    stable_row_key: str | None = None
+    field_name: str | None = None
+    model_value: str | None = None
+    feedback_type: str | None = None
+    suggested_value: str | None = None
+    comment: str | None = None
+    session_id: str | None = None
+
+
+class RecordFeedbackResponse(BaseModel):
+    record_id: int
+    items: list[FeedbackItem]
 
 
 class ProteinSearchResponse(BaseModel):

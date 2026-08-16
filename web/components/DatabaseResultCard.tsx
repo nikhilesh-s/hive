@@ -88,22 +88,36 @@ export function formatLaneLabel(c?: string | null): string {
 }
 
 // Deterministic experiment-design tag derived ONLY from the group's own lane
-// labels (data-backed, never invented): ≥3 pure-timepoint lanes = a time
-// course; ≥3 lanes sharing a prefix with distinct trailing numbers = a dose
-// series. Anything else: no tag.
-export function deriveDesignTag(lanes?: LaneSummary[]): string | null {
+// labels + the reviewed treatment context (data-backed, never invented).
+// Abstention is the default: no supported semantics -> no tag.
+const DOSE_UNIT_RE = /(\d+(\.\d+)?)\s*(ng\/ml|[uµμ]g\/ml|mg\/ml|[nuµμ]M\b|mmol|nmol|[uµμ]mol|mg\/kg|%)/i;
+// Embryonic/postnatal developmental-stage nomenclature: E14.5, P0, P7,
+// P28M/P25F (optional sex suffix). These are SAMPLE STAGES, never doses.
+const DEV_STAGE_RE = /^[EP]\d+(\.\d+)?[FM]?$/;
+
+export function deriveDesignTag(lanes?: LaneSummary[], treatmentContext?: string | null): string | null {
   if (!lanes || lanes.length < 3) return null;
   const conds = lanes.map((l) => (l.condition || '').trim()).filter(Boolean);
   if (conds.length < 3) return null;
-  const timepoints = conds.filter((c) => /^\d+(\.\d+)?\s*(min|mins|h|hr|hrs|d)$/i.test(c));
+  // Developmental series takes precedence: E/P-day labels also end in digits
+  // and previously false-fired the dose heuristic (GAPDH mouse, "P0..P28M").
+  const dev = conds.filter((c) => DEV_STAGE_RE.test(c));
+  if (dev.length >= 3) return 'developmental series';
+  const timepoints = conds.filter((c) => /^\d+(\.\d+)?\s*(min|mins|h|hr|hrs)$/i.test(c));
   if (timepoints.length >= 3) return 'time course';
+  // DOSE SERIES needs explicit dose semantics, not just trailing numbers:
+  // either the lane labels carry a unit, or the reviewed treatment context
+  // states a concentration series the lane numbers correspond to.
   const trailing = conds
     .map((c) => /^(.*?)(\d+(?:\.\d+)?)$/.exec(c))
-    .filter((m): m is RegExpExecArray => !!m && m[1].trim().length > 0);
+    .filter((m): m is RegExpExecArray => !!m && m[1].trim().length > 0 && !DEV_STAGE_RE.test(m.input));
   if (trailing.length >= 3) {
     const prefixes = new Set(trailing.map((m) => m[1].trim()));
     const numbers = new Set(trailing.map((m) => m[2]));
-    if (prefixes.size === 1 && numbers.size >= 3) return 'dose series';
+    const doseSemantics =
+      conds.some((c) => DOSE_UNIT_RE.test(c)) ||
+      (treatmentContext ? DOSE_UNIT_RE.test(treatmentContext) : false);
+    if (prefixes.size === 1 && numbers.size >= 3 && doseSemantics) return 'dose series';
   }
   return null;
 }
@@ -155,6 +169,40 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
           .filter(Boolean)
           .join(' · ')
       : null;
+  // Multi-condition experiments (P0-4): surface co-conditions that are
+  // literally named on this group's lane labels (CL-E, Bis II, U0126 …) so the
+  // summary doesn't understate the design. "±" = the lanes carry both with-
+  // and without- states; nothing is asserted beyond the printed labels.
+  const extraAgents = (() => {
+    if (!treatment || !lanes || lanes.length < 2) return [] as string[];
+    const seen = new Set<string>();
+    for (const l of lanes) {
+      for (const tok of (l.condition || '').split(/[+/·,]/)) {
+        const t = tok.trim().replace(/[+−-]+$/, '').trim();
+        if (!t || /^\d/.test(t)) continue;
+        if (/^(ctrl|control|input|igg|ip:.*)$/i.test(t)) continue;
+        if (DEV_STAGE_RE.test(t)) continue;
+        const base = t.replace(/\s+\d+(\.\d+)?$/, '').trim();
+        if (!base) continue;
+        if (data.treatment_name && base.toLowerCase() === data.treatment_name.toLowerCase()) continue;
+        seen.add(base);
+      }
+    }
+    return [...seen];
+  })();
+  const treatmentDisplay = treatment
+    ? `${treatment}${extraAgents.length ? ` (± ${extraAgents.join(', ')})` : ''}`
+    : null;
+  // co-IP context from this group's own lane labels (P1): "IP:PIK3CA" printed
+  // on a lane IS the bait statement for the panel.
+  const ipBait = (() => {
+    if (blotType !== 'co_ip' || !lanes) return null;
+    for (const l of lanes) {
+      const m = /\bIP:\s*([A-Za-z0-9-]+)/.exec(l.condition || '');
+      if (m) return m[1];
+    }
+    return null;
+  })();
   const mw =
     data.reported_molecular_weight_kda != null || data.expected_molecular_weight_kda != null
       ? [
@@ -213,11 +261,11 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
             Design tag is derived only from this group's own lane labels; the
             context text is the reviewed record's treatment_context verbatim
             (truncated). Nothing here is invented. */}
-        {(deriveDesignTag(lanes) || data.treatment_context) && (
+        {(deriveDesignTag(lanes, data.treatment_context) || data.treatment_context) && (
           <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIMTEXT, marginTop: '-8px', fontStyle: 'italic' }}>
-            {deriveDesignTag(lanes) && (
+            {deriveDesignTag(lanes, data.treatment_context) && (
               <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, fontStyle: 'normal', letterSpacing: '0.4px', marginRight: '8px' }}>
-                {deriveDesignTag(lanes)!.toUpperCase()}
+                {deriveDesignTag(lanes, data.treatment_context)!.toUpperCase()}
               </span>
             )}
             {data.treatment_context && (
@@ -231,11 +279,12 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {sampleText && <Field label="SAMPLE" value={sampleText} />}
-            {blotType && <Field label="EXPERIMENT" value={titleCase(blotType)} />}
+            {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
+            {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
             {antibody && <Field label="ANTIBODY" value={antibody} mono />}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {treatment && <Field label="TREATMENT" value={treatment} />}
+            {treatmentDisplay && <Field label="TREATMENT" value={treatmentDisplay} />}
             {lanes && lanes.length > 1 ? (
               <Field
                 label={`LANES (${lanes.length})`}
@@ -283,7 +332,7 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
               )}
               {data.paper_id && (
                 <div>
-                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Paper: </span>
+                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>DOI: </span>
                   <span style={{ color: '#a9bdb5', fontFamily: MONO, fontSize: '12px' }}>{data.paper_id}</span>
                 </div>
               )}

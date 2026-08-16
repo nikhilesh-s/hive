@@ -8,6 +8,7 @@ PAIRS = [
     ("api/db/schema.sql", "supabase/migrations/20260701000001_base_schema.sql"),
     ("migrations/001_evidence_record.sql", "supabase/migrations/20260701000002_evidence_record.sql"),
     ("migrations/002_feedback.sql", "supabase/migrations/20260701000003_feedback.sql"),
+    ("migrations/003_stable_row_key.sql", "supabase/migrations/20260701000004_stable_row_key.sql"),
 ]
 
 

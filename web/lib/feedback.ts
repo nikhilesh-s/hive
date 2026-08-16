@@ -4,6 +4,7 @@
 export interface FeedbackPayload {
   feedback_scope: 'field' | 'record' | 'missing_field' | 'search' | 'ui';
   record_id?: number | null;
+  stable_row_key?: string | null;
   paper_id?: string | null;
   figure_label?: string | null;
   search_query?: string | null;
