@@ -6,6 +6,42 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-17 (session 10)** — Claude Code (Opus 5). **LEGACY SUPABASE AUDIT
+  (READ-ONLY). No production change.** The original hackathon project `QIB`
+  (`belalrbfrndxvdwvjxte`, org SuhasKM's-Org, us-west-2, PG 17.6) is now
+  linked; CLI 2.113.0, already authenticated. Full findings:
+  **`research/supabase_legacy_audit.md`**. Headlines: production `public` holds
+  exactly two tables — **`western_blot_records` 616 rows** (5 papers, 64 of
+  those rows an exact duplicate of another 64 under a second `paper_id`
+  spelling) and **`blot_results` 2 rows** (fabricated demo: `p53 paper 1.pdf`,
+  placeholder DOI `10.1234/example.2024`; referenced by no source file).
+  **Migration history is EMPTY** — all four local migrations unapplied; prod was
+  built by hand, so `db push` must never target it (`create table if not
+  exists` would sail past and then ALTER prod). Production's 12 columns are
+  exactly `api/db/schema.sql`'s list and order ⇒ **it IS a lineal ancestor of
+  the current base table**, with one divergence: **`confidence` is `text`, not
+  `real`** (the reviewed seed inserts floats ⇒ asyncpg would hard-fail). Also
+  absent: all 60 migration-001 columns, `hiveblot_feedback`, `stable_row_key`,
+  the GIN trigram index on `target`, and **both `hive_readonly` and
+  `hive_feedback` roles** (verified against the full server role list).
+  Legacy data is **not** worth migrating as evidence — it bakes in the banned
+  p-prefix heuristic (62 `p53` + 4 `PARP` rows typed `phospho_signaling`), has
+  no provenance/UniProt/residue/status, 4 of 6 `paper_id`s are filenames, and
+  `confidence` is a constant `'0.9'`. Its one real value is a **5-paper
+  shortlist for re-ingestion** through the current pipeline (zero paper overlap
+  with the reviewed corpus). **Security finding (no action taken): both tables
+  are fully readable with the project's anon key** — RLS is off or not
+  restricting anon reads; write exposure deliberately untested (a probe would
+  have mutated prod) — verify in the dashboard.
+  **Recommendation (NOT implemented): a Supabase branch `hive-beta`, created
+  PERSISTENT, not preview** — the beta must outlive any PR because collecting
+  `hiveblot_feedback` from UCSF researchers IS the deliverable. Branching is
+  available (`supabase branches list` → `[]`). Create **without `--with-data`**,
+  re-link to the branch ref, `db push` the four migrations, verify
+  `confidence real` (branch-only `ALTER` if the parent's `text` carries over),
+  set the two role passwords, then `seed_remote.py` → 475 rows. Fallback if
+  branching is plan-gated: a separate standalone project. No files outside
+  `research/` + this HANDOFF changed; no tests affected.
 - **2026-08-16 (session 9)** — Claude Fable 5. **FINAL INTERNAL-BETA FIX PASS.**
   All reproducible manual-beta findings fixed; no scientific regressions.
   **P0 feedback persistence/rehydration — diagnosed, fixed durably.** The
@@ -440,11 +476,21 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 ~~Result grouping + multi-dose/time-course representation~~ — **DONE (session 5)**.
 ~~Manual-test fixes (search submit, card identity, IL-6·3D, lanes) + Supabase CLI prep~~ — **DONE (session 8)**.
 
-**TOMORROW MORNING (user), in order:**
-1. Create the Supabase project in the dashboard, then run the exact flow in
-   `DEPLOYMENT.md` §1: `supabase login` → `supabase link --project-ref <REF>` →
-   `supabase db push --dry-run` → `supabase db push` → set the two role
-   passwords → `seed_remote.py` (expect **475 rows** via `--check`).
+~~Legacy Supabase production audit~~ — **DONE (session 10)**,
+`research/supabase_legacy_audit.md`.
+
+**NEXT (user decision first, then the flow):**
+0. **Decide the beta environment.** Recommended: a **persistent** Supabase
+   branch `hive-beta` off `belalrbfrndxvdwvjxte`, created **without
+   `--with-data`**. Needs owner confirmation on plan + branch compute cost;
+   fallback is a standalone project. **Production stays untouched — never
+   point `db push` or `seed_remote.py` at `belalrbfrndxvdwvjxte`.**
+1. Create `hive-beta`, **re-link to the BRANCH ref**, then run the flow in
+   `DEPLOYMENT.md` §1: `supabase db push --dry-run` → `supabase db push` →
+   **verify `confidence` is `real`** (the parent has it as `text`; branch-only
+   `ALTER … TYPE real USING confidence::real` if it carried over) → set the two
+   role passwords → `seed_remote.py` (expect **475 rows** via `--check`, and
+   **zero** dropped keys).
 2. Fill `api/.env`: `DB_READONLY_URL` + `DB_FEEDBACK_URL` (the two restricted
    DSNs), `SUPABASE_URL`/`SUPABASE_KEY`, `ALLOWED_ORIGINS`; web host gets
    `API_BASE_URL` + `INTERNAL_API_KEY`. Then run the 8-step smoke checklist
@@ -581,7 +627,16 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 10. **Raw source wording is always preserved** alongside normalized values.
 
 ## Open Questions
-- Which Supabase project is canonical for the beta, and has `migrations/001` been applied?
+- ~~Which Supabase project is canonical for the beta, and has `migrations/001` been applied?~~
+  **ANSWERED (session 10).** The legacy hackathon project `QIB`
+  (`belalrbfrndxvdwvjxte`) is **NOT** canonical for the beta and must stay
+  read-only: no migration has ever been applied to it and its owner has
+  frozen the schema. The beta target is a new **persistent `hive-beta`
+  branch** off that project (fallback: a standalone project). See
+  `research/supabase_legacy_audit.md`.
+- Is `SuhasKM's-Org` on a plan that allows a persistent branch, and is the
+  per-hour branch compute cost accepted by the owner? (Only open blocker to
+  creating `hive-beta`.)
 - Which Bedrock model + region are provisioned (model access approved)?
 - Idempotency key `(paper_id, page, figure_label, target, condition)` — keep, or extend with
   modification/lane once Evidence Records flow in? (Affects dedupe on re-ingest.)
