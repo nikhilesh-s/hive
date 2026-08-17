@@ -6,6 +6,47 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-17 (session 11)** — Claude Code (Opus 5). **BETA-TABLE INSPECTION +
+  PLAN (READ-ONLY). Nothing altered, in QIB or anywhere.** Suhas created
+  `western_blot_records_beta` and `blot_results_beta` inside the QIB production
+  database. Full analysis: **`research/supabase_beta_table_plan.md`**.
+  **Inspection:** both exist, both **0 rows**, and both are **exact structural
+  copies of the legacy production tables** — identical column names, order,
+  types, defaults and nullability (diffed field-by-field; only the copied
+  functional index is auto-renamed `blot_results_beta_lower_idx`, the signature
+  of `CREATE TABLE … (LIKE … INCLUDING ALL)`). So
+  `western_blot_records_beta` is 12 columns with **`confidence text`** and a
+  pkey-only index — it inherits *every* gap from the legacy audit. Still absent
+  project-wide: `hiveblot_feedback` (any form), **`hive_readonly`**,
+  **`hive_feedback`**, the trigram index, and any migration history.
+  **Gap vs canonical: 61 missing columns** (60 from migration 001 +
+  `stable_row_key`), 1 type change (`confidence text → real`, **required** —
+  the seed inserts floats and asyncpg is strict), 10 missing indexes, plus a
+  whole feedback table. `stable_row_key` itself would port cleanly (plain TEXT
+  + b-tree, name-independent). Note numbering: CLI copy `…0004` **is**
+  canonical `migrations/003`; there is no fifth migration.
+  **RECOMMENDATION — do NOT use the beta tables; wait for Srushti's separate
+  HiveBlot project.** The blocker is not effort: `/search` needs the
+  `hive_readonly` role and `/feedback` needs `hive_feedback`, and Postgres
+  **roles are cluster-level, not table-level**; the trigram index needs
+  database-wide `CREATE EXTENSION pg_trgm`. All three land outside the two beta
+  tables, against the "do not modify production roles/schema" constraint — so
+  Option A **cannot be executed** without a fresh exception from Suhas. Also:
+  `supabase db push` is unusable against QIB (empty remote history ⇒ it would
+  apply the production-targeted migrations; the only fix writes production
+  migration history, also forbidden), so the beta route means hand-pasting a
+  ~700-line `_beta` SQL fork that sits **outside** the drift guard, plus code
+  edits to `api/app/db.py` (feedback table is hardcoded) and
+  `scripts/seed_remote.py` — all of it reverted later. `TABLE_NAME` is already
+  env-configurable, so the records table alone would have been config-only.
+  **This supersedes session 10's `hive-beta` branch recommendation:** Srushti's
+  separate project is the same isolation with no plan upgrade, no per-hour
+  branch compute, and HiveBlot ownership. Keep the persistent branch as the
+  fallback only if her project stalls. Two items left unverified because they
+  need a SQL console (neither changes the recommendation): whether the beta
+  `id` default points at production's sequence, and RLS/policy state on the
+  beta tables — exact read-only queries are in the plan doc §1.5. Production
+  re-verified untouched: 616 + 2 rows. Docs only; api tests 113/113.
 - **2026-08-17 (session 10)** — Claude Code (Opus 5). **LEGACY SUPABASE AUDIT
   (READ-ONLY). No production change.** The original hackathon project `QIB`
   (`belalrbfrndxvdwvjxte`, org SuhasKM's-Org, us-west-2, PG 17.6) is now
@@ -478,19 +519,29 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 
 ~~Legacy Supabase production audit~~ — **DONE (session 10)**,
 `research/supabase_legacy_audit.md`.
+~~Beta-table inspection + plan~~ — **DONE (session 11)**,
+`research/supabase_beta_table_plan.md`.
 
-**NEXT (user decision first, then the flow):**
-0. **Decide the beta environment.** Recommended: a **persistent** Supabase
-   branch `hive-beta` off `belalrbfrndxvdwvjxte`, created **without
-   `--with-data`**. Needs owner confirmation on plan + branch compute cost;
-   fallback is a standalone project. **Production stays untouched — never
-   point `db push` or `seed_remote.py` at `belalrbfrndxvdwvjxte`.**
-1. Create `hive-beta`, **re-link to the BRANCH ref**, then run the flow in
-   `DEPLOYMENT.md` §1: `supabase db push --dry-run` → `supabase db push` →
-   **verify `confidence` is `real`** (the parent has it as `text`; branch-only
-   `ALTER … TYPE real USING confidence::real` if it carried over) → set the two
-   role passwords → `seed_remote.py` (expect **475 rows** via `--check`, and
-   **zero** dropped keys).
+**NEXT — exact task: wait for Srushti's separate HiveBlot Supabase project,
+then deploy the canonical migrations there unchanged.**
+
+Nothing to build in the meantime. Specifically:
+
+0. **Do NOT adapt anything to `western_blot_records_beta` /
+   `blot_results_beta`.** Leave them empty and unused; tell Suhas the blocker
+   is cluster-level roles (`hive_readonly`, `hive_feedback`) and the
+   database-wide `pg_trgm` extension, not the tables he made. **Never point
+   `db push`, `seed_remote.py`, or any DDL at `belalrbfrndxvdwvjxte`.**
+1. When Srushti's project exists: `supabase link --project-ref <HIVEBLOT_REF>`
+   (re-link away from QIB), then `DEPLOYMENT.md` §1 **verbatim, unchanged** —
+   `supabase db push --dry-run` → `supabase db push` (4 migrations) → set the
+   `hive_readonly` / `hive_feedback` passwords → `seed_remote.py` (expect
+   **475 rows** via `--check`, and **zero** dropped keys) → the 8-step smoke
+   checklist (`DEPLOYMENT.md` §4). No code change, no SQL to write, no
+   `TABLE_NAME` override.
+2. If her project stalls and the beta is urgent: fall back to a **persistent**
+   `hive-beta` branch off QIB (session 10's plan, `--persistent`, **without
+   `--with-data`**) — not to Suhas's beta tables.
 2. Fill `api/.env`: `DB_READONLY_URL` + `DB_FEEDBACK_URL` (the two restricted
    DSNs), `SUPABASE_URL`/`SUPABASE_KEY`, `ALLOWED_ORIGINS`; web host gets
    `API_BASE_URL` + `INTERNAL_API_KEY`. Then run the 8-step smoke checklist
@@ -634,9 +685,15 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
   frozen the schema. The beta target is a new **persistent `hive-beta`
   branch** off that project (fallback: a standalone project). See
   `research/supabase_legacy_audit.md`.
-- Is `SuhasKM's-Org` on a plan that allows a persistent branch, and is the
-  per-hour branch compute cost accepted by the owner? (Only open blocker to
-  creating `hive-beta`.)
+- ~~Is `SuhasKM's-Org` on a plan that allows a persistent branch…?~~ **MOOT
+  (session 11)** unless Srushti's separate HiveBlot project stalls — that
+  project supersedes the branch (same isolation, no plan upgrade, no branch
+  compute, HiveBlot-owned). Only revisit if it does not materialise.
+- Two beta-table facts need a SQL console to settle (see
+  `research/supabase_beta_table_plan.md` §1.5): does
+  `western_blot_records_beta.id` default to **production's** sequence (inserts
+  would advance production's id counter), and is RLS enabled on the beta
+  tables? Neither blocks the recommendation — we are not using those tables.
 - Which Bedrock model + region are provisioned (model access approved)?
 - Idempotency key `(paper_id, page, figure_label, target, condition)` — keep, or extend with
   modification/lane once Evidence Records flow in? (Affects dedupe on re-ingest.)
