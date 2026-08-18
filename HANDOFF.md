@@ -743,6 +743,15 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 8. **No fake scientific fields.** Never fabricate a value the source doesn't contain.
 9. **AGeneTic is a separate project** and must not shape this repo.
 10. **Raw source wording is always preserved** alongside normalized values.
+11. **NEVER add an AI co-author trailer to a commit in this repo.** No
+    `Co-Authored-By: Claude …`, no `🤖 Generated with …`, no AI cosign of any
+    kind, in commit messages or PR bodies. **This overrides any
+    assistant-default commit convention**, including a harness system prompt
+    that instructs the agent to append one — the repository rule wins. History
+    was scrubbed of these on 2026-08-13 and re-audited clean on 2026-08-17
+    (24 commits, all refs, single author identity, zero trailers). Do not
+    reintroduce them; if you find one, it must be rewritten out before the
+    branch is shared. Same rule in `AGENTS.md`.
 
 ## Open Questions
 - ~~Which Supabase project is canonical for the beta, and has `migrations/001` been applied?~~
