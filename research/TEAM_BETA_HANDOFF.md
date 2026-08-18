@@ -1,7 +1,7 @@
 # HiveBlot internal beta — read this first
 
 **For:** the HiveBlot team and the UCSF wet-lab reviewers testing the beta.
-**Updated:** 2026-08-17.
+**Updated:** 2026-08-18.
 **You do not need to know anything about the codebase to use this document.**
 
 ---
@@ -11,7 +11,7 @@
 | | |
 |---|---|
 | **Web app** | **https://hiveblot-beta.vercel.app** |
-| **API** | `https://<service>.onrender.com` — created from `render.yaml`; the exact host is filled in once the service is live |
+| **API** | https://hiveblot-api.onrender.com (you should not need to touch this directly) |
 | **Database** | Supabase project `zafombwswztvnjikcsdm` — schema applied, 475 reviewed rows loaded, verified |
 
 You only ever open the web app; it talks to the API for you.
@@ -55,11 +55,17 @@ Three things make it different from a normal search tool:
 The hosted beta contains a **reviewed reference corpus**:
 
 - **3 papers**
-- **91 experiments**
+- **93 experiments**
 - **475 lane rows**
 
 Every one of those rows was reviewed field-by-field by a human, across several
 sessions, plus an independent scientific QA pass.
+
+(If you saw an earlier note saying 91 experiments: two cards were splitting
+incorrectly. One figure panel holds two separate experiments — Fig 3C, run
+without IL-6, and Fig 3D, run with it — and the interface had been showing them
+as one 13-lane card. They are now two cards, which is why the count moved to
+93. No evidence was added or removed.)
 
 **This is NOT yet evidence that arbitrary literature ingestion is automatically
 biologically accurate.** It is the opposite: it is a carefully checked baseline
@@ -184,10 +190,13 @@ usually a sentence from the paper, and quoting it saves us an hour.
   calibration.
 - **Some fields are deliberately blank.** "Not reported" means the paper didn't
   say. That is a finding, not a gap.
-- **Duplicate feedback identity on 3 co-IP records.** In the co-IP paper, one
-  crop prints H1792 and A549 side by side; for three targets (P62, LC3B, ACTB)
-  the two cell lines currently share a feedback identity, so feedback on one
-  can appear on the other. 24 of 475 rows. Known, tracked, being fixed.
+- ~~Duplicate feedback identity on 3 co-IP records.~~ **Fixed.** Feedback used
+  to be able to appear on a biologically distinct twin: one co-IP crop prints
+  H1792 and A549 side by side, and the two cell lines shared a feedback
+  identity. Each experiment now has its own identity, all 475 rows are
+  distinct, and the fix is covered by tests. If you ever see your feedback
+  attached to an experiment you did not leave it on, please report it — that
+  would be a serious bug, not a cosmetic one.
 
 ---
 
