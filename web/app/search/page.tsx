@@ -29,18 +29,25 @@ interface DatabaseResult {
   experiment_type?: string | null;
   cell_line?: string | null;
   modification_label?: string | null;
+  stable_row_key?: string | null;
 }
 
 // One card per EXPERIMENT, not per lane row: a 6-lane time course reads as one
 // result with a lane strip, not 6 near-identical cards.
 //
-// The key must never merge biologically distinct rows. Panel + target alone is
-// NOT enough: one crop in PMC12706926 (page_004_cand_0025) holds two cell lines
-// side by side (H1792 | A549), so cell line is part of the identity. Modification
-// label separates a phospho row from its total row when both print the same
-// target string. Verified against all 374 demo rows: 77 groups, zero groups
-// containing >1 distinct target / canonical target / modification / residue /
-// experiment type / UniProt / figure / cell line / catalog / organism.
+// The card boundary IS the experiment identity that researcher feedback keys
+// to: `stable_row_key` is `<experiment hash>:<lane index>`, so the hash half
+// groups the lanes. Deriving the card from a separate composite key used to be
+// a second, parallel notion of "one experiment" — and the two disagreed. One
+// crop in PMC12706926 (page_004_cand_0025) prints H1792 and A549 side by side;
+// grouping split them on cell line while the identity hash did not, so feedback
+// left on the H1792 arm could rehydrate onto the A549 arm. The identity hash
+// now carries the sample, and grouping reads that same hash, so the two cannot
+// drift apart again.
+//
+// The composite fallback below is for rows with no stable_row_key (legacy rows
+// predating migration 003). It keeps its own cell-line component for exactly
+// the reason above.
 interface ResultGroup {
   first: DatabaseResult;
   lanes: LaneSummary[];
@@ -49,14 +56,16 @@ interface ResultGroup {
 function groupResults(rows: DatabaseResult[]): ResultGroup[] {
   const groups = new Map<string, ResultGroup>();
   for (const r of rows) {
-    const key = [
-      r.paper_id,
-      r.image_crop_ref ?? `p${r.page}`,
-      r.target,
-      r.experiment_type ?? '',
-      r.cell_line ?? r.sample ?? '',
-      r.modification_label ?? '',
-    ].join('|');
+    const key = r.stable_row_key
+      ? r.stable_row_key.split(':')[0]
+      : [
+          r.paper_id,
+          r.image_crop_ref ?? `p${r.page}`,
+          r.target,
+          r.experiment_type ?? '',
+          r.cell_line ?? r.sample ?? '',
+          r.modification_label ?? '',
+        ].join('|');
     const lane: LaneSummary = {
       condition: r.lane_condition ?? r.condition ?? null,
       band_state: r.band_state ?? (r.band_detected == null ? null : r.band_detected ? 'present' : 'absent'),

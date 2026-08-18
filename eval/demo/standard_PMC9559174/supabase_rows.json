@@ -46,7 +46,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "116fe648587ade49",
+      "record_id": "3d19011ff82fd081",
       "paper": {
         "pmid": {
           "value": null,
@@ -771,7 +771,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "116fe648587ade49:1",
+    "stable_row_key": "3d19011ff82fd081:1",
     "lane_condition": "L5d Ctrl",
     "condition": "L5d Ctrl",
     "band_state": "present",
@@ -826,7 +826,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "116fe648587ade49",
+      "record_id": "3d19011ff82fd081",
       "paper": {
         "pmid": {
           "value": null,
@@ -1551,7 +1551,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "116fe648587ade49:2",
+    "stable_row_key": "3d19011ff82fd081:2",
     "lane_condition": "L5d",
     "condition": "L5d",
     "band_state": "uncertain",
@@ -1606,7 +1606,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "116fe648587ade49",
+      "record_id": "3d19011ff82fd081",
       "paper": {
         "pmid": {
           "value": null,
@@ -2331,7 +2331,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "116fe648587ade49:3",
+    "stable_row_key": "3d19011ff82fd081:3",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -2386,7 +2386,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "116fe648587ade49",
+      "record_id": "3d19011ff82fd081",
       "paper": {
         "pmid": {
           "value": null,
@@ -3111,7 +3111,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "116fe648587ade49:4",
+    "stable_row_key": "3d19011ff82fd081:4",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "uncertain",
@@ -3166,7 +3166,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3450e156027919ce",
+      "record_id": "15f3b18c22282917",
       "paper": {
         "pmid": {
           "value": null,
@@ -3912,7 +3912,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3450e156027919ce:1",
+    "stable_row_key": "15f3b18c22282917:1",
     "lane_condition": "L5d Ctrl",
     "condition": "L5d Ctrl",
     "band_state": "present",
@@ -3967,7 +3967,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3450e156027919ce",
+      "record_id": "15f3b18c22282917",
       "paper": {
         "pmid": {
           "value": null,
@@ -4713,7 +4713,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3450e156027919ce:2",
+    "stable_row_key": "15f3b18c22282917:2",
     "lane_condition": "L5d",
     "condition": "L5d",
     "band_state": "present",
@@ -4768,7 +4768,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3450e156027919ce",
+      "record_id": "15f3b18c22282917",
       "paper": {
         "pmid": {
           "value": null,
@@ -5514,7 +5514,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3450e156027919ce:3",
+    "stable_row_key": "15f3b18c22282917:3",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -5569,7 +5569,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3450e156027919ce",
+      "record_id": "15f3b18c22282917",
       "paper": {
         "pmid": {
           "value": null,
@@ -6315,7 +6315,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3450e156027919ce:4",
+    "stable_row_key": "15f3b18c22282917:4",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -6370,7 +6370,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e6006ecca26e426a",
+      "record_id": "6c8e4569baa5de4f",
       "paper": {
         "pmid": {
           "value": null,
@@ -7116,7 +7116,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e6006ecca26e426a:1",
+    "stable_row_key": "6c8e4569baa5de4f:1",
     "lane_condition": "L5d Ctrl",
     "condition": "L5d Ctrl",
     "band_state": "present",
@@ -7171,7 +7171,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e6006ecca26e426a",
+      "record_id": "6c8e4569baa5de4f",
       "paper": {
         "pmid": {
           "value": null,
@@ -7917,7 +7917,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e6006ecca26e426a:2",
+    "stable_row_key": "6c8e4569baa5de4f:2",
     "lane_condition": "L5d",
     "condition": "L5d",
     "band_state": "present",
@@ -7972,7 +7972,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e6006ecca26e426a",
+      "record_id": "6c8e4569baa5de4f",
       "paper": {
         "pmid": {
           "value": null,
@@ -8718,7 +8718,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e6006ecca26e426a:3",
+    "stable_row_key": "6c8e4569baa5de4f:3",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -8773,7 +8773,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e6006ecca26e426a",
+      "record_id": "6c8e4569baa5de4f",
       "paper": {
         "pmid": {
           "value": null,
@@ -9519,7 +9519,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e6006ecca26e426a:4",
+    "stable_row_key": "6c8e4569baa5de4f:4",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -9574,7 +9574,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3c896f72f922a92b",
+      "record_id": "0bb97065f4d7db17",
       "paper": {
         "pmid": {
           "value": null,
@@ -10320,7 +10320,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3c896f72f922a92b:1",
+    "stable_row_key": "0bb97065f4d7db17:1",
     "lane_condition": "L5d Ctrl",
     "condition": "L5d Ctrl",
     "band_state": "present",
@@ -10375,7 +10375,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3c896f72f922a92b",
+      "record_id": "0bb97065f4d7db17",
       "paper": {
         "pmid": {
           "value": null,
@@ -11121,7 +11121,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3c896f72f922a92b:2",
+    "stable_row_key": "0bb97065f4d7db17:2",
     "lane_condition": "L5d",
     "condition": "L5d",
     "band_state": "present",
@@ -11176,7 +11176,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3c896f72f922a92b",
+      "record_id": "0bb97065f4d7db17",
       "paper": {
         "pmid": {
           "value": null,
@@ -11922,7 +11922,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3c896f72f922a92b:3",
+    "stable_row_key": "0bb97065f4d7db17:3",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -11977,7 +11977,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "3c896f72f922a92b",
+      "record_id": "0bb97065f4d7db17",
       "paper": {
         "pmid": {
           "value": null,
@@ -12723,7 +12723,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3c896f72f922a92b:4",
+    "stable_row_key": "0bb97065f4d7db17:4",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -12778,7 +12778,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -13663,7 +13663,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:1",
+    "stable_row_key": "e555f0ae313c14ee:1",
     "lane_condition": "E14.5",
     "condition": "E14.5",
     "band_state": "present",
@@ -13718,7 +13718,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -14603,7 +14603,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:2",
+    "stable_row_key": "e555f0ae313c14ee:2",
     "lane_condition": "E15.5",
     "condition": "E15.5",
     "band_state": "present",
@@ -14658,7 +14658,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -15543,7 +15543,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:3",
+    "stable_row_key": "e555f0ae313c14ee:3",
     "lane_condition": "E16.5",
     "condition": "E16.5",
     "band_state": "present",
@@ -15598,7 +15598,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -16483,7 +16483,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:4",
+    "stable_row_key": "e555f0ae313c14ee:4",
     "lane_condition": "E17.5",
     "condition": "E17.5",
     "band_state": "present",
@@ -16538,7 +16538,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -17423,7 +17423,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:5",
+    "stable_row_key": "e555f0ae313c14ee:5",
     "lane_condition": "E18.5",
     "condition": "E18.5",
     "band_state": "present",
@@ -17478,7 +17478,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "3979d9dd3eb170ef",
+      "record_id": "e555f0ae313c14ee",
       "paper": {
         "pmid": {
           "value": null,
@@ -18363,7 +18363,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "3979d9dd3eb170ef:6",
+    "stable_row_key": "e555f0ae313c14ee:6",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -18418,7 +18418,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -19324,7 +19324,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:1",
+    "stable_row_key": "6693a9c0996f10a8:1",
     "lane_condition": "E14.5",
     "condition": "E14.5",
     "band_state": "present",
@@ -19379,7 +19379,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -20285,7 +20285,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:2",
+    "stable_row_key": "6693a9c0996f10a8:2",
     "lane_condition": "E15.5",
     "condition": "E15.5",
     "band_state": "present",
@@ -20340,7 +20340,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -21246,7 +21246,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:3",
+    "stable_row_key": "6693a9c0996f10a8:3",
     "lane_condition": "E16.5",
     "condition": "E16.5",
     "band_state": "present",
@@ -21301,7 +21301,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -22207,7 +22207,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:4",
+    "stable_row_key": "6693a9c0996f10a8:4",
     "lane_condition": "E17.5",
     "condition": "E17.5",
     "band_state": "present",
@@ -22262,7 +22262,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -23168,7 +23168,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:5",
+    "stable_row_key": "6693a9c0996f10a8:5",
     "lane_condition": "E18.5",
     "condition": "E18.5",
     "band_state": "present",
@@ -23223,7 +23223,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "b84c278281dd49a1",
+      "record_id": "6693a9c0996f10a8",
       "paper": {
         "pmid": {
           "value": null,
@@ -24129,7 +24129,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "b84c278281dd49a1:6",
+    "stable_row_key": "6693a9c0996f10a8:6",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -24184,7 +24184,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -25090,7 +25090,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:1",
+    "stable_row_key": "f30cc6df1a913438:1",
     "lane_condition": "E14.5",
     "condition": "E14.5",
     "band_state": "present",
@@ -25145,7 +25145,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -26051,7 +26051,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:2",
+    "stable_row_key": "f30cc6df1a913438:2",
     "lane_condition": "E15.5",
     "condition": "E15.5",
     "band_state": "present",
@@ -26106,7 +26106,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -27012,7 +27012,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:3",
+    "stable_row_key": "f30cc6df1a913438:3",
     "lane_condition": "E16.5",
     "condition": "E16.5",
     "band_state": "present",
@@ -27067,7 +27067,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -27973,7 +27973,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:4",
+    "stable_row_key": "f30cc6df1a913438:4",
     "lane_condition": "E17.5",
     "condition": "E17.5",
     "band_state": "present",
@@ -28028,7 +28028,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -28934,7 +28934,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:5",
+    "stable_row_key": "f30cc6df1a913438:5",
     "lane_condition": "E18.5",
     "condition": "E18.5",
     "band_state": "present",
@@ -28989,7 +28989,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "4480641cb790e72e",
+      "record_id": "f30cc6df1a913438",
       "paper": {
         "pmid": {
           "value": null,
@@ -29895,7 +29895,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "4480641cb790e72e:6",
+    "stable_row_key": "f30cc6df1a913438:6",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -29950,7 +29950,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -30856,7 +30856,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:1",
+    "stable_row_key": "7c813a2e46d310cf:1",
     "lane_condition": "E14.5",
     "condition": "E14.5",
     "band_state": "present",
@@ -30911,7 +30911,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -31817,7 +31817,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:2",
+    "stable_row_key": "7c813a2e46d310cf:2",
     "lane_condition": "E15.5",
     "condition": "E15.5",
     "band_state": "present",
@@ -31872,7 +31872,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -32778,7 +32778,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:3",
+    "stable_row_key": "7c813a2e46d310cf:3",
     "lane_condition": "E16.5",
     "condition": "E16.5",
     "band_state": "present",
@@ -32833,7 +32833,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -33739,7 +33739,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:4",
+    "stable_row_key": "7c813a2e46d310cf:4",
     "lane_condition": "E17.5",
     "condition": "E17.5",
     "band_state": "present",
@@ -33794,7 +33794,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -34700,7 +34700,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:5",
+    "stable_row_key": "7c813a2e46d310cf:5",
     "lane_condition": "E18.5",
     "condition": "E18.5",
     "band_state": "present",
@@ -34755,7 +34755,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "e0698d53b133d51a",
+      "record_id": "7c813a2e46d310cf",
       "paper": {
         "pmid": {
           "value": null,
@@ -35661,7 +35661,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "e0698d53b133d51a:6",
+    "stable_row_key": "7c813a2e46d310cf:6",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -35716,7 +35716,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -36761,7 +36761,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:1",
+    "stable_row_key": "df0abbc2ed59b527:1",
     "lane_condition": "P28F",
     "condition": "P28F",
     "band_state": "present",
@@ -36816,7 +36816,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -37861,7 +37861,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:2",
+    "stable_row_key": "df0abbc2ed59b527:2",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -37916,7 +37916,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -38961,7 +38961,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:3",
+    "stable_row_key": "df0abbc2ed59b527:3",
     "lane_condition": "P56F",
     "condition": "P56F",
     "band_state": "present",
@@ -39016,7 +39016,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -40061,7 +40061,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:4",
+    "stable_row_key": "df0abbc2ed59b527:4",
     "lane_condition": "P56M",
     "condition": "P56M",
     "band_state": "uncertain",
@@ -40116,7 +40116,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -41161,7 +41161,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:5",
+    "stable_row_key": "df0abbc2ed59b527:5",
     "lane_condition": "P84F",
     "condition": "P84F",
     "band_state": "uncertain",
@@ -41216,7 +41216,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -42261,7 +42261,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:6",
+    "stable_row_key": "df0abbc2ed59b527:6",
     "lane_condition": "P84M",
     "condition": "P84M",
     "band_state": "uncertain",
@@ -42316,7 +42316,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -43361,7 +43361,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:7",
+    "stable_row_key": "df0abbc2ed59b527:7",
     "lane_condition": "P112F",
     "condition": "P112F",
     "band_state": "present",
@@ -43416,7 +43416,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "5d86e01f7fc49aa3",
+      "record_id": "df0abbc2ed59b527",
       "paper": {
         "pmid": {
           "value": null,
@@ -44461,7 +44461,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "5d86e01f7fc49aa3:8",
+    "stable_row_key": "df0abbc2ed59b527:8",
     "lane_condition": "P112M",
     "condition": "P112M",
     "band_state": "absent",
@@ -44516,7 +44516,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -45582,7 +45582,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:1",
+    "stable_row_key": "a0a3f225a1cc2193:1",
     "lane_condition": "P28F",
     "condition": "P28F",
     "band_state": "present",
@@ -45637,7 +45637,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -46703,7 +46703,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:2",
+    "stable_row_key": "a0a3f225a1cc2193:2",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -46758,7 +46758,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -47824,7 +47824,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:3",
+    "stable_row_key": "a0a3f225a1cc2193:3",
     "lane_condition": "P56F",
     "condition": "P56F",
     "band_state": "present",
@@ -47879,7 +47879,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -48945,7 +48945,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:4",
+    "stable_row_key": "a0a3f225a1cc2193:4",
     "lane_condition": "P56M",
     "condition": "P56M",
     "band_state": "uncertain",
@@ -49000,7 +49000,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -50066,7 +50066,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:5",
+    "stable_row_key": "a0a3f225a1cc2193:5",
     "lane_condition": "P84F",
     "condition": "P84F",
     "band_state": "present",
@@ -50121,7 +50121,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -51187,7 +51187,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:6",
+    "stable_row_key": "a0a3f225a1cc2193:6",
     "lane_condition": "P84M",
     "condition": "P84M",
     "band_state": "uncertain",
@@ -51242,7 +51242,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -52308,7 +52308,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:7",
+    "stable_row_key": "a0a3f225a1cc2193:7",
     "lane_condition": "P112F",
     "condition": "P112F",
     "band_state": "present",
@@ -52363,7 +52363,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "967e400f56b29a25",
+      "record_id": "a0a3f225a1cc2193",
       "paper": {
         "pmid": {
           "value": null,
@@ -53429,7 +53429,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "967e400f56b29a25:8",
+    "stable_row_key": "a0a3f225a1cc2193:8",
     "lane_condition": "P112M",
     "condition": "P112M",
     "band_state": "uncertain",
@@ -53484,7 +53484,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -54550,7 +54550,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:1",
+    "stable_row_key": "4ac782c486ce298f:1",
     "lane_condition": "P28F",
     "condition": "P28F",
     "band_state": "present",
@@ -54605,7 +54605,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -55671,7 +55671,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:2",
+    "stable_row_key": "4ac782c486ce298f:2",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -55726,7 +55726,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -56792,7 +56792,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:3",
+    "stable_row_key": "4ac782c486ce298f:3",
     "lane_condition": "P56F",
     "condition": "P56F",
     "band_state": "present",
@@ -56847,7 +56847,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -57913,7 +57913,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:4",
+    "stable_row_key": "4ac782c486ce298f:4",
     "lane_condition": "P56M",
     "condition": "P56M",
     "band_state": "present",
@@ -57968,7 +57968,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -59034,7 +59034,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:5",
+    "stable_row_key": "4ac782c486ce298f:5",
     "lane_condition": "P84F",
     "condition": "P84F",
     "band_state": "present",
@@ -59089,7 +59089,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -60155,7 +60155,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:6",
+    "stable_row_key": "4ac782c486ce298f:6",
     "lane_condition": "P84M",
     "condition": "P84M",
     "band_state": "present",
@@ -60210,7 +60210,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -61276,7 +61276,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:7",
+    "stable_row_key": "4ac782c486ce298f:7",
     "lane_condition": "P112F",
     "condition": "P112F",
     "band_state": "present",
@@ -61331,7 +61331,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "c4eb3ecdd59bbf1c",
+      "record_id": "4ac782c486ce298f",
       "paper": {
         "pmid": {
           "value": null,
@@ -62397,7 +62397,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "c4eb3ecdd59bbf1c:8",
+    "stable_row_key": "4ac782c486ce298f:8",
     "lane_condition": "P112M",
     "condition": "P112M",
     "band_state": "present",
@@ -62452,7 +62452,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -63518,7 +63518,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:1",
+    "stable_row_key": "fd78a874572e448c:1",
     "lane_condition": "P28F",
     "condition": "P28F",
     "band_state": "present",
@@ -63573,7 +63573,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -64639,7 +64639,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:2",
+    "stable_row_key": "fd78a874572e448c:2",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -64694,7 +64694,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -65760,7 +65760,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:3",
+    "stable_row_key": "fd78a874572e448c:3",
     "lane_condition": "P56F",
     "condition": "P56F",
     "band_state": "present",
@@ -65815,7 +65815,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -66881,7 +66881,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:4",
+    "stable_row_key": "fd78a874572e448c:4",
     "lane_condition": "P56M",
     "condition": "P56M",
     "band_state": "present",
@@ -66936,7 +66936,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -68002,7 +68002,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:5",
+    "stable_row_key": "fd78a874572e448c:5",
     "lane_condition": "P84F",
     "condition": "P84F",
     "band_state": "present",
@@ -68057,7 +68057,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -69123,7 +69123,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:6",
+    "stable_row_key": "fd78a874572e448c:6",
     "lane_condition": "P84M",
     "condition": "P84M",
     "band_state": "present",
@@ -69178,7 +69178,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -70244,7 +70244,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:7",
+    "stable_row_key": "fd78a874572e448c:7",
     "lane_condition": "P112F",
     "condition": "P112F",
     "band_state": "present",
@@ -70299,7 +70299,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "0ef3503d7b3d42d6",
+      "record_id": "fd78a874572e448c",
       "paper": {
         "pmid": {
           "value": null,
@@ -71365,7 +71365,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "0ef3503d7b3d42d6:8",
+    "stable_row_key": "fd78a874572e448c:8",
     "lane_condition": "P112M",
     "condition": "P112M",
     "band_state": "present",
@@ -71420,7 +71420,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "6b0f573910170184",
+      "record_id": "dd7e5b14331023d2",
       "paper": {
         "pmid": {
           "value": null,
@@ -72225,7 +72225,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "6b0f573910170184:1",
+    "stable_row_key": "dd7e5b14331023d2:1",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -72280,7 +72280,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "6b0f573910170184",
+      "record_id": "dd7e5b14331023d2",
       "paper": {
         "pmid": {
           "value": null,
@@ -73085,7 +73085,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "6b0f573910170184:2",
+    "stable_row_key": "dd7e5b14331023d2:2",
     "lane_condition": "P7",
     "condition": "P7",
     "band_state": "present",
@@ -73140,7 +73140,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "6b0f573910170184",
+      "record_id": "dd7e5b14331023d2",
       "paper": {
         "pmid": {
           "value": null,
@@ -73945,7 +73945,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "6b0f573910170184:3",
+    "stable_row_key": "dd7e5b14331023d2:3",
     "lane_condition": "P14",
     "condition": "P14",
     "band_state": "present",
@@ -74000,7 +74000,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "6b0f573910170184",
+      "record_id": "dd7e5b14331023d2",
       "paper": {
         "pmid": {
           "value": null,
@@ -74805,7 +74805,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "6b0f573910170184:4",
+    "stable_row_key": "dd7e5b14331023d2:4",
     "lane_condition": "P25F",
     "condition": "P25F",
     "band_state": "present",
@@ -74860,7 +74860,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "6b0f573910170184",
+      "record_id": "dd7e5b14331023d2",
       "paper": {
         "pmid": {
           "value": null,
@@ -75665,7 +75665,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "6b0f573910170184:5",
+    "stable_row_key": "dd7e5b14331023d2:5",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -75720,7 +75720,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9ee8eb1d662c86fa",
+      "record_id": "c77117251f0e4ed5",
       "paper": {
         "pmid": {
           "value": null,
@@ -76546,7 +76546,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9ee8eb1d662c86fa:1",
+    "stable_row_key": "c77117251f0e4ed5:1",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -76601,7 +76601,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9ee8eb1d662c86fa",
+      "record_id": "c77117251f0e4ed5",
       "paper": {
         "pmid": {
           "value": null,
@@ -77427,7 +77427,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9ee8eb1d662c86fa:2",
+    "stable_row_key": "c77117251f0e4ed5:2",
     "lane_condition": "P7",
     "condition": "P7",
     "band_state": "present",
@@ -77482,7 +77482,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9ee8eb1d662c86fa",
+      "record_id": "c77117251f0e4ed5",
       "paper": {
         "pmid": {
           "value": null,
@@ -78308,7 +78308,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9ee8eb1d662c86fa:3",
+    "stable_row_key": "c77117251f0e4ed5:3",
     "lane_condition": "P14",
     "condition": "P14",
     "band_state": "present",
@@ -78363,7 +78363,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9ee8eb1d662c86fa",
+      "record_id": "c77117251f0e4ed5",
       "paper": {
         "pmid": {
           "value": null,
@@ -79189,7 +79189,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9ee8eb1d662c86fa:4",
+    "stable_row_key": "c77117251f0e4ed5:4",
     "lane_condition": "P25F",
     "condition": "P25F",
     "band_state": "present",
@@ -79244,7 +79244,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9ee8eb1d662c86fa",
+      "record_id": "c77117251f0e4ed5",
       "paper": {
         "pmid": {
           "value": null,
@@ -80070,7 +80070,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9ee8eb1d662c86fa:5",
+    "stable_row_key": "c77117251f0e4ed5:5",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -80125,7 +80125,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "7f240aba468a16d2",
+      "record_id": "34bf3b350cf73377",
       "paper": {
         "pmid": {
           "value": null,
@@ -80951,7 +80951,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "7f240aba468a16d2:1",
+    "stable_row_key": "34bf3b350cf73377:1",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -81006,7 +81006,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "7f240aba468a16d2",
+      "record_id": "34bf3b350cf73377",
       "paper": {
         "pmid": {
           "value": null,
@@ -81832,7 +81832,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "7f240aba468a16d2:2",
+    "stable_row_key": "34bf3b350cf73377:2",
     "lane_condition": "P7",
     "condition": "P7",
     "band_state": "present",
@@ -81887,7 +81887,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "7f240aba468a16d2",
+      "record_id": "34bf3b350cf73377",
       "paper": {
         "pmid": {
           "value": null,
@@ -82713,7 +82713,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "7f240aba468a16d2:3",
+    "stable_row_key": "34bf3b350cf73377:3",
     "lane_condition": "P14",
     "condition": "P14",
     "band_state": "present",
@@ -82768,7 +82768,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "7f240aba468a16d2",
+      "record_id": "34bf3b350cf73377",
       "paper": {
         "pmid": {
           "value": null,
@@ -83594,7 +83594,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "7f240aba468a16d2:4",
+    "stable_row_key": "34bf3b350cf73377:4",
     "lane_condition": "P25F",
     "condition": "P25F",
     "band_state": "present",
@@ -83649,7 +83649,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "7f240aba468a16d2",
+      "record_id": "34bf3b350cf73377",
       "paper": {
         "pmid": {
           "value": null,
@@ -84475,7 +84475,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "7f240aba468a16d2:5",
+    "stable_row_key": "34bf3b350cf73377:5",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -84530,7 +84530,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "915ffcff75d92c03",
+      "record_id": "981fcc451c18ff26",
       "paper": {
         "pmid": {
           "value": null,
@@ -85356,7 +85356,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "915ffcff75d92c03:1",
+    "stable_row_key": "981fcc451c18ff26:1",
     "lane_condition": "P0",
     "condition": "P0",
     "band_state": "present",
@@ -85411,7 +85411,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "915ffcff75d92c03",
+      "record_id": "981fcc451c18ff26",
       "paper": {
         "pmid": {
           "value": null,
@@ -86237,7 +86237,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "915ffcff75d92c03:2",
+    "stable_row_key": "981fcc451c18ff26:2",
     "lane_condition": "P7",
     "condition": "P7",
     "band_state": "present",
@@ -86292,7 +86292,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "915ffcff75d92c03",
+      "record_id": "981fcc451c18ff26",
       "paper": {
         "pmid": {
           "value": null,
@@ -87118,7 +87118,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "915ffcff75d92c03:3",
+    "stable_row_key": "981fcc451c18ff26:3",
     "lane_condition": "P14",
     "condition": "P14",
     "band_state": "present",
@@ -87173,7 +87173,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "915ffcff75d92c03",
+      "record_id": "981fcc451c18ff26",
       "paper": {
         "pmid": {
           "value": null,
@@ -87999,7 +87999,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "915ffcff75d92c03:4",
+    "stable_row_key": "981fcc451c18ff26:4",
     "lane_condition": "P25F",
     "condition": "P25F",
     "band_state": "present",
@@ -88054,7 +88054,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "915ffcff75d92c03",
+      "record_id": "981fcc451c18ff26",
       "paper": {
         "pmid": {
           "value": null,
@@ -88880,7 +88880,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "915ffcff75d92c03:5",
+    "stable_row_key": "981fcc451c18ff26:5",
     "lane_condition": "P28M",
     "condition": "P28M",
     "band_state": "present",
@@ -88935,7 +88935,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -89980,7 +89980,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:1",
+    "stable_row_key": "1b326596b61eedad:1",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -90035,7 +90035,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -91080,7 +91080,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:2",
+    "stable_row_key": "1b326596b61eedad:2",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -91135,7 +91135,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -92180,7 +92180,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:3",
+    "stable_row_key": "1b326596b61eedad:3",
     "lane_condition": "DL7d Ctrl",
     "condition": "DL7d Ctrl",
     "band_state": "present",
@@ -92235,7 +92235,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -93280,7 +93280,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:4",
+    "stable_row_key": "1b326596b61eedad:4",
     "lane_condition": "DL7d",
     "condition": "DL7d",
     "band_state": "present",
@@ -93335,7 +93335,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -94380,7 +94380,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:5",
+    "stable_row_key": "1b326596b61eedad:5",
     "lane_condition": "DL14d Ctrl",
     "condition": "DL14d Ctrl",
     "band_state": "present",
@@ -94435,7 +94435,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -95480,7 +95480,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:6",
+    "stable_row_key": "1b326596b61eedad:6",
     "lane_condition": "DL14d",
     "condition": "DL14d",
     "band_state": "present",
@@ -95535,7 +95535,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -96580,7 +96580,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:7",
+    "stable_row_key": "1b326596b61eedad:7",
     "lane_condition": "DL28d Ctrl",
     "condition": "DL28d Ctrl",
     "band_state": "present",
@@ -96635,7 +96635,7 @@
     "expected_molecular_weight_kda": null,
     "molecular_weight_source": null,
     "provenance": {
-      "record_id": "07d5b47568eb980f",
+      "record_id": "1b326596b61eedad",
       "paper": {
         "pmid": {
           "value": null,
@@ -97680,7 +97680,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "07d5b47568eb980f:8",
+    "stable_row_key": "1b326596b61eedad:8",
     "lane_condition": "DL28d",
     "condition": "DL28d",
     "band_state": "present",
@@ -97735,7 +97735,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -98801,7 +98801,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:1",
+    "stable_row_key": "ffc882eb92094bea:1",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -98856,7 +98856,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -99922,7 +99922,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:2",
+    "stable_row_key": "ffc882eb92094bea:2",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -99977,7 +99977,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -101043,7 +101043,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:3",
+    "stable_row_key": "ffc882eb92094bea:3",
     "lane_condition": "DL7d Ctrl",
     "condition": "DL7d Ctrl",
     "band_state": "present",
@@ -101098,7 +101098,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -102164,7 +102164,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:4",
+    "stable_row_key": "ffc882eb92094bea:4",
     "lane_condition": "DL7d",
     "condition": "DL7d",
     "band_state": "present",
@@ -102219,7 +102219,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -103285,7 +103285,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:5",
+    "stable_row_key": "ffc882eb92094bea:5",
     "lane_condition": "DL14d Ctrl",
     "condition": "DL14d Ctrl",
     "band_state": "present",
@@ -103340,7 +103340,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -104406,7 +104406,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:6",
+    "stable_row_key": "ffc882eb92094bea:6",
     "lane_condition": "DL14d",
     "condition": "DL14d",
     "band_state": "present",
@@ -104461,7 +104461,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -105527,7 +105527,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:7",
+    "stable_row_key": "ffc882eb92094bea:7",
     "lane_condition": "DL28d Ctrl",
     "condition": "DL28d Ctrl",
     "band_state": "present",
@@ -105582,7 +105582,7 @@
     "expected_molecular_weight_kda": 50.2,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "9b126196e219f6e7",
+      "record_id": "ffc882eb92094bea",
       "paper": {
         "pmid": {
           "value": null,
@@ -106648,7 +106648,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "9b126196e219f6e7:8",
+    "stable_row_key": "ffc882eb92094bea:8",
     "lane_condition": "DL28d",
     "condition": "DL28d",
     "band_state": "present",
@@ -106703,7 +106703,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -107769,7 +107769,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:1",
+    "stable_row_key": "5890db9fe8e25f3f:1",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -107824,7 +107824,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -108890,7 +108890,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:2",
+    "stable_row_key": "5890db9fe8e25f3f:2",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -108945,7 +108945,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -110011,7 +110011,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:3",
+    "stable_row_key": "5890db9fe8e25f3f:3",
     "lane_condition": "DL7d Ctrl",
     "condition": "DL7d Ctrl",
     "band_state": "present",
@@ -110066,7 +110066,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -111132,7 +111132,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:4",
+    "stable_row_key": "5890db9fe8e25f3f:4",
     "lane_condition": "DL7d",
     "condition": "DL7d",
     "band_state": "present",
@@ -111187,7 +111187,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -112253,7 +112253,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:5",
+    "stable_row_key": "5890db9fe8e25f3f:5",
     "lane_condition": "DL14d Ctrl",
     "condition": "DL14d Ctrl",
     "band_state": "present",
@@ -112308,7 +112308,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -113374,7 +113374,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:6",
+    "stable_row_key": "5890db9fe8e25f3f:6",
     "lane_condition": "DL14d",
     "condition": "DL14d",
     "band_state": "present",
@@ -113429,7 +113429,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -114495,7 +114495,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:7",
+    "stable_row_key": "5890db9fe8e25f3f:7",
     "lane_condition": "DL28d Ctrl",
     "condition": "DL28d Ctrl",
     "band_state": "present",
@@ -114550,7 +114550,7 @@
     "expected_molecular_weight_kda": 35.8,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "45a3557569c7a1e2",
+      "record_id": "5890db9fe8e25f3f",
       "paper": {
         "pmid": {
           "value": null,
@@ -115616,7 +115616,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "45a3557569c7a1e2:8",
+    "stable_row_key": "5890db9fe8e25f3f:8",
     "lane_condition": "DL28d",
     "condition": "DL28d",
     "band_state": "present",
@@ -115671,7 +115671,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -116737,7 +116737,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:1",
+    "stable_row_key": "ff43ff531cfe2318:1",
     "lane_condition": "L7d Ctrl",
     "condition": "L7d Ctrl",
     "band_state": "present",
@@ -116792,7 +116792,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -117858,7 +117858,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:2",
+    "stable_row_key": "ff43ff531cfe2318:2",
     "lane_condition": "L7d",
     "condition": "L7d",
     "band_state": "present",
@@ -117913,7 +117913,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -118979,7 +118979,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:3",
+    "stable_row_key": "ff43ff531cfe2318:3",
     "lane_condition": "DL7d Ctrl",
     "condition": "DL7d Ctrl",
     "band_state": "present",
@@ -119034,7 +119034,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -120100,7 +120100,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:4",
+    "stable_row_key": "ff43ff531cfe2318:4",
     "lane_condition": "DL7d",
     "condition": "DL7d",
     "band_state": "present",
@@ -120155,7 +120155,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -121221,7 +121221,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:5",
+    "stable_row_key": "ff43ff531cfe2318:5",
     "lane_condition": "DL14d Ctrl",
     "condition": "DL14d Ctrl",
     "band_state": "present",
@@ -121276,7 +121276,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -122342,7 +122342,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:6",
+    "stable_row_key": "ff43ff531cfe2318:6",
     "lane_condition": "DL14d",
     "condition": "DL14d",
     "band_state": "present",
@@ -122397,7 +122397,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -123463,7 +123463,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:7",
+    "stable_row_key": "ff43ff531cfe2318:7",
     "lane_condition": "DL28d Ctrl",
     "condition": "DL28d Ctrl",
     "band_state": "present",
@@ -123518,7 +123518,7 @@
     "expected_molecular_weight_kda": 41.7,
     "molecular_weight_source": "uniprot_reference",
     "provenance": {
-      "record_id": "1492ea1f84d9b568",
+      "record_id": "ff43ff531cfe2318",
       "paper": {
         "pmid": {
           "value": null,
@@ -124584,7 +124584,7 @@
     "extraction_stage": "deterministic+llm",
     "extraction_model": "claude-opus-4.8 (agent-in-the-loop)",
     "extraction_version": "0.3.0",
-    "stable_row_key": "1492ea1f84d9b568:8",
+    "stable_row_key": "ff43ff531cfe2318:8",
     "lane_condition": "DL28d",
     "condition": "DL28d",
     "band_state": "present",
