@@ -6,6 +6,80 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-18 (session 14)** — Claude Code (Opus 5). **P0 IDENTITY FIX + FULL
+  HOSTED BETA LIVE.** **Web https://hiveblot-beta.vercel.app · API
+  https://hiveblot-api.onrender.com · DB Supabase `zafombwswztvnjikcsdm`.**
+  Old QIB untouched (never linked, queried or seeded).
+  **ROOT CAUSE.** `_record_id` hashed paper + figure/panel + crop + raw target
+  + treatment context but **omitted the biological system**. Crop
+  `page_004_cand_0025.png` (PMC12706926) prints **H1792 and A549 side by
+  side**, so P62/LC3B/ACTB each collapsed two distinct experiments into one id
+  — 12 duplicate keys / 24 of 475 rows; feedback on the H1792 arm could
+  rehydrate onto the A549 arm. Diffed every collision field-by-field: **all 3
+  groups differed ONLY by `cell_line`/`sample` — one class, one cause.**
+  The deeper flaw: **two disagreeing notions of "one experiment"** — search
+  grouping had its own composite key.
+  **NEW STABLE IDENTITY.** `stable_row_key = <experiment hash>:<lane_index>`;
+  hash = sha1(paper doi/pmcid/pmid | figure_label | panel_label | crop filename
+  | raw_target | treatment_context | **normalized sample**)[:16], via new
+  `record_builder.identity_sample()` (same `sample or cell_line` precedence as
+  `_sample_info`; case/whitespace-folded — deliberately NOT applied to target
+  labels, where case is semantic: uppercase `P-` is not a phospho marker).
+  **Only OBSERVATION data feeds it** — reconciliation outputs
+  (modification/experiment_type/ip_bait/protein_status/confidence/needs_review),
+  DB serials and display text are excluded and each is pinned by a test, so
+  engine improvements can never orphan stored corrections. Lane identity stays
+  the reviewed panel's **index**, not its printed condition (immune to the
+  display-only lane formatter). **Search grouping now reads that same hash**
+  (`stable_row_key` added to the list schema `WesternBlotRecord`), so the card
+  boundary and the feedback boundary are one thing.
+  **SECOND COLLISION CLASS FOUND (same flaw, opposite direction).** The old
+  grouping key carried no treatment context, so on crop `page_005_cand_0034` —
+  which holds **two** experiments — it concatenated the 6-lane **Fig 3C (no
+  IL-6)** strip and the 7-lane **Fig 3D (with IL-6)** strip into ONE 13-lane
+  card for T-Stat3 and β-actin. That is exactly session 7's C1 conflation,
+  still live in the UI. **Experiment count 91 → 93 is a CORRECTION, not
+  drift**: it splits 2 cards that should never have been one; no flagship query
+  changes its card count. Verified in the hosted UI (T-Stat3 now renders 6-lane
+  and 7-lane cards with their own Fig 3C / Fig 3D identity lines).
+  **UNIQUENESS PROOF.** Artifacts regenerated through the REAL pipeline (not
+  patched); diffing each regenerated file against its committed version shows
+  **every biological field, provenance envelope and validation flag
+  byte-identical, `record_id` the only change**. Corpus + remote DB both:
+  **475 rows / 3 papers / 475 distinct `stable_row_key` / 0 duplicate groups /
+  93 experiment hashes / 0 null provenance / 21 crop refs valid / 0 legacy QIB
+  rows.**
+  **FEEDBACK ISOLATION PROOF (real, against cloud).** A = P62/H1792
+  (`d95fb4cda43a320f:1`), B = P62/A549 (`8ee3bb5a3555e3cd:1`) — same crop, same
+  target, formerly ONE id. Feedback → A: appears on A, **absent on B**. Then a
+  full reseed regenerated serials (A 594→1069, B 610→1085): A's feedback
+  **rehydrated by stable key onto the new id**, B still clean. Repeated
+  end-to-end through the hosted stack. All smoke rows deleted;
+  `hiveblot_feedback` back to **0 rows**.
+  **DEPLOY.** Render `hiveblot-api` (`srv-da1rbvs9v7es738635ug`), **plan free**,
+  Docker, repo `nikhilesh-s/hive`, branch `feature/bio-context-beta`,
+  `autoDeploy: false`; deployed commit `bc923bb` → status **live**, `/health`
+  200 (~0.15 s warm), and the deployed revision proven new (list rows now carry
+  `stable_row_key`). Vercel `hiveblot-beta` production re-pointed to the Render
+  origin and redeployed; `ALLOWED_ORIGINS` is the Vercel origin only (never
+  `*`). Seeding again used a temporary `hive_seed` role, revoked + DROPped
+  after (only `hive_readonly` / `hive_feedback` remain).
+  **HOSTED VERIFICATION (all through the public frontend):** `/` and `/search`
+  200; `phospho STAT3 Tyr705` 18 rows/3 cards (88.1 expected, reported null —
+  distinct; CST 9145), `co-IP PIK3CA` 14/4 with **IP BAIT = PIK3CA** and
+  Input/IgG/IP lanes, `CST 9145` 18/3, `P-ERK` 10/2 **Conflicting** with the
+  "Why unresolved" sentence and both competing claims and no winner,
+  `GAPDH mouse` 31/5 mouse loading-control, `needs review` 20/4,
+  `BRCA1 MCF7 olaparib` **0** with scoped copy. Crops served as real PNGs over
+  the hosted proxy (442,670 B and 247,631 B, PNG signature verified).
+  **15 hosted browser assets scanned: no DSN, no DB user/password, no pooler
+  host, no INTERNAL_API_KEY, no Supabase key/JWT, no `NEXT_PUBLIC_*`.**
+  Tests: biology **165/165**, reconcile 21/21, loader ok, extract 10/10,
+  pipeline 11/11, **stable-row-key 34/34 (NEW suite)**, benchmark 34/34,
+  harness 3/3 papers EXACT, api **113/113**, `tsc` clean.
+  **Model automation remains future work — the 3/3 EXACT harness is a
+  self-consistency check on the reviewed reference set and says NOTHING about
+  extraction accuracy on an unseen paper.**
 - **2026-08-17 (session 13)** — Claude Code (Opus 5). **ZERO-COST STACK: WEB
   DEPLOYED, API ONE LOGIN AWAY.** Stack is now **Supabase Free + Render Free
   Web Service + Vercel Free**. **Railway is dropped** as the recommended API
@@ -631,33 +705,29 @@ migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 
 ~~Deploy the web app~~ — **DONE (session 13)**: https://hiveblot-beta.vercel.app
 
-**NEXT — exact task: create the Render free Web Service, then re-point Vercel.**
+~~Create the Render service, re-point Vercel~~ — **DONE (session 14)**.
+~~Fix the duplicate `stable_row_key`~~ — **DONE (session 14)**, 475/475 distinct.
 
-1. **USER ACTION (the only blocker):** in the Render dashboard — **New →
-   Blueprint** → authorize GitHub → repo **`nikhilesh-s/hive`** → branch
-   **`feature/bio-context-beta`** → Render reads `render.yaml` and proposes
-   `hiveblot-api` on the **Free** plan (do not change it) → paste the four
-   secrets it asks for (`DB_READONLY_URL`, `DB_FEEDBACK_URL`, `SUPABASE_KEY`,
-   `INTERNAL_API_KEY`) from the untracked `api/.env.cloud` → **Apply**.
-   Alternative: `render login` in a terminal, then the agent can drive the CLI.
-2. Agent: take the `https://<service>.onrender.com` host and
-   ```bash
-   cd web && vercel env rm API_BASE_URL production --yes \
-     && printf '%s' 'https://<service>.onrender.com' | vercel env add API_BASE_URL production \
-     && vercel deploy --prod --yes
-   ```
-   (repeat for preview/development), then fix `ALLOWED_ORIGINS` on Render if
-   the Vercel origin ever changes.
-3. Agent: run the hosted verification — `/health`, `phospho STAT3 Tyr705`,
-   `co-IP PIK3CA`, crop PNG, feedback submit + rehydrate, zero-result query,
-   and a browser-asset secret scan.
-4. Fill the API URL into `research/TEAM_BETA_HANDOFF.md` and send it out.
-5. **Fix the duplicate `stable_row_key`** — add cell line to `_record_id`, then
-   re-review and reseed. 24 of 475 rows. Live in the hosted beta today.
-6. Model creds → the staged automated-extraction evaluation (harness already
-   scores EXACT / ACCEPTABLE / PARTIAL / WRONG / MISSING / HALLUCINATED;
-   protocol in `research/automated_extraction_eval_protocol.md`). **Model
-   automation remains future work — no accuracy claim is possible yet.**
+**The hosted internal beta is READY to distribute.**
+Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
+
+**NEXT, in order:**
+1. Distribute to the team / UCSF reviewers and collect feedback. Warn them
+   about the free-tier cold start (~30–60 s on the first request after ~15 min
+   idle) so it is not reported as a bug.
+2. Watch `hiveblot_feedback` fill up. It starts at **0 rows** — every row from
+   here is real researcher signal. Corrections are stored BESIDE the
+   extraction and are never auto-applied.
+3. **Model credentials** (Bedrock `AWS_*` or `ANTHROPIC_API_KEY`) → run the
+   staged automated-extraction evaluation. Harness already scores EXACT /
+   ACCEPTABLE / PARTIAL / WRONG / MISSING / HALLUCINATED; protocol in
+   `research/automated_extraction_eval_protocol.md`. **Until that runs, no
+   claim about arbitrary-paper accuracy is defensible.**
+4. Independent scientific QA re-run against the corrected 93-experiment
+   grouping (the Fig 3C/3D split changes what two cards show).
+5. Consider making `image_crop_ref` relative to `CROP_BASE_DIR` — the
+   container currently reproduces the authoring absolute path. Cosmetic, but
+   it removes a surprising line from the Dockerfile.
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).
