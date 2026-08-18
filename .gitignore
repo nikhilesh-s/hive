@@ -22,6 +22,6 @@ research/papers/*.pdf
 # Embedded local Postgres for dev (scripts/local_db.py)
 .localdb/
 
-# Staged figure crops for the API container image (derived; scripts/stage_crops.py)
-api/crops/*
-!api/crops/.gitkeep
+# api/crops/ IS tracked on purpose: Render builds from the GitHub clone, so the
+# 21 referenced panel crops (~6 MB) must be in the repo for the deployed image
+# to serve figure evidence. Refresh with scripts/stage_crops.py.

@@ -10,14 +10,17 @@
 
 | | |
 |---|---|
-| **Web app** | _to be filled in when the frontend is deployed_ |
-| **API** | _to be filled in when the API is deployed_ |
+| **Web app** | **https://hiveblot-beta.vercel.app** |
+| **API** | `https://<service>.onrender.com` — created from `render.yaml`; the exact host is filled in once the service is live |
 | **Database** | Supabase project `zafombwswztvnjikcsdm` — schema applied, 475 reviewed rows loaded, verified |
 
-The database is live and fully verified. The two hosted URLs are pending one
-account login (see *Current status* at the bottom). Until they exist, HiveBlot
-runs locally against the same cloud database — ask Nikhilesh for the two-command
-bring-up.
+You only ever open the web app; it talks to the API for you.
+
+**The whole stack is free-tier**, which has one visible consequence worth
+knowing before you file a bug: **the API sleeps after about 15 minutes of
+inactivity, so the first search you run after a quiet spell can take 30–60
+seconds.** Everything after that is fast. A slow first search is the free plan
+waking up, not HiveBlot being broken.
 
 ---
 
@@ -195,6 +198,11 @@ roles, 475 rows, all seven flagship searches, record detail, figure crops,
 feedback submission and feedback rehydration were all tested end-to-end
 against the cloud database.
 
-The **hosted URLs are pending one account login** for the API host. Until then,
-testing runs locally against the same cloud database. Ask Nikhilesh, and see
-`DEPLOYMENT.md` for the exact steps.
+The **web app is deployed** at https://hiveblot-beta.vercel.app. The **API is
+the last step** — it deploys from the committed `render.yaml` onto a Render
+free Web Service, which needs one browser login. Searches will not return
+results until that is done; `DEPLOYMENT.md` §2 has the exact clicks.
+
+No model credentials exist yet, so nothing here says anything about how
+accurately HiveBlot reads a paper it has not been shown. That evaluation is
+the next scientific milestone and it has not run.
