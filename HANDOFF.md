@@ -6,6 +6,65 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-17 (session 12)** — Claude Code (Opus 5). **CLOUD DATABASE LIVE ON
+  THE CLEAN BETA PROJECT.** Deployment target is now Supabase
+  **`zafombwswztvnjikcsdm`** (`https://zafombwswztvnjikcsdm.supabase.co`,
+  us-east-1, PG 17.6). **The old QIB project `belalrbfrndxvdwvjxte` is NO
+  LONGER A DEPLOYMENT TARGET** — never link/push/seed to it (empty migration
+  history means a `db push` would ALTER Suhas's production tables).
+  **Migrations:** repo re-linked; project verified fresh (0 tables, 0
+  migrations, no hive roles); `db push --dry-run` showed exactly the canonical
+  4-migration chain, no seeds, no `roles.sql`; pre-flight proved all 57 seed
+  columns exist in the 73 migration columns; **push applied all 4, all recorded
+  in remote history**. **Remote schema verified:** `western_blot_records` 73
+  cols, `hiveblot_feedback` 16 cols, **`confidence` = `real`**, `stable_row_key`
+  TEXT on both tables, `pg_trgm` 1.6, **17 indexes** (incl. the GIN trigram on
+  `target`). **Security verified against `information_schema` + `pg_authid`:**
+  `hive_readonly` = SELECT only; `hive_feedback` = INSERT+SELECT on
+  `hiveblot_feedback` ONLY with **zero grants on `western_blot_records`** and
+  USAGE on only the feedback sequence; neither role is superuser/createrole/
+  createdb/bypassrls; both passwords set (SCRAM confirmed — note `pg_roles.
+  rolpassword` always reads non-null and proves nothing). Roles are created **by
+  the migrations**, not a `supabase/roles.sql`. Seeding needed INSERT, which
+  neither restricted role has by design, so a **temporary `hive_seed` role was
+  created, used, then revoked and DROPped** (verified: only the two designed
+  roles remain). **Seed: 475 rows / 3 papers / 91 experiment groups**, zero
+  dropped keys, 0 null `stable_row_key`, 0 null `provenance`, and **zero legacy
+  QIB data** (0 `p53` rows, 0 legacy paper_ids). **Cloud verification (local API
+  → cloud DB, all green):** `/health`; all 7 flagship searches — `phospho STAT3
+  Tyr705` 3 groups/18 lanes, `co-IP PIK3CA` 4 co-IP groups + IP BAIT=PIK3CA,
+  `CST 9145`, `GAPDH mouse` 5 groups with DEVELOPMENTAL SERIES on the E14.5/P0/
+  P28 panels and correctly **untagged** ligation panels, `needs review`,
+  `P-ERK` = MAPK1/MAPK3 **Conflicting** with both claims and no winner,
+  `BRCA1 MCF7 olaparib` 0 results with scoped copy; record detail; **crops
+  served (1153x909 PNG)**; feedback INSERT + rehydration (2 smoke rows render
+  as RESEARCHER FEEDBACK beside the fields); lane-specific durations and
+  "varies by lane: 0-60 min"; explicit-submit proven again (30 chars typed +
+  2.5 s → **zero** fetches); **21 browser assets scanned: no DSN, no
+  INTERNAL_API_KEY, no Supabase key, no `NEXT_PUBLIC_*`**.
+  **Deployment prep:** `api/Dockerfile` (+ `Dockerfile.dockerignore`) and
+  `scripts/stage_crops.py` (21 crops / 6.2 MB staged into `api/crops/`, so the
+  container serves crops with zero code and zero corpus change);
+  `DEPLOYMENT.md` rewritten for the new project incl. the **pooler-not-direct**
+  rule (`db.<ref>` is IPv6-only; use Supavisor **session mode 5432**, not
+  transaction 6543 which breaks asyncpg prepared statements).
+  `research/TEAM_BETA_HANDOFF.md` written.
+  **NOT DEPLOYED YET — one credential boundary:** Vercel CLI is authenticated
+  (`nikhilesh-s`) so web can ship, but no container host is logged in
+  (`railway login` needed; no Fly/Render CLI). Web alone is useless without the
+  API, so nothing was published.
+  **NEW KNOWN ISSUE (pre-existing, not caused by deployment): 12 duplicate
+  `stable_row_key` values across 24 of 475 rows.** The co-IP crop
+  `page_004_cand_0025.png` prints **H1792 and A549 side by side**; the search
+  grouping key includes `cell_line` (so the UI correctly shows 2 cards) but
+  `_record_id` does **not**, so P62/LC3B/ACTB collide across the two cell lines
+  and feedback on one rehydrates onto its twin. Session 9's "113/113 unique"
+  covered the phospho paper only. Fix = add cell line to `_record_id`; that
+  rehashes every `stable_row_key` and needs a reviewed reseed, so it is
+  deliberately NOT done here. Tests: biology **165/165**, reconcile 21/21,
+  loader ok, extract 10/10, pipeline 11/11, benchmark **34/34 (100%)**, harness
+  **100% EXACT** on all 3 papers, api **113/113** (incl. migration drift
+  guard), web `tsc` clean + production build clean.
 - **2026-08-17 (session 11)** — Claude Code (Opus 5). **BETA-TABLE INSPECTION +
   PLAN (READ-ONLY). Nothing altered, in QIB or anywhere.** Suhas created
   `western_blot_records_beta` and `blot_results_beta` inside the QIB production
@@ -522,75 +581,34 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 ~~Beta-table inspection + plan~~ — **DONE (session 11)**,
 `research/supabase_beta_table_plan.md`.
 
-**NEXT — exact task: wait for Srushti's separate HiveBlot Supabase project,
-then deploy the canonical migrations there unchanged.**
+~~Wait for Srushti's clean Supabase project~~ — **DONE (session 12)**: linked,
+migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 
-Nothing to build in the meantime. Specifically:
+**NEXT — exact task: host the API, then the web app.**
 
-0. **Do NOT adapt anything to `western_blot_records_beta` /
-   `blot_results_beta`.** Leave them empty and unused; tell Suhas the blocker
-   is cluster-level roles (`hive_readonly`, `hive_feedback`) and the
-   database-wide `pg_trgm` extension, not the tables he made. **Never point
-   `db push`, `seed_remote.py`, or any DDL at `belalrbfrndxvdwvjxte`.**
-1. When Srushti's project exists: `supabase link --project-ref <HIVEBLOT_REF>`
-   (re-link away from QIB), then `DEPLOYMENT.md` §1 **verbatim, unchanged** —
-   `supabase db push --dry-run` → `supabase db push` (4 migrations) → set the
-   `hive_readonly` / `hive_feedback` passwords → `seed_remote.py` (expect
-   **475 rows** via `--check`, and **zero** dropped keys) → the 8-step smoke
-   checklist (`DEPLOYMENT.md` §4). No code change, no SQL to write, no
-   `TABLE_NAME` override.
-2. If her project stalls and the beta is urgent: fall back to a **persistent**
-   `hive-beta` branch off QIB (session 10's plan, `--persistent`, **without
-   `--with-data`**) — not to Suhas's beta tables.
-2. Fill `api/.env`: `DB_READONLY_URL` + `DB_FEEDBACK_URL` (the two restricted
-   DSNs), `SUPABASE_URL`/`SUPABASE_KEY`, `ALLOWED_ORIGINS`; web host gets
-   `API_BASE_URL` + `INTERNAL_API_KEY`. Then run the 8-step smoke checklist
-   (DEPLOYMENT.md §4).
-3. Model creds when available (Bedrock `AWS_*` or `ANTHROPIC_API_KEY`) →
-   automated-extraction evaluation below.
-
-Then, in priority order:
-1. **USER ACTION — model backend creds** (Bedrock preferred, or Anthropic). Everything
-   is staged for a one-command evaluation. Bedrock:
+1. **USER ACTION (the only blocker):** log in to one container host, then tell
+   the agent. Recommended `railway login` (CLI already installed, free tier);
+   Fly.io or Render are equally fine. Everything after this is prepared:
    ```bash
-   export AWS_ACCESS_KEY_ID=… AWS_SECRET_ACCESS_KEY=… AWS_REGION=us-east-1
-   export WBM_LLM_BACKEND=bedrock            # optional: WBM_BEDROCK_MODEL / WBM_BEDROCK_ESCALATION_MODEL
-   WBM_EXTRACTION_MODE=records .venv/bin/python -m western_blot_miner.pipeline \
-       research/papers/phospho_PMC12856536.pdf --mode records --no-cache
-   .venv/bin/python eval/model_comparison/compare_records.py \
-       western_blot_miner/data/pdf_runs/10.3892_br.2026.2108/evidence_records.json \
-       eval/demo/phospho_PMC12856536/evidence_records.json
+   python scripts/stage_crops.py                    # 21 crops, 6.2 MB
+   docker build -f api/Dockerfile -t hiveblot-api . # context = repo root
    ```
-   Anthropic direct: `export ANTHROPIC_API_KEY=… WBM_LLM_BACKEND=anthropic` (same
-   pipeline + compare commands). Protocol: `research/automated_extraction_eval_protocol.md`.
-   Repeat for `standard_PMC9559174` (run dir `10.3892_ijmm.2022.5188`) and
-   `coip_PMC12706926` (`10.1186_s12964-025-02385-8`). boto3 + anthropic are installed.
-2. **USER ACTION — provision cloud Supabase** for the hosted beta: run
-   `api/db/schema.sql` + `migrations/001` + **`migrations/002_feedback.sql`**, set
-   `hive_readonly`/`hive_feedback` passwords, seed `eval/demo/*/supabase_rows.json`,
-   fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`/`DB_FEEDBACK_URL`.
-   Full steps: `DEPLOYMENT.md`.
-3. Independent scientific QA re-run (session-4 QA was a self-audit; session-6 skipped
-   the optional band-pattern review agent). Both former Major findings are now closed:
-   **M1 (session 5)**, **M2 (session 6)**.
-4. Figure-crop image serving (the evidence panel currently prints the crop filename
-   and says image serving is not enabled locally).
-
-Local dev bring-up (all one-time steps already done in this repo):
-```bash
-.venv/bin/python scripts/local_db.py up      # embedded Postgres + schema + migration
-.venv/bin/python scripts/local_db.py load eval/demo/*/supabase_rows.json
-cd api && .venv/bin/python -m uvicorn app.main:app --port 8000   # api/.venv
-cd web && npm run dev                                            # port 3000
-# search: phospho STAT3 Tyr705 · phospho AKT Ser473 · co-IP PIK3CA · CST 9145
-```
-
-Reproduce an agent-in-the-loop paper run:
-```bash
-PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py preprocess research/papers/<paper>.pdf
-# inspect panel_candidates/*.png, write observed rows (see eval/tools/build_responses_*.py), then:
-PYTHONPATH=. .venv/bin/python eval/tools/manual_pipeline.py run <out_dir> eval/demo/<paper>/responses_observed.json
-```
+   Then set the API env vars (names in `DEPLOYMENT.md` §2; values are already
+   generated in the untracked `api/.env.cloud`) and deploy.
+2. Deploy `web/` to Vercel (CLI already authenticated as `nikhilesh-s`), root
+   `web/`, with `API_BASE_URL` = the deployed API origin and the SAME
+   `INTERNAL_API_KEY`. **Never** prefix either with `NEXT_PUBLIC_`.
+3. Set `ALLOWED_ORIGINS` on the API to the deployed web origin, redeploy the
+   API, then run the 12-step hosted smoke checklist (`DEPLOYMENT.md` §4).
+4. Fill the two URLs into `research/TEAM_BETA_HANDOFF.md` and send it to the
+   team.
+5. **Fix the duplicate `stable_row_key`** (session-12 finding): add cell line to
+   `_record_id` so the H1792/A549 side-by-side crop stops collapsing P62, LC3B
+   and ACTB across cell lines, then re-review and reseed. 24 of 475 rows.
+6. Model creds when available → the staged automated-extraction evaluation
+   below (harness already scores EXACT / ACCEPTABLE / PARTIAL / WRONG /
+   MISSING / HALLUCINATED; protocol in
+   `research/automated_extraction_eval_protocol.md`).
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).
@@ -695,6 +713,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
   would advance production's id counter), and is RLS enabled on the beta
   tables? Neither blocks the recommendation — we are not using those tables.
 - Which Bedrock model + region are provisioned (model access approved)?
+- Should `image_crop_ref` become RELATIVE to `CROP_BASE_DIR`? The container
+  currently reproduces the authoring absolute path to serve crops without
+  touching the reviewed corpus (session 12). Relative refs are cleaner but
+  rewrite every seeded row.
 - Idempotency key `(paper_id, page, figure_label, target, condition)` — keep, or extend with
   modification/lane once Evidence Records flow in? (Affects dedupe on re-ingest.)
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
