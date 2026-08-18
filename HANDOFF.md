@@ -6,6 +6,51 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-17 (session 13)** — Claude Code (Opus 5). **ZERO-COST STACK: WEB
+  DEPLOYED, API ONE LOGIN AWAY.** Stack is now **Supabase Free + Render Free
+  Web Service + Vercel Free**. **Railway is dropped** as the recommended API
+  host (kept as a one-line alternative only).
+  **WEB IS LIVE: https://hiveblot-beta.vercel.app** — Vercel project
+  `hiveblot-beta` (org `nikhilesh-suravarjjalas-projects`), Hobby/free,
+  production deploy Ready, HTTP 200 publicly. `API_BASE_URL` +
+  `INTERNAL_API_KEY` set on Production/Preview/Development; **neither is
+  `NEXT_PUBLIC_*`**. `API_BASE_URL` currently holds a PLACEHOLDER
+  (`https://hiveblot-api.onrender.com`) and **must be re-set + redeployed**
+  once the real Render host exists — Vercel does not hot-swap env values into
+  an existing build.
+  **API NOT DEPLOYED — the one blocker is a Render browser login.** Render CLI
+  v2.23.0 installed (`brew install render`) but unauthenticated (no
+  `~/.render`), so the canonical path is the dashboard Blueprint. Added
+  **`render.yaml`** (committed): one web service `hiveblot-api`, `runtime:
+  docker`, **`plan: free`**, `dockerfilePath: ./api/Dockerfile`,
+  `dockerContext: .`, `healthCheckPath: /health`, `autoDeploy: false`, branch
+  `feature/bio-context-beta`; the 4 secrets are `sync: false` (dashboard-only,
+  never in git) and `ALLOWED_ORIGINS` is already pinned to the live Vercel
+  origin.
+  **Render compatibility audited:** CMD already binds `0.0.0.0:${PORT:-8000}`
+  so Render's injected `PORT` works and local dev is unchanged; config reads
+  pure env vars (no `.env` in the image); `/health` is unauthenticated.
+  **Audited and confirmed: the API performs ZERO runtime filesystem writes** —
+  Render's ephemeral disk is therefore safe, and Supabase remains the only
+  persistence layer (feedback included).
+  **`api/crops/` is now TRACKED (21 PNGs, ~6 MB)** — Render builds from the
+  GitHub clone, so gitignored crops would have meant no figure evidence in the
+  hosted beta; verified all 21 DB `image_crop_ref` values map to a staged file.
+  **Supabase re-verified:** still linked to `zafombwswztvnjikcsdm`, 475 rows /
+  3 papers / **91 experiment groups**. **Smoke-test feedback rows CLEARED** —
+  `hiveblot_feedback` is now **0 rows**, ready for the team.
+  **⚠ `stable_row_key` uniqueness is NOT 100% — 463 distinct of 475, 12
+  duplicate keys (24 rows).** The session-12 follow-up was never run; this is
+  the same pre-existing co-IP defect (the `page_004_cand_0025.png` crop prints
+  H1792 and A549 side by side; `_record_id` omits cell line). Feedback on one
+  of those rows can surface on its twin. Deploying does not make it worse, but
+  it is live in the hosted beta and is disclosed in the team doc.
+  Docs: `DEPLOYMENT.md` rewritten around the free stack incl. Render's
+  spin-down / cold-start / ephemeral-disk behaviour;
+  `research/TEAM_BETA_HANDOFF.md` carries the live web URL and the cold-start
+  warning. Tests: biology **165/165**, reconcile 21/21, loader ok, extract
+  10/10, pipeline 11/11, benchmark **34/34**, harness **100% EXACT**, api
+  **113/113**, web `tsc` clean + production build clean.
 - **2026-08-17 (session 12)** — Claude Code (Opus 5). **CLOUD DATABASE LIVE ON
   THE CLEAN BETA PROJECT.** Deployment target is now Supabase
   **`zafombwswztvnjikcsdm`** (`https://zafombwswztvnjikcsdm.supabase.co`,
@@ -584,31 +629,35 @@ travels with each field; a disputed modification keeps its residue **unsettled**
 ~~Wait for Srushti's clean Supabase project~~ — **DONE (session 12)**: linked,
 migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 
-**NEXT — exact task: host the API, then the web app.**
+~~Deploy the web app~~ — **DONE (session 13)**: https://hiveblot-beta.vercel.app
 
-1. **USER ACTION (the only blocker):** log in to one container host, then tell
-   the agent. Recommended `railway login` (CLI already installed, free tier);
-   Fly.io or Render are equally fine. Everything after this is prepared:
+**NEXT — exact task: create the Render free Web Service, then re-point Vercel.**
+
+1. **USER ACTION (the only blocker):** in the Render dashboard — **New →
+   Blueprint** → authorize GitHub → repo **`nikhilesh-s/hive`** → branch
+   **`feature/bio-context-beta`** → Render reads `render.yaml` and proposes
+   `hiveblot-api` on the **Free** plan (do not change it) → paste the four
+   secrets it asks for (`DB_READONLY_URL`, `DB_FEEDBACK_URL`, `SUPABASE_KEY`,
+   `INTERNAL_API_KEY`) from the untracked `api/.env.cloud` → **Apply**.
+   Alternative: `render login` in a terminal, then the agent can drive the CLI.
+2. Agent: take the `https://<service>.onrender.com` host and
    ```bash
-   python scripts/stage_crops.py                    # 21 crops, 6.2 MB
-   docker build -f api/Dockerfile -t hiveblot-api . # context = repo root
+   cd web && vercel env rm API_BASE_URL production --yes \
+     && printf '%s' 'https://<service>.onrender.com' | vercel env add API_BASE_URL production \
+     && vercel deploy --prod --yes
    ```
-   Then set the API env vars (names in `DEPLOYMENT.md` §2; values are already
-   generated in the untracked `api/.env.cloud`) and deploy.
-2. Deploy `web/` to Vercel (CLI already authenticated as `nikhilesh-s`), root
-   `web/`, with `API_BASE_URL` = the deployed API origin and the SAME
-   `INTERNAL_API_KEY`. **Never** prefix either with `NEXT_PUBLIC_`.
-3. Set `ALLOWED_ORIGINS` on the API to the deployed web origin, redeploy the
-   API, then run the 12-step hosted smoke checklist (`DEPLOYMENT.md` §4).
-4. Fill the two URLs into `research/TEAM_BETA_HANDOFF.md` and send it to the
-   team.
-5. **Fix the duplicate `stable_row_key`** (session-12 finding): add cell line to
-   `_record_id` so the H1792/A549 side-by-side crop stops collapsing P62, LC3B
-   and ACTB across cell lines, then re-review and reseed. 24 of 475 rows.
-6. Model creds when available → the staged automated-extraction evaluation
-   below (harness already scores EXACT / ACCEPTABLE / PARTIAL / WRONG /
-   MISSING / HALLUCINATED; protocol in
-   `research/automated_extraction_eval_protocol.md`).
+   (repeat for preview/development), then fix `ALLOWED_ORIGINS` on Render if
+   the Vercel origin ever changes.
+3. Agent: run the hosted verification — `/health`, `phospho STAT3 Tyr705`,
+   `co-IP PIK3CA`, crop PNG, feedback submit + rehydrate, zero-result query,
+   and a browser-asset secret scan.
+4. Fill the API URL into `research/TEAM_BETA_HANDOFF.md` and send it out.
+5. **Fix the duplicate `stable_row_key`** — add cell line to `_record_id`, then
+   re-review and reseed. 24 of 475 rows. Live in the hosted beta today.
+6. Model creds → the staged automated-extraction evaluation (harness already
+   scores EXACT / ACCEPTABLE / PARTIAL / WRONG / MISSING / HALLUCINATED;
+   protocol in `research/automated_extraction_eval_protocol.md`). **Model
+   automation remains future work — no accuracy claim is possible yet.**
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).

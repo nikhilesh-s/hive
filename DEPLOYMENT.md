@@ -4,6 +4,24 @@ The beta is three pieces: **Postgres** (Supabase in prod, embedded pgserver
 locally), **FastAPI** (`api/`), **Next.js** (`web/`). Everything below is
 config + commands; all secret VALUES live in env vars / `.env` files only.
 
+**The canonical beta stack is zero-cost and must stay that way:**
+
+| Piece | Host | Plan |
+|---|---|---|
+| Postgres | Supabase `zafombwswztvnjikcsdm` | **Free** |
+| FastAPI (`api/`) | **Render Web Service** (Docker, `render.yaml`) | **Free** |
+| Next.js (`web/`) | **Vercel** | **Free (Hobby)** |
+
+Never select Render Starter/Standard/Pro or a paid Vercel plan. `render.yaml`
+pins `plan: free`; changing that line starts billing.
+
+**Live URLs**
+
+| | |
+|---|---|
+| Web | **https://hiveblot-beta.vercel.app** |
+| API | `https://<service>.onrender.com` — pending the Render service |
+
 ## 0. Which Supabase project
 
 | | |
@@ -79,16 +97,32 @@ anything. Neither restricted DSN ever reaches browser JavaScript: both live in
 API-server env vars; the web app talks only to the API through the Next.js
 server-side proxy with `INTERNAL_API_KEY`.
 
-## 2. API (`api/`, FastAPI)
-Any container/VM host (Fly.io, Railway, Render, Cloud Run, EC2…). A
-`api/Dockerfile` is committed; **the build context is the repo root**:
+## 2. API (`api/`, FastAPI) — Render free Web Service
+`render.yaml` is a committed Blueprint; it is the canonical deployment path.
+
+**First-time deploy (Render dashboard, ~2 minutes):**
+1. **New → Blueprint**, authorize GitHub if asked, pick **`nikhilesh-s/hive`**,
+   branch **`feature/bio-context-beta`**.
+2. Render reads `render.yaml` and proposes one web service, `hiveblot-api`,
+   already on the **Free** plan. Do not change the plan.
+3. It then prompts for the four `sync: false` secrets — paste them from the
+   untracked `api/.env.cloud`: `DB_READONLY_URL`, `DB_FEEDBACK_URL`,
+   `SUPABASE_KEY`, `INTERNAL_API_KEY`. Everything else is already in the file.
+4. **Apply**. First build takes a few minutes (Docker image, ~6 MB of crops).
+
+Health check is `/health`; `autoDeploy: false`, so later pushes deploy only
+when you click **Manual Deploy**.
+
+The image is host-agnostic — Fly.io, Cloud Run, EC2 or a local `docker run`
+work with the same file. Railway also works and was the earlier plan; it is no
+longer the recommended path because Render's free Web Service costs nothing.
 
 ```bash
-python scripts/stage_crops.py                      # optional, ~6 MB, see below
-docker build -f api/Dockerfile -t hiveblot-api .
+docker build -f api/Dockerfile -t hiveblot-api .   # context = REPO ROOT
 ```
 - Run: `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (the image's default
-  CMD; deps `api/requirements.txt`, Python ≥3.13)
+  CMD, falling back to 8000 locally, so the same image runs in both places;
+  Render injects `PORT`). Deps `api/requirements.txt`, Python 3.13 in the image.
 - Health check: `GET /health` (no auth)
 - Env NAMES (exact, from `api/app/config.py` — never commit values):
   required: `SUPABASE_URL`, `SUPABASE_KEY` (may stay empty → only `/proteins`
@@ -101,23 +135,47 @@ docker build -f api/Dockerfile -t hiveblot-api .
   `OPENAI_MODEL`. Model-provider vars (`WBM_LLM_BACKEND`, `AWS_*`,
   `ANTHROPIC_API_KEY`) belong to the INGESTION engine later, not to this API.
 
-**Figure crops in a container.** Records store an ABSOLUTE `image_crop_ref`, and
-`/records/{id}/crop` requires the path to resolve inside `CROP_BASE_DIR`, so the
-image reproduces the authoring path verbatim — crops serve with zero code change
-and, more importantly, **zero change to the reviewed corpus**. Run
-`scripts/stage_crops.py` before building to copy the 21 referenced crops
-(~6 MB) into `api/crops/`. Skip it and the evidence panel degrades to text-only,
-which is supported behaviour, not a failure. Storing crop refs *relative* to
-`CROP_BASE_DIR` is the cleaner long-term fix and is tracked in `HANDOFF.md`.
+### Render free-tier behaviour — accepted, not worked around
+- **The service spins down after ~15 minutes idle.** The next request pays a
+  cold start, typically 30–60 s. Expect the first search of a session to hang
+  briefly; it is not a bug and it is not a reason to change the architecture.
+  Warn testers rather than adding a keep-alive pinger.
+- **The filesystem is ephemeral** — anything written at runtime is lost on
+  redeploy or spin-down. This is safe here because **the API never writes to
+  disk at runtime** (audited: no `open(...,'w')`, no `mkdir`, no temp files in
+  `api/app/`). **Supabase is the only persistence layer**, including all
+  researcher feedback. Figure crops are read-only and baked into the image.
+- **No shell/disk add-on on free.** Anything you would want to persist has to
+  go in Postgres.
+- Rate limiting is in-process (slowapi), so it is per-instance.
 
-## 3. Web (`web/`, Next.js)
-Vercel (or any Node host): root `web/`, `npm run build`.
-- Env: `API_BASE_URL` (the deployed API origin), `INTERNAL_API_KEY`
-  (must equal the API's). Both are server-side only (used in route handlers);
-  nothing secret ships to the browser. **Never prefix either with
-  `NEXT_PUBLIC_`** — that publishes it to every visitor.
-- After the API URL exists, set `ALLOWED_ORIGINS` on the API to the web origin
-  and redeploy the API.
+**Figure crops in the container.** Records store an ABSOLUTE `image_crop_ref`,
+and `/records/{id}/crop` requires the path to resolve inside `CROP_BASE_DIR`, so
+the image reproduces the authoring path verbatim — crops serve with zero code
+change and, more importantly, **zero change to the reviewed corpus**.
+`api/crops/` (21 files, ~6 MB) is **tracked in git on purpose**: Render builds
+from the GitHub clone, so an untracked directory would mean no figure evidence
+in the hosted beta. Refresh it with `python scripts/stage_crops.py`. Storing
+crop refs *relative* to `CROP_BASE_DIR` is the cleaner long-term fix and is
+tracked in `HANDOFF.md`.
+
+## 3. Web (`web/`, Next.js) — Vercel free
+Already deployed: project `hiveblot-beta`, production alias
+**https://hiveblot-beta.vercel.app**. The Vercel project root is `web/`.
+
+```bash
+cd web
+vercel link --yes --project hiveblot-beta     # once per machine
+vercel deploy --prod --yes
+```
+- Env (Production + Preview + Development), set with `vercel env add`:
+  `API_BASE_URL` = the Render API origin, `INTERNAL_API_KEY` = the same value
+  the API has. Both are read only in server-side route handlers; nothing
+  secret ships to the browser. **Never prefix either with `NEXT_PUBLIC_`** —
+  that publishes it to every visitor.
+- After changing an env var you must **redeploy** (`vercel deploy --prod
+  --yes`); Vercel does not hot-swap env values into an existing build.
+- Keep `ALLOWED_ORIGINS` on the API in sync with this origin.
 
 ## 4. Smoke test after deploy
 1. `GET <api>/health` → `{"status":"ok"}`
@@ -166,3 +224,5 @@ Point the web app at it with `web/.env.local` (also untracked):
   `/records/{id}`, `/feedback` run on plain Postgres.
 - Rate limiting is in-process (slowapi); it is per-instance, so it weakens if
   the API is scaled to multiple instances.
+- Render free spins down when idle; the first request after that is slow. This
+  is documented for testers rather than engineered around.
