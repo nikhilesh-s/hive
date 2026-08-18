@@ -20,7 +20,7 @@ pins `plan: free`; changing that line starts billing.
 | | |
 |---|---|
 | Web | **https://hiveblot-beta.vercel.app** |
-| API | `https://<service>.onrender.com` — pending the Render service |
+| API | **https://hiveblot-api.onrender.com** (Render free Web Service `hiveblot-api`, `srv-da1rbvs9v7es738635ug`) |
 
 ## 0. Which Supabase project
 
@@ -100,6 +100,16 @@ server-side proxy with `INTERNAL_API_KEY`.
 ## 2. API (`api/`, FastAPI) — Render free Web Service
 `render.yaml` is a committed Blueprint; it is the canonical deployment path.
 
+**Routine deploy (CLI, service already exists).** `autoDeploy` is off, so a
+push does not ship. Deploy an explicit commit and confirm it went live:
+
+```bash
+render deploys create srv-da1rbvs9v7es738635ug --commit <sha> --confirm -o json
+render deploys list srv-da1rbvs9v7es738635ug --confirm -o json   # status must read "live"
+curl -s https://hiveblot-api.onrender.com/health                 # {"status":"ok"}
+```
+`render deploys list` takes no `--limit`; the newest deploy is the first entry.
+
 **First-time deploy (Render dashboard, ~2 minutes):**
 1. **New → Blueprint**, authorize GitHub if asked, pick **`nikhilesh-s/hive`**,
    branch **`feature/bio-context-beta`**.
@@ -168,6 +178,10 @@ cd web
 vercel link --yes --project hiveblot-beta     # once per machine
 vercel deploy --prod --yes
 ```
+- Vercel marks these **Sensitive**, which makes them write-only: `vercel env
+  pull` returns the literal `[SENSITIVE]`, not the value. The readable source
+  of truth is the untracked `api/.env.cloud`. Changing a value means
+  `vercel env rm` then `vercel env add`, then a redeploy.
 - Env (Production + Preview + Development), set with `vercel env add`:
   `API_BASE_URL` = the Render API origin, `INTERNAL_API_KEY` = the same value
   the API has. Both are read only in server-side route handlers; nothing
@@ -181,7 +195,10 @@ vercel deploy --prod --yes
 1. `GET <api>/health` → `{"status":"ok"}`
 2. Web UI: type `phospho STAT3 Tyr705`, press Enter/SEARCH → 3 grouped
    experiment cards (18 lane records), STAT3 · phospho-Tyr705, Hep3B,
-   CST #9145, expected 88.1 kDa
+   CST #9145, expected 88.1 kDa. Corpus-wide the reviewed set is **475 rows /
+   93 experiments** — cards are grouped by the experiment identity hash
+   (`stable_row_key` before the `:`), which is the same identity researcher
+   feedback keys to.
 3. Search `co-IP PIK3CA` → co-IP cards with IP bait = PIK3CA
 4. Search `GAPDH mouse` → 5 experiments, Loading Control, DEVELOPMENTAL SERIES
    on the E14.5/P0/P28 panels and **no** design tag on the ligation panels
