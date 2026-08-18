@@ -708,13 +708,55 @@ def _first_gene_after(text: str, pos: int) -> Optional[str]:
     return m.group(1) if m else None
 
 
+def identity_sample(mc: dict) -> str:
+    """The biological system this evidence came from, normalized for identity.
+
+    Same precedence as `_sample_info`, so the experiment identity and the
+    SAMPLE the UI prints can never disagree about which system a row belongs
+    to. Case- and whitespace-folded because `H1792`, `h1792` and ` H1792 ` are
+    the same cell line and a reviewer re-typing one must not orphan feedback.
+
+    Deliberately NOT applied to target labels: in this codebase case is
+    semantic there (uppercase `P-` is not a phospho marker, lowercase `p-`
+    is), so folding a target would merge biologically distinct rows.
+    """
+    val = mc.get("sample") or mc.get("cell_line") or ""
+    return " ".join(str(val).split()).casefold()
+
+
 def _record_id(case: dict, raw_target: str) -> str:
-    """Deterministic experiment identity. Includes the panel crop and the
-    treatment context so two experiments that share one crop and one target
-    label (e.g. Fig 3C vs 3D total-STAT3 strips in PMC12856536) get DISTINCT
-    ids. Every input comes from the reviewed observation data — never from DB
-    serials — so the id is stable across reseeds; researcher feedback keys on
-    it (via stable_row_key) and must survive a reload."""
+    """Deterministic experiment identity — the unit researcher feedback keys to.
+
+    Every input is reviewed OBSERVATION data (what the paper printed), never a
+    DB serial and never a reconciliation OUTPUT. That is the whole design:
+    reconciliation results (modification_label, experiment_type, ip_bait,
+    protein_status, confidence) legitimately change when the engine improves,
+    and if they fed the identity every stored correction would orphan itself on
+    the next fix. Display-layer text never reaches here either, so reformatting
+    a lane label cannot move a key.
+
+    Components, and why each earns its place:
+      * paper (doi/pmcid/pmid) — which source
+      * figure_label, panel_label, crop filename — which blot in that source
+      * raw_target — which row of that blot, as printed
+      * treatment_context — separates two experiments sharing one crop and one
+        target label (Fig 3C vs 3D total-STAT3 in PMC12856536)
+      * sample/cell line — separates two experiments sharing crop, target AND
+        treatment but run in different biological systems
+
+    The sample component fixes a P0 identity collision: crop
+    `page_004_cand_0025.png` in PMC12706926 prints H1792 and A549 side by side,
+    so P62, LC3B and ACTB each produced ONE id for TWO biologically distinct
+    experiments (12 duplicate stable keys over 24 rows). Search grouping had
+    always split those two cards on cell line while the identity did not —
+    two disagreeing notions of "one experiment" was the underlying flaw, and
+    feedback left on the H1792 arm could surface on the A549 arm.
+
+    Lane identity lives OUTSIDE this hash: `stable_row_key` is
+    `<record_id>:<lane_index>`. Lane index is the reviewed panel's own left-to-
+    right order — stable across reseeds and immune to lane-label reformatting,
+    which the printed condition text is not.
+    """
     paper = case.get("paper", {})
     fig = case.get("figure", {})
     mc = case.get("model_claims", {})
@@ -724,5 +766,6 @@ def _record_id(case: dict, raw_target: str) -> str:
         paper.get("doi") or paper.get("pmcid") or paper.get("pmid"),
         fig.get("figure_label"), fig.get("panel_label"), crop_name,
         raw_target, mc.get("treatment_context") or "",
+        identity_sample(mc),
     ])
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]

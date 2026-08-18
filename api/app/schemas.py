@@ -92,6 +92,14 @@ class WesternBlotRecord(BaseModel):
     extraction_stage: str | None = None
     extraction_model: str | None = None
 
+    # Reseed-proof identity: `<experiment hash>:<lane index>` (migration 003).
+    # Surfaced on list rows too — not only on RecordDetail — so the search UI
+    # groups lanes into cards by the SAME experiment identity that researcher
+    # feedback keys to. Deriving the card boundary from a separate composite
+    # key is what let grouping and identity disagree (the H1792/A549 co-IP
+    # collision); one source of truth removes that whole failure class.
+    stable_row_key: str | None = None
+
 
 class SearchResponse(BaseModel):
     question: str
