@@ -21,3 +21,7 @@ research/papers/*.pdf
 
 # Embedded local Postgres for dev (scripts/local_db.py)
 .localdb/
+
+# Staged figure crops for the API container image (derived; scripts/stage_crops.py)
+api/crops/*
+!api/crops/.gitkeep
