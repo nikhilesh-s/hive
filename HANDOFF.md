@@ -6,6 +6,31 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-18 (session 15)** — Claude Code (Fable 5). **TEAM DELEGATION
+  PACKAGE (docs only — no product code, no deploy, no DB change).** The
+  founder-walkthrough findings (`/Users/niks/Downloads/
+  HiveBlot-Founder-Walkthrough.md`) were turned into
+  `research/team_delegation/`: `MASTER_DELEGATION.md` (product state,
+  scope guardrails, findings by domain with priorities, 4 workstreams + Nik,
+  coordination rules), four role-based handoffs (`BIOLOGY_QA_HANDOFF.md`,
+  `SCIENTIFIC_COMMUNICATION_HANDOFF.md`, `PRODUCT_UX_HANDOFF.md`,
+  `SEARCH_DATA_HANDOFF.md` — each teaches the concept it touches via a
+  "What you should understand before finishing" section), and
+  `NIK_FOUNDER_LEARNING.md`. Role-based, not named: project docs identify
+  collaborators only by infra actions (Suhas: legacy QIB; Srushti: clean
+  Supabase project), insufficient to map specialties — Nik assigns.
+  **Priorities: P0 = `/about` fabricated numbers (2.8K/12.4K/520) +
+  automated-ingestion claims (only P0).** P1: `/learn`
+  Upregulated/Downregulated + densitometry mismatch, homepage first-run
+  guidance, needs-review reason not shown in lists, internal values rendered
+  as paper quotes (`ambiguous_family`, `{}`, candidate "none", empty WHY
+  section), `image_crop_ref` absolute-path leak (plan only — ties to the
+  existing relative-ref open question), `GAPDH mouse` organism
+  investigation (investigate-only; parser must not hallucinate filters),
+  scientific QA re-run vs the 93-experiment grouping, terminology glossary.
+  P2: next-action UX exploration, confidence-display question, `RESULTS -`
+  dash, cold-start copy, audience statement. Workflow: OBSERVE → UNDERSTAND
+  → ASSIGN → then FIX; all fixes deferred to workstreams; Nik alone deploys.
 - **2026-08-18 (session 14)** — Claude Code (Opus 5). **P0 IDENTITY FIX + FULL
   HOSTED BETA LIVE.** **Web https://hiveblot-beta.vercel.app · API
   https://hiveblot-api.onrender.com · DB Supabase `zafombwswztvnjikcsdm`.**
@@ -712,6 +737,10 @@ migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
 
 **NEXT, in order:**
+0. **Nik: read `research/team_delegation/NIK_FOUNDER_LEARNING.md`, map people
+   to workstreams A–D (`research/team_delegation/MASTER_DELEGATION.md`), and
+   send each teammate their handoff file. The P0 (`/about` overclaims) gates
+   wider distribution — Workstream B drafts, Nik ships.**
 1. Distribute to the team / UCSF reviewers and collect feedback. Warn them
    about the free-tier cold start (~30–60 s on the first request after ~15 min
    idle) so it is not reported as a bug.
