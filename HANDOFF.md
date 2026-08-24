@@ -6,6 +6,26 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-24 (session 16)** — Claude Code (Fable 5). **TEAM LOCAL-DEV ENV
+  PLAN (docs + .gitignore only; no code, no deploy, no credential rotation,
+  no Supabase change, QIB untouched).** `research/team_delegation/
+  ENV_SETUP.md`: per-teammate least-privilege env plan for the 6-person team
+  (Suhas D, Ananya A+D, Srushti C, Tanvi B+A, Yashvi coordination, Nik
+  owner). Core: **the local stack needs ZERO production secrets** —
+  `scripts/local_db.py` embedded Postgres + self-generated local
+  `INTERNAL_API_KEY`/`AGENT_API_KEYS`; cloud `SUPABASE_*`/`OPENAI_KEY` stay
+  empty. Only shared credential: cloud `DB_READONLY_URL` (`hive_readonly`,
+  SELECT-only on `western_blot_records`, session-12-audited) to **Suhas
+  only**, staged outside the repo at `~/hiveblot-env-handoff/suhas/` (0600)
+  for password-manager share or AirDrop — never messaging apps. Forbidden to
+  distribute: cloud `DB_FEEDBACK_URL` (write-capable), `SUPABASE_KEY`,
+  production `INTERNAL_API_KEY`/`AGENT_API_KEYS`, Nik's model keys,
+  Vercel/Render auth. **Gap fixed: `western_blot_miner/.env` was NOT
+  gitignored** (api/ and web/ ignore their own; the miner had no rule) —
+  root `.gitignore` now ignores `western_blot_miner/.env*` except the
+  example. Verified: no `.env` tracked in git (examples only). PR #1
+  (branch → main) remains open, unmerged; all work stays on
+  `feature/bio-context-beta`.
 - **2026-08-18 (session 15)** — Claude Code (Fable 5). **TEAM DELEGATION
   PACKAGE (docs only — no product code, no deploy, no DB change).** The
   founder-walkthrough findings (`/Users/niks/Downloads/
