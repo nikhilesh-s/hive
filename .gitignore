@@ -6,6 +6,11 @@
 *.swp
 
 # Python ingestion engine (western_blot_miner) + eval
+# api/ and web/ ignore their own .env files; the miner has no .gitignore, so
+# its env file (may hold a personal ANTHROPIC_API_KEY) is caught here.
+western_blot_miner/.env
+western_blot_miner/.env.*
+!western_blot_miner/.env.example
 __pycache__/
 *.pyc
 *.pyo
