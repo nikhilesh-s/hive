@@ -50,11 +50,16 @@ From repo root, on `feature/bio-context-beta`:
 ```bash
 # 1. Python env + local database (real Postgres, no Docker, no cloud)
 python3.12 -m venv .venv
-.venv/bin/pip install -r western_blot_miner/requirements.txt -r api/requirements.txt
+.venv/bin/pip install -r requirements-local.txt
 .venv/bin/python scripts/local_db.py up
 .venv/bin/python scripts/local_db.py load eval/demo/*/supabase_rows.json
 .venv/bin/python scripts/local_db.py status   # prints row counts + the local DSNs
 ```
+
+`requirements-local.txt` includes the production API dependencies plus
+`pgserver`, the local-only package that starts the embedded Postgres database.
+Render still installs `api/requirements.txt`; production does not need
+`pgserver`.
 
 ```bash
 # 2. api/.env — copy the example, then fill as below

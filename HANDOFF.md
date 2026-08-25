@@ -6,6 +6,26 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-25 (session 17)** — Codex. **LOCAL DEV REQUIREMENTS WIRED +
+  LOCAL STACK OPENED (docs/dependency only; no production code path change, no
+  deploy, no cloud DB/Supabase change, no production secrets).** Added root
+  `requirements-local.txt` for teammates who need local search/results/cards:
+  it includes `api/requirements.txt`, `western_blot_miner/requirements.txt`,
+  and local-only `pgserver`. Updated `research/team_delegation/ENV_SETUP.md`
+  so the setup command installs `requirements-local.txt`; Render/production
+  continues to install `api/requirements.txt` only, so `pgserver` stays out of
+  the production API dependency surface. Local verification on
+  `feature/bio-context-beta`: `python3.12 -m venv .venv`; pip install from
+  `requirements-local.txt` succeeded; `scripts/local_db.py up` started embedded
+  Postgres at `.localdb/` (local pg_trgm unavailable, index skipped as expected
+  per helper); `scripts/local_db.py load eval/demo/*/supabase_rows.json` loaded
+  475 rows; `scripts/local_db.py status` confirmed 475 rows; local FastAPI
+  `/health` returned 200; local `/search` for `phospho STAT3 Tyr705` returned
+  18 rows; existing local Next dev server on `http://127.0.0.1:3000` served 200
+  and proxied `/api/search` to the local API with 18 rows. Created gitignored
+  local `.env` files only for this machine using local values; no env values
+  were committed. Existing uncommitted `web/next.config.ts` change
+  (`allowedDevOrigins`) was present before this task and left untouched.
 - **2026-08-24 (session 16)** — Claude Code (Fable 5). **TEAM LOCAL-DEV ENV
   PLAN (docs + .gitignore only; no code, no deploy, no credential rotation,
   no Supabase change, QIB untouched).** `research/team_delegation/
