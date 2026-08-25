@@ -24,7 +24,9 @@
   18 rows; existing local Next dev server on `http://127.0.0.1:3000` served 200
   and proxied `/api/search` to the local API with 18 rows. Created gitignored
   local `.env` files only for this machine using local values; no env values
-  were committed. Existing uncommitted `web/next.config.ts` change
+  were committed. Required checks run after setup: biology 165/165, reconcile
+  21/21, loader enrichment 18/18, extract 10/10, pipeline wiring 11/11,
+  benchmark 34/34. Existing uncommitted `web/next.config.ts` change
   (`allowedDevOrigins`) was present before this task and left untouched.
 - **2026-08-24 (session 16)** — Claude Code (Fable 5). **TEAM LOCAL-DEV ENV
   PLAN (docs + .gitignore only; no code, no deploy, no credential rotation,
