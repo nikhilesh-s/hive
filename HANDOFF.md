@@ -6,6 +6,23 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 28)** — Codex. **SEARCH BAR ALIGNMENT VISIBILITY
+  CORRECTION (frontend CSS only; no layout ownership, search behavior, filters,
+  API, URL semantics, backend, schema, data, or evidence change).** Follow-up
+  to session 27 after user feedback that the search bar itself did not look
+  changed. The shared workspace grid was live, but the retained 920px search
+  max-width and near-identical dimensions made the alignment shift too subtle.
+  Removed the desktop max-width cap so the search control and examples visibly
+  span the full results column, reduced control height from 52px to 48px,
+  reduced the search heading from 22px to 19px, and tightened heading/helper
+  spacing. The left edge remains exactly aligned with results and all search
+  interactions/API behavior are unchanged. File changed:
+  `web/app/globals.css` plus this handoff. Verification: final `cd web && npm
+  run build` passed; targeted search/filter ESLint passed; `git diff --check`
+  passed; reopened the local search route with a cache-busting URL; required
+  biology checks passed under `.venv`: biology 165/165, reconcile 21/21,
+  loader enrichment 18/18, extract 10/10, pipeline wiring 11/11, benchmark
+  34/34. No environment values or secrets were committed.
 - **2026-08-26 (session 27)** — Codex. **SEARCH/RESULTS RESEARCH-WORKSPACE
   ALIGNMENT + MOBILE FILTER DRAWER (frontend presentation only; no search API,
   query semantics, URL parameters, database, backend, ranking, schema, filter
@@ -828,8 +845,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `1c02ec0` (IBM Plex
-  typography system). This workspace-alignment change commits on top; run
+- **Latest finalized commit before this handoff entry:** `6aae109` (search/results
+  workspace alignment). This visible search-bar correction commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
