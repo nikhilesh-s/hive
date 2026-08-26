@@ -6,6 +6,14 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-25 (session 23)** — Claude Code (Sonnet 5). **COMMIT LONG-STANDING
+  LOCAL DEV CONFIG (frontend dev-server config only; no app/backend/schema/
+  deploy change, no production secrets).** Committed `web/next.config.ts`'s
+  `allowedDevOrigins: ["127.0.0.1"]`, which sessions 17–22 repeatedly noted as
+  "existing uncommitted... left untouched." This silences Next.js's dev-server
+  cross-origin warning when the local API/web stack is accessed via
+  `127.0.0.1`; it has no effect on production builds. No tests affected (no
+  code path changed).
 - **2026-08-26 (session 22)** — Codex. **HIDE SEARCH-RESULT EVIDENCE PANEL
   INTERACTION (frontend presentation-only; no backend/API/schema/query/filter/
   extraction/evidence data change, no deploy, no cloud DB/Supabase change, no
