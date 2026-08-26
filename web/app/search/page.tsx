@@ -225,13 +225,13 @@ export default function SearchPage() {
         {showResults ? (
           <div>
             {/* Results Header */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
+            <div className="hb-results-header">
+              <div className="hb-results-title">
                 <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
                 <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
                 <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Western Blot Evidence</span>
               </div>
-              <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
+              <p className="hb-results-count">
                 {loading
                   ? 'Searching database...'
                   : (() => {
@@ -287,7 +287,9 @@ export default function SearchPage() {
             {/* Results Cards */}
             {!loading && results.length > 0 && (
               <>
-                <SearchFeedback query={query} />
+                <div className="hb-search-feedback-wrap">
+                  <SearchFeedback query={query} />
+                </div>
                 <div className="hb-result-list">
                   {groups.map((g) => (
                     <DatabaseResultCard key={g.first.id} data={g.first} lanes={g.lanes} />

@@ -43,7 +43,7 @@ export default function SearchFeedback({ query }: { query: string }) {
   } as const;
 
   return (
-    <div style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {state === 'idle' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <span style={{ fontFamily: SERIF, fontSize: '12px', color: '#6f857d' }}>
