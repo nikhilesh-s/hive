@@ -285,7 +285,7 @@ export default function SearchPage() {
             {!loading && results.length > 0 && (
               <>
                 <SearchFeedback query={query} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="hb-result-list">
                   {groups.map((g) => (
                     <DatabaseResultCard key={g.first.id} data={g.first} lanes={g.lanes} />
                   ))}

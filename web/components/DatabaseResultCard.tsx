@@ -70,7 +70,6 @@ const TEXT = '#e7f0ee';
 const TEAL = '#4ad6b0';
 const GOLD = '#e0b23c';
 const RED = '#ff6b6b';
-const DIMTEXT = '#a9bdb5';
 
 function titleCase(s?: string | null): string {
   if (!s) return '';
@@ -134,8 +133,8 @@ function reviewState(d: DatabaseResult): { label: string; color: string } | null
 
 function Field({ label, value, mono, color }: { label: string; value: ReactNode; mono?: boolean; color?: string }) {
   return (
-    <div>
-      <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL, marginBottom: '4px', letterSpacing: '0.4px' }}>
+    <div className="hb-result-field">
+      <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL, marginBottom: '4px' }}>
         {label}
       </div>
       <div style={{ fontFamily: mono ? MONO : SERIF, fontSize: mono ? '13px' : '14px', color: color || TEXT, lineHeight: 1.3 }}>
@@ -143,6 +142,28 @@ function Field({ label, value, mono, color }: { label: string; value: ReactNode;
       </div>
     </div>
   );
+}
+
+function Metadata({ label, value, mono }: { label: string; value: ReactNode; mono?: boolean }) {
+  return (
+    <div className="hb-result-metadata-row">
+      <div className="hb-result-metadata-label">{label}</div>
+      <div className={mono ? 'hb-result-metadata-value hb-result-metadata-value-mono' : 'hb-result-metadata-value'}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Chip({ children }: { children: ReactNode }) {
+  return <span className="hb-result-chip">{children}</span>;
+}
+
+function experimentLabel(blotType?: string | null): string | null {
+  if (!blotType) return null;
+  if (blotType === 'co_ip') return 'co-IP';
+  if (blotType.includes('western')) return 'WB';
+  return titleCase(blotType);
 }
 
 export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardProps) {
@@ -218,62 +239,41 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
   const previewSrc = /\bSTAT3\b/i.test([data.canonical_target, data.target].filter(Boolean).join(' '))
     ? '/images/STATE3.png'
     : null;
-  const cropName = data.image_crop_ref?.split('/').filter(Boolean).at(-1);
+  const designTag = deriveDesignTag(lanes, data.treatment_context);
+  const sourceId = data.doi || data.paper_id;
+  const indicatorChips = [
+    experimentLabel(blotType),
+    data.modification_label?.toLowerCase().includes('phospho') ? 'Phospho' : null,
+    designTag ? titleCase(designTag) : null,
+    lanes && lanes.length > 1 ? `${lanes.length} lanes` : null,
+  ].filter((chip): chip is string => Boolean(chip));
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'rgba(255,255,255,.07)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-        border: '1px solid rgba(255,255,255,.06)',
-      }}
-    >
+    <div className="hb-result-card">
       <div className="hb-result-card-main">
-        <section className="hb-result-card-experiment">
-          {/* Biological headline + review badge */}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ fontFamily: SERIF, fontSize: '21px', color: TEAL, lineHeight: 1.2 }}>
+        <section className="hb-result-card-primary">
+          <div className="hb-result-title-row">
+            <div className="hb-result-title" style={{ fontFamily: SERIF }}>
               {headline}
-              <span style={{ color: TEXT }}>{headlineMod}</span>
+              <span>{headlineMod}</span>
             </div>
             {review && (
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: review.color,
-                  border: `1px solid ${review.color}`,
-                  borderRadius: '4px',
-                  padding: '2px 8px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <span className="hb-status-badge" style={{ color: review.color, borderColor: review.color }}>
                 {review.label}
               </span>
             )}
           </div>
-          {/* raw label when it differs from the canonical headline */}
+
           {data.canonical_target && data.target && data.canonical_target !== data.target && (
-            <div style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, marginTop: '-8px' }}>as printed: {data.target}</div>
+            <div className="hb-printed-target">as printed: {data.target}</div>
           )}
-          {/* Experiment identity: WHY this card is distinct from its siblings.
-              Design tag is derived only from this group's own lane labels; the
-              context text is the reviewed record's treatment_context verbatim
-              (truncated). Nothing here is invented. */}
-          {(deriveDesignTag(lanes, data.treatment_context) || data.treatment_context) && (
-            <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIMTEXT, fontStyle: 'italic', lineHeight: 1.45 }}>
-              {deriveDesignTag(lanes, data.treatment_context) && (
-                <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, fontStyle: 'normal', marginRight: '8px' }}>
-                  {deriveDesignTag(lanes, data.treatment_context)!.toUpperCase()}
-                </span>
-              )}
+
+          {(designTag || data.treatment_context) && (
+            <div className="hb-result-context" style={{ fontFamily: SERIF }}>
+              {designTag && <span className="hb-result-context-tag">{designTag.toUpperCase()}</span>}
               {data.treatment_context && (
                 data.treatment_context.length > 130
-                  ? data.treatment_context.slice(0, 130) + '…'
+                  ? `${data.treatment_context.slice(0, 130)}...`
                   : data.treatment_context
               )}
             </div>
@@ -281,29 +281,25 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
 
           <div className="hb-card-field-grid">
             {sampleText && <Field label="SAMPLE" value={sampleText} />}
+            {treatmentDisplay && <Field label="TREATMENT" value={treatmentDisplay} />}
             {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
             {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
             {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
-            {treatmentDisplay && <Field label="TREATMENT" value={treatmentDisplay} />}
             {lanes && lanes.length > 1 ? (
               <Field
                 label={`LANES (${lanes.length})`}
                 value={
-                  <span style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                  <span className="hb-lane-strip">
                     {lanes.slice(0, 8).map((l, i) => (
-                      <span key={i} style={{
-                        fontFamily: MONO, fontSize: '10px', padding: '2px 7px', borderRadius: '4px',
-                        border: '1px solid rgba(255,255,255,.1)',
-                        color: l.band_state === 'present' ? TEAL : l.band_state === 'absent' ? RED : GOLD,
-                      }}>
+                      <span
+                        key={i}
+                        className="hb-lane-pill"
+                        style={{ color: l.band_state === 'present' ? TEAL : l.band_state === 'absent' ? RED : GOLD }}
+                      >
                         {formatLaneLabel(l.condition) || `lane ${i + 1}`}
                       </span>
                     ))}
-                    {lanes.length > 8 && (
-                      <span style={{ fontFamily: MONO, fontSize: '10px', color: LABEL }}>
-                        +{lanes.length - 8} more
-                      </span>
-                    )}
+                    {lanes.length > 8 && <span className="hb-lane-more">+{lanes.length - 8} more</span>}
                   </span>
                 }
               />
@@ -313,63 +309,55 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
           </div>
         </section>
 
-        <section className="hb-result-card-preview">
-          <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL }}>
-            FIGURE PREVIEW
-          </div>
+        <section className="hb-result-card-figure">
           {previewSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={previewSrc}
-              alt={`Western blot preview for ${headline}`}
-              className="hb-result-preview-image"
-            />
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewSrc}
+                alt={`Sample Western blot preview for ${headline}`}
+                className="hb-result-preview-image"
+              />
+              <div className="hb-result-preview-caption">Sample figure preview</div>
+            </>
           ) : (
-            <div className="hb-result-preview-placeholder">
-              {cropName || 'Preview unavailable'}
-            </div>
+            <div className="hb-result-preview-placeholder">Figure preview unavailable</div>
           )}
         </section>
 
-        <section className="hb-result-card-source">
-          <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL }}>
-            EVIDENCE / SOURCE
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {antibody && <Field label="ANTIBODY" value={antibody} mono />}
-            {mw && <Field label="MOLECULAR WEIGHT" value={mw} mono />}
-            {data.uniprot_id && <Field label="UNIPROT" value={data.uniprot_id} mono />}
-            {(data.figure_label || data.page || data.paper_id) && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {data.figure_label && (
-                  <div>
-                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Figure: </span>
-                    <span style={{ color: TEXT, fontSize: '12px' }}>{data.figure_label}</span>
-                  </div>
-                )}
-                {data.page && (
-                  <div>
-                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Page: </span>
-                    <span style={{ color: TEXT, fontSize: '12px' }}>{data.page}</span>
-                  </div>
-                )}
-                {data.paper_id && (
-                  <div>
-                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>DOI: </span>
-                    <span style={{ color: '#a9bdb5', fontFamily: MONO, fontSize: '11px', overflowWrap: 'anywhere' }}>{data.paper_id}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+        <section className="hb-result-card-indicators" aria-label="Experiment indicators">
+          {indicatorChips.map((chip) => (
+            <Chip key={chip}>{chip}</Chip>
+          ))}
+        </section>
 
+        <section className="hb-result-card-source">
+          {antibody && <Metadata label="Antibody" value={antibody} mono />}
+          {mw && <Metadata label="Molecular weight" value={mw} mono />}
+          {data.uniprot_id && <Metadata label="UniProt" value={data.uniprot_id} mono />}
+          {(data.figure_label || data.page || sourceId) && (
+            <Metadata
+              label="Source"
+              mono
+              value={
+                <>
+                  {data.figure_label && <span>{data.figure_label}</span>}
+                  {data.page && <span>Page {data.page}</span>}
+                  {sourceId && <span>DOI: {sourceId}</span>}
+                </>
+              }
+            />
+          )}
+        </section>
+
+        <section className="hb-result-card-action">
           <button
             aria-expanded={expanded}
-            aria-label={expanded ? 'Hide evidence' : 'Show evidence — why HiveBlot says this'}
+            aria-label={expanded ? 'Hide evidence' : 'View evidence — why HiveBlot says this'}
             onClick={() => setExpanded(!expanded)}
             className="hb-evidence-toggle"
           >
-            {expanded ? 'Hide Evidence' : 'Show Evidence'}
+            {expanded ? 'Hide Evidence' : 'View Evidence'}
           </button>
         </section>
       </div>
