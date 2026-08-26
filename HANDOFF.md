@@ -6,6 +6,36 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 18)** — Codex. **SEARCH RESULTS INFORMATION
+  ARCHITECTURE REDESIGN (frontend-only; no backend/API/schema/query change, no
+  deploy, no cloud DB/Supabase change, no production secrets).** Rebuilt the
+  `/search` results surface around the requested BenchSci/ASCEND-style
+  information hierarchy while keeping HiveBlot's existing dark visual system:
+  top search bar, persistent left filter sidebar, active filter chips above the
+  result list, and desktop result cards split into **Experiment information |
+  Figure preview | Evidence / source**. Reused the existing filter concepts
+  (protein, site/modification, experiment, cell line, vendor, catalog number,
+  needs review) with the same explicit **Apply** action; filters still compose
+  a plain query string that the existing deterministic backend parser already
+  understands, and `/api/search` still receives only `{query}`. Evidence
+  accordion, record-detail fetches, feedback paths, search URL behavior, and
+  grouping by `stable_row_key` were preserved. Added/used the provided
+  development image at `web/public/images/STATE3.png`; STAT3 cards show it via
+  frontend-only `/images/STATE3.png`, with no image API or backend crop-path
+  change. Files changed: `web/app/search/page.tsx`,
+  `web/components/FiltersBar.tsx`, `web/components/DatabaseResultCard.tsx`,
+  `web/app/globals.css`, `web/public/images/STATE3.png`, and this handoff.
+  Verification: `cd web && npm run build` passed; targeted ESLint on changed
+  frontend files passed; full `npm run lint` still fails only on pre-existing
+  unrelated issues in `web/app/learn/page.tsx`, `web/app/page.tsx`,
+  `web/components/Navigation.tsx`, `web/components/ResultsCard.tsx`,
+  `web/components/SearchFeedback.tsx`, and `web/components/SearchInput.tsx`;
+  `curl -I http://127.0.0.1:3000/search?q=phospho%20STAT3%20Tyr705` returned
+  200; local web `/api/search` proxy returned 18 rows for
+  `phospho STAT3 Tyr705`; required biology checks passed again: biology
+  165/165, reconcile 21/21, loader enrichment 18/18, extract 10/10, pipeline
+  wiring 11/11, benchmark 34/34. Existing uncommitted `web/next.config.ts`
+  (`allowedDevOrigins`) was present before this task and left untouched.
 - **2026-08-25 (session 17)** — Codex. **LOCAL DEV REQUIREMENTS WIRED +
   LOCAL STACK OPENED (docs/dependency only; no production code path change, no
   deploy, no cloud DB/Supabase change, no production secrets).** Added root
@@ -566,8 +596,9 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest implementation commit:** `2cb2d0c` (pipeline records-mode wiring). This HANDOFF
-  update commits on top; see *Recent Commits* for the current tip.
+- **Latest finalized commit before this handoff entry:** `228a490` (local
+  requirements handoff). This search-results redesign commits on top; run
+  `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
 ## Current Architecture
@@ -611,8 +642,9 @@ validation Stage 3 → expensive-model escalation Stage 4 only for ambiguous/con
 - **Frontend**: `EvidencePanel.tsx` (full-width accordion: normalization chain,
   per-field audit + feedback, conflict candidates "Which is right?", antibodies,
   lane strip, missing-info + flag-result forms, DOI link), `SearchFeedback.tsx`,
-  `BetaFeedback.tsx`, `FiltersBar.tsx` (composes queries for the deterministic
-  parser). Home-page search now routes to `/search?q=…` (legacy table retired).
+  `BetaFeedback.tsx`, `FiltersBar.tsx` (persistent sidebar that composes queries
+  for the deterministic parser). Home-page search now routes to `/search?q=…`
+  (legacy table retired).
 
 ## Completed Work
 - **Phase 1 — Repository audit / canonical architecture.** Identified the real system
@@ -664,6 +696,12 @@ validation Stage 3 → expensive-model escalation Stage 4 only for ambiguous/con
   `biopharma_workflows.md`, `frontend_integration_plan.md`, `benchmark_candidates.md`
   (+ `eval/candidates.json`, 26 verified papers), `real_pipeline_report.md`, and the
   integration `RESEARCH_SYNTHESIS.md`.
+- **Session 18 — Search-results IA redesign**: `/search` now keeps the search
+  bar on top, moves filters into a persistent left sidebar with explicit Apply,
+  shows removable active chips above results, and lays each desktop result card
+  out as experiment information, figure preview, and evidence/source. This is a
+  frontend-only change; `/api/search`, record detail, evidence feedback, schema,
+  and local/production env requirements are unchanged.
 
 ## Current Biological Contract
 Every important field is an **Evidence Field envelope**: `{value, confidence, status,
@@ -774,6 +812,9 @@ migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 
 ~~Create the Render service, re-point Vercel~~ — **DONE (session 14)**.
 ~~Fix the duplicate `stable_row_key`~~ — **DONE (session 14)**, 475/475 distinct.
+~~Search-results information architecture redesign~~ — **DONE (session 18)**,
+frontend-only, using the provided `/images/STATE3.png` preview asset for STAT3
+cards.
 
 **The hosted internal beta is READY to distribute.**
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
@@ -921,9 +962,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `228a490` Update handoff for local requirements verification
+- `43c3b63` Add local development requirements file
+- `4b38b95` Add the team local-dev env plan and close the miner .env gitignore gap
 - `2cb2d0c` Wire Evidence Record engine into pipeline.py behind WBM_EXTRACTION_MODE flag
 - `28f1372` Establish HANDOFF.md agent-handoff system + agent instructions
 - `97cdcf2` Migrate HiveBlot Phase 3: Evidence Record engine + resolver + benchmark
-- `6a3140b` Migrate HiveBlot Phase 2: biological schema + phospho fix
-- `4d5df1e` Execute plan steps 1-7: tests, sql_guard fix, verification (pre-existing /hive)
-- (this HANDOFF update commits on top of `2cb2d0c`)
+- (this HANDOFF update commits on top of `228a490`)
