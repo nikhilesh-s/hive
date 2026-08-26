@@ -227,9 +227,9 @@ export default function SearchPage() {
             {/* Results Header */}
             <div className="hb-results-header">
               <div className="hb-results-title">
-                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
-                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
-                <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Western Blot Evidence</span>
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
+                <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: '#e7f0ee' }}>Western Blot Evidence</span>
               </div>
               <p className="hb-results-count">
                 {loading
@@ -260,7 +260,7 @@ export default function SearchPage() {
             {/* Loading State */}
             {loading && (
               <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                <div style={{ fontFamily: '"Newsreader", serif', fontSize: '16px', color: '#a9bdb5' }}>
+                <div style={{ fontFamily: 'var(--font-serif), serif', fontSize: '16px', color: '#a9bdb5' }}>
                   Querying database...
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function SearchPage() {
                   border: '1px solid rgba(255, 107, 107, 0.3)',
                   borderRadius: '8px',
                   color: '#ff6b6b',
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '14px',
                   marginBottom: '40px',
                 }}
@@ -301,7 +301,7 @@ export default function SearchPage() {
             {/* No Results */}
             {!loading && results.length === 0 && !error && (
               <div style={{ textAlign: 'center', paddingTop: '40px', color: '#a9bdb5' }}>
-                <p style={{ fontFamily: '"Newsreader", serif', fontSize: '16px', lineHeight: 1.6 }}>
+                <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '16px', lineHeight: 1.6 }}>
                   No matching Western blot evidence was found in the current HiveBlot
                   beta dataset (3 reviewed papers). This does not mean no such evidence
                   exists in the literature — the beta corpus is deliberately small.
@@ -311,10 +311,10 @@ export default function SearchPage() {
           </div>
         ) : (
           <div style={{ textAlign: 'center', paddingTop: '80px', color: '#a9bdb5' }}>
-            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '18px', lineHeight: 1.6 }}>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '18px', lineHeight: 1.6 }}>
               Enter a natural language query to search for western blot evidence
             </p>
-            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', marginTop: '12px', color: '#6f857d' }}>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', marginTop: '12px', color: '#6f857d' }}>
               Example: &quot;Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.&quot;
             </p>
           </div>

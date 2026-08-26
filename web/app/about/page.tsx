@@ -2,7 +2,7 @@
 
 export default function About() {
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif" }}>
+    <div style={{ minHeight: '100vh', fontFamily: "var(--font-sans), sans-serif" }}>
       {/* Hero */}
       <section style={{ textAlign: 'center', padding: '88px 56px 60px' }}>
         <h1 style={{ fontSize: '64px', fontWeight: 600, marginBottom: '24px' }}>
@@ -72,16 +72,16 @@ export default function About() {
         <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '60px' }}>By the Numbers</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '80px', maxWidth: '1000px', margin: '0 auto' }}>
           <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#4ad6b0', marginBottom: '12px' }}>2.8K+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>PAPERS PROCESSED</div>
+            <div style={{ fontSize: '52px', fontWeight: 600, color: '#4ad6b0', marginBottom: '12px' }}>2.8K+</div>
+            <div style={{ color: '#a9bdb5', fontFamily: 'var(--font-mono), monospace', fontSize: '12px', letterSpacing: '1px' }}>PAPERS PROCESSED</div>
           </div>
           <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#e0a458', marginBottom: '12px' }}>12.4K+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>BLOTS INDEXED</div>
+            <div style={{ fontSize: '52px', fontWeight: 600, color: '#e0a458', marginBottom: '12px' }}>12.4K+</div>
+            <div style={{ color: '#a9bdb5', fontFamily: 'var(--font-mono), monospace', fontSize: '12px', letterSpacing: '1px' }}>BLOTS INDEXED</div>
           </div>
           <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#8fb6ff', marginBottom: '12px' }}>520+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>PROTEINS TRACKED</div>
+            <div style={{ fontSize: '52px', fontWeight: 600, color: '#8fb6ff', marginBottom: '12px' }}>520+</div>
+            <div style={{ color: '#a9bdb5', fontFamily: 'var(--font-mono), monospace', fontSize: '12px', letterSpacing: '1px' }}>PROTEINS TRACKED</div>
           </div>
         </div>
       </section>

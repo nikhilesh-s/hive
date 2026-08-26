@@ -8,7 +8,8 @@ import { useState } from 'react';
 
 import { submitFeedback } from '@/lib/feedback';
 
-const MONO = '"IBM Plex Mono", monospace';
+const MONO = 'var(--font-mono), monospace';
+const SANS = 'var(--font-sans), sans-serif';
 
 export default function BetaFeedback({ query }: { query?: string }) {
   const [state, setState] = useState<'idle' | 'open' | 'done'>('idle');
@@ -56,7 +57,7 @@ export default function BetaFeedback({ query }: { query?: string }) {
             placeholder="e.g. keep the blot visible while I inspect the methods"
             style={{
               background: '#06090c', border: '1px solid rgba(255,255,255,.12)', color: '#e7f0ee',
-              borderRadius: '4px', padding: '8px', fontFamily: '"Newsreader", serif', fontSize: '13px', resize: 'vertical',
+              borderRadius: '4px', padding: '8px', fontFamily: SANS, fontSize: '13px', resize: 'vertical',
             }}
           />
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -69,13 +70,13 @@ export default function BetaFeedback({ query }: { query?: string }) {
                 });
                 setState('done');
               }}
-              style={{ background: 'transparent', border: '1px solid #4ad6b0', color: '#4ad6b0', borderRadius: '4px', padding: '4px 12px', fontFamily: MONO, fontSize: '10px', cursor: 'pointer' }}
+              style={{ background: 'transparent', border: '1px solid #4ad6b0', color: '#4ad6b0', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
             >
               Send
             </button>
             <button
               onClick={() => setState('idle')}
-              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,.15)', color: '#6f857d', borderRadius: '4px', padding: '4px 12px', fontFamily: MONO, fontSize: '10px', cursor: 'pointer' }}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,.15)', color: '#6f857d', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
             >
               Cancel
             </button>

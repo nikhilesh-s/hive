@@ -62,7 +62,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div>
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '10px',
                   fontWeight: 600,
                   color: '#6f857d',
@@ -74,7 +74,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               </div>
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '14px',
                   color: '#e7f0ee',
                   lineHeight: 1.3,
@@ -88,7 +88,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div>
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#6f857d',
@@ -100,7 +100,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               </div>
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
                   color: '#e7f0ee',
                   lineHeight: 1.4,
@@ -114,7 +114,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div>
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#6f857d',
@@ -126,7 +126,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               </div>
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
                   color: '#4ad6b0',
                   lineHeight: 1.4,
@@ -143,7 +143,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div>
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#6f857d',
@@ -155,7 +155,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               </div>
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
                   color: '#a9bdb5',
                   lineHeight: 1.4,
@@ -169,7 +169,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div>
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#6f857d',
@@ -181,7 +181,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               </div>
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
                   color: '#e7f0ee',
                   lineHeight: 1.4,
@@ -197,7 +197,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
         <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
           <div
             style={{
-              fontFamily: '"IBM Plex Mono", monospace',
+              fontFamily: 'var(--font-mono), monospace',
               fontSize: '11px',
               fontWeight: 600,
               color: '#6f857d',
@@ -209,7 +209,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
           </div>
           <div
             style={{
-              fontFamily: '"Newsreader", serif',
+              fontFamily: 'var(--font-serif), serif',
               fontSize: '15px',
               color: '#e7f0ee',
               lineHeight: 1.6,
@@ -223,7 +223,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingTop: '8px' }}>
           <div
             style={{
-              fontFamily: '"IBM Plex Mono", monospace',
+              fontFamily: 'var(--font-mono), monospace',
               fontSize: '11px',
               fontWeight: 600,
               color: '#6f857d',
@@ -234,7 +234,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
           </div>
           <div
             style={{
-              fontFamily: '"Newsreader", serif',
+              fontFamily: 'var(--font-serif), serif',
               fontSize: '15px',
               color: '#4ad6b0',
               fontWeight: 600,
@@ -288,7 +288,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               {/* Figure Counter */}
               <div
                 style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
+                  fontFamily: 'var(--font-mono), monospace',
                   fontSize: '9px',
                   fontWeight: 600,
                   color: '#4ad6b0',
@@ -303,7 +303,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               {/* Caption */}
               <div
                 style={{
-                  fontFamily: '"Newsreader", serif',
+                  fontFamily: 'var(--font-serif), serif',
                   fontSize: '11px',
                   color: '#a9bdb5',
                   lineHeight: 1.3,
@@ -336,7 +336,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                       color: '#4ad6b0',
                       padding: '5px',
                       borderRadius: '3px',
-                      fontFamily: '"IBM Plex Mono", monospace',
+                      fontFamily: 'var(--font-mono), monospace',
                       fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -363,7 +363,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                       color: '#4ad6b0',
                       padding: '5px',
                       borderRadius: '3px',
-                      fontFamily: '"IBM Plex Mono", monospace',
+                      fontFamily: 'var(--font-mono), monospace',
                       fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -391,7 +391,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               >
                 <div
                   style={{
-                    fontFamily: '"IBM Plex Mono", monospace',
+                    fontFamily: 'var(--font-mono), monospace',
                     fontSize: '9px',
                     fontWeight: 600,
                     color: '#6f857d',
@@ -406,7 +406,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    fontFamily: '"IBM Plex Mono", monospace',
+                    fontFamily: 'var(--font-mono), monospace',
                     fontSize: '9px',
                     color: '#4ad6b0',
                     wordBreak: 'break-all',
@@ -438,7 +438,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
           >
             <div
               style={{
-                fontFamily: '"IBM Plex Mono", monospace',
+                fontFamily: 'var(--font-mono), monospace',
                 fontSize: '9px',
                 fontWeight: 600,
                 color: '#4ad6b0',

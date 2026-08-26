@@ -6,6 +6,34 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 26)** — Codex. **IBM PLEX TYPOGRAPHY SYSTEM
+  (frontend styling only; no layout structure, search behavior, filters, API,
+  backend, schema, data model, extraction, or result-data change).** Replaced
+  the render-blocking Google Fonts CSS `@import` (Newsreader + Manrope + IBM
+  Plex Mono) with Next.js `next/font/google` loading for IBM Plex Serif, IBM
+  Plex Sans, and IBM Plex Mono. The optimized font variables are exposed as
+  `--font-serif`, `--font-sans`, and `--font-mono` from the root layout and used
+  consistently across the frontend. Semantic mapping now uses Serif for the
+  HiveBlot/scientific identity, research headings, target/modification titles,
+  experimental descriptions, and figure-caption text; Sans for navigation,
+  search controls, result counts, filter values/actions, feedback controls,
+  ordinary metadata values, and general UI copy; Mono for section/field labels,
+  status/technical chips, lanes, and identifiers. Reduced prior monospace
+  overuse in navigation/sidebar controls and removed all remaining
+  Newsreader/Manrope declarations. Preserved existing dimensions, spacing,
+  colors, borders, card/sidebar hierarchy, and behavior. Files changed:
+  `web/app/layout.tsx`, `web/app/globals.css`, frontend pages under `web/app/`,
+  typography-bearing components under `web/components/`, and this handoff.
+  Verification: `cd web && npm run build` passed; targeted ESLint on the root
+  layout, search page, result card, filters, and canvas passed; `git diff
+  --check` passed; source scan found no legacy Newsreader/Manrope/font-import
+  declarations; live `/search?q=phospho%20STAT3%20Tyr705` returned 200,
+  preloaded optimized local WOFF2 assets, and exposed all three CSS variables;
+  required biology checks passed under `.venv`: biology 165/165, reconcile
+  21/21, loader enrichment 18/18, extract 10/10, pipeline wiring 11/11,
+  benchmark 34/34. Automated browser inspection was unavailable because the
+  in-app browser control tool was not exposed in this session. No environment
+  values or secrets were committed.
 - **2026-08-26 (session 25)** — Codex. **COMPACT SEARCH RESULTS VERTICAL
   RHYTHM (frontend styling/layout only; no search behavior, filters, API,
   backend, schema, query, extraction, or result-data change).** Tightened the
@@ -770,8 +798,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `9423949` (search-bar
-  UX/UI refinement). This compact-spacing change commits on top; run
+- **Latest finalized commit before this handoff entry:** `69ebdfd` (compact
+  search-results spacing). This IBM Plex typography change commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
