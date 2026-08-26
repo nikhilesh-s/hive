@@ -146,17 +146,17 @@ body {
 
 .hb-search-input-shell {
   margin: 0;
-  max-width: 920px;
+  max-width: none;
   width: 100%;
 }
 
 .hb-search-input-heading {
   color: var(--color-text);
   font-family: var(--font-serif), serif;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 500;
   line-height: 1.2;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   text-align: left;
 }
 
@@ -164,7 +164,7 @@ body {
   align-items: stretch;
   display: flex;
   margin: 0;
-  max-width: 920px;
+  max-width: none;
   width: 100%;
 }
 
@@ -177,7 +177,7 @@ body {
   display: flex;
   flex: 1 1 auto;
   gap: 12px;
-  min-height: 52px;
+  min-height: 48px;
   min-width: 0;
   padding: 0 12px 0 17px;
   transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
@@ -261,7 +261,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   line-height: 1;
-  min-height: 52px;
+  min-height: 48px;
   padding: 0 18px;
   transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.08s;
 }
@@ -290,8 +290,8 @@ body {
   font-size: 11px;
   gap: 8px;
   line-height: 1.5;
-  margin: 7px 0 0;
-  max-width: 920px;
+  margin: 6px 0 0;
+  max-width: none;
   padding-left: 2px;
 }
 
