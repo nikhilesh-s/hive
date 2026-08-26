@@ -7,8 +7,8 @@
 
 import type { ReactNode } from 'react';
 
-const MONO = '"IBM Plex Mono", monospace';
-const SERIF = '"Newsreader", serif';
+const MONO = 'var(--font-mono), monospace';
+const SANS = 'var(--font-sans), sans-serif';
 const LABEL = '#6f857d';
 const TEAL = '#4ad6b0';
 
@@ -170,7 +170,7 @@ export default function FiltersBar({
           <div style={{ fontFamily: MONO, fontSize: '11px', fontWeight: 600, color: TEAL }}>
             FILTERS
           </div>
-          <div style={{ fontFamily: SERIF, fontSize: '12px', color: LABEL, marginTop: '4px', lineHeight: 1.35 }}>
+          <div style={{ fontFamily: SANS, fontSize: '12px', color: LABEL, marginTop: '4px', lineHeight: 1.35 }}>
             Applied when you press Apply.
           </div>
         </div>

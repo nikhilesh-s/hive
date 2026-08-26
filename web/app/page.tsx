@@ -104,7 +104,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif", background: '#06090c' }}>
+    <div style={{ minHeight: '100vh', fontFamily: "var(--font-sans), sans-serif", background: '#06090c' }}>
       {!showResults ? (
         // Hero Section
         <section
@@ -171,13 +171,13 @@ export default function Home() {
             </svg>
 
             <div style={{ marginBottom: 'clamp(20px, 3vh, 32px)' }}>
-              <h1 style={{ fontFamily: '"Newsreader", serif', fontWeight: 400, fontSize: 'clamp(20px, 5vw, 52px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0 0 clamp(6px, 1.5vh, 12px) 0', color: '#e7f0ee' }}>
+              <h1 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(20px, 5vw, 52px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0 0 clamp(6px, 1.5vh, 12px) 0', color: '#e7f0ee' }}>
                 <span style={{ position: 'relative', display: 'inline-block' }}>
                   Protein mentions, missing context
                   <span aria-hidden="true" style={{ position: 'absolute', left: '-0.02em', right: '-0.02em', top: '54%', height: '3px', borderRadius: '999px', background: '#ff6b6b', transform: 'translateY(-50%)' }} />
                 </span>
               </h1>
-              <h2 style={{ fontFamily: '"Newsreader", serif', fontWeight: 400, fontSize: 'clamp(26px, 6vw, 62px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0', color: '#e7f0ee', fontStyle: 'italic' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(26px, 6vw, 62px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0', color: '#e7f0ee', fontStyle: 'italic' }}>
                 <TypewriterHeadline />
               </h2>
             </div>
@@ -192,11 +192,11 @@ export default function Home() {
         <div style={{ padding: '60px 56px', maxWidth: '1000px', margin: '0 auto' }}>
           <div style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
-              <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
-              <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
-              <span style={{ fontFamily: '"Newsreader", serif', fontSize: '20px', fontWeight: 400, color: '#e7f0ee' }}>Western Blot Evidence</span>
+              <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: '#4ad6b0' }}>RESULTS</span>
+              <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: '#6f857d' }}>-</span>
+              <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: '#e7f0ee' }}>Western Blot Evidence</span>
             </div>
-            <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', color: '#a9bdb5', lineHeight: 1.6, marginTop: '12px' }}>
               {loading ? 'Searching...' : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`}
             </p>
             <button
@@ -208,7 +208,7 @@ export default function Home() {
                 border: '1px solid rgba(74,214,176,.3)',
                 color: '#4ad6b0',
                 borderRadius: '4px',
-                fontFamily: '"IBM Plex Mono", monospace',
+                fontFamily: 'var(--font-mono), monospace',
                 fontSize: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.2s',

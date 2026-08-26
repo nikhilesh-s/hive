@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 
 import { submitFeedback } from '@/lib/feedback';
 
-const MONO = '"IBM Plex Mono", monospace';
-const SERIF = '"Newsreader", serif';
+const MONO = 'var(--font-mono), monospace';
+const SANS = 'var(--font-sans), sans-serif';
 
 export default function SearchFeedback({ query }: { query: string }) {
   const [state, setState] = useState<'idle' | 'explain' | 'done'>('idle');
@@ -39,14 +39,14 @@ export default function SearchFeedback({ query }: { query: string }) {
   const btn = {
     background: 'transparent', border: '1px solid rgba(255,255,255,.15)',
     color: '#a9bdb5', borderRadius: '4px', padding: '2px 10px',
-    fontFamily: MONO, fontSize: '10px', cursor: 'pointer',
+    fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer',
   } as const;
 
   return (
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
       {state === 'idle' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: SERIF, fontSize: '12px', color: '#6f857d' }}>
+          <span style={{ fontFamily: SANS, fontSize: '12px', color: '#6f857d' }}>
             Beta — did HiveBlot understand what you were looking for?
           </span>
           <button style={btn} onClick={() => send('understood_yes')}>Yes</button>
@@ -62,7 +62,7 @@ export default function SearchFeedback({ query }: { query: string }) {
             placeholder="What did you expect instead?"
             style={{
               background: '#0a0d0f', border: '1px solid rgba(255,255,255,.15)', color: '#e7f0ee',
-              borderRadius: '4px', padding: '4px 10px', fontFamily: MONO, fontSize: '11px', width: '320px',
+              borderRadius: '4px', padding: '4px 10px', fontFamily: SANS, fontSize: '11px', width: '320px',
             }}
           />
           <button style={{ ...btn, color: '#4ad6b0', borderColor: '#4ad6b0' }}

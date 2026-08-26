@@ -74,7 +74,8 @@ export default function OrbitCanvas() {
       });
 
       // center label
-      ctx.font = '500 11.5px "IBM Plex Mono", monospace';
+      const monoFamily = getComputedStyle(canvas).getPropertyValue('--font-mono').trim();
+      ctx.font = `500 11.5px ${monoFamily || 'monospace'}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = 'rgba(74,214,176,.45)';
