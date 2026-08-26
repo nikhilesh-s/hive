@@ -6,6 +6,37 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 19)** — Codex. **SEARCH RESULTS ROW REFINEMENT
+  (frontend-only; no backend/API/schema/query change, no deploy, no cloud
+  DB/Supabase change, no production secrets).** Refined the session-18
+  `/search` layout so result cards read less like three rigid database columns
+  and more like one wide scientific catalog row. The left filter sidebar stayed
+  intact and visually secondary; results now dominate the page width. Each
+  desktop result row is organized as **primary scientific identity | centered
+  figure preview | compact experiment chips | source metadata | action** with
+  only one subtle outer card border, wider internal spacing, no heavy vertical
+  panel dividers, a larger contained figure preview, compact chips derived only
+  from existing result data (`WB`/`co-IP`, `Phospho`, design tag, lane count),
+  lighter metadata rows for antibody/MW/UniProt/source, and a compact
+  right-aligned `View Evidence` action that still toggles the same
+  `EvidencePanel`. The STAT3 temporary image remains frontend-only at
+  `/images/STATE3.png` and is labeled "Sample figure preview" so it is not
+  presented as confirmed provenance. Files changed:
+  `web/components/DatabaseResultCard.tsx`, `web/app/globals.css`,
+  `web/app/search/page.tsx`, and this handoff. Verification:
+  `cd web && npm run build` passed; targeted ESLint on changed frontend files
+  passed; full `npm run lint` still fails only on pre-existing unrelated lint
+  issues in `web/app/learn/page.tsx`, `web/app/page.tsx`,
+  `web/components/Navigation.tsx`, `web/components/ResultsCard.tsx`,
+  `web/components/SearchFeedback.tsx`, and `web/components/SearchInput.tsx`;
+  local API `/health` returned OK; local `/search?q=phospho%20STAT3%20Tyr705`
+  returned 200; local web `/api/search` proxy returned count 18; required
+  biology checks passed again: biology 165/165, reconcile 21/21, loader
+  enrichment 18/18, extract 10/10, pipeline wiring 11/11, benchmark 34/34.
+  In-app browser automation was unavailable in this Codex session, so visual
+  QA was limited to local server checks plus opening the page for manual
+  inspection. Existing uncommitted `web/next.config.ts` (`allowedDevOrigins`)
+  was present before this task and left untouched.
 - **2026-08-26 (session 18)** — Codex. **SEARCH RESULTS INFORMATION
   ARCHITECTURE REDESIGN (frontend-only; no backend/API/schema/query change, no
   deploy, no cloud DB/Supabase change, no production secrets).** Rebuilt the
@@ -596,8 +627,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `228a490` (local
-  requirements handoff). This search-results redesign commits on top; run
+- **Latest finalized commit before this handoff entry:** `8e996c0` (search
+  results information architecture redesign). This row refinement commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
@@ -815,6 +846,9 @@ migrated, seeded, verified on `zafombwswztvnjikcsdm`.
 ~~Search-results information architecture redesign~~ — **DONE (session 18)**,
 frontend-only, using the provided `/images/STATE3.png` preview asset for STAT3
 cards.
+~~Search-results row refinement~~ — **DONE (session 19)**, frontend-only:
+lighter wide rows, centered preview, compact existing-data chips, lighter
+source metadata, compact right-aligned evidence action.
 
 **The hosted internal beta is READY to distribute.**
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
@@ -962,10 +996,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `8e996c0` Redesign search results IA
 - `228a490` Update handoff for local requirements verification
 - `43c3b63` Add local development requirements file
 - `4b38b95` Add the team local-dev env plan and close the miner .env gitignore gap
 - `2cb2d0c` Wire Evidence Record engine into pipeline.py behind WBM_EXTRACTION_MODE flag
 - `28f1372` Establish HANDOFF.md agent-handoff system + agent instructions
-- `97cdcf2` Migrate HiveBlot Phase 3: Evidence Record engine + resolver + benchmark
-- (this HANDOFF update commits on top of `228a490`)
+- (this HANDOFF update commits on top of `8e996c0`)
