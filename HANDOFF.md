@@ -6,6 +6,27 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 25)** — Codex. **COMPACT SEARCH RESULTS VERTICAL
+  RHYTHM (frontend styling/layout only; no search behavior, filters, API,
+  backend, schema, query, extraction, or result-data change).** Tightened the
+  `/search` workspace from the search heading through the first result card:
+  reduced heading-to-input and input-to-example spacing, reduced search-header
+  bottom padding while retaining its divider, moved the results workspace
+  closer to that divider, and replaced the results header's large inline
+  margins with scoped classes for compact title/count/feedback/card spacing.
+  Preserved the current sidebar, result cards, typography sizes, dark/teal
+  visual system, and responsive layout; the mobile breakpoint receives the
+  same proportional tightening. Files changed: `web/app/globals.css`,
+  `web/app/search/page.tsx`, `web/components/SearchFeedback.tsx`, and this
+  handoff. Verification: `cd web && npm run build` passed; targeted ESLint on
+  `app/search/page.tsx` passed; `git diff --check` passed; local
+  `/search?q=phospho%20STAT3%20Tyr705` returned 200; required biology checks
+  passed under `.venv`: biology 165/165, reconcile 21/21, loader enrichment
+  18/18, extract 10/10, pipeline wiring 11/11, benchmark 34/34. Automated
+  browser inspection was unavailable because the in-app browser control tool
+  was not exposed in this session; the page was instead verified via the
+  production build and live local HTTP route. No environment values or secrets
+  were committed.
 - **2026-08-26 (session 24)** — Codex. **SEARCH BAR UX/UI REFINEMENT
   (frontend presentation/interaction only; no backend/API/schema/query/filter/
   extraction/evidence data change, no deploy, no cloud DB/Supabase change, no
@@ -749,8 +770,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `db57622` (local
-  dev-origin config). This search-bar UX/UI refinement commits on top; run
+- **Latest finalized commit before this handoff entry:** `9423949` (search-bar
+  UX/UI refinement). This compact-spacing change commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
