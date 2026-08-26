@@ -6,6 +6,33 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 20)** — Codex. **DEDICATED TREATMENT/LANES RESULT
+  COLUMN (frontend layout-only; no backend/API/schema/query/filter/evidence
+  change, no deploy, no cloud DB/Supabase change, no production secrets).**
+  Refined `DatabaseResultCard` so desktop result rows now follow
+  **primary result info | treatment + lanes | figure preview | experiment tags
+  | evidence/source | action**. Treatment and lane chips moved out of the
+  primary identity section into their own adjacent column; all lane chips now
+  render and wrap naturally instead of truncating after eight lanes. Primary
+  result info keeps target/modification, status, as-printed label, context,
+  sample, experiment type, organism/IP bait when present. Figure preview,
+  compact existing-data chips, source metadata, and `View Evidence` behavior
+  are unchanged except for grid placement; dose/duration display now includes a
+  space before units (`10 ng/ml`) as a frontend formatting-only cleanup. Medium
+  screens reflow to two rows (**primary | treatment/lanes | figure**, then
+  **tags | source | action**); mobile stacks in reading order. Files changed:
+  `web/components/DatabaseResultCard.tsx`, `web/app/globals.css`, and this
+  handoff. Verification: `cd web && npm run build` passed; targeted ESLint on
+  `components/DatabaseResultCard.tsx` passed; full `npm run lint` still fails
+  only on pre-existing unrelated lint issues in `web/app/learn/page.tsx`,
+  `web/app/page.tsx`, `web/components/Navigation.tsx`,
+  `web/components/ResultsCard.tsx`, `web/components/SearchFeedback.tsx`, and
+  `web/components/SearchInput.tsx`; local `/search?q=phospho%20STAT3%20Tyr705`
+  returned 200; local web `/api/search` proxy returned count 18; required
+  biology checks passed again: biology 165/165, reconcile 21/21, loader
+  enrichment 18/18, extract 10/10, pipeline wiring 11/11, benchmark 34/34.
+  Existing uncommitted `web/next.config.ts` (`allowedDevOrigins`) was present
+  before this task and left untouched.
 - **2026-08-26 (session 19)** — Codex. **SEARCH RESULTS ROW REFINEMENT
   (frontend-only; no backend/API/schema/query change, no deploy, no cloud
   DB/Supabase change, no production secrets).** Refined the session-18
@@ -627,8 +654,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `8e996c0` (search
-  results information architecture redesign). This row refinement commits on top; run
+- **Latest finalized commit before this handoff entry:** `6941f7c` (search
+  result row refinement). This dedicated treatment/lanes column update commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
@@ -849,6 +876,9 @@ cards.
 ~~Search-results row refinement~~ — **DONE (session 19)**, frontend-only:
 lighter wide rows, centered preview, compact existing-data chips, lighter
 source metadata, compact right-aligned evidence action.
+~~Dedicated treatment/lanes result column~~ — **DONE (session 20)**,
+frontend layout-only: treatment and all lane chips now occupy their own
+desktop column immediately after primary identity, with medium/mobile reflow.
 
 **The hosted internal beta is READY to distribute.**
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
@@ -996,10 +1026,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `6941f7c` Refine search result rows
 - `8e996c0` Redesign search results IA
 - `228a490` Update handoff for local requirements verification
 - `43c3b63` Add local development requirements file
 - `4b38b95` Add the team local-dev env plan and close the miner .env gitignore gap
 - `2cb2d0c` Wire Evidence Record engine into pipeline.py behind WBM_EXTRACTION_MODE flag
-- `28f1372` Establish HANDOFF.md agent-handoff system + agent instructions
-- (this HANDOFF update commits on top of `8e996c0`)
+- (this HANDOFF update commits on top of `6941f7c`)
