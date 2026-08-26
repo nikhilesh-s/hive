@@ -6,6 +6,36 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 27)** — Codex. **SEARCH/RESULTS RESEARCH-WORKSPACE
+  ALIGNMENT + MOBILE FILTER DRAWER (frontend presentation only; no search API,
+  query semantics, URL parameters, database, backend, ranking, schema, filter
+  composition, extraction, or evidence-classification change).** Reframed
+  `/search` around one shared desktop workspace grid: the search heading,
+  control, and examples now begin on the same horizontal axis as the results
+  column while the persistent filter sidebar occupies the first grid track.
+  Reduced search-section and result-card whitespace, tightened the desktop
+  faceted sidebar, and retained the existing wide card hierarchy, prominent
+  Western blot preview, temporary-preview disclosure, metadata, IBM Plex
+  typography, dark theme, and teal accents. At <=900px, the sidebar is removed
+  from document flow and exposed through a real Filters button as a scrollable
+  off-canvas panel with backdrop, close control, Escape dismissal, background
+  scroll lock, active-filter count, and hidden-when-closed keyboard behavior.
+  The drawer reuses the same draft/applied filter state and existing
+  Apply/Reset handlers; Apply still builds the same query and now also closes
+  the drawer. No fake controls were added and View Evidence remains absent.
+  Files changed: `web/app/search/page.tsx`, `web/components/FiltersBar.tsx`,
+  `web/app/globals.css`, and this handoff. `SearchInput.tsx` and
+  `DatabaseResultCard.tsx` were inspected but required no changes because their
+  preserved content/behavior already matched the requested hierarchy.
+  Verification: `cd web && npm run build` passed; targeted ESLint on search,
+  filters, SearchInput, and DatabaseResultCard passed; `git diff --check`
+  passed; live `/search?q=phospho%20STAT3%20Tyr705` returned 200 and the
+  unchanged local `/api/search` proxy returned 200; required biology checks
+  passed under `.venv`: biology 165/165, reconcile 21/21, loader enrichment
+  18/18, extract 10/10, pipeline wiring 11/11, benchmark 34/34. Automated
+  browser screenshots were unavailable because the in-app browser control tool
+  was not exposed in this session. No environment values or secrets were
+  committed.
 - **2026-08-26 (session 26)** — Codex. **IBM PLEX TYPOGRAPHY SYSTEM
   (frontend styling only; no layout structure, search behavior, filters, API,
   backend, schema, data model, extraction, or result-data change).** Replaced
@@ -798,8 +828,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `69ebdfd` (compact
-  search-results spacing). This IBM Plex typography change commits on top; run
+- **Latest finalized commit before this handoff entry:** `1c02ec0` (IBM Plex
+  typography system). This workspace-alignment change commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 

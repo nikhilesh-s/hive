@@ -103,6 +103,8 @@ interface FiltersBarProps {
   onApply: () => void;
   onClearField: (key: SearchFilterKey) => void;
   onReset: () => void;
+  open?: boolean;
+  onClose?: () => void;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -157,6 +159,8 @@ export default function FiltersBar({
   onApply,
   onClearField,
   onReset,
+  open = false,
+  onClose,
 }: FiltersBarProps) {
   const setFilter = <K extends SearchFilterKey>(key: K, value: SearchFilters[K]) => {
     onChange({ ...filters, [key]: value });
@@ -164,7 +168,17 @@ export default function FiltersBar({
   const hasAnyFilter = hasFilters(filters);
 
   return (
-    <aside className="hb-filter-sidebar" aria-label="Search filters">
+    <aside
+      id="hb-search-filters"
+      className={`hb-filter-sidebar${open ? ' is-open' : ''}`}
+      aria-label="Search filters"
+    >
+      <div className="hb-filter-mobile-header">
+        <span>Filters</span>
+        <button type="button" onClick={onClose} aria-label="Close filters">
+          &times;
+        </button>
+      </div>
       <div className="hb-filter-sidebar-heading">
         <div>
           <div style={{ fontFamily: MONO, fontSize: '11px', fontWeight: 600, color: TEAL }}>
