@@ -96,6 +96,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<SearchFilters>(emptySearchFilters);
   const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(emptySearchFilters);
 
@@ -106,6 +107,20 @@ export default function SearchPage() {
     if (q) handleSearch(q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setFiltersOpen(false);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [filtersOpen]);
 
   const clearSearchUrl = () => {
     const url = new URL(window.location.href);
@@ -170,6 +185,7 @@ export default function SearchPage() {
     const filterQuery = buildFilterQuery(draftFilters);
     if (!filterQuery) return;
     setAppliedFilters({ ...draftFilters });
+    setFiltersOpen(false);
     handleSearch(filterQuery);
   };
 
@@ -198,30 +214,55 @@ export default function SearchPage() {
   const filterChips = activeFilterChips(appliedFilters);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '28px' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '16px' }}>
       {/* Search Bar */}
       <div className="hb-search-workspace-header">
-        <SearchInput
-          heading="Search Western blot evidence"
-          placeholder="Search protein, phosphosite, antibody, cell line..."
-          onSearch={handlePrimarySearch}
-          initialValue={query}
-          examples={['STAT3 Tyr705', 'Hep3B', 'CST #9145']}
-          loading={loading}
-        />
+        <div className="hb-search-workspace-grid">
+          <div className="hb-search-sidebar-spacer" aria-hidden="true" />
+          <SearchInput
+            heading="Search Western blot evidence"
+            placeholder="Search protein, phosphosite, antibody, cell line..."
+            onSearch={handlePrimarySearch}
+            initialValue={query}
+            examples={['STAT3 Tyr705', 'Hep3B', 'CST #9145']}
+            loading={loading}
+          />
+        </div>
       </div>
 
       <div className="hb-search-body">
+        <button
+          type="button"
+          className={`hb-filter-backdrop${filtersOpen ? ' is-open' : ''}`}
+          onClick={() => setFiltersOpen(false)}
+          aria-label="Close filters"
+          tabIndex={filtersOpen ? 0 : -1}
+        />
         <FiltersBar
           filters={draftFilters}
           onChange={setDraftFilters}
           onApply={handleApplyFilters}
           onClearField={handleClearDraftFilter}
           onReset={handleResetFilters}
+          open={filtersOpen}
+          onClose={() => setFiltersOpen(false)}
         />
 
         {/* Results Section */}
         <main className="hb-search-results">
+          <button
+            type="button"
+            className="hb-mobile-filter-trigger"
+            onClick={() => setFiltersOpen(true)}
+            aria-expanded={filtersOpen}
+            aria-controls="hb-search-filters"
+          >
+            <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
+              <path d="M3 5h14M5.5 10h9M8 15h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+            </svg>
+            <span>Filters</span>
+            {filterChips.length > 0 && <span className="hb-mobile-filter-count">{filterChips.length}</span>}
+          </button>
         {showResults ? (
           <div>
             {/* Results Header */}
