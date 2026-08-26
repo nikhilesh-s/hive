@@ -250,8 +250,7 @@ body {
 }
 
 .hb-filter-apply,
-.hb-filter-reset,
-.hb-evidence-toggle {
+.hb-filter-reset {
   border-radius: 4px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
@@ -326,13 +325,12 @@ body {
 .hb-result-card-main {
   display: grid;
   grid-template-columns:
-    minmax(220px, 1.28fr)
-    minmax(136px, 0.62fr)
-    minmax(160px, 0.78fr)
-    minmax(170px, 0.82fr)
-    minmax(170px, 0.78fr)
-    minmax(92px, 0.36fr);
-  gap: 24px;
+    minmax(240px, 1.34fr)
+    minmax(140px, 0.62fr)
+    minmax(166px, 0.78fr)
+    minmax(180px, 0.86fr)
+    minmax(190px, 0.9fr);
+  gap: 26px;
   align-items: start;
   padding: 30px 32px;
   background: #070a0d;
@@ -342,8 +340,7 @@ body {
 .hb-result-card-sample,
 .hb-result-card-treatment,
 .hb-result-card-figure,
-.hb-result-card-metadata,
-.hb-result-card-action {
+.hb-result-card-metadata {
   min-width: 0;
 }
 
@@ -546,23 +543,6 @@ body {
   font-size: 11px;
 }
 
-.hb-result-card-action {
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.hb-evidence-toggle {
-  min-height: 32px;
-  border: 1px solid rgba(74, 214, 176, 0.55);
-  background: transparent;
-  color: var(--color-accent);
-  padding: 0 10px;
-  white-space: nowrap;
-}
-
-.hb-evidence-toggle:hover,
 .hb-filter-apply:hover:not(:disabled),
 .hb-filter-reset:hover:not(:disabled) {
   border-color: var(--color-accent);
@@ -605,9 +585,6 @@ body {
     min-height: 0;
   }
 
-  .hb-result-card-action {
-    justify-content: flex-start;
-  }
 }
 
 @keyframes typewriter-cursor-pulse {

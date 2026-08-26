@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
-
-import EvidencePanel from '@/components/EvidencePanel';
+import { type ReactNode } from 'react';
 
 // NOTE: every Evidence Record field below is OPTIONAL. Legacy rows (pre-migration
 // 001) simply omit them and the card falls back to the original base fields, so
@@ -175,8 +173,6 @@ function experimentLabel(blotType?: string | null): string | null {
 }
 
 export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardProps) {
-  const [expanded, setExpanded] = useState(false);
-
   const headline = data.canonical_target || data.target;
   const headlineMod = data.modification_label ? ` · ${data.modification_label}` : '';
   const review = reviewState(data);
@@ -360,21 +356,7 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
             />
           )}
         </section>
-
-        <section className="hb-result-card-action">
-          <button
-            aria-expanded={expanded}
-            aria-label={expanded ? 'Hide evidence' : 'View evidence — why HiveBlot says this'}
-            onClick={() => setExpanded(!expanded)}
-            className="hb-evidence-toggle"
-          >
-            {expanded ? 'Hide Evidence' : 'View Evidence'}
-          </button>
-        </section>
       </div>
-
-      {/* Full-width provenance + per-field feedback accordion */}
-      {expanded && <EvidencePanel recordId={data.id} />}
     </div>
   );
 }
