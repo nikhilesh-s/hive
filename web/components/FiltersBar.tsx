@@ -9,8 +9,8 @@ import type { ReactNode } from 'react';
 
 const MONO = 'var(--font-mono), monospace';
 const SANS = 'var(--font-sans), sans-serif';
-const LABEL = '#6f857d';
-const TEAL = '#4ad6b0';
+const LABEL = 'var(--text-subtle)';
+const TEAL = 'var(--accent)';
 
 export interface SearchFilters {
   protein: string;

@@ -6,6 +6,42 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 29)** — Codex. **LIGHT/DARK THEME SYSTEM
+  (frontend theme/styling only; no backend, search API, query semantics, URL,
+  result schema, filters, database, evidence logic, ranking, extraction, or
+  result-state change).** Added a compact, keyboard-accessible Light/Dark
+  segmented control beside the header navigation. Theme selection updates the
+  document immediately without reload/API activity, stores the explicit choice
+  in browser `localStorage` under `hiveblot-theme`, and otherwise follows the
+  initial system `prefers-color-scheme`. A pre-hydration script in the root
+  layout applies `data-theme` and `color-scheme` before body rendering to avoid
+  wrong-theme flash. Refactored the frontend around shared semantic CSS tokens
+  for background/surfaces/text/borders/accent/status/chips/overlay/focus states,
+  retaining the existing dark palette as the default and adding the intentional
+  light scientific palette (`#f7f8f6` page, white cards/inputs, soft green-gray
+  sidebar, dark text, deep teal accents, restrained purple, amber warnings,
+  muted red errors). Converted hard-coded theme colors across home, About,
+  Learn, search/results, filters, feedback, evidence, legacy results, and header
+  surfaces to those tokens. Search is white with a filled teal submit action in
+  light mode; cards remain white and restrained; figure/panel image backgrounds
+  remain white in both themes. IBM Plex typography, all layout/data hierarchy,
+  mobile filter drawer, and responsive behavior remain intact; on small screens
+  theme labels collapse to icons and the wordmark text hides at <=520px to
+  prevent header crowding. Files changed: `web/app/layout.tsx`,
+  `web/app/globals.css`, active frontend pages/components with theme colors,
+  new `web/components/ThemeToggle.tsx`, and this handoff. Verification: final
+  `cd web && npm run build` passed; targeted ESLint passed for layout,
+  ThemeToggle, Navigation, search page, filters, DatabaseResultCard, and
+  BetaFeedback; `SearchFeedback.tsx` still has its documented pre-existing
+  `react-hooks/set-state-in-effect` error unrelated to theme styling; `git diff
+  --check` passed; live `/search?q=phospho%20STAT3%20Tyr705` returned 200 and
+  server HTML contained both accessible theme labels plus the pre-hydration
+  `hiveblot-theme` script; required biology checks passed under `.venv`:
+  biology 165/165, reconcile 21/21, loader enrichment 18/18, extract 10/10,
+  pipeline wiring 11/11, benchmark 34/34. Automated browser screenshots were
+  unavailable because the in-app browser control tool was not exposed; the
+  local themed page was opened for direct inspection. No environment values or
+  secrets were committed.
 - **2026-08-26 (session 28)** — Codex. **SEARCH BAR ALIGNMENT VISIBILITY
   CORRECTION (frontend CSS only; no layout ownership, search behavior, filters,
   API, URL semantics, backend, schema, data, or evidence change).** Follow-up
@@ -845,8 +881,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `6aae109` (search/results
-  workspace alignment). This visible search-bar correction commits on top; run
+- **Latest finalized commit before this handoff entry:** `f3455ce` (visible
+  search-workspace alignment correction). This theme-system change commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 

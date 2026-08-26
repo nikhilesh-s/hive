@@ -14,12 +14,12 @@ import { submitFeedback } from '@/lib/feedback';
 
 const MONO = 'var(--font-mono), monospace';
 const SERIF = 'var(--font-serif), serif';
-const LABEL = '#6f857d';
-const TEXT = '#e7f0ee';
-const DIM = '#a9bdb5';
-const TEAL = '#4ad6b0';
-const GOLD = '#e0b23c';
-const RED = '#ff6b6b';
+const LABEL = 'var(--text-subtle)';
+const TEXT = 'var(--text-primary)';
+const DIM = 'var(--text-secondary)';
+const TEAL = 'var(--accent)';
+const GOLD = 'var(--warning)';
+const RED = 'var(--error)';
 
 interface FieldEvidence {
   value: unknown;
@@ -154,7 +154,7 @@ function CorrectionForm({ placeholder, onSubmit, onCancel, askValue = true }: {
   const [value, setValue] = useState('');
   const [comment, setComment] = useState('');
   const input = {
-    background: '#0a0d0f', border: '1px solid rgba(255,255,255,.15)', color: TEXT,
+    background: 'var(--input-background)', border: '1px solid var(--border-strong)', color: TEXT,
     borderRadius: '4px', padding: '4px 8px', fontFamily: MONO, fontSize: '11px', width: '100%',
   } as const;
   return (
@@ -302,7 +302,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
               <button key={i}
                 onClick={() => send('incorrect', String(c.value ?? 'none'), 'picked from candidates')}
                 style={{
-                  background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.15)',
+                  background: 'rgba(255,255,255,.04)', border: '1px solid var(--border-strong)',
                   borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', textAlign: 'left',
                 }}>
                 <span style={{ fontFamily: SERIF, fontSize: '12px', color: TEXT }}>{String(c.value ?? 'none')}</span>
@@ -388,7 +388,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
   const sect = { fontFamily: MONO, fontSize: '10px', fontWeight: 600 as const, color: TEAL, letterSpacing: '0.6px', margin: '14px 0 4px' };
 
   return (
-    <div style={{ padding: '18px 28px 22px', borderTop: '1px solid rgba(255,255,255,.08)', backgroundColor: '#0a0d0f' }}>
+    <div style={{ padding: '18px 28px 22px', borderTop: '1px solid var(--border)', backgroundColor: 'var(--input-background)' }}>
       <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, letterSpacing: '0.6px' }}>
         WHY HIVEBLOT SAYS THIS
       </div>
@@ -414,8 +414,8 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
               onError={() => setCropFailed(true)}
               style={{
                 maxWidth: '520px', width: '100%', borderRadius: '4px',
-                border: '1px solid rgba(255,255,255,.12)', marginBottom: '6px',
-                backgroundColor: '#fff',
+                border: '1px solid var(--border-strong)', marginBottom: '6px',
+                backgroundColor: 'var(--figure-background)',
               }}
             />
           )}
@@ -484,7 +484,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
             {detail.bands.map((b, i) => (
               <span key={i} style={{
                 fontFamily: MONO, fontSize: '10px', padding: '3px 8px', borderRadius: '4px',
-                border: '1px solid rgba(255,255,255,.1)',
+                border: '1px solid var(--border)',
                 color: b.band_state === 'present' ? TEAL : b.band_state === 'absent' ? RED : GOLD,
               }}>
                 {formatLaneLabel(b.lane_condition) || `lane ${b.lane_index}`}: {b.band_state || '?'}
@@ -554,7 +554,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
       {flagMode === 'open' && (
         <div style={{ marginTop: '8px' }} onClick={(e) => e.stopPropagation()}>
           <select value={flagType} onChange={(e) => setFlagType(e.target.value)}
-            style={{ background: '#0a0d0f', color: TEXT, border: '1px solid rgba(255,255,255,.15)',
+            style={{ background: 'var(--input-background)', color: TEXT, border: '1px solid var(--border-strong)',
                      borderRadius: '4px', fontFamily: MONO, fontSize: '11px', padding: '4px 8px' }}>
             {RECORD_FLAGS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>

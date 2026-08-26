@@ -32,12 +32,12 @@ export default function ResultsTable({ results }: ResultsTableProps) {
       >
         <thead>
           <tr style={{ borderBottom: '2px solid rgba(74,214,176,.3)' }}>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TARGET</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>SAMPLE</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>CONDITION</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TYPE</th>
-            <th style={{ padding: '12px', textAlign: 'center', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>DETECTED</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>PAPER</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TARGET</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>SAMPLE</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>CONDITION</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TYPE</th>
+            <th style={{ padding: '12px', textAlign: 'center', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>DETECTED</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>PAPER</th>
           </tr>
         </thead>
         <tbody>
@@ -49,22 +49,22 @@ export default function ResultsTable({ results }: ResultsTableProps) {
                 backgroundColor: index % 2 === 0 ? 'rgba(74,214,176,.02)' : 'transparent',
               }}
             >
-              <td style={{ padding: '12px', color: '#4ad6b0', fontWeight: 600 }}>
+              <td style={{ padding: '12px', color: 'var(--accent)', fontWeight: 600 }}>
                 {result.target}
               </td>
-              <td style={{ padding: '12px', color: '#e7f0ee' }}>
+              <td style={{ padding: '12px', color: 'var(--text-primary)' }}>
                 {result.sample}
               </td>
-              <td style={{ padding: '12px', color: '#e7f0ee', maxWidth: '200px', wordBreak: 'break-word' }}>
+              <td style={{ padding: '12px', color: 'var(--text-primary)', maxWidth: '200px', wordBreak: 'break-word' }}>
                 {result.condition}
               </td>
-              <td style={{ padding: '12px', color: '#a9bdb5', fontSize: '13px' }}>
+              <td style={{ padding: '12px', color: 'var(--text-secondary)', fontSize: '13px' }}>
                 {result.western_blot_type.replace(/_/g, ' / ')}
               </td>
-              <td style={{ padding: '12px', textAlign: 'center', color: result.band_detected ? '#4ad6b0' : '#ff6b6b', fontWeight: 600 }}>
+              <td style={{ padding: '12px', textAlign: 'center', color: result.band_detected ? 'var(--accent)' : 'var(--error)', fontWeight: 600 }}>
                 {result.band_detected ? '✓' : '✗'}
               </td>
-              <td style={{ padding: '12px', color: '#a9bdb5', fontFamily: 'var(--font-mono), monospace', fontSize: '12px' }}>
+              <td style={{ padding: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono), monospace', fontSize: '12px' }}>
                 {result.paper_id}
               </td>
             </tr>
