@@ -21,8 +21,8 @@ export default function BetaFeedback({ query }: { query?: string }) {
         onClick={() => setState('open')}
         style={{
           position: 'fixed', bottom: '18px', right: '18px', zIndex: 50,
-          background: '#0a0d0f', border: '1px solid rgba(255,255,255,.15)',
-          color: '#a9bdb5', borderRadius: '6px', padding: '6px 12px',
+          background: 'var(--input-background)', border: '1px solid var(--border-strong)',
+          color: 'var(--text-secondary)', borderRadius: '6px', padding: '6px 12px',
           fontFamily: MONO, fontSize: '10px', cursor: 'pointer', letterSpacing: '0.4px',
         }}
       >
@@ -34,20 +34,20 @@ export default function BetaFeedback({ query }: { query?: string }) {
   return (
     <div style={{
       position: 'fixed', bottom: '18px', right: '18px', zIndex: 50, width: '320px',
-      background: '#0a0d0f', border: '1px solid rgba(255,255,255,.15)',
+      background: 'var(--input-background)', border: '1px solid var(--border-strong)',
       borderRadius: '8px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px',
     }}>
       {state === 'done' ? (
-        <div style={{ fontFamily: MONO, fontSize: '11px', color: '#4ad6b0' }}>
+        <div style={{ fontFamily: MONO, fontSize: '11px', color: 'var(--accent)' }}>
           ✓ thank you — recorded
           <button onClick={() => { setState('idle'); setText(''); }}
-                  style={{ marginLeft: '12px', background: 'none', border: 'none', color: '#6f857d', cursor: 'pointer', fontFamily: MONO, fontSize: '10px' }}>
+                  style={{ marginLeft: '12px', background: 'none', border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', fontFamily: MONO, fontSize: '10px' }}>
             close
           </button>
         </div>
       ) : (
         <>
-          <div style={{ fontFamily: MONO, fontSize: '10px', color: '#6f857d' }}>
+          <div style={{ fontFamily: MONO, fontSize: '10px', color: 'var(--text-subtle)' }}>
             Anything — layout, missing filters, information overload, what you wish this did.
           </div>
           <textarea
@@ -56,7 +56,7 @@ export default function BetaFeedback({ query }: { query?: string }) {
             rows={4}
             placeholder="e.g. keep the blot visible while I inspect the methods"
             style={{
-              background: '#06090c', border: '1px solid rgba(255,255,255,.12)', color: '#e7f0ee',
+              background: 'var(--background)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)',
               borderRadius: '4px', padding: '8px', fontFamily: SANS, fontSize: '13px', resize: 'vertical',
             }}
           />
@@ -70,13 +70,13 @@ export default function BetaFeedback({ query }: { query?: string }) {
                 });
                 setState('done');
               }}
-              style={{ background: 'transparent', border: '1px solid #4ad6b0', color: '#4ad6b0', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'transparent', border: '1px solid var(--accent)', color: 'var(--accent)', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
             >
               Send
             </button>
             <button
               onClick={() => setState('idle')}
-              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,.15)', color: '#6f857d', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-strong)', color: 'var(--text-subtle)', borderRadius: '4px', padding: '4px 12px', fontFamily: SANS, fontSize: '10px', fontWeight: 500, cursor: 'pointer' }}
             >
               Cancel
             </button>

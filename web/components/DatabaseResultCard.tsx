@@ -64,11 +64,11 @@ interface DatabaseResultCardProps {
 const MONO = 'var(--font-mono), monospace';
 const SERIF = 'var(--font-serif), serif';
 const SANS = 'var(--font-sans), sans-serif';
-const LABEL = '#6f857d';
-const TEXT = '#e7f0ee';
-const TEAL = '#4ad6b0';
-const GOLD = '#e0b23c';
-const RED = '#ff6b6b';
+const LABEL = 'var(--text-subtle)';
+const TEXT = 'var(--text-primary)';
+const TEAL = 'var(--accent)';
+const GOLD = 'var(--warning)';
+const RED = 'var(--error)';
 
 function titleCase(s?: string | null): string {
   if (!s) return '';

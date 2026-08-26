@@ -37,7 +37,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
         display: 'grid',
         gridTemplateColumns: expanded ? '1fr 240px' : '1fr 56px',
         gap: '0',
-        backgroundColor: 'rgba(255,255,255,.07)',
+        backgroundColor: 'var(--border)',
         borderRadius: '6px',
         overflow: 'hidden',
         transition: 'grid-template-columns 0.25s ease',
@@ -47,7 +47,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
       {/* Main Content Area */}
       <div
         style={{
-          backgroundColor: '#06090c',
+          backgroundColor: 'var(--background)',
           padding: '24px 28px',
           display: 'flex',
           flexDirection: 'column',
@@ -65,7 +65,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '10px',
                   fontWeight: 600,
-                  color: '#6f857d',
+                  color: 'var(--text-subtle)',
                   marginBottom: '4px',
                   letterSpacing: '0.4px',
                 }}
@@ -76,7 +76,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '14px',
-                  color: '#e7f0ee',
+                  color: 'var(--text-primary)',
                   lineHeight: 1.3,
                 }}
               >
@@ -91,7 +91,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#6f857d',
+                  color: 'var(--text-subtle)',
                   marginBottom: '6px',
                   letterSpacing: '0.5px',
                 }}
@@ -102,7 +102,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
-                  color: '#e7f0ee',
+                  color: 'var(--text-primary)',
                   lineHeight: 1.4,
                 }}
               >
@@ -117,7 +117,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#6f857d',
+                  color: 'var(--text-subtle)',
                   marginBottom: '6px',
                   letterSpacing: '0.5px',
                 }}
@@ -128,7 +128,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
-                  color: '#4ad6b0',
+                  color: 'var(--accent)',
                   lineHeight: 1.4,
                 }}
               >
@@ -146,7 +146,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#6f857d',
+                  color: 'var(--text-subtle)',
                   marginBottom: '6px',
                   letterSpacing: '0.5px',
                 }}
@@ -157,7 +157,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
-                  color: '#a9bdb5',
+                  color: 'var(--text-secondary)',
                   lineHeight: 1.4,
                 }}
               >
@@ -172,7 +172,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#6f857d',
+                  color: 'var(--text-subtle)',
                   marginBottom: '6px',
                   letterSpacing: '0.5px',
                 }}
@@ -183,7 +183,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '16px',
-                  color: '#e7f0ee',
+                  color: 'var(--text-primary)',
                   lineHeight: 1.4,
                 }}
               >
@@ -194,13 +194,13 @@ export default function ResultsCard({ data }: ResultsCardProps) {
         </div>
 
         {/* Result */}
-        <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
+        <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
           <div
             style={{
               fontFamily: 'var(--font-mono), monospace',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#6f857d',
+              color: 'var(--text-subtle)',
               marginBottom: '8px',
               letterSpacing: '0.5px',
             }}
@@ -211,7 +211,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             style={{
               fontFamily: 'var(--font-serif), serif',
               fontSize: '15px',
-              color: '#e7f0ee',
+              color: 'var(--text-primary)',
               lineHeight: 1.6,
             }}
           >
@@ -226,7 +226,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
               fontFamily: 'var(--font-mono), monospace',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#6f857d',
+              color: 'var(--text-subtle)',
               letterSpacing: '0.5px',
             }}
           >
@@ -236,7 +236,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             style={{
               fontFamily: 'var(--font-serif), serif',
               fontSize: '15px',
-              color: '#4ad6b0',
+              color: 'var(--accent)',
               fontWeight: 600,
             }}
           >
@@ -248,10 +248,10 @@ export default function ResultsCard({ data }: ResultsCardProps) {
       {/* Citation Tab / Expanded Section */}
       <div
         style={{
-          backgroundColor: '#0a0d0f',
+          backgroundColor: 'var(--input-background)',
           display: 'flex',
           flexDirection: 'column',
-          borderLeft: '1px solid rgba(255,255,255,.06)',
+          borderLeft: '1px solid var(--border)',
           cursor: 'pointer',
           overflow: 'hidden',
         }}
@@ -264,7 +264,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             <div
               style={{
                 flex: 1,
-                backgroundColor: '#000000',
+                backgroundColor: 'var(--figure-background)',
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
@@ -284,14 +284,14 @@ export default function ResultsCard({ data }: ResultsCardProps) {
             </div>
 
             {/* Navigation & Info */}
-            <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,.06)', backgroundColor: '#06090c' }}>
+            <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,.06)', backgroundColor: 'var(--background)' }}>
               {/* Figure Counter */}
               <div
                 style={{
                   fontFamily: 'var(--font-mono), monospace',
                   fontSize: '9px',
                   fontWeight: 600,
-                  color: '#4ad6b0',
+                  color: 'var(--accent)',
                   marginBottom: '6px',
                   textAlign: 'center',
                   letterSpacing: '0.3px',
@@ -305,7 +305,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 style={{
                   fontFamily: 'var(--font-serif), serif',
                   fontSize: '11px',
-                  color: '#a9bdb5',
+                  color: 'var(--text-secondary)',
                   lineHeight: 1.3,
                   marginBottom: '10px',
                   maxHeight: '50px',
@@ -333,7 +333,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                       flex: 1,
                       backgroundColor: 'rgba(74,214,176,.12)',
                       border: '1px solid rgba(74,214,176,.25)',
-                      color: '#4ad6b0',
+                      color: 'var(--accent)',
                       padding: '5px',
                       borderRadius: '3px',
                       fontFamily: 'var(--font-mono), monospace',
@@ -360,7 +360,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                       flex: 1,
                       backgroundColor: 'rgba(74,214,176,.12)',
                       border: '1px solid rgba(74,214,176,.25)',
-                      color: '#4ad6b0',
+                      color: 'var(--accent)',
                       padding: '5px',
                       borderRadius: '3px',
                       fontFamily: 'var(--font-mono), monospace',
@@ -394,7 +394,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                     fontFamily: 'var(--font-mono), monospace',
                     fontSize: '9px',
                     fontWeight: 600,
-                    color: '#6f857d',
+                    color: 'var(--text-subtle)',
                     marginBottom: '4px',
                     letterSpacing: '0.3px',
                   }}
@@ -408,7 +408,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                   style={{
                     fontFamily: 'var(--font-mono), monospace',
                     fontSize: '9px',
-                    color: '#4ad6b0',
+                    color: 'var(--accent)',
                     wordBreak: 'break-all',
                     textDecoration: 'none',
                     lineHeight: 1.2,
@@ -441,7 +441,7 @@ export default function ResultsCard({ data }: ResultsCardProps) {
                 fontFamily: 'var(--font-mono), monospace',
                 fontSize: '9px',
                 fontWeight: 600,
-                color: '#4ad6b0',
+                color: 'var(--accent)',
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
                 letterSpacing: '0.8px',
