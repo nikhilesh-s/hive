@@ -27,17 +27,17 @@ export default function ResultsTable({ results }: ResultsTableProps) {
           width: '100%',
           borderCollapse: 'collapse',
           fontSize: '14px',
-          fontFamily: '"Newsreader", serif',
+          fontFamily: 'var(--font-serif), serif',
         }}
       >
         <thead>
           <tr style={{ borderBottom: '2px solid rgba(74,214,176,.3)' }}>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>TARGET</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>SAMPLE</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>CONDITION</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>TYPE</th>
-            <th style={{ padding: '12px', textAlign: 'center', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>DETECTED</th>
-            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px' }}>PAPER</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TARGET</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>SAMPLE</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>CONDITION</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>TYPE</th>
+            <th style={{ padding: '12px', textAlign: 'center', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>DETECTED</th>
+            <th style={{ padding: '12px', textAlign: 'left', color: '#4ad6b0', fontWeight: 600, fontFamily: 'var(--font-mono), monospace', fontSize: '11px' }}>PAPER</th>
           </tr>
         </thead>
         <tbody>
@@ -64,7 +64,7 @@ export default function ResultsTable({ results }: ResultsTableProps) {
               <td style={{ padding: '12px', textAlign: 'center', color: result.band_detected ? '#4ad6b0' : '#ff6b6b', fontWeight: 600 }}>
                 {result.band_detected ? '✓' : '✗'}
               </td>
-              <td style={{ padding: '12px', color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px' }}>
+              <td style={{ padding: '12px', color: '#a9bdb5', fontFamily: 'var(--font-mono), monospace', fontSize: '12px' }}>
                 {result.paper_id}
               </td>
             </tr>

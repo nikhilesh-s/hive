@@ -2,7 +2,7 @@
 
 export default function Learn() {
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif" }}>
+    <div style={{ minHeight: '100vh', fontFamily: "var(--font-sans), sans-serif" }}>
       {/* Hero */}
       <section style={{ textAlign: 'center', padding: '88px 56px 60px' }}>
         <h1 style={{ fontSize: '64px', fontWeight: 600, marginBottom: '24px' }}>

@@ -61,8 +61,9 @@ interface DatabaseResultCardProps {
   lanes?: LaneSummary[];
 }
 
-const MONO = '"IBM Plex Mono", monospace';
-const SERIF = '"Newsreader", serif';
+const MONO = 'var(--font-mono), monospace';
+const SERIF = 'var(--font-serif), serif';
+const SANS = 'var(--font-sans), sans-serif';
 const LABEL = '#6f857d';
 const TEXT = '#e7f0ee';
 const TEAL = '#4ad6b0';
@@ -139,7 +140,7 @@ function Field({ label, value, mono, color }: { label: string; value: ReactNode;
       <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL, marginBottom: '4px' }}>
         {label}
       </div>
-      <div style={{ fontFamily: mono ? MONO : SERIF, fontSize: mono ? '13px' : '14px', color: color || TEXT, lineHeight: 1.3 }}>
+      <div style={{ fontFamily: mono ? MONO : SANS, fontSize: mono ? '13px' : '14px', color: color || TEXT, lineHeight: 1.3 }}>
         {value}
       </div>
     </div>

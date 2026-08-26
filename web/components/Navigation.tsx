@@ -28,7 +28,7 @@ export function Navigation() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
             <span
               style={{
-                fontFamily: '"Newsreader", serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontStyle: 'italic',
                 fontWeight: 600,
                 fontSize: '20px',
@@ -38,7 +38,7 @@ export function Navigation() {
             >
               HiveBlot
             </span>
-            <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '9px', color: '#4ad6b0', letterSpacing: '.6px' }}>
+            <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '9px', color: '#4ad6b0', letterSpacing: '.6px' }}>
               PROTEIN DISCOVERY
             </span>
           </div>
@@ -50,17 +50,17 @@ export function Navigation() {
       {/* Nav Links */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '34px', marginRight: '36px' }}>
         <Link href="/search">
-          <span className="vt-navlink" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '12.5px', letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             SEARCH
           </span>
         </Link>
         <Link href="/about">
-          <span className="vt-navlink" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '12.5px', letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             ABOUT
           </span>
         </Link>
         <Link href="/learn">
-          <span className="vt-navlink" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '12.5px', letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             LEARN
           </span>
         </Link>

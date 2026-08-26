@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { formatLaneLabel } from '@/components/DatabaseResultCard';
 import { submitFeedback } from '@/lib/feedback';
 
-const MONO = '"IBM Plex Mono", monospace';
-const SERIF = '"Newsreader", serif';
+const MONO = 'var(--font-mono), monospace';
+const SERIF = 'var(--font-serif), serif';
 const LABEL = '#6f857d';
 const TEXT = '#e7f0ee';
 const DIM = '#a9bdb5';
@@ -265,7 +265,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
           {seriesText || value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : 'not reported')}
         </span>
         {glyph && (
-          <span title={glyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: glyph.color, fontWeight: 700 }}>
+          <span title={glyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: glyph.color, fontWeight: 600 }}>
             {glyph.g}
           </span>
         )}
