@@ -1,10 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { SearchInput } from '@/components/SearchInput';
 import DatabaseResultCard, { type LaneSummary } from '@/components/DatabaseResultCard';
-import FiltersBar from '@/components/FiltersBar';
+import FiltersBar, {
+  activeFilterChips,
+  buildFilterQuery,
+  clearFilter,
+  emptySearchFilters,
+  hasFilters,
+  type SearchFilterKey,
+  type SearchFilters,
+} from '@/components/FiltersBar';
 import SearchFeedback from '@/components/SearchFeedback';
 import BetaFeedback from '@/components/BetaFeedback';
 
@@ -89,6 +96,8 @@ export default function SearchPage() {
   const [results, setResults] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [draftFilters, setDraftFilters] = useState<SearchFilters>(emptySearchFilters);
+  const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(emptySearchFilters);
 
   // Support /search?q=… (home-page searches route here so there is ONE
   // results surface — the Evidence Record card, not the legacy table).
@@ -98,11 +107,24 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearch = async (searchQuery: string) => {
+  const clearSearchUrl = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('q');
+    window.history.replaceState(null, '', url.toString());
+  };
+
+  const clearResults = () => {
+    setQuery('');
+    setShowResults(false);
+    setResults([]);
+    setError(null);
+    clearSearchUrl();
+  };
+
+  async function handleSearch(searchQuery: string) {
     setQuery(searchQuery);
     if (!searchQuery.trim()) {
-      setShowResults(false);
-      setResults([]);
+      clearResults();
       return;
     }
 
@@ -136,7 +158,44 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  const handlePrimarySearch = (searchQuery: string) => {
+    setDraftFilters(emptySearchFilters());
+    setAppliedFilters(emptySearchFilters());
+    handleSearch(searchQuery);
   };
+
+  const handleApplyFilters = () => {
+    const filterQuery = buildFilterQuery(draftFilters);
+    if (!filterQuery) return;
+    setAppliedFilters({ ...draftFilters });
+    handleSearch(filterQuery);
+  };
+
+  const handleClearDraftFilter = (key: SearchFilterKey) => {
+    setDraftFilters((current) => clearFilter(current, key));
+  };
+
+  const handleClearAppliedFilter = (key: SearchFilterKey) => {
+    const next = clearFilter(appliedFilters, key);
+    setDraftFilters(next);
+    setAppliedFilters(next);
+    const filterQuery = buildFilterQuery(next);
+    if (filterQuery) handleSearch(filterQuery);
+    else clearResults();
+  };
+
+  const handleResetFilters = () => {
+    setDraftFilters(emptySearchFilters());
+    if (hasFilters(appliedFilters)) {
+      setAppliedFilters(emptySearchFilters());
+      clearResults();
+    }
+  };
+
+  const groups = groupResults(results);
+  const filterChips = activeFilterChips(appliedFilters);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '40px' }}>
@@ -144,16 +203,22 @@ export default function SearchPage() {
       <div style={{ padding: '40px 56px 24px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
         <SearchInput
           placeholder="Search for a protein or experimental condition (e.g., 'phospho STAT3 Tyr705' or 'co-IP PIK3CA')"
-          onSearch={handleSearch}
+          onSearch={handlePrimarySearch}
           initialValue={query}
         />
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <FiltersBar onSearch={handleSearch} />
-        </div>
       </div>
 
-      {/* Results Section */}
-      <div style={{ padding: '60px 56px', maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="hb-search-body">
+        <FiltersBar
+          filters={draftFilters}
+          onChange={setDraftFilters}
+          onApply={handleApplyFilters}
+          onClearField={handleClearDraftFilter}
+          onReset={handleResetFilters}
+        />
+
+        {/* Results Section */}
+        <main className="hb-search-results">
         {showResults ? (
           <div>
             {/* Results Header */}
@@ -167,10 +232,26 @@ export default function SearchPage() {
                 {loading
                   ? 'Searching database...'
                   : (() => {
-                      const n = groupResults(results).length;
+                      const n = groups.length;
                       return `Found ${n} experiment${n !== 1 ? 's' : ''} (${results.length} lane record${results.length !== 1 ? 's' : ''})`;
                     })()}
               </p>
+              {filterChips.length > 0 && (
+                <div className="hb-active-filters" aria-label="Active filters">
+                  {filterChips.map((chip) => (
+                    <button
+                      key={chip.key}
+                      type="button"
+                      className="hb-active-filter-chip"
+                      onClick={() => handleClearAppliedFilter(chip.key)}
+                      aria-label={`Clear ${chip.label}`}
+                    >
+                      <span>{chip.value}</span>
+                      <span aria-hidden="true">x</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Loading State */}
@@ -205,7 +286,7 @@ export default function SearchPage() {
               <>
                 <SearchFeedback query={query} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {groupResults(results).map((g) => (
+                  {groups.map((g) => (
                     <DatabaseResultCard key={g.first.id} data={g.first} lanes={g.lanes} />
                   ))}
                 </div>
@@ -229,10 +310,11 @@ export default function SearchPage() {
               Enter a natural language query to search for western blot evidence
             </p>
             <p style={{ fontFamily: '"Newsreader", serif', fontSize: '14px', marginTop: '12px', color: '#6f857d' }}>
-              Example: "Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts."
+              Example: &quot;Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.&quot;
             </p>
           </div>
         )}
+        </main>
       </div>
       <BetaFeedback query={query} />
     </div>

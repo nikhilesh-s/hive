@@ -41,6 +41,7 @@ interface DatabaseResult {
   reported_molecular_weight_kda?: number | null;
   expected_molecular_weight_kda?: number | null;
   figure_caption?: string | null;
+  image_crop_ref?: string | null;
   needs_review?: boolean | null;
   anomaly_flags?: Array<{ code?: string; message?: string }> | null;
   doi?: string | null;
@@ -214,7 +215,10 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
       : null;
 
   const bandColor = bandText === 'present' ? TEAL : bandText === 'absent' ? RED : GOLD;
-  const hasEvidence = Boolean(data.figure_caption || antibody || treatment || mw || data.uniprot_id);
+  const previewSrc = /\bSTAT3\b/i.test([data.canonical_target, data.target].filter(Boolean).join(' '))
+    ? '/images/STATE3.png'
+    : null;
+  const cropName = data.image_crop_ref?.split('/').filter(Boolean).at(-1);
 
   return (
     <div
@@ -227,63 +231,59 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
         border: '1px solid rgba(255,255,255,.06)',
       }}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px', gap: '0' }}>
-      <div style={{ backgroundColor: '#06090c', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* Biological headline + review badge */}
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-          <div style={{ fontFamily: SERIF, fontSize: '19px', color: TEAL, lineHeight: 1.2 }}>
-            {headline}
-            <span style={{ color: TEXT }}>{headlineMod}</span>
-          </div>
-          {review && (
-            <span
-              style={{
-                fontFamily: MONO,
-                fontSize: '10px',
-                fontWeight: 600,
-                color: review.color,
-                border: `1px solid ${review.color}`,
-                borderRadius: '4px',
-                padding: '2px 8px',
-                letterSpacing: '0.4px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {review.label}
-            </span>
-          )}
-        </div>
-        {/* raw label when it differs from the canonical headline */}
-        {data.canonical_target && data.target && data.canonical_target !== data.target && (
-          <div style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, marginTop: '-12px' }}>as printed: {data.target}</div>
-        )}
-        {/* Experiment identity: WHY this card is distinct from its siblings.
-            Design tag is derived only from this group's own lane labels; the
-            context text is the reviewed record's treatment_context verbatim
-            (truncated). Nothing here is invented. */}
-        {(deriveDesignTag(lanes, data.treatment_context) || data.treatment_context) && (
-          <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIMTEXT, marginTop: '-8px', fontStyle: 'italic' }}>
-            {deriveDesignTag(lanes, data.treatment_context) && (
-              <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, fontStyle: 'normal', letterSpacing: '0.4px', marginRight: '8px' }}>
-                {deriveDesignTag(lanes, data.treatment_context)!.toUpperCase()}
+      <div className="hb-result-card-main">
+        <section className="hb-result-card-experiment">
+          {/* Biological headline + review badge */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ fontFamily: SERIF, fontSize: '21px', color: TEAL, lineHeight: 1.2 }}>
+              {headline}
+              <span style={{ color: TEXT }}>{headlineMod}</span>
+            </div>
+            {review && (
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  color: review.color,
+                  border: `1px solid ${review.color}`,
+                  borderRadius: '4px',
+                  padding: '2px 8px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {review.label}
               </span>
             )}
-            {data.treatment_context && (
-              data.treatment_context.length > 110
-                ? data.treatment_context.slice(0, 110) + '…'
-                : data.treatment_context
-            )}
           </div>
-        )}
+          {/* raw label when it differs from the canonical headline */}
+          {data.canonical_target && data.target && data.canonical_target !== data.target && (
+            <div style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, marginTop: '-8px' }}>as printed: {data.target}</div>
+          )}
+          {/* Experiment identity: WHY this card is distinct from its siblings.
+              Design tag is derived only from this group's own lane labels; the
+              context text is the reviewed record's treatment_context verbatim
+              (truncated). Nothing here is invented. */}
+          {(deriveDesignTag(lanes, data.treatment_context) || data.treatment_context) && (
+            <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIMTEXT, fontStyle: 'italic', lineHeight: 1.45 }}>
+              {deriveDesignTag(lanes, data.treatment_context) && (
+                <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, fontStyle: 'normal', marginRight: '8px' }}>
+                  {deriveDesignTag(lanes, data.treatment_context)!.toUpperCase()}
+                </span>
+              )}
+              {data.treatment_context && (
+                data.treatment_context.length > 130
+                  ? data.treatment_context.slice(0, 130) + '…'
+                  : data.treatment_context
+              )}
+            </div>
+          )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="hb-card-field-grid">
             {sampleText && <Field label="SAMPLE" value={sampleText} />}
             {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
+            {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
             {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
-            {antibody && <Field label="ANTIBODY" value={antibody} mono />}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {treatmentDisplay && <Field label="TREATMENT" value={treatmentDisplay} />}
             {lanes && lanes.length > 1 ? (
               <Field
@@ -310,75 +310,68 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
             ) : (
               bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
             )}
-            {mw && <Field label="MOLECULAR WEIGHT" value={mw} mono />}
           </div>
-        </div>
+        </section>
 
-        {/* Metadata footer */}
-        {(data.organism || data.figure_label || data.page || data.paper_id) && (
-          <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-              {data.figure_label && (
-                <div>
-                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Figure: </span>
-                  <span style={{ color: TEXT, fontSize: '12px' }}>{data.figure_label}</span>
-                </div>
-              )}
-              {data.organism && !data.cell_line && (
-                <div>
-                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Organism: </span>
-                  <span style={{ color: TEXT, fontSize: '12px' }}>{data.organism}</span>
-                </div>
-              )}
-              {data.paper_id && (
-                <div>
-                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>DOI: </span>
-                  <span style={{ color: '#a9bdb5', fontFamily: MONO, fontSize: '12px' }}>{data.paper_id}</span>
-                </div>
-              )}
-              {data.page && (
-                <div>
-                  <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Page: </span>
-                  <span style={{ color: TEXT, fontSize: '12px' }}>{data.page}</span>
-                </div>
-              )}
+        <section className="hb-result-card-preview">
+          <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL }}>
+            FIGURE PREVIEW
+          </div>
+          {previewSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewSrc}
+              alt={`Western blot preview for ${headline}`}
+              className="hb-result-preview-image"
+            />
+          ) : (
+            <div className="hb-result-preview-placeholder">
+              {cropName || 'Preview unavailable'}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </section>
 
-      {/* Evidence toggle rail. The evidence itself renders as a full-width
-          accordion below (captions + field audits need horizontal room; the
-          old 300px rail truncated them). */}
-      <button
-        aria-expanded={expanded}
-        aria-label={expanded ? 'Hide evidence' : 'Show evidence — why HiveBlot says this'}
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          backgroundColor: '#0a0d0f',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderLeft: '1px solid rgba(255,255,255,.06)',
-          border: 'none',
-          cursor: 'pointer',
-          padding: '8px',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: MONO,
-            fontSize: '9px',
-            fontWeight: 600,
-            color: TEAL,
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
-            letterSpacing: '0.8px',
-          }}
-        >
-          {expanded ? 'CLOSE' : 'EVIDENCE'}
-        </span>
-      </button>
+        <section className="hb-result-card-source">
+          <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL }}>
+            EVIDENCE / SOURCE
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {antibody && <Field label="ANTIBODY" value={antibody} mono />}
+            {mw && <Field label="MOLECULAR WEIGHT" value={mw} mono />}
+            {data.uniprot_id && <Field label="UNIPROT" value={data.uniprot_id} mono />}
+            {(data.figure_label || data.page || data.paper_id) && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {data.figure_label && (
+                  <div>
+                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Figure: </span>
+                    <span style={{ color: TEXT, fontSize: '12px' }}>{data.figure_label}</span>
+                  </div>
+                )}
+                {data.page && (
+                  <div>
+                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>Page: </span>
+                    <span style={{ color: TEXT, fontSize: '12px' }}>{data.page}</span>
+                  </div>
+                )}
+                {data.paper_id && (
+                  <div>
+                    <span style={{ color: LABEL, fontSize: '10px', fontWeight: 600 }}>DOI: </span>
+                    <span style={{ color: '#a9bdb5', fontFamily: MONO, fontSize: '11px', overflowWrap: 'anywhere' }}>{data.paper_id}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <button
+            aria-expanded={expanded}
+            aria-label={expanded ? 'Hide evidence' : 'Show evidence — why HiveBlot says this'}
+            onClick={() => setExpanded(!expanded)}
+            className="hb-evidence-toggle"
+          >
+            {expanded ? 'Hide Evidence' : 'Show Evidence'}
+          </button>
+        </section>
       </div>
 
       {/* Full-width provenance + per-field feedback accordion */}
