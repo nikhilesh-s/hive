@@ -198,13 +198,16 @@ export default function SearchPage() {
   const filterChips = activeFilterChips(appliedFilters);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '40px' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#06090c', paddingTop: '28px' }}>
       {/* Search Bar */}
-      <div style={{ padding: '40px 56px 24px', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+      <div className="hb-search-workspace-header">
         <SearchInput
-          placeholder="Search for a protein or experimental condition (e.g., 'phospho STAT3 Tyr705' or 'co-IP PIK3CA')"
+          heading="Search Western blot evidence"
+          placeholder="Search protein, phosphosite, antibody, cell line..."
           onSearch={handlePrimarySearch}
           initialValue={query}
+          examples={['STAT3 Tyr705', 'Hep3B', 'CST #9145']}
+          loading={loading}
         />
       </div>
 
