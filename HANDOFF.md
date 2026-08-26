@@ -6,6 +6,40 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 24)** — Codex. **SEARCH BAR UX/UI REFINEMENT
+  (frontend presentation/interaction only; no backend/API/schema/query/filter/
+  extraction/evidence data change, no deploy, no cloud DB/Supabase change, no
+  production secrets).** Reworked the reusable `SearchInput` and `/search`
+  header into one compact scientific search control: cohesive input + teal
+  submit button with matching height and coordinated borders, inline accessible
+  SVG search icon, improved placeholder (`Search protein, phosphosite,
+  antibody, cell line...`), keyboard-accessible clear control, subtle clickable
+  example queries that populate the field without submitting, preserved
+  submitted query display, and loading/disabled `SEARCHING...` button state
+  wired to the existing frontend `loading` flag. Reduced `/search` header/body
+  vertical whitespace and widened/aligned the search control to the results
+  workspace. Confirmed the search API contract is unchanged: `web/app/search/
+  page.tsx` still submits only the query string to the existing `/api/search`
+  proxy, URL `q` behavior remains in `handleSearch`, and no backend/filter
+  query logic changed. Files changed: `web/components/SearchInput.tsx`,
+  `web/app/search/page.tsx`, `web/app/globals.css`, and this handoff.
+  Verification: `cd web && npm run build` passed; targeted ESLint on
+  `components/SearchInput.tsx` and `app/search/page.tsx` passed; full
+  `npm run lint` still fails only on pre-existing unrelated issues in
+  `web/app/learn/page.tsx`, `web/app/page.tsx`,
+  `web/components/Navigation.tsx`, `web/components/ResultsCard.tsx`, and
+  `web/components/SearchFeedback.tsx` (SearchInput is no longer part of the
+  full-lint failure list); local `/search?q=phospho%20STAT3%20Tyr705` returned
+  200; local web `/api/search` proxy returned 200; required biology checks
+  passed under `.venv`: biology 165/165, reconcile 21/21, loader enrichment
+  18/18, extract 10/10, pipeline wiring 11/11, benchmark 34/34. The plain
+  `python3` biology commands failed on this machine because that interpreter
+  lacks `pydantic`; rerunning the same commands with `.venv/bin/python` passed.
+  Browser automation was unavailable in this Codex session (`node_repl js` was
+  not exposed and Playwright was not installed), so UI QA was limited to build/
+  lint, local HTTP checks, and opening the local page for inspection. Local
+  gitignored env files may exist for the dev stack; no env values were
+  committed.
 - **2026-08-25 (session 23)** — Claude Code (Sonnet 5). **COMMIT LONG-STANDING
   LOCAL DEV CONFIG (frontend dev-server config only; no app/backend/schema/
   deploy change, no production secrets).** Committed `web/next.config.ts`'s
@@ -715,9 +749,8 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `58ba25e` (compact
-  result card metadata). This search-results evidence UI hiding update commits
-  on top; run
+- **Latest finalized commit before this handoff entry:** `db57622` (local
+  dev-origin config). This search-bar UX/UI refinement commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
