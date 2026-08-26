@@ -6,6 +6,31 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 22)** — Codex. **HIDE SEARCH-RESULT EVIDENCE PANEL
+  INTERACTION (frontend presentation-only; no backend/API/schema/query/filter/
+  extraction/evidence data change, no deploy, no cloud DB/Supabase change, no
+  production secrets).** Removed the user-facing `View Evidence` interaction
+  from `DatabaseResultCard`: no evidence button, no expandable `EvidencePanel`,
+  and no visible field-level feedback/provenance controls in the current search
+  results experience. The underlying `EvidencePanel.tsx`, record/feedback API
+  routes, evidence/provenance fields, extraction pipeline, stored data, and
+  backend behavior were left intact. Search result cards still show target,
+  modification/status, sample, experiment, treatment, lanes, figure preview,
+  chips, antibody/catalog, molecular weight, UniProt, page, and DOI/source.
+  Files changed: `web/components/DatabaseResultCard.tsx`,
+  `web/app/globals.css`, and this handoff. Verification: `cd web && npm run
+  build` passed; targeted ESLint on `components/DatabaseResultCard.tsx` passed;
+  search-card path grep found no remaining `View Evidence`/`EvidencePanel`/
+  visible evidence-panel strings; full `npm run lint` still fails only on
+  pre-existing unrelated lint issues in `web/app/learn/page.tsx`,
+  `web/app/page.tsx`, `web/components/Navigation.tsx`,
+  `web/components/ResultsCard.tsx`, `web/components/SearchFeedback.tsx`, and
+  `web/components/SearchInput.tsx`; local
+  `/search?q=phospho%20STAT3%20Tyr705` returned 200; local web `/api/search`
+  proxy returned count 18; required biology checks passed again: biology
+  165/165, reconcile 21/21, loader enrichment 18/18, extract 10/10, pipeline
+  wiring 11/11, benchmark 34/34. Existing uncommitted `web/next.config.ts`
+  (`allowedDevOrigins`) was present before this task and left untouched.
 - **2026-08-26 (session 21)** — Codex. **RESULT CARD SAMPLE/EXPERIMENT +
   COMPACT METADATA REBALANCE (frontend layout-only; no backend/API/schema/
   query/filter/evidence/DOI/image change, no deploy, no cloud DB/Supabase
@@ -682,9 +707,9 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `d17e8ce` (dedicated
-  treatment/lanes result column). This sample/experiment + compact metadata
-  layout update commits on top; run
+- **Latest finalized commit before this handoff entry:** `58ba25e` (compact
+  result card metadata). This search-results evidence UI hiding update commits
+  on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
@@ -912,6 +937,10 @@ desktop column immediately after primary identity, with medium/mobile reflow.
 21)**, frontend layout-only: removed the large evidence/source column from the
 main card, moved sample/experiment into their own column, and kept source
 metadata compact beside tags.
+~~Hide search-result evidence panel interaction~~ — **DONE (session 22)**,
+frontend presentation-only: `View Evidence` and the expandable evidence/
+feedback panel are no longer shown from result cards; underlying evidence code
+and routes remain.
 
 **The hosted internal beta is READY to distribute.**
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
@@ -1059,10 +1088,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `58ba25e` Compact result card metadata
 - `d17e8ce` Add treatment lanes result column
 - `6941f7c` Refine search result rows
 - `8e996c0` Redesign search results IA
 - `228a490` Update handoff for local requirements verification
 - `43c3b63` Add local development requirements file
-- `4b38b95` Add the team local-dev env plan and close the miner .env gitignore gap
-- (this HANDOFF update commits on top of `d17e8ce`)
+- (this HANDOFF update commits on top of `58ba25e`)
