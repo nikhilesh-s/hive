@@ -6,6 +6,34 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-26 (session 21)** — Codex. **RESULT CARD SAMPLE/EXPERIMENT +
+  COMPACT METADATA REBALANCE (frontend layout-only; no backend/API/schema/
+  query/filter/evidence/DOI/image change, no deploy, no cloud DB/Supabase
+  change, no production secrets).** Refined `DatabaseResultCard` to remove the
+  dedicated large Evidence/Source column from the main card layout. Desktop
+  result rows now follow **primary result | sample/experiment | treatment/lanes
+  | figure | tags + compact metadata | action**. Primary result now contains
+  only the target/modification identity, status, as-printed label, and
+  descriptive context. `Sample`, `Experiment`, organism, and IP bait moved into
+  their own simple scan column. Treatment/lanes remain in their dedicated
+  column. The former source metadata is preserved but compacted into the tags/
+  metadata column alongside the existing-data chips (`WB`/`co-IP`, `Phospho`,
+  design tag, lane count): antibody/catalog, molecular weight, UniProt, page,
+  and DOI still render, but no longer occupy a standalone evidence/source
+  column. `View Evidence` behavior is unchanged and still toggles the existing
+  `EvidencePanel`. Files changed: `web/components/DatabaseResultCard.tsx`,
+  `web/app/globals.css`, and this handoff. Verification: `cd web && npm run
+  build` passed; targeted ESLint on `components/DatabaseResultCard.tsx` passed;
+  full `npm run lint` still fails only on pre-existing unrelated lint issues in
+  `web/app/learn/page.tsx`, `web/app/page.tsx`,
+  `web/components/Navigation.tsx`, `web/components/ResultsCard.tsx`,
+  `web/components/SearchFeedback.tsx`, and `web/components/SearchInput.tsx`;
+  local `/search?q=phospho%20STAT3%20Tyr705` returned 200; local web
+  `/api/search` proxy returned count 18; required biology checks passed again:
+  biology 165/165, reconcile 21/21, loader enrichment 18/18, extract 10/10,
+  pipeline wiring 11/11, benchmark 34/34. Existing uncommitted
+  `web/next.config.ts` (`allowedDevOrigins`) was present before this task and
+  left untouched.
 - **2026-08-26 (session 20)** — Codex. **DEDICATED TREATMENT/LANES RESULT
   COLUMN (frontend layout-only; no backend/API/schema/query/filter/evidence
   change, no deploy, no cloud DB/Supabase change, no production secrets).**
@@ -654,8 +682,9 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `6941f7c` (search
-  result row refinement). This dedicated treatment/lanes column update commits on top; run
+- **Latest finalized commit before this handoff entry:** `d17e8ce` (dedicated
+  treatment/lanes result column). This sample/experiment + compact metadata
+  layout update commits on top; run
   `git log -1` for the exact current tip after this handoff commit lands.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
@@ -879,6 +908,10 @@ source metadata, compact right-aligned evidence action.
 ~~Dedicated treatment/lanes result column~~ — **DONE (session 20)**,
 frontend layout-only: treatment and all lane chips now occupy their own
 desktop column immediately after primary identity, with medium/mobile reflow.
+~~Sample/experiment column + compact metadata rebalance~~ — **DONE (session
+21)**, frontend layout-only: removed the large evidence/source column from the
+main card, moved sample/experiment into their own column, and kept source
+metadata compact beside tags.
 
 **The hosted internal beta is READY to distribute.**
 Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
@@ -1026,10 +1059,10 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
 
 ## Recent Commits (rolling)
+- `d17e8ce` Add treatment lanes result column
 - `6941f7c` Refine search result rows
 - `8e996c0` Redesign search results IA
 - `228a490` Update handoff for local requirements verification
 - `43c3b63` Add local development requirements file
 - `4b38b95` Add the team local-dev env plan and close the miner .env gitignore gap
-- `2cb2d0c` Wire Evidence Record engine into pipeline.py behind WBM_EXTRACTION_MODE flag
-- (this HANDOFF update commits on top of `6941f7c`)
+- (this HANDOFF update commits on top of `d17e8ce`)

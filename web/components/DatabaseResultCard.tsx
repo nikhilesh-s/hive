@@ -286,16 +286,13 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
               )}
             </div>
           )}
+        </section>
 
-          <div className="hb-card-field-grid">
-            {sampleText && <Field label="SAMPLE" value={sampleText} />}
-            {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
-            {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
-            {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
-            {(!lanes || lanes.length <= 1) && bandText && (
-              <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
-            )}
-          </div>
+        <section className="hb-result-card-sample">
+          {sampleText && <Field label="SAMPLE" value={sampleText} />}
+          {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
+          {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
+          {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
         </section>
 
         <section className="hb-result-card-treatment">
@@ -340,13 +337,12 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
           )}
         </section>
 
-        <section className="hb-result-card-indicators" aria-label="Experiment indicators">
-          {indicatorChips.map((chip) => (
-            <Chip key={chip}>{chip}</Chip>
-          ))}
-        </section>
-
-        <section className="hb-result-card-source">
+        <section className="hb-result-card-metadata">
+          <div className="hb-result-chip-group" aria-label="Experiment indicators">
+            {indicatorChips.map((chip) => (
+              <Chip key={chip}>{chip}</Chip>
+            ))}
+          </div>
           {antibody && <Metadata label="Antibody" value={antibody} mono />}
           {mw && <Metadata label="Molecular weight" value={mw} mono />}
           {data.uniprot_id && <Metadata label="UniProt" value={data.uniprot_id} mono />}
