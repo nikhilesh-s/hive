@@ -76,6 +76,10 @@ function titleCase(s?: string | null): string {
   return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function formatMeasurement(value: number, unit?: string | null): string {
+  return unit ? `${value} ${unit}` : String(value);
+}
+
 // Display-only lane-label formatting (semantics untouched): " / " separators
 // become interpuncts and a TRAILING +/− state marker gets a colon, so
 // "IL-6 + / CL-E -" reads "IL-6: + · CL-E: −". A "+" that joins a drug name
@@ -155,6 +159,10 @@ function Metadata({ label, value, mono }: { label: string; value: ReactNode; mon
   );
 }
 
+function EmptyFieldValue() {
+  return <span className="hb-result-empty-value">not reported</span>;
+}
+
 function Chip({ children }: { children: ReactNode }) {
   return <span className="hb-result-chip">{children}</span>;
 }
@@ -185,8 +193,8 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
     data.treatment_name || data.dose != null
       ? [
           data.treatment_name,
-          data.dose != null ? `${data.dose}${data.dose_unit || ''}` : null,
-          data.duration != null ? `${data.duration}${data.duration_unit || ''}` : null,
+          data.dose != null ? formatMeasurement(data.dose, data.dose_unit) : null,
+          data.duration != null ? formatMeasurement(data.duration, data.duration_unit) : null,
         ]
           .filter(Boolean)
           .join(' · ')
@@ -281,16 +289,24 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
 
           <div className="hb-card-field-grid">
             {sampleText && <Field label="SAMPLE" value={sampleText} />}
-            {treatmentDisplay && <Field label="TREATMENT" value={treatmentDisplay} />}
             {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
             {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
             {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
-            {lanes && lanes.length > 1 ? (
+            {(!lanes || lanes.length <= 1) && bandText && (
+              <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
+            )}
+          </div>
+        </section>
+
+        <section className="hb-result-card-treatment">
+          <Field label="TREATMENT" value={treatmentDisplay || <EmptyFieldValue />} />
+          {lanes && lanes.length > 1 ? (
+            <div className="hb-treatment-lanes">
               <Field
                 label={`LANES (${lanes.length})`}
                 value={
                   <span className="hb-lane-strip">
-                    {lanes.slice(0, 8).map((l, i) => (
+                    {lanes.map((l, i) => (
                       <span
                         key={i}
                         className="hb-lane-pill"
@@ -299,14 +315,13 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
                         {formatLaneLabel(l.condition) || `lane ${i + 1}`}
                       </span>
                     ))}
-                    {lanes.length > 8 && <span className="hb-lane-more">+{lanes.length - 8} more</span>}
                   </span>
                 }
               />
-            ) : (
-              bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
-            )}
-          </div>
+            </div>
+          ) : (
+            bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
+          )}
         </section>
 
         <section className="hb-result-card-figure">

@@ -325,14 +325,21 @@ body {
 
 .hb-result-card-main {
   display: grid;
-  grid-template-columns: minmax(280px, 1.5fr) minmax(190px, 0.98fr) minmax(128px, 0.7fr) minmax(220px, 1.2fr) minmax(96px, 0.46fr);
-  gap: 30px;
+  grid-template-columns:
+    minmax(230px, 1.35fr)
+    minmax(160px, 0.82fr)
+    minmax(170px, 0.9fr)
+    minmax(86px, 0.45fr)
+    minmax(190px, 1.08fr)
+    minmax(92px, 0.38fr);
+  gap: 24px;
   align-items: start;
   padding: 30px 32px;
   background: #070a0d;
 }
 
 .hb-result-card-primary,
+.hb-result-card-treatment,
 .hb-result-card-figure,
 .hb-result-card-indicators,
 .hb-result-card-source,
@@ -409,26 +416,40 @@ body {
   min-width: 0;
 }
 
+.hb-result-empty-value {
+  color: var(--color-text-subtle);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+
+.hb-result-card-treatment {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 2px;
+}
+
+.hb-treatment-lanes {
+  min-width: 0;
+}
+
 .hb-lane-strip {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
 }
 
 .hb-lane-pill {
   border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 4px;
+  display: inline-flex;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
   line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 3px 7px;
-}
-
-.hb-lane-more {
-  align-self: center;
-  color: var(--color-text-subtle);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  white-space: normal;
 }
 
 .hb-result-card-figure {
@@ -535,7 +556,7 @@ body {
 .hb-result-card-action {
   align-self: stretch;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-end;
 }
 
@@ -555,17 +576,16 @@ body {
   background: rgba(74, 214, 176, 0.1);
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1400px) {
   .hb-result-card-main {
-    grid-template-columns: minmax(0, 1.5fr) minmax(190px, 0.75fr) minmax(220px, 1fr) minmax(96px, 0.42fr);
+    grid-template-columns: minmax(0, 1.25fr) minmax(170px, 0.9fr) minmax(190px, 0.95fr);
     gap: 26px;
   }
 
   .hb-result-card-indicators {
-    grid-column: 1 / -1;
-    grid-row: 2;
     padding-top: 0;
   }
+
 }
 
 @media (max-width: 900px) {
