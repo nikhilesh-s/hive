@@ -6,6 +6,22 @@
 > blocked, and the exact next task.
 
 ## Last Updated
+- **2026-08-27 (session 30)** — Claude Code (Fable 5). **PROFESSOR ORCHESTRATION
+  BRIEF (docs only — no code, no deploy, no DB change).**
+  `research/PROFESSOR_ORCHESTRATION_BRIEF.md`: a ~5-minute technical handoff
+  for an external AI/ML professor reviewing our model orchestration. Contents:
+  system overview, problem motivation, the ingestion cascade (CV Stage 1 →
+  cheap-model Stage 2 → deterministic reconcile Stage 3 → status-gated Stage 4
+  escalation) and query path as an annotated pipeline + component table
+  (model / retrieval / deterministic / routing), current metrics with the
+  central caveat stated plainly (Stage 2 has only ever run agent-in-the-loop;
+  unseen-paper F1, escalation rate, token cost all unmeasured), a ranked
+  optimization-candidate table (measure-first eval set → calibrated
+  confidence routing → deterministic early-exit → error-specific escalation →
+  k-sample agreement → panel batching), and 5 specific questions for the
+  professor. Shareable web version published as a Claude artifact (URL inside
+  the doc). Also: root `.gitignore` now ignores `.serena/` (local MCP tool
+  state that appeared untracked). No tests affected.
 - **2026-08-26 (session 29)** — Codex. **LIGHT/DARK THEME SYSTEM
   (frontend theme/styling only; no backend, search API, query semantics, URL,
   result schema, filters, database, evidence logic, ranking, extraction, or

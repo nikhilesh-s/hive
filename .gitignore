@@ -30,3 +30,6 @@ research/papers/*.pdf
 # api/crops/ IS tracked on purpose: Render builds from the GitHub clone, so the
 # 21 referenced panel crops (~6 MB) must be in the repo for the deployed image
 # to serve figure evidence. Refresh with scripts/stage_crops.py.
+
+# Serena MCP local state
+.serena/
