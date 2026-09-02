@@ -43,8 +43,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HiveBlot - Protein Discovery Platform",
-  description: "Mine the blots. Extract the truth. Search thousands of published western blot results instantly. Discover protein expression patterns across cell lines and conditions.",
+  title: "HiveBlot — Western blot evidence search (beta)",
+  description:
+    "Experiment-level Western blot evidence from a reviewed reference corpus (3 papers, 93 experiments, 475 evidence rows). Every value traceable to its source; uncertainty and conflicts shown, never guessed.",
 };
 
 export default function RootLayout({
