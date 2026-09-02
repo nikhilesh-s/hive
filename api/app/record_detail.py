@@ -10,7 +10,23 @@ from __future__ import annotations
 
 from typing import Any
 
-from .schemas import FieldEvidence, RecordAntibody, RecordBand, RecordDetail
+from .schemas import (
+    FieldEvidence,
+    RecordAntibody,
+    RecordBand,
+    RecordDetail,
+    review_reasons_from_flags,
+)
+
+# Engine-internal markers that live in the provenance envelope but are NOT
+# source wording. They must never render in the "quoted from the paper" slot.
+# Stored provenance is untouched; this is presentation shaping only.
+_INTERNAL_SOURCE_TEXTS = {"", "{}", "ambiguous_family", "None", "none"}
+
+# Candidate values that are internal placeholders rather than claims. The
+# modification candidate "none" IS a claim (the row label says total protein)
+# and is relabeled, not dropped.
+_CANDIDATE_LABELS = {("modification_type", "none"): "no modification (total protein)"}
 
 # (display key, path into the provenance envelope)
 _FIELD_PATHS: list[tuple[str, tuple[str, ...]]] = [
@@ -44,23 +60,33 @@ def _dig(obj: Any, path: tuple[str, ...]) -> Any:
     return obj
 
 
-def _field_evidence(envelope: Any) -> FieldEvidence | None:
+def _field_evidence(envelope: Any, name: str = "") -> FieldEvidence | None:
     if not isinstance(envelope, dict) or "status" not in envelope:
         return None
-    sources = [
-        {"type": s.get("type"), "text": s.get("text")}
-        for s in envelope.get("sources", []) or []
-        if isinstance(s, dict)
-    ]
-    candidates = [
-        {
-            "value": c.get("value"),
+    sources = []
+    for s in envelope.get("sources", []) or []:
+        if not isinstance(s, dict):
+            continue
+        text = s.get("text")
+        if not isinstance(text, str) or text.strip() in _INTERNAL_SOURCE_TEXTS:
+            # Keep the provenance TYPE (e.g. "via UniProt") but never show an
+            # internal marker as if it were a sentence from the paper.
+            sources.append({"type": s.get("type"), "text": None})
+        else:
+            sources.append({"type": s.get("type"), "text": text})
+    candidates = []
+    for c in envelope.get("candidates", []) or []:
+        if not isinstance(c, dict):
+            continue
+        value = c.get("value")
+        if value is None:
+            continue  # a null candidate carries no claim a researcher can judge
+        value = _CANDIDATE_LABELS.get((name, str(value)), value)
+        candidates.append({
+            "value": value,
             "source_type": c.get("source_type"),
             "confidence": c.get("confidence"),
-        }
-        for c in envelope.get("candidates", []) or []
-        if isinstance(c, dict)
-    ]
+        })
     return FieldEvidence(
         value=envelope.get("value"),
         confidence=envelope.get("confidence"),
@@ -74,12 +100,21 @@ def _v(envelope: Any) -> Any:
     return envelope.get("value") if isinstance(envelope, dict) else None
 
 
+def _measure(value: Any, unit: Any) -> str | None:
+    """'30 min', not '30.0 min': lane values are stored as floats."""
+    if value is None:
+        return None
+    if isinstance(value, float) and value.is_integer():
+        value = int(value)
+    return f"{value}{f' {unit}' if unit else ''}"
+
+
 def build_record_detail(row: dict) -> RecordDetail:
     prov = row.get("provenance") or {}
 
     fields: dict[str, FieldEvidence] = {}
     for name, path in _FIELD_PATHS:
-        fe = _field_evidence(_dig(prov, path))
+        fe = _field_evidence(_dig(prov, path), name)
         if fe is not None and fe.status != "MISSING":
             fields[name] = fe
     # Keep MISSING envelopes only for fields where absence is itself
@@ -89,7 +124,7 @@ def build_record_detail(row: dict) -> RecordDetail:
             continue
         if name in ("modification_type", "experiment_type",
                     "reported_molecular_weight_kda", "expected_molecular_weight_kda"):
-            fe = _field_evidence(_dig(prov, path))
+            fe = _field_evidence(_dig(prov, path), name)
             if fe is not None:
                 fields[name] = fe
 
@@ -130,8 +165,8 @@ def build_record_detail(row: dict) -> RecordDetail:
             lane_condition=_v(b.get("lane_condition")),
             band_state=_v(state_env),
             confidence=state_env.get("confidence") if isinstance(state_env, dict) else None,
-            lane_dose=f"{dose}{f' {dose_u}' if dose_u else ''}" if dose is not None else None,
-            lane_duration=f"{dur}{f' {dur_u}' if dur_u else ''}" if dur is not None else None,
+            lane_dose=_measure(dose, dose_u),
+            lane_duration=_measure(dur, dur_u),
             band_pattern=_v(b.get("band_pattern")),
             band_pattern_status=(b.get("band_pattern") or {}).get("status")
             if isinstance(b.get("band_pattern"), dict) else None,
@@ -140,6 +175,13 @@ def build_record_detail(row: dict) -> RecordDetail:
         ))
 
     validation = row.get("validation") or {}
+    flags = [
+        {"code": a.get("code"), "severity": a.get("severity"),
+         # the engine stores the plain-language reason under `detail`
+         "message": a.get("detail") or a.get("message")}
+        for a in (row.get("anomaly_flags") or [])
+        if isinstance(a, dict)
+    ]
 
     return RecordDetail(
         id=row["id"],
@@ -172,9 +214,7 @@ def build_record_detail(row: dict) -> RecordDetail:
         bands=bands,
         record_status=validation.get("record_status"),
         needs_review=row.get("needs_review"),
-        anomaly_flags=[
-            {"code": a.get("code"), "message": a.get("message")}
-            for a in (row.get("anomaly_flags") or [])
-            if isinstance(a, dict)
-        ],
+        anomaly_flags=flags,
+        review_reasons=review_reasons_from_flags(
+            [{"code": f["code"], "severity": f["severity"], "detail": f["message"]} for f in flags]),
     )

@@ -1,4 +1,48 @@
-from pydantic import BaseModel, Field
+from pathlib import PurePosixPath
+
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+# Severity order for review reasons: the most serious flag reads first.
+_SEVERITY_RANK = {"high": 0, "med": 1, "medium": 1, "low": 2}
+
+
+def _crop_basename(ref: object) -> str | None:
+    """Public responses carry only the crop FILENAME. The stored value is the
+    authoring machine's absolute path (reviewed corpus, unchanged on purpose);
+    exposing it leaked a username and directory layout. The crop endpoint
+    reads the stored column directly, so serving is unaffected."""
+    if not ref:
+        return None
+    return PurePosixPath(str(ref)).name or None
+
+
+def _trim_flags(flags: object) -> list[dict]:
+    """Keep the researcher-facing part of each anomaly flag (code, severity,
+    plain-language detail); drop the internal evidence envelopes."""
+    out = []
+    for f in flags or []:
+        if not isinstance(f, dict):
+            continue
+        out.append({
+            "code": f.get("code"),
+            "severity": f.get("severity"),
+            "detail": f.get("detail") or f.get("message"),
+        })
+    return out
+
+
+def review_reasons_from_flags(flags: list[dict]) -> list[str]:
+    """Plain-language reasons a row needs review, derived ONLY from the
+    validation flags the engine stored (never invented), most severe first,
+    de-duplicated. This is what a result list shows instead of the raw
+    validation object."""
+    ordered = sorted(flags, key=lambda f: _SEVERITY_RANK.get(str(f.get("severity")).lower(), 3))
+    seen: list[str] = []
+    for f in ordered:
+        text = f.get("detail") or (str(f.get("code")).replace("_", " ").capitalize() if f.get("code") else None)
+        if text and text not in seen:
+            seen.append(text)
+    return seen
 
 
 class SearchRequest(BaseModel):
@@ -88,6 +132,10 @@ class WesternBlotRecord(BaseModel):
     # record dump); a dedicated record-detail endpoint serves them so list
     # responses stay small ("avoid giant internal blobs by default").
     anomaly_flags: list[dict] | None = None
+    # Plain-language "why does this need review" (from the flags above). The
+    # full `validation` JSONB stays out of list responses; this is the
+    # smallest researcher-facing projection of it.
+    review_reasons: list[str] = []
     needs_review: bool | None = None
     extraction_stage: str | None = None
     extraction_model: str | None = None
@@ -99,6 +147,22 @@ class WesternBlotRecord(BaseModel):
     # key is what let grouping and identity disagree (the H1792/A549 co-IP
     # collision); one source of truth removes that whole failure class.
     stable_row_key: str | None = None
+
+    @field_validator("image_crop_ref", mode="before")
+    @classmethod
+    def _public_crop_ref(cls, v):
+        return _crop_basename(v)
+
+    @field_validator("anomaly_flags", mode="before")
+    @classmethod
+    def _public_flags(cls, v):
+        return _trim_flags(v) if v is not None else None
+
+    @model_validator(mode="after")
+    def _derive_review_reasons(self):
+        if not self.review_reasons and self.anomaly_flags:
+            self.review_reasons = review_reasons_from_flags(self.anomaly_flags)
+        return self
 
 
 class SearchResponse(BaseModel):
@@ -192,6 +256,12 @@ class RecordDetail(BaseModel):
     record_status: str | None = None
     needs_review: bool | None = None
     anomaly_flags: list[dict] = []
+    review_reasons: list[str] = []
+
+    @field_validator("image_crop_ref", mode="before")
+    @classmethod
+    def _public_crop_ref(cls, v):
+        return _crop_basename(v)
 
 
 # --- researcher feedback -----------------------------------------------------

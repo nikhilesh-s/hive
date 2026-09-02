@@ -4,19 +4,18 @@
 // for?" Persisted with the query so misunderstood searches become training
 // signal for the search layer.
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { submitFeedback } from '@/lib/feedback';
 
 const MONO = 'var(--font-mono), monospace';
 const SANS = 'var(--font-sans), sans-serif';
 
+// A new query resets the prompt: the parent renders this with key={query},
+// so React remounts it instead of an effect calling setState.
 export default function SearchFeedback({ query }: { query: string }) {
   const [state, setState] = useState<'idle' | 'explain' | 'done'>('idle');
   const [expected, setExpected] = useState('');
-
-  // A new query resets the prompt.
-  useEffect(() => { setState('idle'); setExpected(''); }, [query]);
 
   if (!query) return null;
   if (state === 'done') {
