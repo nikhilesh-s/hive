@@ -1,8 +1,18 @@
 # HiveBlot Team Assignments
 
+> **STATUS (2026-09-01, UCSF beta-readiness pass): the five teammate
+> workstreams below are CONSOLIDATED.** They were absorbed into one pass owned
+> by Nik + the primary Claude engineering agent, and that pass is complete:
+> see `research/UCSF_BETA_READINESS.md` (findings, fixes, verdict) and
+> `HANDOFF.md` (current state). **Future agents must not wait for Ananya,
+> Suhas, Srushti, Tanvi or Yashvi deliverables — none are pending.** The
+> personal handoff files in this directory remain as historical specification
+> and backlog only. Srushti's frontend work landed directly on
+> `feature/bio-context-beta` (14 commits, 2026-08-25/26) and is canonical.
+
 Current beta: **3 reviewed papers · 93 experiments · 475 evidence rows**.
 
-Use this file as the assignment index for the current internal beta pass.
+Historical assignment index for the August 2026 internal beta pass (see status above).
 
 | Person | Primary role | Handoff |
 |---|---|---|
