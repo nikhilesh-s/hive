@@ -5,7 +5,7 @@ with its data dir inside the repo at `.localdb/` (gitignored), then applies the
 SAME SQL a Supabase project would get, in the same order:
 
     1. api/db/schema.sql                  (table + pg_trgm + hive_readonly role)
-    2. migrations/001_evidence_record.sql (additive Evidence Record columns)
+    2. migrations/001..004 (Evidence Record columns, feedback, stable key, RLS)
 
 and loads demo Evidence Record rows. The API's /search path talks to Postgres
 via asyncpg (DB_READONLY_URL) and never touches PostgREST, so against this
@@ -16,6 +16,7 @@ Usage (from repo root):
     .venv/bin/python scripts/local_db.py up            # init + start + migrate
     .venv/bin/python scripts/local_db.py load <rows.json> [...]   # load demo rows
     .venv/bin/python scripts/local_db.py status        # row counts + DSNs
+    .venv/bin/python scripts/local_db.py test-url      # scratch superuser URI for the RLS matrix test
     .venv/bin/python scripts/local_db.py stop
 
 Idempotent: `up` re-applies (everything is IF NOT EXISTS); `load` replaces any
@@ -187,6 +188,21 @@ def cmd_status() -> None:
     print(f"DB_READONLY_URL={readonly_uri(server)}")
 
 
+TEST_DB_NAME = "hiveblot_rlstest"
+
+
+def cmd_test_url() -> None:
+    """Print a SUPERUSER URI for a scratch database, for
+    api/tests/test_db_access_matrix.py (which drops/recreates the two
+    application tables on every run — never point it at the dev database)."""
+    server = get_server()
+    base = server.get_uri()
+    names = [r["datname"] for r in fetch(base, "SELECT datname FROM pg_database")]
+    if TEST_DB_NAME not in names:
+        run_sql(base, f'CREATE DATABASE "{TEST_DB_NAME}"')
+    print(server.get_uri(TEST_DB_NAME))
+
+
 def cmd_stop() -> None:
     server = get_server(cleanup_mode="stop")
     server.cleanup()
@@ -201,6 +217,8 @@ if __name__ == "__main__":
         cmd_load(sys.argv[2:])
     elif cmd == "status":
         cmd_status()
+    elif cmd == "test-url":
+        cmd_test_url()
     elif cmd == "stop":
         cmd_stop()
     else:

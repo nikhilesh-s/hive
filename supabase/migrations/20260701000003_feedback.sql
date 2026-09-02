@@ -72,8 +72,9 @@ $$;
 GRANT USAGE ON SCHEMA public TO hive_feedback;
 GRANT INSERT, SELECT ON hiveblot_feedback TO hive_feedback;
 GRANT USAGE ON SEQUENCE hiveblot_feedback_feedback_id_seq TO hive_feedback;
--- The read-only search role may read feedback (for future "community notes"
--- style display) but cannot write it.
-GRANT SELECT ON hiveblot_feedback TO hive_readonly;
+-- hive_readonly gets NO access to this table: the search role never reads
+-- feedback (rehydration goes through hive_feedback's own SELECT). An earlier
+-- version of this file granted it SELECT here; migration 004 revokes that on
+-- projects that applied it.
 
 COMMIT;
