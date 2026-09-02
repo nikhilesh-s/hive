@@ -325,7 +325,7 @@ the home page (currently in the scope line under the headline).
 - **Automated unseen-paper extraction is not validated.** Stage 2 has only run agent-in-the-loop; no precision / recall / F1 exists. No copy anywhere claims otherwise.
 - **No densitometry**, ever, by design.
 - **Render free-tier cold start** ~20–30 s (measured 21 s) after ~15 min idle; documented on the site.
-- **Render redeploy pending (Nik).** The Render CLI on this machine is unauthenticated, so the API build `5c54352` (review reasons, crop filename, raw-value shaping, no PostgREST) is **not yet live** on `hiveblot-api.onrender.com`. The deployed frontend works against the old build (it falls back to flag details and never displays the raw crop path). Until the redeploy, list responses from the hosted API still contain the absolute crop path. Deploy: `render deploys create srv-da1rbvs9v7es738635ug --commit <sha> --confirm -o json` after `render login`, or Manual Deploy in the dashboard.
+- ~~Render redeploy pending~~ **Done 2026-09-02:** `96678c8` deployed to `hiveblot-api` (`dep-dabrjdojo6nc738n1to0`, live 05:53 UTC) and verified end-to-end through the hosted stack (see `HANDOFF.md` → Release freeze).
 - **pg_trgm in public** (advisor WARN) deferred with a documented procedure.
 - **Corpus findings QA-1…QA-5** are abstentions / classification nits, not false claims; each needs a reviewed reseed and is deferred to Nik.
 - `supabase test db` and `supabase db dump` need Docker; the pytest access matrix and the structured snapshot stand in.
@@ -342,19 +342,16 @@ flagship queries return the reviewed shapes through the hosted stack after the
 migration; no false SUPPORTED exists in the corpus; every test suite is green.
 
 Why "with known limitations": three papers, no unseen-paper accuracy claim,
-free-tier cold start, and one deployment step (Render) that only Nik can
-perform. None of these affect scientific correctness of what is shown.
+free-tier cold start. None of these affect scientific correctness of what is
+shown. **Status 2026-09-02: FROZEN — READY FOR UCSF BETA WITH KNOWN
+LIMITATIONS** (API deployed, hosted verification passed; see `HANDOFF.md`
+→ Release freeze).
 
 ## J. Presentation-day checklist
 
-1. Supabase: dashboard shows `zafombwswztvnjikcsdm` ACTIVE_HEALTHY; Security Advisor shows 0 errors.
-2. Warm the API 2–3 minutes before: `curl https://hiveblot-api.onrender.com/health` (first call may take ~20–30 s; the second should be < 1 s).
-3. If not yet done, deploy the API build (see H) and re-run step 2.
-4. Open https://hiveblot-beta.vercel.app; confirm the scope line reads "3 papers · 93 experiments · 475 evidence rows".
-5. Search `phospho STAT3 Tyr705` → 3 experiments (18 lane records); the first card shows the panel crop.
-6. Click **Evidence & sources** on that card → crop, field sources with quoted sentences, lanes, DOI link.
-7. Search `P-ERK` → Conflicting, both claims shown, "Why conflicting" listed.
-8. Search `BRCA1 MCF7 olaparib` → 0 with the scoped copy (this is the honesty demo).
-9. Submit one feedback (✓ on a field) and reload: it rehydrates as RESEARCHER FEEDBACK.
-10. Toggle Light/Dark once; open `/about` and `/learn`.
-11. Present.
+1. Supabase dashboard: `zafombwswztvnjikcsdm` ACTIVE_HEALTHY, Security Advisor 0 errors.
+2. Warm the API 2–3 minutes before: `curl https://hiveblot-api.onrender.com/health` twice (first call may take ~20–30 s, second < 1 s).
+3. Open https://hiveblot-beta.vercel.app: scope line reads "3 papers · 93 experiments · 475 evidence rows"; toggle Light/Dark once.
+4. Search `phospho STAT3 Tyr705` → 3 experiments (18 lane records); the first card shows its panel crop; click **Evidence & sources** → crop, quoted sources, lanes, DOI.
+5. Search `P-ERK` → Conflicting with both claims and "Why conflicting"; then `BRCA1 MCF7 olaparib` → 0 with the scoped copy.
+6. Present (any feedback you submit while demoing is real data; do not delete it).
