@@ -1,140 +1,163 @@
 'use client';
 
+// Teaches what HiveBlot actually reports: the four evidence statuses,
+// categorical band presence (no densitometry), expected vs reported MW, and
+// the terms a result card uses. Generic blot theory is kept to the minimum a
+// non-blot user needs to read a card.
+
+const MONO = 'var(--font-mono), monospace';
+
+const STATUSES: { name: string; color: string; badge: string; text: string }[] = [
+  {
+    name: 'SUPPORTED', color: 'var(--accent)', badge: 'Supported',
+    text: 'The available sources agree and the value is settled. Silence is the signal: a settled field shows no marker.',
+  },
+  {
+    name: 'AMBIGUOUS', color: 'var(--warning)', badge: 'Needs review',
+    text: 'More than one interpretation remains plausible, or the value legitimately varies within the panel (a time course, a dose series, a label that maps to a protein family such as ERK1/2 = MAPK1/MAPK3). The value shown is a flagged best effort, not a settled fact.',
+  },
+  {
+    name: 'CONFLICTING', color: 'var(--error)', badge: 'Conflicting',
+    text: 'Credible sources actively disagree. HiveBlot records no value at all, shows every competing claim with where it came from, and explains why it did not pick one. This is a feature: it is what makes the Supported badge mean something.',
+  },
+  {
+    name: 'MISSING', color: 'var(--text-subtle)', badge: 'not reported',
+    text: 'The paper does not state the value. It is shown as "not reported", never as a plausible guess. A missing value is a finding about the paper, not a gap in HiveBlot.',
+  },
+];
+
+const GLOSSARY: [string, string][] = [
+  ['IgG', 'Immunoglobulin G, the antibody class used for detection and immunoprecipitation. In a co-IP figure the "IgG" lane is the negative control: a non-specific antibody of the same class, so anything it pulls down is background rather than a real interaction.'],
+  ['IP bait', 'The protein an immunoprecipitation antibody captures out of the lysate (printed as "IP: PIK3CA" on the figure). Proteins that come down with it and are blotted in the IP lanes are the readouts, i.e. candidate interaction partners.'],
+  ['Input', 'A sample of the lysate taken before immunoprecipitation and run beside the IP lanes. It shows the proteins were present to begin with and that loading was comparable; it says nothing about interaction on its own.'],
+  ['phospho / site', 'A phospho-specific antibody recognizes a protein only when a particular residue is phosphorylated; the site names that residue (Tyr705 = tyrosine 705, Ser473 = serine 473). HiveBlot records phosphorylation only when the antibody or the printed label states it. A "p-" or "P-" prefix on its own is not evidence (P-selectin and P-cadherin are not phosphoproteins), which is why some rows stay Conflicting.'],
+  ['loading control', 'An abundant protein (β-actin/ACTB, GAPDH, tubulin) blotted on the same membrane to show that comparable amounts of protein were loaded in each lane. It supports the comparison; it says nothing about the target itself.'],
+  ['doublet', 'Two closely spaced bands for one target. HiveBlot records a doublet or smear as a description of what the blot shows and never assigns the second band to an isoform, cleavage product or modification.'],
+  ['kDa', 'Kilodalton, the unit of molecular mass. A band position is reported in kDa by reading it against the marker ladder run on the same gel.'],
+  ['expected vs reported MW', 'Expected molecular weight is the reference mass computed from the UniProt sequence for the resolved protein. Reported molecular weight is only what the paper itself printed for the band. They are kept apart because they legitimately differ (modifications, glycosylation, running behavior), and HiveBlot never reads mass off an image without a printed ladder calibration.'],
+  ['as printed', 'The target label exactly as it appears in the figure. It is always kept beside the normalized name so you can check the normalization yourself.'],
+];
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="hb-page-section">
+      <h2 className="hb-page-h2">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 export default function Learn() {
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "var(--font-sans), sans-serif" }}>
-      {/* Hero */}
-      <section style={{ textAlign: 'center', padding: '88px 56px 60px' }}>
-        <h1 style={{ fontSize: '64px', fontWeight: 600, marginBottom: '24px' }}>
-          How to Interpret Results
-        </h1>
-        <p style={{ fontSize: '18px', color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.7 }}>
-          Western blots can look intimidating, but once you understand the basics, they tell a clear story. Here's what to look for.
+    <div className="hb-page">
+      <section className="hb-page-hero">
+        <h1 className="hb-page-h1">How to read a HiveBlot result</h1>
+        <p className="hb-page-lead">
+          A result is one Western blot experiment: one panel, one target, one sample,
+          one treatment design, with every lane listed. This page explains what each
+          part of a card and its evidence panel means, and what HiveBlot deliberately
+          does not claim.
         </p>
       </section>
 
-      {/* Western Blot Basics */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid var(--border)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>What is a Western Blot?</h2>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '24px' }}>
-          A western blot is a molecular biology technique used to detect and quantify specific proteins in a sample. The process works like this:
+      <Section title="What one result represents">
+        <p className="hb-page-p">
+          Searching returns experiments, not sentences. Each card is one blot panel for
+          one target in one biological system: the normalized protein name (with the
+          label <em>as printed</em> underneath when they differ), a status badge, the
+          sample or cell line and organism, the experiment type (Western, phospho
+          Western, co-IP, loading control), the treatment and dose/duration when the
+          paper states them, every lane with its printed condition, the antibody and
+          catalog number, molecular weight, the UniProt accession and the DOI. Open{' '}
+          <strong>Evidence</strong> on a card to see the figure crop, the field-level
+          sources and the feedback controls.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '32px' }}>
-          <div style={{ backgroundColor: 'var(--accent-faint)', padding: '24px', borderRadius: '8px', border: '1px solid rgba(74,214,176,.2)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
-              1. Extraction & Loading
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-              Proteins are extracted from cells or tissues and loaded onto a gel. Equal amounts are typically used to make comparisons fair.
-            </p>
+      </Section>
+
+      <Section title="The four evidence statuses">
+        <p className="hb-page-p">
+          Every important field carries a status. The card badge summarizes the record;
+          the evidence panel shows the status per field.
+        </p>
+        <div className="hb-status-grid">
+          {STATUSES.map((s) => (
+            <div key={s.name} className="hb-status-card" style={{ borderLeftColor: s.color }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '6px' }}>
+                <span style={{ fontFamily: MONO, fontSize: '12px', fontWeight: 600, color: s.color }}>{s.name}</span>
+                <span style={{ fontFamily: MONO, fontSize: '10px', color: 'var(--text-subtle)' }}>badge: {s.badge}</span>
+              </div>
+              <p className="hb-page-p" style={{ margin: 0, fontSize: '14px' }}>{s.text}</p>
+            </div>
+          ))}
+        </div>
+        <p className="hb-page-p">
+          <strong>Needs review</strong> on a card means at least one field is
+          Ambiguous or a validation flag fired. The card lists the reason (for example
+          <em> Protein name maps to more than one reviewed UniProt entry</em>) so you can
+          decide whether it matters for your question without opening the evidence panel.
+        </p>
+      </Section>
+
+      <Section title="What a lane tells you (and what it does not)">
+        <p className="hb-page-p">
+          Each lane is shown with its printed condition and a categorical band state:
+          <span style={{ color: 'var(--accent)' }}> present</span>,
+          <span style={{ color: 'var(--error)' }}> absent</span> or
+          <span style={{ color: 'var(--warning)' }}> uncertain</span>. HiveBlot does
+          not measure band intensity, does not report fold changes, and does not call a
+          protein up- or down-regulated. That is densitometry, and it is out of scope by
+          design: an intensity read off a figure without the original exposure is not a
+          measurement. If a lane is faint or hard to judge from the published image it is
+          marked uncertain rather than guessed.
+        </p>
+        <p className="hb-page-p">
+          When a panel is a time course or dose series, the panel-level dose or duration
+          is shown as varying by lane and the per-lane values live on the lanes
+          themselves. When one panel mixes several agents with different units, the
+          panel-level dose stays unsettled and the treatment context describes the design.
+        </p>
+      </Section>
+
+      <Section title="Where each value comes from">
+        <p className="hb-page-p">
+          The evidence panel tags each field with its source: <span style={{ fontFamily: MONO }}>caption</span>,{' '}
+          <span style={{ fontFamily: MONO }}>methods</span>, <span style={{ fontFamily: MONO }}>antibody</span> (the reagent
+          entry), <span style={{ fontFamily: MONO }}>row label</span> (the printed target),{' '}
+          <span style={{ fontFamily: MONO }}>image</span> (the panel itself, for lane conditions and band presence) or{' '}
+          <span style={{ fontFamily: MONO }}>UniProt</span> (canonical name, accession, expected mass). Where the source is
+          a sentence, the sentence is quoted. Every panel links to the DOI so the paper
+          is one click away. Corrections you submit are stored beside the extraction as
+          an auditable pair and are never applied over it.
+        </p>
+      </Section>
+
+      <Section title="Western blot basics, briefly">
+        <div className="hb-two-col">
+          <div>
+            <h3 className="hb-page-h3">1. Extraction and loading</h3>
+            <p className="hb-page-p">Proteins are extracted from cells or tissue and loaded onto a gel, usually in equal amounts so lanes can be compared.</p>
+            <h3 className="hb-page-h3">2. Separation by size</h3>
+            <p className="hb-page-p">An electric field moves proteins through the gel; smaller proteins travel further. A marker ladder gives the size scale in kDa.</p>
           </div>
-          <div style={{ backgroundColor: 'var(--accent-faint)', padding: '24px', borderRadius: '8px', border: '1px solid rgba(74,214,176,.2)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
-              2. Gel Electrophoresis
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-              An electric field separates proteins by size. Smaller proteins move faster; larger ones move slower.
-            </p>
-          </div>
-          <div style={{ backgroundColor: 'var(--accent-faint)', padding: '24px', borderRadius: '8px', border: '1px solid rgba(74,214,176,.2)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
-              3. Transfer to Membrane
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-              Proteins are transferred from the gel onto a nitrocellulose or PVDF membrane for detection.
-            </p>
-          </div>
-          <div style={{ backgroundColor: 'var(--accent-faint)', padding: '24px', borderRadius: '8px', border: '1px solid rgba(74,214,176,.2)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', color: 'var(--accent)' }}>
-              4. Antibody Detection
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-              Specific antibodies bind to your target protein and are visualized using chemiluminescence or fluorescence.
-            </p>
+          <div>
+            <h3 className="hb-page-h3">3. Transfer to a membrane</h3>
+            <p className="hb-page-p">Proteins are transferred onto a nitrocellulose or PVDF membrane for detection.</p>
+            <h3 className="hb-page-h3">4. Antibody detection</h3>
+            <p className="hb-page-p">A primary antibody binds the target; a labeled secondary antibody makes the band visible. The antibody is why the same target can look different across papers.</p>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* Reading Results */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid var(--border)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>Reading Your Results</h2>
-        
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px', color: 'var(--warning)' }}>Band Intensity</h3>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-            The darker or brighter a band, the more of that protein is present. A faint band means low protein levels; a dark band means high levels. This is what you're really measuring.
-          </p>
-        </div>
-
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px', color: 'var(--warning)' }}>Protein Size (Molecular Weight)</h3>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-            Where a band appears on the blot tells you the molecular weight of the protein. Your target protein should appear at a specific size. If it appears at a different size, it might be a degradation product or splice variant.
-          </p>
-        </div>
-
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px', color: 'var(--warning)' }}>Loading Controls</h3>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-            A loading control like GAPDH, beta-actin, or tubulin appears at the bottom of most western blots. This shows that equal amounts of protein were loaded in each lane. If loading controls differ significantly between lanes, any comparison becomes questionable.
-          </p>
-        </div>
-
-        <div>
-          <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px', color: 'var(--warning)' }}>Multiple Lanes</h3>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-            Each lane represents a different condition or treatment. You compare band intensity across lanes to see if your protein levels changed in response to treatment.
-          </p>
-        </div>
-      </section>
-
-      {/* Common Results */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid var(--border)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>Result Interpretations in HiveBlot</h2>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginTop: '32px' }}>
-          <div style={{ padding: '20px', backgroundColor: 'var(--accent-soft)', borderRadius: '8px', borderLeft: '4px solid var(--accent)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent)' }}>Detected</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              The protein is present in the cell line or tissue. A band is visible and clear.
-            </p>
-          </div>
-
-          <div style={{ padding: '20px', backgroundColor: 'var(--warning-soft)', borderRadius: '8px', borderLeft: '4px solid var(--warning)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: 'var(--warning)' }}>Upregulated</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              The protein is more abundant than in a control or compared condition. The band is darker/brighter.
-            </p>
-          </div>
-
-          <div style={{ padding: '20px', backgroundColor: 'var(--error-soft)', borderRadius: '8px', borderLeft: '4px solid var(--error)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: 'var(--error)' }}>Downregulated</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              The protein is less abundant than in a control or compared condition. The band is fainter.
-            </p>
-          </div>
-
-          <div style={{ padding: '20px', backgroundColor: 'var(--blue-soft)', borderRadius: '8px', borderLeft: '4px solid var(--blue)' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: 'var(--blue)' }}>Not Detected</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-              The protein is absent or below the detection limit. No band is visible.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Tips */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid var(--border)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>Tips for Interpreting Results</h2>
-        
-        <ul style={{ color: 'var(--text-secondary)', lineHeight: 2, fontSize: '16px', paddingLeft: '20px' }}>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Always check the loading control.</strong> Unequal loading makes protein comparisons invalid.</li>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Look for the expected size.</strong> An unexpected band size suggests degradation, modification, or off-target antibody binding.</li>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Use biological replicates.</strong> A single lane doesn't prove much. Multiple replicates increase confidence.</li>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Check the antibody specificity.</strong> The antibody used matters. Different antibodies can give different results.</li>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Consider the context.</strong> Cell type, condition, and species all affect what you see.</li>
-        </ul>
-      </section>
+      <Section title="Glossary">
+        <dl className="hb-glossary">
+          {GLOSSARY.map(([term, def]) => (
+            <div key={term} className="hb-glossary-row">
+              <dt>{term}</dt>
+              <dd>{def}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
     </div>
   );
 }
