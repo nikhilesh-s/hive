@@ -95,6 +95,8 @@ export default function SearchPage() {
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(false);
+  // Set ~4 s into a search: the only slow path is the free-tier API waking up.
+  const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<SearchFilters>(emptySearchFilters);
@@ -151,8 +153,10 @@ export default function SearchPage() {
     window.history.replaceState(null, '', url.toString());
 
     setLoading(true);
+    setSlow(false);
     setError(null);
     setShowResults(true);
+    const slowTimer = window.setTimeout(() => setSlow(true), 4000);
 
     try {
       const response = await fetch('/api/search', {
@@ -171,6 +175,8 @@ export default function SearchPage() {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setResults([]);
     } finally {
+      window.clearTimeout(slowTimer);
+      setSlow(false);
       setLoading(false);
     }
   }
@@ -224,7 +230,7 @@ export default function SearchPage() {
             placeholder="Search protein, phosphosite, antibody, cell line..."
             onSearch={handlePrimarySearch}
             initialValue={query}
-            examples={['STAT3 Tyr705', 'Hep3B', 'CST #9145']}
+            examples={['phospho STAT3 Tyr705', 'co-IP PIK3CA', 'CST 9145', 'GAPDH mouse', 'needs review']}
             loading={loading}
           />
         </div>
@@ -269,12 +275,12 @@ export default function SearchPage() {
             <div className="hb-results-header">
               <div className="hb-results-title">
                 <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: 'var(--accent)' }}>RESULTS</span>
-                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: 'var(--text-subtle)' }}>-</span>
-                <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)' }}>Western Blot Evidence</span>
+                <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)' }}>Western blot evidence</span>
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '10px', color: 'var(--text-subtle)' }}>reviewed corpus · 3 papers</span>
               </div>
               <p className="hb-results-count">
                 {loading
-                  ? 'Searching database...'
+                  ? 'Searching the reviewed corpus…'
                   : (() => {
                       const n = groups.length;
                       return `Found ${n} experiment${n !== 1 ? 's' : ''} (${results.length} lane record${results.length !== 1 ? 's' : ''})`;
@@ -302,8 +308,15 @@ export default function SearchPage() {
             {loading && (
               <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                 <div style={{ fontFamily: 'var(--font-serif), serif', fontSize: '16px', color: 'var(--text-secondary)' }}>
-                  Querying database...
+                  Querying the database…
                 </div>
+                {slow && (
+                  <p className="hb-search-slow-note">
+                    Still working. The beta API runs on a free tier that sleeps after about 15 minutes
+                    idle; the first search after that can take 30–60 seconds while it wakes up. Later
+                    searches are fast.
+                  </p>
+                )}
               </div>
             )}
 
@@ -329,7 +342,7 @@ export default function SearchPage() {
             {!loading && results.length > 0 && (
               <>
                 <div className="hb-search-feedback-wrap">
-                  <SearchFeedback query={query} />
+                  <SearchFeedback key={query} query={query} />
                 </div>
                 <div className="hb-result-list">
                   {groups.map((g) => (
@@ -353,10 +366,13 @@ export default function SearchPage() {
         ) : (
           <div style={{ textAlign: 'center', paddingTop: '80px', color: 'var(--text-secondary)' }}>
             <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '18px', lineHeight: 1.6 }}>
-              Enter a natural language query to search for western blot evidence
+              Search a reviewed corpus of experiment-level Western blot evidence:
+              3 papers · 93 experiments · 475 evidence rows.
             </p>
-            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', marginTop: '12px', color: 'var(--text-subtle)' }}>
-              Example: &quot;Show western blot evidence for phospho-TBK1 in p53 wild-type versus p53 knockout mouse embryonic fibroblasts.&quot;
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', marginTop: '12px', color: 'var(--text-subtle)', lineHeight: 1.6 }}>
+              Type a protein, a phosphosite (Tyr705), an antibody vendor and catalog number (CST 9145),
+              a cell line (Hep3B), or a design word such as co-IP, loading control or needs review, then
+              press Enter. Results group lanes into experiments; each card links to its figure crop and sources.
             </p>
           </div>
         )}
