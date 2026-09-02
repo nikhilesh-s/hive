@@ -9,8 +9,11 @@ class Settings(BaseSettings):
     instead of failing deep inside a request handler.
     """
 
-    supabase_url: str
-    supabase_key: str
+    # Kept only so existing env files keep loading; the API no longer opens a
+    # PostgREST client (migration 004 revoked the anon key's table access and
+    # every endpoint now runs on the scoped Postgres roles below).
+    supabase_url: str = ""
+    supabase_key: str = ""
     openai_key: str
 
     # Connection string for a Postgres role that only has SELECT on

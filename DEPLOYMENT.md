@@ -55,8 +55,8 @@ edit the copies).
 ```bash
 supabase login                                # once per machine
 supabase link --project-ref zafombwswztvnjikcsdm
-supabase db push --dry-run                    # review: 4 migrations, additive
-supabase db push                              # base schema + 001 + 002 + 003
+supabase db push --dry-run                    # review: 5 migrations, additive
+supabase db push                              # base schema + 001 + 002 + 003 + 004
 ```
 Both restricted roles are created **by the migrations themselves** (there is no
 `supabase/roles.sql`): `hive_readonly` in the base schema, `hive_feedback` in
@@ -83,19 +83,47 @@ export SEED_DATABASE_URL='<owner connection string>'   # NOT a restricted role
 .venv/bin/python scripts/seed_remote.py eval/demo/*/supabase_rows.json
 .venv/bin/python scripts/seed_remote.py --check                 # expect 475 rows
 ```
-Fallback (no CLI): run the four canonical files in the SQL editor in order —
+Fallback (no CLI): run the five canonical files in the SQL editor in order —
 `api/db/schema.sql`, `migrations/001_evidence_record.sql`,
-`migrations/002_feedback.sql`, `migrations/003_stable_row_key.sql` — then
-passwords + seed as above. Do NOT run both the CLI flow and the SQL-editor
+`migrations/002_feedback.sql`, `migrations/003_stable_row_key.sql`,
+`migrations/004_secure_public_tables.sql` — then passwords + seed as above. Do NOT run both the CLI flow and the SQL-editor
 flow; everything is idempotent, but pick one.
 
-**Security invariants (encoded in the SQL; verified on the beta project):**
-`hive_readonly` = SELECT-only on evidence + feedback. `hive_feedback` =
-INSERT+SELECT on `hiveblot_feedback` ONLY (+ its id sequence) — it holds **no
-grant of any kind on `western_blot_records`** and cannot UPDATE or DELETE
-anything. Neither restricted DSN ever reaches browser JavaScript: both live in
-API-server env vars; the web app talks only to the API through the Next.js
-server-side proxy with `INTERNAL_API_KEY`.
+**Security invariants (migration 004, applied to the beta project 2026-09-01;
+verified by `api/tests/test_db_access_matrix.py` and re-checked live):**
+
+| Role | `western_blot_records` | `hiveblot_feedback` | Notes |
+|---|---|---|---|
+| `anon` / `authenticated` (Supabase client roles) | nothing | nothing | table + sequence grants revoked, default privileges revoked; the anon key cannot reach either table through PostgREST |
+| `hive_readonly` (API search / record detail) | SELECT via RLS policy | nothing | no write of any kind |
+| `hive_feedback` (API feedback path) | nothing | INSERT + SELECT via RLS policies, USAGE on the id sequence | SELECT is required by `INSERT … RETURNING` and by feedback rehydration; no UPDATE / DELETE |
+| `postgres` / `service_role` | owner / BYPASSRLS | owner / BYPASSRLS | server-only; used for migrations and seeding, never from a browser |
+
+Row Level Security is ENABLED on both tables with explicit per-role policies
+(`hive_readonly_select_records`, `hive_feedback_insert_feedback`,
+`hive_feedback_select_feedback`). There are deliberately NO policies for
+`anon` / `authenticated`. The API opens no PostgREST client at all (`/` and
+`/proteins` run on `hive_readonly` too), so `SUPABASE_KEY` is optional.
+Neither restricted DSN ever reaches browser JavaScript: both live in API-server
+env vars; the web app talks only to the API through the Next.js server-side
+proxy with `INTERNAL_API_KEY`.
+
+**Seeding under RLS.** `postgres` (the owner) has BYPASSRLS, so
+`seed_remote.py` with the owner connection string is unaffected. A temporary
+seed role without BYPASSRLS would now ALSO need a policy; use the owner string
+(or a role created `WITH BYPASSRLS`, dropped immediately after).
+
+Re-verify after any migration:
+
+```bash
+supabase db query --linked "select relname, relrowsecurity from pg_class where relname in ('western_blot_records','hiveblot_feedback')"
+supabase db query --linked "select grantee, table_name, string_agg(privilege_type, ',') from information_schema.role_table_grants where table_schema='public' group by 1,2 order by 2,1"
+```
+Local check of the whole access matrix (needs no cloud):
+```bash
+.venv/bin/python scripts/local_db.py up
+HIVE_DB_TEST_URL=$(.venv/bin/python scripts/local_db.py test-url) .venv/bin/python -m pytest api/tests/test_db_access_matrix.py -v
+```
 
 ## 2. API (`api/`, FastAPI) — Render free Web Service
 `render.yaml` is a committed Blueprint; it is the canonical deployment path.
@@ -135,12 +163,12 @@ docker build -f api/Dockerfile -t hiveblot-api .   # context = REPO ROOT
   Render injects `PORT`). Deps `api/requirements.txt`, Python 3.13 in the image.
 - Health check: `GET /health` (no auth)
 - Env NAMES (exact, from `api/app/config.py` — never commit values):
-  required: `SUPABASE_URL`, `SUPABASE_KEY` (may stay empty → only `/proteins`
-  and `/` degrade), `OPENAI_KEY` (empty ⇒ deterministic bio_query search),
+  required: `OPENAI_KEY` (empty ⇒ deterministic bio_query search),
   `DB_READONLY_URL` (hive_readonly pooler DSN), `DB_FEEDBACK_URL`
   (hive_feedback pooler DSN), `INTERNAL_API_KEY`, `AGENT_API_KEYS`,
   `ALLOWED_ORIGINS` (the deployed web origin);
-  optional with defaults: `SEARCH_RATE_LIMIT`, `AGENT_RATE_LIMIT`,
+  optional with defaults: `SUPABASE_URL`, `SUPABASE_KEY` (unused since
+  migration 004 — no PostgREST client), `SEARCH_RATE_LIMIT`, `AGENT_RATE_LIMIT`,
   `TABLE_NAME`, `MAX_SEARCH_LIMIT`, `CROP_BASE_DIR` (set by the image),
   `OPENAI_MODEL`. Model-provider vars (`WBM_LLM_BACKEND`, `AWS_*`,
   `ANTHROPIC_API_KEY`) belong to the INGESTION engine later, not to this API.
@@ -162,7 +190,9 @@ docker build -f api/Dockerfile -t hiveblot-api .   # context = REPO ROOT
 **Figure crops in the container.** Records store an ABSOLUTE `image_crop_ref`,
 and `/records/{id}/crop` requires the path to resolve inside `CROP_BASE_DIR`, so
 the image reproduces the authoring path verbatim — crops serve with zero code
-change and, more importantly, **zero change to the reviewed corpus**.
+change and, more importantly, **zero change to the reviewed corpus**. Public
+API responses expose only the crop FILENAME (`api/app/schemas.py`); the
+absolute path never leaves the server.
 `api/crops/` (21 files, ~6 MB) is **tracked in git on purpose**: Render builds
 from the GitHub clone, so an untracked directory would mean no figure evidence
 in the hosted beta. Refresh it with `python scripts/stage_crops.py`. Storing
@@ -237,8 +267,8 @@ Point the web app at it with `web/.env.local` (also untracked):
 ## Known deployment gaps (deliberate, documented)
 - Crop refs are absolute paths; the container reproduces the authoring path.
   Relative refs + a join against `CROP_BASE_DIR` is the tracked follow-up.
-- `/proteins` and `/` require real Supabase (PostgREST); `/search`,
-  `/records/{id}`, `/feedback` run on plain Postgres.
+- Every endpoint runs on plain Postgres through the two scoped roles; there
+  is no PostgREST dependency.
 - Rate limiting is in-process (slowapi); it is per-instance, so it weakens if
   the API is scaled to multiple instances.
 - Render free spins down when idle; the first request after that is slow. This

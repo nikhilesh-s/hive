@@ -6,6 +6,18 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "web", "run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "hiveblot-api-local",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd api && ../.venv/bin/python -m uvicorn app.main:app --port 8000"],
+      "port": 8000
+    },
+    {
+      "name": "hiveblot-api-cloud",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd api && set -a && . ./.env.cloud && set +a && ../.venv/bin/python -m uvicorn app.main:app --port 8010"],
+      "port": 8010
     }
   ]
 }

@@ -7,6 +7,8 @@
 | 20260701000001_base_schema.sql         | api/db/schema.sql                 |
 | 20260701000002_evidence_record.sql     | migrations/001_evidence_record.sql|
 | 20260701000003_feedback.sql            | migrations/002_feedback.sql       |
+| 20260701000004_stable_row_key.sql      | migrations/003_stable_row_key.sql |
+| 20260901000005_secure_hiveblot_public_tables.sql | migrations/004_secure_public_tables.sql |
 
 Edit the CANONICAL files, then run `scripts/sync_supabase_migrations.py`.
 `api/tests/test_supabase_migrations_sync.py` fails the suite on any drift.
