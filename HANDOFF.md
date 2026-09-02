@@ -3,9 +3,118 @@
 > Read this file first. It is the single source of truth for **current project
 > state**. Any agent (Claude Code, another Claude session, Codex, a human) should
 > be able to read this and immediately know what HiveBlot is, what's done, what's
-> blocked, and the exact next task.
+> blocked, and the exact next task. The **CURRENT STATE** section below is
+> authoritative; everything under "Historical session log" is chronology and
+> may contain statements that were true only at the time.
 
-## Last Updated
+## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
+
+**1. What is HiveBlot?** A biologically accurate Western blot evidence search
+platform. It turns published blot figures, captions and methods into
+structured, searchable, auditable *experiment-level* Evidence Records (per-field
+value + status + source + verbatim wording), for wet-lab researchers who need
+to locate and compare blot evidence (antibody/target/context already
+published?). Beta target: UCSF wet-lab researchers.
+
+**2. Canonical branch.** `feature/bio-context-beta` on
+`git@github.com:nikhilesh-s/hive.git`, in sync with origin. `main` predates the
+beta and must not be treated as current or merged into. Tip: run `git log -1`;
+the last four commits of this pass are `beaec0f` (RLS hardening), `393ffa6`
+(About/Learn P0), `5c54352` (QA/UX fixes) and the handoff commit on top.
+
+**3. What is deployed.**
+| Piece | Where | State |
+|---|---|---|
+| Web | Vercel `hiveblot-beta` → https://hiveblot-beta.vercel.app | **deployed from `5c54352`** via `vercel deploy --prod` (Vercel does not auto-deploy this branch) |
+| API | Render free Web Service `hiveblot-api` (`srv-da1rbvs9v7es738635ug`) → https://hiveblot-api.onrender.com | **still on the pre-pass build** (`autoDeploy: false`; Render CLI on this machine is unauthenticated). Works fine under the new RLS. Needs Nik: `render login` then `render deploys create srv-da1rbvs9v7es738635ug --commit <tip sha> --confirm -o json` |
+| DB | Supabase `zafombwswztvnjikcsdm` (us-east-1, PG 17.6) | **migration 004 applied 2026-09-01**; 5/5 migrations in remote history; Security Advisor 0 errors (1 WARN: pg_trgm in public, deferred) |
+Legacy QIB `belalrbfrndxvdwvjxte` is never touched.
+
+**4. Data in the beta.** Reviewed reference corpus: **3 papers · 93 experiment
+groups · 475 evidence rows** (475 distinct `stable_row_key`, 21 crops in
+`api/crops/`). Papers: 10.3892/br.2026.2108 (phospho-STAT3, Hep3B),
+10.3892/ijmm.2022.5188 (mouse SMG loading controls),
+10.1186/s12964-025-02385-8 (BEX2/PIK3CA co-IP). `hiveblot_feedback` holds
+**1 real researcher row** (id 5, 2026-08-18, search scope); all smoke rows from
+this pass were deleted.
+
+**5. Scientifically proven (on the reviewed corpus).** Structured Evidence
+Records; experiment-level search; field-level provenance with quoted
+wording; explicit uncertainty/abstention; conflicts preserved (value null +
+both claims); researcher feedback stored beside model output, reseed-proof;
+independent QA re-run this pass found **no false SUPPORTED**.
+
+**6. Explicitly NOT proven.** Literature-wide coverage; automated extraction
+accuracy on unseen papers (Stage 2 has only ever run agent-in-the-loop);
+precision/recall/F1 on unseen papers (no number exists); densitometry or any
+band-intensity inference. The site now says exactly this.
+
+**7. What changed in this pass** (full report: `research/UCSF_BETA_READINESS.md`).
+- **Git forensics:** Srushti's work = Case A, all 14 commits already on the branch; nothing to merge; `requirements-local.txt` verified (pgserver local-only).
+- **Security (P0):** migration `004_secure_public_tables` — RLS on both tables, anon/authenticated revoked (tables, sequences, default privileges), hive_readonly scoped to records, hive_feedback INSERT+SELECT on feedback via explicit policies. Verified live: anon key gets 401 on read/insert/update/delete; hosted search/feedback/crop unaffected. API dropped its PostgREST client (`/`, `/proteins` on hive_readonly; `supabase` dependency removed). New `api/tests/test_db_access_matrix.py`.
+- **Communication (P0):** `/about` and `/learn` rewritten honestly (no 2.8K/12.4K/520, no automated-ingestion story, no Upregulated/Downregulated, no densitometry); glossary added; metadata/nav tagline fixed.
+- **API shaping:** `review_reasons` on list rows + detail; crop refs serialized as filename only (no `/Users/...` leak); `ambiguous_family` / `{}` / empty sources hidden; null candidates dropped; modification candidate `none` relabeled "no modification (total protein)"; flag `detail` passed through; lane measures without float noise.
+- **UX:** home explains scope + examples + cold start; cards show the record's own crop (stand-in `STATE3.png` removed), review reasons, DOI link and an `Evidence & sources` toggle (provenance had become unreachable); evidence panel empty-state, lane-series `?`, mixed-unit dose, flags section; search page examples/empty state/slow note; bare dash removed; lint 0/0; legacy `ResultsTable`/`ResultsCard`/`OrbitCanvas` deleted.
+- **Docs:** `DEPLOYMENT.md` security matrix; `TEAM_ASSIGNMENTS.md` + `MASTER_DELEGATION.md` marked consolidated; `TEAM_BETA_HANDOFF.md` status refreshed; `.claude/launch.json` gained API launch configs.
+
+**8. Security architecture now active.** Browser → Next.js server route
+(`INTERNAL_API_KEY`, never in the bundle) → FastAPI → `sql_guard` AST check →
+asyncpg pools on two scoped Postgres roles. RLS enabled on both tables with
+explicit per-role policies; no PostgREST path; anon key unused. Verified by
+`test_db_access_matrix.py` and by live probes (see readiness report §B).
+
+**9. Supabase roles and what they may do.**
+| Role | `western_blot_records` | `hiveblot_feedback` |
+|---|---|---|
+| `hive_readonly` (login; `DB_READONLY_URL`) | SELECT (policy `hive_readonly_select_records`) | nothing |
+| `hive_feedback` (login; `DB_FEEDBACK_URL`) | nothing | INSERT + SELECT (policies `hive_feedback_insert_feedback`, `hive_feedback_select_feedback`), USAGE on id sequence; no UPDATE/DELETE |
+| `anon`, `authenticated` | nothing | nothing |
+| `postgres`, `service_role` | owner / BYPASSRLS (migrations, seeding; server-only) | same |
+Neither hive role is superuser/createrole/createdb/bypassrls.
+
+**10. Tests currently passing** (branch tip, 2026-09-01): biology 165/165,
+reconcile 21/21, loader enrichment 18/18, extract 10/10, pipeline wiring
+11/11, stable-row-key 34/34, benchmark 34/34 (seed self-consistency only),
+api **129/129** (incl. 9 access-matrix tests that need `HIVE_DB_TEST_URL`;
+they skip without it), `tsc` clean, `npm run lint` 0 errors / 0 warnings,
+`npm run build` clean, `git diff --check` clean.
+
+**11. Bugs / limitations remaining.** Render API redeploy pending (Nik);
+pg_trgm-in-public advisor WARN deferred with procedure; corpus findings QA-1…5
+(abstentions/classification nits, each needs a reviewed reseed); organism
+filtering is text-based (documented, deliberately unchanged); "why did this
+match" not surfaced; free-tier cold start ~21 s measured.
+
+**12. Absorbed from the former teammate handoffs.** Ananya (Fig 3C/3D re-verified,
+one experiment per paper audited, every abstention judged, glossary),
+Suhas (GAPDH mouse analysis, crop-ref consumer map + fix, raw-value shaping,
+review_reasons, cold-start measurement), Srushti (first-run home, needs-review
+comprehension, presentation fixes, confidence-display decision, next-action
+ranking), Tanvi (About/Learn/glossary/audience/cold-start copy), Yashvi
+(issue table + dedup). No teammate deliverable is pending.
+
+**13. Founder decisions remaining.** (a) Deploy the API build to Render.
+(b) Whether to apply corpus corrections QA-1…QA-5 via a reviewed reseed.
+(c) Structured organism filter go/no-go (recommendation: `organism = X OR
+text`, exact tokens only). (d) Which next action to build first
+(recommendation: "more from this paper" by making DOI searchable).
+(e) Move pg_trgm to `extensions` after a proven dry run. (f) Model
+credentials → run the unseen-paper extraction evaluation.
+
+**14. EXACT NEXT TASK.** `render login` → deploy the branch tip to
+`hiveblot-api` → re-run the presentation-day checklist
+(`research/UCSF_BETA_READINESS.md` §J), confirming that a hosted `/api/search`
+response contains no `/Users/` path and that needs-review cards list
+`review_reasons` from the hosted API. Then present at UCSF.
+
+---
+
+## Historical session log
+- **2026-09-01 (session 31)** — Claude Code (Fable 5.1). **UCSF BETA-READINESS
+  PASS (security migration + P0 communication + consolidated QA/UX; deployed
+  web; Supabase migrated).** See CURRENT STATE above and
+  `research/UCSF_BETA_READINESS.md` for the full report (before/after security
+  matrix, QA findings, flagship results, UX findings, tests, verdict, checklist).
 - **2026-08-27 (session 30)** — Claude Code (Fable 5). **PROFESSOR ORCHESTRATION
   BRIEF (docs only — no code, no deploy, no DB change).**
   `research/PROFESSOR_ORCHESTRATION_BRIEF.md`: a ~5-minute technical handoff
@@ -897,18 +1006,20 @@ comparable evidence in the literature.
 ## Canonical Repository
 - **Repo:** `git@github.com:nikhilesh-s/hive.git` (this `/hive` working tree).
 - **Branch:** `feature/bio-context-beta` (do NOT build features on `main`).
-- **Latest finalized commit before this handoff entry:** `f3455ce` (visible
-  search-workspace alignment correction). This theme-system change commits on top; run
-  `git log -1` for the exact current tip after this handoff commit lands.
+- **Latest finalized commits:** `beaec0f`, `393ffa6`, `5c54352` (UCSF
+  beta-readiness pass, 2026-09-01); this handoff commits on top — run
+  `git log -1` for the exact tip.
 - The old `Ananya-Jha-code/QBI` repo is **superseded**. Do not build there.
 
 ## Current Architecture
 - **Frontend** — `web/` (Next.js App Router, TypeScript). Search UI → `web/app/api/search/route.ts` → API.
 - **Backend API** — `api/` (FastAPI). Split routers: `internal` (frontend-only, `INTERNAL_API_KEY`)
   and `external` (agent-facing `/v1/search`, `AGENT_API_KEYS`). Security: `sql_guard.py`
-  (AST validation of LLM-generated SQL) + a low-privilege `hive_readonly` Postgres role.
+  (AST validation of generated SQL) + two scoped Postgres roles (`hive_readonly`,
+  `hive_feedback`) behind Row Level Security (migration 004). No PostgREST client.
 - **Supabase (Postgres)** — table `western_blot_records` (`api/db/schema.sql`), extended
-  additively by `migrations/001_evidence_record.sql` with the biological Evidence Record columns.
+  additively by `migrations/001` (Evidence Record columns), `002` (feedback table + role),
+  `003` (`stable_row_key`), `004` (RLS + least-privilege grants).
 - **Literature / PDF ingestion** — `western_blot_miner/` package. Free NCBI E-utilities +
   BioC (`pmc.py`) for literature; local PDF render via PyMuPDF (`pdf_preprocess.py`).
 - **Deterministic CV filtering** — `pdf_preprocess.py` (OpenCV): renders pages, scores
@@ -1131,14 +1242,16 @@ frontend presentation-only: `View Evidence` and the expandable evidence/
 feedback panel are no longer shown from result cards; underlying evidence code
 and routes remain.
 
-**The hosted internal beta is READY to distribute.**
-Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
+~~Team delegation package + P0 `/about` overclaims + Supabase public-table
+exposure~~ — **DONE (session 31, 2026-09-01)**: workstreams consolidated and
+executed; see CURRENT STATE above and `research/UCSF_BETA_READINESS.md`.
+
+**The hosted beta is READY FOR UCSF WITH KNOWN LIMITATIONS.** The one
+outstanding deployment step is the Render API redeploy (Nik).
 
 **NEXT, in order:**
-0. **Nik: read `research/team_delegation/NIK_FOUNDER_LEARNING.md`, map people
-   to workstreams A–D (`research/team_delegation/MASTER_DELEGATION.md`), and
-   send each teammate their handoff file. The P0 (`/about` overclaims) gates
-   wider distribution — Workstream B drafts, Nik ships.**
+0. **Nik: `render login`, deploy the branch tip to `hiveblot-api`, run the
+   presentation-day checklist (readiness report §J).**
 1. Distribute to the team / UCSF reviewers and collect feedback. Warn them
    about the free-tier cold start (~30–60 s on the first request after ~15 min
    idle) so it is not reported as a bug.
@@ -1150,11 +1263,12 @@ Send `research/TEAM_BETA_HANDOFF.md` + https://hiveblot-beta.vercel.app.
    ACCEPTABLE / PARTIAL / WRONG / MISSING / HALLUCINATED; protocol in
    `research/automated_extraction_eval_protocol.md`. **Until that runs, no
    claim about arbitrary-paper accuracy is defensible.**
-4. Independent scientific QA re-run against the corrected 93-experiment
-   grouping (the Fig 3C/3D split changes what two cards show).
-5. Consider making `image_crop_ref` relative to `CROP_BASE_DIR` — the
-   container currently reproduces the authoring absolute path. Cosmetic, but
-   it removes a surprising line from the Dockerfile.
+4. ~~Independent scientific QA re-run against the corrected 93-experiment
+   grouping~~ — **DONE (session 31)**; findings QA-1…QA-5 await a founder
+   decision on a reviewed reseed.
+5. `image_crop_ref`: public responses now expose the filename only (session
+   31). Making the STORED refs relative to `CROP_BASE_DIR` remains cosmetic
+   (removes the Dockerfile path line) and needs a reseed.
 
 ## Next After That
 - Live Bedrock + UniProt validation (real credentials + network).
@@ -1199,8 +1313,11 @@ python3 western_blot_miner/tests/test_pipeline_records.py   # ingestion wiring (
 # Biological benchmark (offline; writes eval/out/)
 python3 eval/score.py
 
-# API tests
-cd api && pytest
+# API tests (install deps once: .venv/bin/pip install -r requirements-local.txt)
+cd api && ../.venv/bin/python -m pytest
+# + the RLS access matrix against the embedded local Postgres
+.venv/bin/python scripts/local_db.py up
+HIVE_DB_TEST_URL=$(.venv/bin/python scripts/local_db.py test-url) .venv/bin/python -m pytest api/tests/test_db_access_matrix.py -v
 
 # Frontend
 cd web && npm install && npm run dev
@@ -1214,8 +1331,9 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
 ```
 
 ## Environment Variables / Services  (NAMES ONLY — never put values here)
-- **API (`api/.env`):** `SUPABASE_URL`, `SUPABASE_KEY`, `DB_READONLY_URL`, `OPENAI_KEY`,
-  `INTERNAL_API_KEY`, `AGENT_API_KEYS`, `ALLOWED_ORIGINS`, `AGENT_RATE_LIMIT`, `SEARCH_RATE_LIMIT`.
+- **API (`api/.env`):** `DB_READONLY_URL`, `DB_FEEDBACK_URL`, `OPENAI_KEY`,
+  `INTERNAL_API_KEY`, `AGENT_API_KEYS`, `ALLOWED_ORIGINS`, `AGENT_RATE_LIMIT`, `SEARCH_RATE_LIMIT`;
+  `SUPABASE_URL`/`SUPABASE_KEY` optional and unused since migration 004.
 - **Web (`web/.env`):** `API_BASE_URL`, `INTERNAL_API_KEY`.
 - **Ingestion engine (`western_blot_miner/.env`):** `ANTHROPIC_API_KEY`, `NCBI_API_KEY`,
   `NCBI_EMAIL`, `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_TABLE`, `SUPABASE_IDEMPOTENT`,
@@ -1268,19 +1386,23 @@ WBM_EXTRACTION_MODE=records python3 -m western_blot_miner.pipeline paper.pdf --m
   would advance production's id counter), and is RLS enabled on the beta
   tables? Neither blocks the recommendation — we are not using those tables.
 - Which Bedrock model + region are provisioned (model access approved)?
-- Should `image_crop_ref` become RELATIVE to `CROP_BASE_DIR`? The container
-  currently reproduces the authoring absolute path to serve crops without
-  touching the reviewed corpus (session 12). Relative refs are cleaner but
-  rewrite every seeded row.
+- Should the STORED `image_crop_ref` become RELATIVE to `CROP_BASE_DIR`? The
+  container reproduces the authoring absolute path to serve crops without
+  touching the reviewed corpus (session 12); since session 31 the API never
+  exposes the path. Relative refs are cleaner but rewrite every seeded row.
+- Structured organism filter (`organism = X OR text match`, exact tokens
+  only)? Investigated session 31; deliberately not implemented.
+- Move `pg_trgm` to the `extensions` schema (advisor WARN)? Procedure in the
+  readiness report §B; needs a proven dry run first.
 - Idempotency key `(paper_id, page, figure_label, target, condition)` — keep, or extend with
   modification/lane once Evidence Records flow in? (Affects dedupe on re-ingest.)
 - Organism handling: thread cell-line→organism into the UniProt query before resolution?
+- Apply corpus corrections QA-1…QA-5 (readiness report §C) via a reviewed reseed?
 
 ## Recent Commits (rolling)
-- `58ba25e` Compact result card metadata
-- `d17e8ce` Add treatment lanes result column
-- `6941f7c` Refine search result rows
-- `8e996c0` Redesign search results IA
-- `228a490` Update handoff for local requirements verification
-- `43c3b63` Add local development requirements file
-- (this HANDOFF update commits on top of `58ba25e`)
+- `5c54352` Complete consolidated researcher and biology QA fixes
+- `393ffa6` Resolve UCSF beta P0 communication issues on About and Learn
+- `beaec0f` Harden Supabase table access with RLS and scoped roles
+- `0653fbd` Add professor orchestration brief and ignore .serena local state
+- `987c4aa` Add light and dark theme system
+- (this HANDOFF update commits on top of `5c54352`)

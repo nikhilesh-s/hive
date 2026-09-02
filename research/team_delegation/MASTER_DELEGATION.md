@@ -1,5 +1,10 @@
 # HiveBlot Team Delegation
 
+> **Historical (2026-08-18).** Superseded on 2026-09-01: every workstream in
+> this package was consolidated into the UCSF beta-readiness pass and worked
+> to completion by Nik + the primary Claude agent. Outcomes per finding are in
+> `research/UCSF_BETA_READINESS.md`; do not wait for teammate deliverables.
+
 **Date:** 2026-08-18
 **Source:** the founder walkthrough of the live hosted beta
 (`/Users/niks/Downloads/HiveBlot-Founder-Walkthrough.md`), cross-checked against

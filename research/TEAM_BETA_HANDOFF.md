@@ -1,7 +1,7 @@
 # HiveBlot internal beta — read this first
 
 **For:** the HiveBlot team and the UCSF wet-lab reviewers testing the beta.
-**Updated:** 2026-08-18.
+**Updated:** 2026-09-01 (UCSF beta-readiness pass).
 **You do not need to know anything about the codebase to use this document.**
 
 ---
@@ -119,7 +119,7 @@ are for.
 ## What we would like you to test
 
 ### Biology QA — the priority
-Open a card, expand **EVIDENCE**, and check each field against the paper:
+Open a card, click **Evidence & sources**, and check each field against the paper:
 
 - **Target** — is the protein right, and is the canonical/UniProt mapping right?
 - **Phosphosite** — residue and position (Tyr705, Ser473…), and whether a
@@ -207,10 +207,12 @@ roles, 475 rows, all seven flagship searches, record detail, figure crops,
 feedback submission and feedback rehydration were all tested end-to-end
 against the cloud database.
 
-The **web app is deployed** at https://hiveblot-beta.vercel.app. The **API is
-the last step** — it deploys from the committed `render.yaml` onto a Render
-free Web Service, which needs one browser login. Searches will not return
-results until that is done; `DEPLOYMENT.md` §2 has the exact clicks.
+The **web app and API are both deployed** (https://hiveblot-beta.vercel.app,
+https://hiveblot-api.onrender.com). On 2026-09-01 the database was locked
+down (Row Level Security + scoped roles; the public anon key can no longer
+read or write either table), the About/Learn pages were rewritten to describe
+only what the beta actually contains, result cards regained evidence access,
+and needs-review cards now say why. Details: `research/UCSF_BETA_READINESS.md`.
 
 No model credentials exist yet, so nothing here says anything about how
 accurately HiveBlot reads a paper it has not been shown. That evaluation is
