@@ -26,7 +26,7 @@ the last four commits of this pass are `beaec0f` (RLS hardening), `393ffa6`
 | Piece | Where | State |
 |---|---|---|
 | Web | Vercel `hiveblot-beta` → https://hiveblot-beta.vercel.app | **deployed from `5c54352`** via `vercel deploy --prod` (Vercel does not auto-deploy this branch) |
-| API | Render free Web Service `hiveblot-api` (`srv-da1rbvs9v7es738635ug`) → https://hiveblot-api.onrender.com | **still on the pre-pass build** (`autoDeploy: false`; Render CLI on this machine is unauthenticated). Works fine under the new RLS. Needs Nik: `render login` then `render deploys create srv-da1rbvs9v7es738635ug --commit <tip sha> --confirm -o json` |
+| API | Render free Web Service `hiveblot-api` (`srv-da1rbvs9v7es738635ug`) → https://hiveblot-api.onrender.com | **deployed from `96678c8354b16c67984f4329ab964e54bc27a07c`** (deploy `dep-dabrjdojo6nc738n1to0`, live 2026-09-02 05:53 UTC, triggered by `render deploys create`; `autoDeploy` stays off) |
 | DB | Supabase `zafombwswztvnjikcsdm` (us-east-1, PG 17.6) | **migration 004 applied 2026-09-01**; 5/5 migrations in remote history; Security Advisor 0 errors (1 WARN: pg_trgm in public, deferred) |
 Legacy QIB `belalrbfrndxvdwvjxte` is never touched.
 
@@ -79,8 +79,8 @@ api **129/129** (incl. 9 access-matrix tests that need `HIVE_DB_TEST_URL`;
 they skip without it), `tsc` clean, `npm run lint` 0 errors / 0 warnings,
 `npm run build` clean, `git diff --check` clean.
 
-**11. Bugs / limitations remaining.** Render API redeploy pending (Nik);
-pg_trgm-in-public advisor WARN deferred with procedure; corpus findings QA-1…5
+**11. Bugs / limitations remaining.** pg_trgm-in-public advisor WARN deferred
+with procedure; corpus findings QA-1…5
 (abstentions/classification nits, each needs a reviewed reseed); organism
 filtering is text-based (documented, deliberately unchanged); "why did this
 match" not surfaced; free-tier cold start ~21 s measured.
@@ -93,19 +93,42 @@ comprehension, presentation fixes, confidence-display decision, next-action
 ranking), Tanvi (About/Learn/glossary/audience/cold-start copy), Yashvi
 (issue table + dedup). No teammate deliverable is pending.
 
-**13. Founder decisions remaining.** (a) Deploy the API build to Render.
-(b) Whether to apply corpus corrections QA-1…QA-5 via a reviewed reseed.
+**13. Founder decisions remaining.** (a) ~~Deploy the API build to Render~~
+done 2026-09-02. (b) Whether to apply corpus corrections QA-1…QA-5 via a reviewed reseed.
 (c) Structured organism filter go/no-go (recommendation: `organism = X OR
 text`, exact tokens only). (d) Which next action to build first
 (recommendation: "more from this paper" by making DOI searchable).
 (e) Move pg_trgm to `extensions` after a proven dry run. (f) Model
 credentials → run the unseen-paper extraction evaluation.
 
-**14. EXACT NEXT TASK.** `render login` → deploy the branch tip to
-`hiveblot-api` → re-run the presentation-day checklist
-(`research/UCSF_BETA_READINESS.md` §J), confirming that a hosted `/api/search`
-response contains no `/Users/` path and that needs-review cards list
-`review_reasons` from the hosted API. Then present at UCSF.
+**14. EXACT NEXT TASK.** None before UCSF: the beta is **FROZEN** (see
+"Release freeze" below). On presentation day run the 6-step checklist in
+`research/UCSF_BETA_READINESS.md` §J. After UCSF, the first task is Nik's
+decision on the deferred corpus corrections QA-1…QA-5 (reviewed reseed).
+
+### Release freeze — final hosted verification (2026-09-02 ~06:00 UTC)
+
+Web `hiveblot-beta.vercel.app` (Vercel, from `5c54352`; the handoff commit
+changed docs only) · API `hiveblot-api.onrender.com` (Render, `96678c8`) ·
+DB `zafombwswztvnjikcsdm` (migration 004 live).
+
+| Check | Result |
+|---|---|
+| `/health` | 200, 0.27 s warm; `/` returns the static index (proves the new build; the old build returned sample rows) |
+| Flagship searches through the hosted Vercel proxy | `phospho STAT3 Tyr705` 3/18 · `co-IP PIK3CA` 4/14 · `CST 9145` 3/18 · `P-ERK` 2/10 with `modification_type = null` on all CONFLICTING rows · `GAPDH mouse` 5/31 · `needs review` 4/20 · `BRCA1 MCF7 olaparib` 0 |
+| `review_reasons` | present on every needs-review row (4 reasons on the P-ERK rows), absent on settled rows |
+| `image_crop_ref` | filename only in every list and detail response; scan for `/Users/`, `/home/`, leading `/` found nothing |
+| Crops | `/api/record/{1200,1252,999,1310}/crop` → 200, PNG signature, 180–340 KB; the UI loads them as real images (1140×564 etc.) |
+| Raw values | hosted detail 1252 contains no `ambiguous_family`, `"{}"`, `"none"`; modification candidates read "phosphorylation" / "no modification (total protein)" |
+| Feedback | UI ✓ on a field (row 9) and the BETA FEEDBACK widget (row 10) reached `hiveblot_feedback` through the live FastAPI path; reload showed RESEARCHER FEEDBACK rehydrated; both smoke rows deleted; table back to **1 real row** (id 5) |
+| Provenance | `Evidence & sources` opens on every card: crop, quoted source sentences, "Why unresolved", lanes, DOI link, feedback controls; empty-identity state renders a sentence, not a bare heading |
+| Theme | Light chosen → persisted in `localStorage` and re-applied after reload; dark default verified |
+| Mobile | 375 px: filter drawer opens from the Filters button, Escape closes it; cards stack |
+| About / Learn | hosted HTML: no 2.8K/12.4K/520, no Upregulated/Downregulated, no "thousands", densitometry named only as out of scope, corpus scope stated |
+| Security | RLS on both tables; grants: hive_readonly SELECT records only, hive_feedback INSERT+SELECT feedback only, anon/authenticated nothing; 3 policies; anon key 401 on read and insert; Security Advisor 0 ERROR (1 WARN pg_trgm, deferred); 475 rows / 475 distinct `stable_row_key` / 1 feedback row |
+
+**Frozen.** Only a real security issue, a scientific-correctness bug, or a
+demo-blocking runtime failure justifies a change before UCSF. No P2 polish.
 
 ---
 
