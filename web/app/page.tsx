@@ -1,103 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { SearchInput } from '@/components/SearchInput';
-import ResultsTable from '@/components/ResultsTable';
 
-interface DatabaseResult {
-  id: number;
-  paper_id: string;
-  page: number | null;
-  western_blot_type: string;
-  sample: string;
-  organism: string | null;
-  treatment_context: string | null;
-  figure_label: string | null;
-  target: string;
-  condition: string;
-  band_detected: boolean;
-  confidence: number | null;
-}
-
-interface SearchResponse {
-  count: number;
-  results: DatabaseResult[];
-  question?: string;
-}
-
+// Headline typewriter is pure CSS (steps() animation in globals.css) so the
+// page ships no effect-driven state; reduced-motion users see the full line.
 const TYPEWRITER_TEXT = 'Experiment-level evidence, searchable.';
 
+const EXAMPLES = ['phospho STAT3 Tyr705', 'co-IP PIK3CA', 'CST 9145', 'GAPDH mouse', 'P-ERK'];
+
 function TypewriterHeadline() {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [showCursor, setShowCursor] = useState(false);
-  const [isCursorFading, setIsCursorFading] = useState(false);
-
-  useEffect(() => {
-    let typingTimeout: ReturnType<typeof setTimeout> | undefined;
-    let cursorFadeTimeout: ReturnType<typeof setTimeout> | undefined;
-    let cursorHideTimeout: ReturnType<typeof setTimeout> | undefined;
-    let currentIndex = 0;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setVisibleCount(TYPEWRITER_TEXT.length);
-      setShowCursor(false);
-      return;
-    }
-
-    const typeNextCharacter = () => {
-      currentIndex += 1;
-      setVisibleCount(currentIndex);
-
-      if (currentIndex >= TYPEWRITER_TEXT.length) {
-        cursorFadeTimeout = setTimeout(() => {
-          setIsCursorFading(true);
-        }, 800);
-        cursorHideTimeout = setTimeout(() => {
-          setShowCursor(false);
-        }, 1680);
-        return;
-      }
-
-      const currentCharacter = TYPEWRITER_TEXT[currentIndex - 1];
-      const nextDelay = currentCharacter === ',' ? 96 : currentCharacter === ' ' ? 34 : 52 + (currentIndex % 4) * 4;
-      typingTimeout = setTimeout(typeNextCharacter, nextDelay);
-    };
-
-    const startTimeout = setTimeout(() => {
-      setShowCursor(true);
-      setIsCursorFading(false);
-      typeNextCharacter();
-    }, 850);
-
-    return () => {
-      clearTimeout(startTimeout);
-      if (typingTimeout) clearTimeout(typingTimeout);
-      if (cursorFadeTimeout) clearTimeout(cursorFadeTimeout);
-      if (cursorHideTimeout) clearTimeout(cursorHideTimeout);
-    };
-  }, []);
-
   return (
     <span className="typewriter-headline" aria-label={TYPEWRITER_TEXT}>
       <span className="typewriter-reserve" aria-hidden="true">{TYPEWRITER_TEXT}</span>
-      <span className="typewriter-visible" aria-hidden="true">
-        {TYPEWRITER_TEXT.slice(0, visibleCount)}
-        {showCursor && <span className={`typewriter-cursor ${isCursorFading ? 'typewriter-cursor-done' : ''}`} />}
-      </span>
+      <span className="typewriter-visible" aria-hidden="true">{TYPEWRITER_TEXT}</span>
     </span>
   );
 }
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<DatabaseResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   // One results surface: home searches route to /search, which renders the
-  // biological Evidence Record cards (the legacy ResultsTable on this page
-  // showed only the 6 base columns and none of the Evidence Record biology).
+  // biological Evidence Record cards.
   const handleSearch = (query: string) => {
     if (!query.trim()) return;
     window.location.href = `/search?q=${encodeURIComponent(query)}`;
@@ -105,60 +27,58 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "var(--font-sans), sans-serif", background: 'var(--background)' }}>
-      {!showResults ? (
-        // Hero Section
-        <section
+      <section
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px 56px',
+          position: 'relative',
+          textAlign: 'center',
+          overflow: 'hidden',
+          isolation: 'isolate',
+          contain: 'layout style paint',
+        }}
+      >
+        <video
+          aria-hidden="true"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          poster="/images/hive.png"
           style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 56px',
-            position: 'relative',
-            textAlign: 'center',
-            overflow: 'hidden',
-            isolation: 'isolate',
-            contain: 'layout style paint',
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            zIndex: -2,
+            pointerEvents: 'none',
+            contain: 'strict',
           }}
         >
-          <video
-            aria-hidden="true"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="none"
-            poster="/images/hive.png"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              zIndex: -2,
-              pointerEvents: 'none',
-              contain: 'strict',
-            }}
-          >
-            <source src="/videos/hive-background.mp4" type="video/mp4" />
-          </video>
+          <source src="/videos/hive-background.mp4" type="video/mp4" />
+        </video>
 
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: -1,
-              background: 'var(--hero-overlay)',
-              pointerEvents: 'none',
-              contain: 'strict',
-              willChange: 'opacity',
-            }}
-          />
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: -1,
+            background: 'var(--hero-overlay)',
+            pointerEvents: 'none',
+            contain: 'strict',
+            willChange: 'opacity',
+          }}
+        />
 
-          <div style={{ position: 'relative', zIndex: 1, contain: 'layout style', maxWidth: '800px', width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, contain: 'layout style', maxWidth: '800px', width: '100%' }}>
             <svg
               width="clamp(50px, 8vw, 88px)"
               height="clamp(50px, 8vw, 88px)"
@@ -170,71 +90,40 @@ export default function Home() {
               <path fill="var(--accent-contrast)" d="M451.137787,326.756348 C450.916321,326.723785 450.985565,326.273102 451.057556,326.056091 C451.315887,326.054718 451.509369,326.265289 451.672729,326.497070 C451.683838,326.512817 451.468994,326.687897 451.137787,326.756348 z"/>
             </svg>
 
-            <div style={{ marginBottom: 'clamp(20px, 3vh, 32px)' }}>
-              <h1 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(20px, 5vw, 52px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0 0 clamp(6px, 1.5vh, 12px) 0', color: 'var(--text-primary)' }}>
-                <span style={{ position: 'relative', display: 'inline-block' }}>
-                  Protein mentions, missing context
-                  <span aria-hidden="true" style={{ position: 'absolute', left: '-0.02em', right: '-0.02em', top: '54%', height: '3px', borderRadius: '999px', background: 'var(--error)', transform: 'translateY(-50%)' }} />
-                </span>
-              </h1>
-              <h2 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(26px, 6vw, 62px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0', color: 'var(--text-primary)', fontStyle: 'italic' }}>
-                <TypewriterHeadline />
-              </h2>
-            </div>
-
-            <div style={{ maxWidth: '750px', margin: '0 auto clamp(20px, 3vh, 32px)', width: '100%' }}>
-              <SearchInput placeholder="Search proteins, conditions, models..." onSearch={handleSearch} />
-            </div>
-          </div>
-        </section>
-      ) : (
-        // Results Section
-        <div style={{ padding: '60px 56px', maxWidth: '1000px', margin: '0 auto' }}>
-          <div style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px' }}>
-              <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: 'var(--accent)' }}>RESULTS</span>
-              <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: 'var(--text-subtle)' }}>-</span>
-              <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)' }}>Western Blot Evidence</span>
-            </div>
-            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '12px' }}>
-              {loading ? 'Searching...' : `Found ${results.length} result${results.length !== 1 ? 's' : ''}`}
-            </p>
-            <button
-              onClick={() => setShowResults(false)}
-              style={{
-                marginTop: '20px',
-                padding: '8px 16px',
-                backgroundColor: 'rgba(74,214,176,.15)',
-                border: '1px solid rgba(74,214,176,.3)',
-                color: 'var(--accent)',
-                borderRadius: '4px',
-                fontFamily: 'var(--font-mono), monospace',
-                fontSize: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(74,214,176,.15)';
-              }}
-            >
-              ← Back
-            </button>
+          <div style={{ marginBottom: 'clamp(20px, 3vh, 32px)' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(20px, 5vw, 52px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0 0 clamp(6px, 1.5vh, 12px) 0', color: 'var(--text-primary)' }}>
+              <span style={{ position: 'relative', display: 'inline-block' }}>
+                Protein mentions, missing context
+                <span aria-hidden="true" style={{ position: 'absolute', left: '-0.02em', right: '-0.02em', top: '54%', height: '3px', borderRadius: '999px', background: 'var(--error)', transform: 'translateY(-50%)' }} />
+              </span>
+            </h1>
+            <h2 style={{ fontFamily: 'var(--font-serif), serif', fontWeight: 400, fontSize: 'clamp(26px, 6vw, 62px)', lineHeight: 1.2, letterSpacing: '-1.5px', margin: '0', color: 'var(--text-primary)', fontStyle: 'italic' }}>
+              <TypewriterHeadline />
+            </h2>
           </div>
 
-          {error && <div style={{ color: 'var(--error)', marginBottom: '20px' }}>Error: {error}</div>}
+          <p className="hb-home-scope">
+            Search experiment-level Western blot evidence from a <strong>reviewed reference
+            corpus</strong>: 3 papers · 93 experiments · 475 evidence rows. Every value is
+            traceable to the figure, caption or methods sentence it came from; uncertainty
+            and conflicts are shown, never guessed.
+          </p>
 
-          {!loading && results.length > 0 && <ResultsTable results={results} />}
+          <div style={{ maxWidth: '750px', margin: '0 auto clamp(14px, 2vh, 22px)', width: '100%' }}>
+            <SearchInput
+              placeholder="Protein, phosphosite, antibody catalog #, cell line, co-IP..."
+              onSearch={handleSearch}
+              examples={EXAMPLES}
+            />
+          </div>
 
-          {!loading && results.length === 0 && !error && (
-            <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px' }}>
-              No results found
-            </div>
-          )}
+          <p className="hb-home-hint">
+            Enter or SEARCH runs the query. Cards group lanes into experiments; open
+            <strong> Evidence</strong> on any card for the blot crop, sources and feedback.
+            The first search after a quiet spell can take 30–60 s while the free-tier API wakes up.
+          </p>
         </div>
-      )}
+      </section>
     </div>
   );
 }

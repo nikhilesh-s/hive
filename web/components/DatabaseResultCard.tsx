@@ -1,6 +1,9 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+
+import EvidencePanel from '@/components/EvidencePanel';
+import { formatLaneLabel } from '@/lib/lanes';
 
 // NOTE: every Evidence Record field below is OPTIONAL. Legacy rows (pre-migration
 // 001) simply omit them and the card falls back to the original base fields, so
@@ -41,7 +44,10 @@ interface DatabaseResult {
   figure_caption?: string | null;
   image_crop_ref?: string | null;
   needs_review?: boolean | null;
-  anomaly_flags?: Array<{ code?: string; message?: string }> | null;
+  anomaly_flags?: Array<{ code?: string; message?: string; detail?: string }> | null;
+  // Plain-language reasons the row needs review (API-derived from the
+  // stored validation flags; older API builds send only anomaly_flags).
+  review_reasons?: string[] | null;
   doi?: string | null;
   pmcid?: string | null;
   title?: string | null;
@@ -79,15 +85,18 @@ function formatMeasurement(value: number, unit?: string | null): string {
   return unit ? `${value} ${unit}` : String(value);
 }
 
-// Display-only lane-label formatting (semantics untouched): " / " separators
-// become interpuncts and a TRAILING +/− state marker gets a colon, so
-// "IL-6 + / CL-E -" reads "IL-6: + · CL-E: −". A "+" that joins a drug name
-// ("CL-E + Bis II") is a conjunction and is left alone.
-export function formatLaneLabel(c?: string | null): string {
-  if (!c) return '';
-  return c
-    .replace(/(\S+) ([+-])(?=$| \/ )/g, (_m, name, sign) => `${name}: ${sign === '-' ? '−' : '+'}`)
-    .replace(/ \/ /g, ' · ');
+export { formatLaneLabel } from '@/lib/lanes';
+
+// Why a row needs review, in the engine's own plain-language flag text.
+// Never invented: an empty list means the flags carried no detail.
+function reviewReasons(d: DatabaseResult): string[] {
+  if (d.review_reasons?.length) return d.review_reasons;
+  const out: string[] = [];
+  for (const f of d.anomaly_flags || []) {
+    const t = f.detail || f.message;
+    if (t && !out.includes(t)) out.push(t);
+  }
+  return out;
 }
 
 // Deterministic experiment-design tag derived ONLY from the group's own lane
@@ -174,6 +183,8 @@ function experimentLabel(blotType?: string | null): string | null {
 }
 
 export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardProps) {
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [cropFailed, setCropFailed] = useState(false);
   const headline = data.canonical_target || data.target;
   const headlineMod = data.modification_label ? ` · ${data.modification_label}` : '';
   const review = reviewState(data);
@@ -241,9 +252,10 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
       : null;
 
   const bandColor = bandText === 'present' ? TEAL : bandText === 'absent' ? RED : GOLD;
-  const previewSrc = /\bSTAT3\b/i.test([data.canonical_target, data.target].filter(Boolean).join(' '))
-    ? '/images/STATE3.png'
-    : null;
+  // The record's OWN panel crop, served by the API from the reviewed crop
+  // archive (never a stand-in image). Absent crop => honest placeholder.
+  const previewSrc = data.image_crop_ref && !cropFailed ? `/api/record/${data.id}/crop` : null;
+  const reasons = review && review.label !== 'Supported' ? reviewReasons(data) : [];
   const designTag = deriveDesignTag(lanes, data.treatment_context);
   const sourceId = data.doi || data.paper_id;
   const indicatorChips = [
@@ -271,6 +283,17 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
 
           {data.canonical_target && data.target && data.canonical_target !== data.target && (
             <div className="hb-printed-target">as printed: {data.target}</div>
+          )}
+
+          {reasons.length > 0 && (
+            <div className="hb-review-reasons" style={{ color: review?.color }}>
+              <span className="hb-review-reasons-label">{review?.label === 'Conflicting' ? 'Why conflicting' : 'Why it needs review'}</span>
+              <ul>
+                {reasons.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {(designTag || data.treatment_context) && (
@@ -324,13 +347,15 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={previewSrc}
-                alt={`Sample Western blot preview for ${headline}`}
+                alt={`Published blot panel for ${headline}`}
                 className="hb-result-preview-image"
+                loading="lazy"
+                onError={() => setCropFailed(true)}
               />
-              <div className="hb-result-preview-caption">Sample figure preview</div>
+              <div className="hb-result-preview-caption">Panel crop from the published figure</div>
             </>
           ) : (
-            <div className="hb-result-preview-placeholder">Figure preview unavailable</div>
+            <div className="hb-result-preview-placeholder">No figure crop available for this record</div>
           )}
         </section>
 
@@ -351,13 +376,34 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
                 <>
                   {data.figure_label && <span>{data.figure_label}</span>}
                   {data.page && <span>Page {data.page}</span>}
-                  {sourceId && <span>DOI: {sourceId}</span>}
+                  {data.doi ? (
+                    <a href={`https://doi.org/${data.doi}`} target="_blank" rel="noreferrer" className="hb-result-doi">
+                      DOI: {data.doi} ↗
+                    </a>
+                  ) : (
+                    sourceId && <span>DOI: {sourceId}</span>
+                  )}
                 </>
               }
             />
           )}
+          <button
+            type="button"
+            className="hb-evidence-toggle"
+            onClick={() => setEvidenceOpen((o) => !o)}
+            aria-expanded={evidenceOpen}
+            aria-controls={`hb-evidence-${data.id}`}
+          >
+            {evidenceOpen ? 'Hide evidence' : 'Evidence & sources'}
+            <span aria-hidden="true">{evidenceOpen ? ' ▴' : ' ▾'}</span>
+          </button>
         </section>
       </div>
+      {evidenceOpen && (
+        <div id={`hb-evidence-${data.id}`} className="hb-result-card-evidence">
+          <EvidencePanel recordId={data.id} />
+        </div>
+      )}
     </div>
   );
 }

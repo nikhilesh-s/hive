@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { formatLaneLabel } from '@/components/DatabaseResultCard';
+import { formatLaneLabel } from '@/lib/lanes';
 import { submitFeedback } from '@/lib/feedback';
 
 const MONO = 'var(--font-mono), monospace';
@@ -74,7 +74,8 @@ interface RecordDetailData {
   }[];
   record_status?: string | null;
   needs_review?: boolean | null;
-  anomaly_flags: { code?: string | null; message?: string | null }[];
+  anomaly_flags: { code?: string | null; message?: string | null; severity?: string | null }[];
+  review_reasons?: string[];
 }
 
 // Friendly labels for the audit list; order = display order.
@@ -248,12 +249,20 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
   const seriesText = isLaneSeries
     ? (() => {
         const nums = fe.candidates.map((c) => Number(c.value)).filter((n) => !Number.isNaN(n));
-        const unit = all[`${name}_unit`]?.value ? ` ${all[`${name}_unit`]!.value}` : '';
+        const unitEnv = all[`${name}_unit`];
+        // Several agents with different units in one panel (e.g. 60 µg/ml
+        // CL-E next to 20 µM inhibitors) are NOT one value varying by lane.
+        if (unitEnv && unitEnv.status !== 'SUPPORTED') {
+          return 'several agents at different doses in this panel — see treatment context and lanes';
+        }
+        const unit = unitEnv?.value ? ` ${unitEnv.value}` : '';
         return nums.length
           ? `varies by lane: ${Math.min(...nums)}–${Math.max(...nums)}${unit} (see lanes below)`
           : 'varies by lane (see lanes below)';
       })()
     : null;
+  // A lane series is not uncertainty about one value, so it gets no "?" marker.
+  const shownGlyph = isLaneSeries ? null : glyph;
 
   return (
     <div style={{ padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,.05)' }}>
@@ -264,9 +273,9 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
         <span style={{ fontFamily: SERIF, fontSize: '13px', color: value || seriesText ? TEXT : LABEL }}>
           {seriesText || value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : 'not reported')}
         </span>
-        {glyph && (
-          <span title={glyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: glyph.color, fontWeight: 600 }}>
-            {glyph.g}
+        {shownGlyph && (
+          <span title={shownGlyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: shownGlyph.color, fontWeight: 600 }}>
+            {shownGlyph.g}
           </span>
         )}
         {srcName && (
@@ -389,14 +398,23 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
 
   return (
     <div style={{ padding: '18px 28px 22px', borderTop: '1px solid var(--border)', backgroundColor: 'var(--input-background)' }}>
-      <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, letterSpacing: '0.6px' }}>
-        WHY HIVEBLOT SAYS THIS
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: TEAL, letterSpacing: '0.6px' }}>
+          WHY HIVEBLOT SAYS THIS
+        </span>
+        <a href="/learn" style={{ fontFamily: MONO, fontSize: '9px', color: LABEL }}>what these terms mean ↗</a>
       </div>
 
       {/* biological normalization chain */}
-      {chain.length > 1 && (
+      {chain.length > 1 ? (
         <div style={{ fontFamily: MONO, fontSize: '12px', color: TEXT, marginTop: '8px' }}>
           {chain.join('  →  ')}
+        </div>
+      ) : (
+        <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIM, marginTop: '8px' }}>
+          {detail.fields['canonical_target']
+            ? `Label kept as printed: “${detail.raw_target_name ?? ''}”.`
+            : `No normalization chain: the label “${detail.raw_target_name ?? ''}” could not be mapped to a single reviewed protein entry from the source, so HiveBlot keeps it as printed and does not assign a UniProt accession.`}
         </div>
       )}
 
@@ -502,13 +520,14 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
         </div>
       )}
 
-      {/* anomalies */}
+      {/* validation flags = why this record needs review */}
       {detail.anomaly_flags.length > 0 && (
         <div>
-          <div style={{ ...sect, color: GOLD }}>FLAGS</div>
+          <div style={{ ...sect, color: GOLD }}>WHY IT NEEDS REVIEW</div>
           {detail.anomaly_flags.map((a, i) => (
-            <div key={i} style={{ fontFamily: MONO, fontSize: '11px', color: GOLD }}>
-              {a.code}{a.message ? ` — ${a.message}` : ''}
+            <div key={i} style={{ fontFamily: SERIF, fontSize: '12px', color: TEXT, padding: '2px 0' }}>
+              {a.message || a.code}
+              <span style={{ fontFamily: MONO, fontSize: '9px', color: LABEL }}> · {a.code}{a.severity ? ` · ${a.severity}` : ''}</span>
             </div>
           ))}
         </div>
