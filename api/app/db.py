@@ -1,22 +1,12 @@
 import asyncpg
-from supabase import Client, create_client
 
 from .config import settings
 
-# Used only for simple, already-parameterized queries (.ilike(), .limit(), ...)
-# via the Supabase query builder - never for the LLM-generated SQL.
-# Created lazily: only /proteins and the index page need PostgREST, and the
-# /search path must be able to boot and run against DB_READONLY_URL alone
-# (e.g. the local dev database from scripts/local_db.py) with no Supabase
-# project configured. create_client("") raises at import time otherwise.
-_supabase: Client | None = None
-
-
-def get_supabase() -> Client:
-    global _supabase
-    if _supabase is None:
-        _supabase = create_client(settings.supabase_url, settings.supabase_key)
-    return _supabase
+# Every database access in this API goes through one of two asyncpg pools,
+# each bound to a scoped Postgres role (hive_readonly / hive_feedback). There
+# is deliberately NO PostgREST / anon-key client: migration 004 revoked the
+# Supabase client roles from the application tables, so the anon key cannot
+# read or write them, and the API must not depend on it either.
 
 _pool: asyncpg.Pool | None = None
 
@@ -59,6 +49,19 @@ async def run_readonly_query(sql: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(sql)
         return [dict(row) for row in rows]
+
+
+async def search_targets(name: str, limit: int) -> list[dict]:
+    """Parameterized ILIKE on target for /proteins. Runs on the read-only
+    role; the pattern is a bound parameter, never interpolated."""
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT * FROM {settings.table_name} WHERE target ILIKE $1 "
+            "ORDER BY id LIMIT $2",
+            f"%{name}%", limit,
+        )
+        return [dict(r) for r in rows]
 
 
 async def fetch_record_by_id(record_id: int) -> dict | None:

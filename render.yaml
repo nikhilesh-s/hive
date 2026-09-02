@@ -28,7 +28,7 @@ services:
         sync: false
       - key: DB_FEEDBACK_URL    # hive_feedback, Supavisor SESSION mode (5432)
         sync: false
-      - key: SUPABASE_KEY       # anon key; only /proteins and / need it
+      - key: SUPABASE_KEY       # optional since migration 004: the API opens no PostgREST client
         sync: false
       - key: INTERNAL_API_KEY   # must equal the Vercel web app's value
         sync: false

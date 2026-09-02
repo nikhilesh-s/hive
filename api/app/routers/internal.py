@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from ..auth import require_internal_key
 from ..config import settings
-from ..db import fetch_feedback_for_record, fetch_record_by_id, get_supabase, insert_feedback
+from ..db import fetch_feedback_for_record, fetch_record_by_id, insert_feedback, search_targets
 from ..limiter import limiter
 from ..record_detail import build_record_detail
 from ..schemas import (
@@ -38,35 +38,29 @@ def health():
 
 @router.get("/")
 def index():
-    try:
-        resp = get_supabase().table(settings.table_name).select("*").limit(5).execute()
-        return {"connected": True, "sample_rows": resp.data}
-    except Exception as e:
-        logger.exception("Supabase connectivity check failed")
-        raise HTTPException(500, "Supabase query failed") from e
+    """Unauthenticated index. Never returns data: the reviewed corpus is only
+    reachable through the authenticated search endpoints below."""
+    return {
+        "service": "hiveblot-api",
+        "health": "/health",
+        "search": "POST /search (internal, INTERNAL_API_KEY)",
+        "agent_search": "POST /v1/search (AGENT_API_KEYS)",
+    }
 
 
 @router.get("/proteins", response_model=ProteinSearchResponse, dependencies=[Depends(require_internal_key)])
-def search_protein(
+async def search_protein(
     name: str = Query(..., description="Protein name to search, e.g. p53"),
     limit: int = Query(100, ge=1, le=settings.max_search_limit),
 ):
     if not name.strip():
         raise HTTPException(400, "name query param cannot be empty")
-
     try:
-        resp = (
-            get_supabase().table(settings.table_name)
-            .select("*")
-            .ilike("target", f"%{name}%")
-            .limit(limit)
-            .execute()
-        )
+        rows = await search_targets(name.strip(), limit)
     except Exception as e:
-        logger.exception("Supabase query failed in /proteins")
-        raise HTTPException(500, "Supabase query failed") from e
-
-    return {"protein": name, "count": len(resp.data), "results": resp.data}
+        logger.exception("target lookup failed in /proteins")
+        raise HTTPException(500, "Protein lookup failed") from e
+    return {"protein": name, "count": len(rows), "results": rows}
 
 
 @router.post("/search", response_model=SearchResponse, dependencies=[Depends(require_internal_key)])
