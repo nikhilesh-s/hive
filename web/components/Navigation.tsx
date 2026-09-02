@@ -27,7 +27,7 @@ export function Navigation() {
               HiveBlot
             </span>
             <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '9px', color: 'var(--accent)', letterSpacing: '.6px' }}>
-              PROTEIN DISCOVERY
+              WESTERN BLOT EVIDENCE · BETA
             </span>
           </div>
         </div>
