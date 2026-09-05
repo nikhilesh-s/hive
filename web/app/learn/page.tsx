@@ -10,11 +10,11 @@ const MONO = 'var(--font-mono), monospace';
 const STATUSES: { name: string; color: string; badge: string; text: string }[] = [
   {
     name: 'SUPPORTED', color: 'var(--accent)', badge: 'Supported',
-    text: 'The available sources agree and the value is settled. Silence is the signal: a settled field shows no marker.',
+    text: 'The available sources agree on the value, and no validation or ambiguity flag remains.',
   },
   {
     name: 'AMBIGUOUS', color: 'var(--warning)', badge: 'Needs review',
-    text: 'More than one interpretation remains plausible, or the value legitimately varies within the panel (a time course, a dose series, a label that maps to a protein family such as ERK1/2 = MAPK1/MAPK3). The value shown is a flagged best effort, not a settled fact.',
+    text: 'More than one interpretation remains plausible, or the value legitimately varies within the panel (a time course, a dose series, a label that maps to a protein family such as ERK1/2 = MAPK1/MAPK3). The value is retained with an ambiguity flag rather than presented as a settled fact.',
   },
   {
     name: 'CONFLICTING', color: 'var(--error)', badge: 'Conflicting',
@@ -31,7 +31,7 @@ const GLOSSARY: [string, string][] = [
   ['IP bait', 'The protein an immunoprecipitation antibody captures out of the lysate (printed as "IP: PIK3CA" on the figure). Proteins that come down with it and are blotted in the IP lanes are the readouts, i.e. candidate interaction partners.'],
   ['Input', 'A sample of the lysate taken before immunoprecipitation and run beside the IP lanes. It shows the proteins were present to begin with and that loading was comparable; it says nothing about interaction on its own.'],
   ['phospho / site', 'A phospho-specific antibody recognizes a protein only when a particular residue is phosphorylated; the site names that residue (Tyr705 = tyrosine 705, Ser473 = serine 473). HiveBlot records phosphorylation only when the antibody or the printed label states it. A "p-" or "P-" prefix on its own is not evidence (P-selectin and P-cadherin are not phosphoproteins), which is why some rows stay Conflicting.'],
-  ['loading control', 'An abundant protein (β-actin/ACTB, GAPDH, tubulin) blotted on the same membrane to show that comparable amounts of protein were loaded in each lane. It supports the comparison; it says nothing about the target itself.'],
+  ['loading control', 'An reference protein (β-actin/ACTB, GAPDH, tubulin) blotted on the same membrane to show that comparable amounts of protein were loaded in each lane. It supports the comparison; it says nothing about the target itself.'],
   ['doublet', 'Two closely spaced bands for one target. HiveBlot records a doublet or smear as a description of what the blot shows and never assigns the second band to an isoform, cleavage product or modification.'],
   ['kDa', 'Kilodalton, the unit of molecular mass. A band position is reported in kDa by reading it against the marker ladder run on the same gel.'],
   ['expected vs reported MW', 'Expected molecular weight is the reference mass computed from the UniProt sequence for the resolved protein. Reported molecular weight is only what the paper itself printed for the band. They are kept apart because they legitimately differ (modifications, glycosylation, running behavior), and HiveBlot never reads mass off an image without a printed ladder calibration.'],
@@ -62,8 +62,7 @@ export default function Learn() {
 
       <Section title="What one result represents">
         <p className="hb-page-p">
-          Searching returns experiments, not sentences. Each card is one blot panel for
-          one target in one biological system: the normalized protein name (with the
+          Searching returns experiments, not sentences. Each card is one blot panel for one target within a specific experimental context: the normalized protein name (with the
           label <em>as printed</em> underneath when they differ), a status badge, the
           sample or cell line and organism, the experiment type (Western, phospho
           Western, co-IP, loading control), the treatment and dose/duration when the
@@ -135,7 +134,7 @@ export default function Learn() {
         <div className="hb-two-col">
           <div>
             <h3 className="hb-page-h3">1. Extraction and loading</h3>
-            <p className="hb-page-p">Proteins are extracted from cells or tissue and loaded onto a gel, usually in equal amounts so lanes can be compared.</p>
+            <p className="hb-page-p">Proteins are extracted from cells or tissue and loaded onto a gel, often with comparable amounts so differences between lanes can be interpreted in context.</p>
             <h3 className="hb-page-h3">2. Separation by size</h3>
             <p className="hb-page-p">An electric field moves proteins through the gel; smaller proteins travel further. A marker ladder gives the size scale in kDa.</p>
           </div>
