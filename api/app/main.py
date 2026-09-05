@@ -37,6 +37,8 @@ app.include_router(external.router)
 
 if settings.experimental_enabled:
     # Live ingestion / discovery / paper QA / densitometry. Internal-key only.
+    from .experimental.densitometry_router import router as densitometry_router
     from .experimental.router import router as experimental_router
 
     app.include_router(experimental_router)
+    app.include_router(densitometry_router)
