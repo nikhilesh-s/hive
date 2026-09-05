@@ -148,6 +148,11 @@ class WesternBlotRecord(BaseModel):
     # collision); one source of truth removes that whole failure class.
     stable_row_key: str | None = None
 
+    # EXPERIMENTAL: rows from live DOI ingestion carry 'live_unreviewed';
+    # reviewed-corpus rows carry None. The UI badges anything non-null.
+    review_tier: str | None = None
+    job_id: str | None = None
+
     @field_validator("image_crop_ref", mode="before")
     @classmethod
     def _public_crop_ref(cls, v):

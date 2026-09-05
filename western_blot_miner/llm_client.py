@@ -87,9 +87,12 @@ class AnthropicClient(LLMClient):
     name = "anthropic"
 
     def __init__(self, model: Optional[str] = None):
-        self.model = model or os.environ.get("WBM_MODEL", "claude-3-5-haiku-20241022")
+        # Current-generation default; override with WBM_MODEL. Sampling
+        # parameters are not sent: Claude 4.6+ models reject `temperature`
+        # and run adaptive thinking by default.
+        self.model = model or os.environ.get("WBM_MODEL", "claude-opus-5")
 
-    def complete_json(self, system, user, image_data_url=None, max_tokens=4096, temperature=0.0):
+    def complete_json(self, system, user, image_data_url=None, max_tokens=8192, temperature=None):
         import anthropic  # lazy
 
         client = anthropic.Anthropic()
@@ -100,10 +103,12 @@ class AnthropicClient(LLMClient):
                             "source": {"type": "base64", "media_type": media_type, "data": data_b64}})
         content.append({"type": "text", "text": user})
         resp = client.messages.create(
-            model=self.model, max_tokens=max_tokens, temperature=temperature,
+            model=self.model, max_tokens=max_tokens,
             system=system, messages=[{"role": "user", "content": content}],
         )
-        text = "".join(getattr(b, "text", "") for b in resp.content)
+        if getattr(resp, "stop_reason", None) == "refusal":
+            raise RuntimeError("model declined this panel (stop_reason=refusal)")
+        text = "".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", "") == "text")
         return _extract_json(text)
 
 

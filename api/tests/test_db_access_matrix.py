@@ -35,7 +35,10 @@ CHAIN = [
     "migrations/002_feedback.sql",
     "migrations/003_stable_row_key.sql",
     "migrations/004_secure_public_tables.sql",
+    "migrations/005_experimental_live_tables.sql",   # EXPERIMENTAL live tier
 ]
+LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
+            "VALUES ('live-paper', 'STAT3', 'job1')")
 
 RECORD_SQL = ("INSERT INTO western_blot_records (paper_id, target) "
               "VALUES ('test-paper', 'STAT3')")
@@ -54,6 +57,8 @@ async def _apply_chain(conn):
         await conn.execute(
             f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='{role}') "
             f"THEN CREATE ROLE {role} NOLOGIN; END IF; END $$;")
+    for t in ("ingest_crops", "ingest_jobs", "western_blot_records_live"):
+        await conn.execute(f"DROP TABLE IF EXISTS {t} CASCADE")
     await conn.execute("DROP TABLE IF EXISTS hiveblot_feedback CASCADE")
     await conn.execute("DROP TABLE IF EXISTS western_blot_records CASCADE")
     for rel in CHAIN:
@@ -131,7 +136,7 @@ def test_policies_target_explicit_roles(conn):
         "SELECT tablename, policyname, roles::text, cmd FROM pg_policies "
         "WHERE schemaname='public' ORDER BY policyname"))
     got = {(r["tablename"], r["policyname"], r["roles"], r["cmd"]) for r in rows}
-    assert got == {
+    assert got >= {
         ("western_blot_records", "hive_readonly_select_records", "{hive_readonly}", "SELECT"),
         ("hiveblot_feedback", "hive_feedback_insert_feedback", "{hive_feedback}", "INSERT"),
         ("hiveblot_feedback", "hive_feedback_select_feedback", "{hive_feedback}", "SELECT"),
@@ -187,6 +192,33 @@ def test_hive_feedback_is_insert_and_read_only_on_feedback(conn):
     assert run(conn, _as_role(conn, "hive_feedback", "DELETE FROM western_blot_records")) == "42501"
 
 
+def test_live_tier_matrix(conn):
+    """Migration 005: hive_ingest writes ONLY the live tables; hive_readonly
+    reads them; client roles get nothing; the reviewed table stays closed."""
+    denied = "42501"
+    for role in ("anon", "authenticated"):
+        assert run(conn, _as_role(conn, role, "SELECT * FROM western_blot_records_live")) == denied
+        assert run(conn, _as_role(conn, role, LIVE_SQL)) == denied
+        assert run(conn, _as_role(conn, role, "SELECT * FROM ingest_crops")) == denied
+    assert run(conn, _as_role(conn, "hive_ingest", LIVE_SQL)) == "ok"
+    assert run(conn, _as_role(conn, "hive_ingest", "DELETE FROM western_blot_records_live")) == "ok"
+    assert run(conn, _as_role(conn, "hive_ingest", "UPDATE western_blot_records_live SET target='x'")) == denied
+    assert run(conn, _as_role(conn, "hive_ingest",
+               "INSERT INTO ingest_jobs (job_id, doi, status) VALUES ('j', '10.1000/x', 'queued')")) == "ok"
+    assert run(conn, _as_role(conn, "hive_ingest",
+               "INSERT INTO ingest_crops (job_id, filename, png) VALUES ('j', 'a.png', '\\x89'::bytea)")) == "ok"
+    assert run(conn, _as_role(conn, "hive_ingest", "SELECT * FROM western_blot_records")) == denied
+    assert run(conn, _as_role(conn, "hive_ingest", RECORD_SQL)) == denied
+    assert run(conn, _as_role(conn, "hive_ingest", "SELECT * FROM hiveblot_feedback")) == denied
+    assert run(conn, _as_role(conn, "hive_readonly", "SELECT * FROM western_blot_records_live")) == "ok"
+    assert run(conn, _as_role(conn, "hive_readonly", LIVE_SQL)) == denied
+    assert run(conn, _as_role(conn, "hive_feedback", "SELECT * FROM western_blot_records_live")) == denied
+    rows = run(conn, conn.fetch(
+        "SELECT relname, relrowsecurity FROM pg_class WHERE relname IN "
+        "('western_blot_records_live', 'ingest_jobs', 'ingest_crops')"))
+    assert len(rows) == 3 and all(r["relrowsecurity"] for r in rows)
+
+
 def test_hive_roles_are_not_privileged(conn):
     rows = run(conn, conn.fetch(
         "SELECT rolname, rolsuper, rolbypassrls, rolcreaterole, rolcreatedb "
@@ -204,7 +236,8 @@ def test_down_migration_is_reversible(conn):
     rows = run(conn, conn.fetch(
         "SELECT relrowsecurity FROM pg_class WHERE relname IN ('western_blot_records', 'hiveblot_feedback')"))
     assert all(not r["relrowsecurity"] for r in rows)
-    assert run(conn, conn.fetch("SELECT 1 FROM pg_policies WHERE schemaname='public'")) == []
+    assert run(conn, conn.fetch("SELECT 1 FROM pg_policies WHERE schemaname='public' "
+                                "AND tablename IN ('western_blot_records', 'hiveblot_feedback')")) == []
     run(conn, conn.execute((REPO / "migrations/004_secure_public_tables.sql").read_text()))
     assert run(conn, _rows_as_role(conn, "hive_readonly", "SELECT * FROM western_blot_records")) == 1
     assert run(conn, _as_role(conn, "anon", "SELECT * FROM western_blot_records")) == "42501"

@@ -54,6 +54,17 @@ class Settings(BaseSettings):
     table_name: str = "western_blot_records"
     max_search_limit: int = 500
 
+    # --- EXPERIMENTAL (live ingestion / discovery / paper QA / densitometry) --
+    experimental_enabled: bool = True
+    # Unreviewed tier written by live DOI ingestion (migration 005).
+    live_table_name: str = "western_blot_records_live"
+    # hive_ingest role DSN (INSERT/DELETE on the live tables only). Empty =>
+    # ingestion endpoints return 503; search over the live table still works.
+    db_ingest_url: str = ""
+    # Valency Bond bearer token (Settings page in app.valency.io). Server-only.
+    valency_api_token: str = ""
+    valency_mcp_url: str = "https://mcp.valency.io/"
+
     # Base directory the figure-crop endpoint may serve PNGs from. Records
     # store absolute crop paths (image_crop_ref); only paths resolving inside
     # this directory are ever served. Default = the local pipeline's run dir.

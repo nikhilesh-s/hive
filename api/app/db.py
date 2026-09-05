@@ -128,3 +128,120 @@ async def insert_feedback(fields: dict) -> int:
     )
     async with pool.acquire() as conn:
         return await conn.fetchval(sql, *[fields[c] for c in cols])
+
+
+# --- EXPERIMENTAL: live (unreviewed) tier ----------------------------------
+_ingest_pool: asyncpg.Pool | None = None
+
+
+async def get_ingest_pool() -> asyncpg.Pool:
+    """hive_ingest role: INSERT/DELETE on western_blot_records_live,
+    ingest_jobs, ingest_crops — nothing on the reviewed table."""
+    global _ingest_pool
+    if _ingest_pool is None:
+        if not settings.db_ingest_url:
+            raise RuntimeError("DB_INGEST_URL is not configured")
+        _ingest_pool = await asyncpg.create_pool(
+            settings.db_ingest_url, min_size=1, max_size=2, init=_decode_json
+        )
+    return _ingest_pool
+
+
+async def count_live_rows() -> int:
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval(f"SELECT count(*) FROM {settings.live_table_name}")
+
+
+async def fetch_live_record(record_id: int) -> dict | None:
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(f"SELECT * FROM {settings.live_table_name} WHERE id = $1", record_id)
+        return dict(row) if row else None
+
+
+async def fetch_live_crop(job_id: str | None, filename: str) -> bytes | None:
+    if not job_id:
+        return None
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval(
+            "SELECT png FROM ingest_crops WHERE job_id = $1 AND filename = $2", job_id, filename)
+
+
+async def list_ingest_jobs(limit: int = 20) -> list[dict]:
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT * FROM ingest_jobs ORDER BY created_at DESC LIMIT $1", limit)
+        out = []
+        for r in rows:
+            d = dict(r)
+            for k in ("created_at", "updated_at"):
+                d[k] = d[k].isoformat() if d.get(k) else None
+            out.append(d)
+        return out
+
+
+async def upsert_ingest_job(job: dict) -> None:
+    pool = await get_ingest_pool()
+    cols = ("job_id", "doi", "status", "message", "pmcid", "paper_id", "title",
+            "candidates", "records", "rows", "backend", "error")
+    sets = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols[1:])
+    async with pool.acquire() as conn:
+        await conn.execute(
+            f"INSERT INTO ingest_jobs ({', '.join(cols)}, updated_at) "
+            f"VALUES ({', '.join(f'${i}' for i in range(1, len(cols) + 1))}, now()) "
+            f"ON CONFLICT (job_id) DO UPDATE SET {sets}, updated_at = now()",
+            *[job.get(c) for c in cols])
+
+
+async def replace_live_rows(doi: str, job_id: str, rows: list[dict],
+                            crops: dict[str, bytes], jsonb_cols: set[str]) -> int:
+    """Delete this DOI's previous live rows/crops, insert the new ones (one
+    transaction). Unknown keys are dropped against the live table's columns."""
+    import json
+
+    pool = await get_ingest_pool()
+    table = settings.live_table_name
+    async with pool.acquire() as conn:
+        cols = {r["column_name"] for r in await conn.fetch(
+            "SELECT column_name FROM information_schema.columns WHERE table_name = $1", table)}
+        async with conn.transaction():
+            old_jobs = [r["job_id"] for r in await conn.fetch(
+                f"SELECT DISTINCT job_id FROM {table} WHERE doi = $1", doi)]
+            await conn.execute(f"DELETE FROM {table} WHERE doi = $1", doi)
+            for oj in old_jobs:
+                if oj and oj != job_id:
+                    await conn.execute("DELETE FROM ingest_crops WHERE job_id = $1", oj)
+            for name, png in crops.items():
+                await conn.execute(
+                    "INSERT INTO ingest_crops (job_id, filename, png) VALUES ($1, $2, $3) "
+                    "ON CONFLICT (job_id, filename) DO UPDATE SET png = EXCLUDED.png", job_id, name, png)
+            n = 0
+            for row in rows:
+                data = {k: v for k, v in row.items() if k in cols and k != "id"}
+                keys = list(data)
+                vals, casts = [], []
+                for i, k in enumerate(keys, 1):
+                    v = data[k]
+                    if k in jsonb_cols and v is not None:
+                        vals.append(json.dumps(v))
+                        casts.append(f"${i}::jsonb")
+                    else:
+                        vals.append(v)
+                        casts.append(f"${i}")
+                await conn.execute(
+                    f"INSERT INTO {table} ({', '.join(keys)}) VALUES ({', '.join(casts)})", *vals)
+                n += 1
+            return n
+
+
+async def delete_live_job(job_id: str) -> int:
+    pool = await get_ingest_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            res = await conn.execute(f"DELETE FROM {settings.live_table_name} WHERE job_id = $1", job_id)
+            await conn.execute("DELETE FROM ingest_crops WHERE job_id = $1", job_id)
+            await conn.execute("DELETE FROM ingest_jobs WHERE job_id = $1", job_id)
+            return int(res.split()[-1]) if res else 0
