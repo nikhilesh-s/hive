@@ -1603,3 +1603,49 @@ body {
 .hb-live-steps li.is-done { border-color: var(--accent-border); color: var(--accent); }
 .hb-live-message { color: var(--text-secondary); font-size: 14px; margin: 0; }
 .hb-live-message.is-error { color: var(--error); }
+
+/* EXPERIMENTAL: sub-nav, ask page ----------------------------------------- */
+.hb-exp-nav { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+.hb-exp-nav a {
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  text-decoration: none;
+}
+.hb-exp-nav a.is-active { border-color: var(--accent-border); color: var(--accent); }
+
+.hb-ask-form textarea {
+  background: var(--input-background);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  resize: vertical;
+  width: 100%;
+}
+.hb-ask-check { align-items: center; color: var(--text-secondary); display: inline-flex; font-family: var(--font-sans), sans-serif; font-size: 12px; gap: 6px; white-space: nowrap; }
+.hb-ask-answer {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+.hb-ask-answer p { color: var(--text-primary); font-family: var(--font-serif), serif; font-size: 16px; line-height: 1.65; margin: 0 0 10px; }
+.hb-ask-cite { color: var(--accent); font-family: var(--font-mono), monospace; font-size: 12px; text-decoration: none; }
+.hb-ask-cite.is-bad { color: var(--error); text-decoration: line-through; }
+.hb-ask-evidence { list-style: none; margin: 0; padding: 0; }
+.hb-ask-evidence li { border-top: 1px solid var(--border); padding: 12px 0; }
+.hb-ask-evidence li.is-cited { background: var(--accent-faint); padding-left: 10px; padding-right: 10px; }
+.hb-ask-ev-head { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.hb-ask-ref { color: var(--accent); font-family: var(--font-mono), monospace; font-size: 12px; font-weight: 600; }
+.hb-ask-headline { color: var(--text-primary); font-family: var(--font-serif), serif; font-size: 16px; }
+.hb-ask-ev-text { color: var(--text-secondary); font-family: var(--font-mono), monospace; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }

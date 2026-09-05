@@ -24,6 +24,7 @@ from ..schemas import RecordDetail, SearchRequest, SearchResponse
 from ..search_service import execute_search
 from ..valency import ValencyClient, ValencyError
 from . import ingest
+from .ask import answer as ask_answer
 
 logger = logging.getLogger("hive.experimental")
 
@@ -35,6 +36,12 @@ class PaperSearchRequest(BaseModel):
     query: str = Field(min_length=2, max_length=300)
     limit: int = Field(default=8, ge=1, le=25)
     source: str = Field(default="auto", pattern="^(auto|valency|pmc)$")
+
+
+class AskRequest(BaseModel):
+    question: str = Field(min_length=3, max_length=500)
+    doi: str | None = Field(default=None, max_length=200)
+    include_live: bool = True
 
 
 class IngestRequest(BaseModel):
@@ -161,3 +168,11 @@ async def live_crop(record_id: int):
     if not png:
         raise HTTPException(404, "Crop not available")
     return Response(content=png, media_type="image/png")
+
+
+@router.post("/ask")
+@limiter.limit("10/minute")
+async def ask(request: Request, body: AskRequest):
+    """Grounded paper QA: deterministic retrieval over the reviewed corpus
+    (+ live tier), then a model answer that may only cite the shown records."""
+    return await ask_answer(body.question, body.doi or None, body.include_live)

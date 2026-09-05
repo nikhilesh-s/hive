@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import DatabaseResultCard from '@/components/DatabaseResultCard';
+import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
 
 interface Paper {
@@ -123,6 +124,7 @@ export default function LivePage() {
           separate <strong>live, unreviewed</strong> tier and badged as such. It is not part of the reviewed corpus
           and no accuracy claim is attached to it.
         </p>
+        <ExperimentalNav />
         {status && (
           <div className="hb-live-status" aria-label="Experimental backend status">
             <span className={status.model_backend_ready ? 'ok' : 'bad'}>model: {status.model_backend}</span>
