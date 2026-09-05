@@ -106,6 +106,17 @@ credentials → run the unseen-paper extraction evaluation.
 `research/UCSF_BETA_READINESS.md` §J. After UCSF, the first task is Nik's
 decision on the deferred corpus corrections QA-1…QA-5 (reviewed reseed).
 
+### Experimental track exists (2026-09-05) — NOT on this branch
+
+Live DOI ingestion (Valency / PMC discovery → existing pipeline → separate
+unreviewed tier), grounded paper QA and an `/experimental-densitometry`
+route are scaffolded and tested on branch **`experimental/demo-day`**
+(stack of `experimental/valency-live-ingest` → `experimental/paper-qa` →
+`experimental/densitometry`). Design, demo flow and Nik's credential /
+deploy checklist: `research/DEMO_DAY_ARCHITECTURE.md` on that branch. This
+frozen beta branch is unchanged by it; do not merge the experimental branches
+here before UCSF.
+
 ### Release freeze — final hosted verification (2026-09-02 ~06:00 UTC)
 
 Web `hiveblot-beta.vercel.app` (Vercel, from `5c54352`; the handoff commit
