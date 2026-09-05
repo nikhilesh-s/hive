@@ -48,6 +48,24 @@ def test_evidence_blocks_group_lanes_and_carry_statuses():
     assert live[0]["text"].endswith("LIVE UNREVIEWED extraction")
 
 
+def test_query_terms_keep_biology_drop_prose():
+    q = "Is STAT3 phosphorylated at Tyr705 after IL-6 in Hep3B, and which antibody (CST) was used?"
+    assert ask.query_terms(q) == ["phospho", "STAT3", "Tyr705", "IL-6", "Hep3B", "CST"]
+    assert ask.query_terms("Does BEX2 co-immunoprecipitate with PIK3CA?") == ["BEX2", "PIK3CA"]
+    assert ask.query_terms("loading controls in mouse submandibular gland") == ["loading control"]
+
+
+def test_retrieve_backs_off_until_rows_appear(monkeypatch):
+    seen = []
+
+    async def fake_query(sql):
+        seen.append(sql)
+        return ROWS if "%after%" not in sql and "%Tyr705%" not in sql and "residue_position = 705" not in sql else []
+    monkeypatch.setattr(ask, "run_readonly_query", fake_query)
+    blocks = _run(ask.retrieve("Is ERK phosphorylated at Tyr705 after IL-6?", None, include_live=False))
+    assert blocks and len(seen) >= 2  # first AND-of-everything query was empty, back-off found rows
+
+
 def test_retrieve_pins_tables_and_filters_doi(monkeypatch):
     seen = []
 

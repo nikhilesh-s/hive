@@ -94,20 +94,57 @@ def evidence_blocks(rows: list[dict], tier: str = "reviewed") -> list[dict]:
     return blocks
 
 
+_KEYWORDS = ("phospho", "co-ip", "coip", "immunoprecipitation", "loading control", "needs review")
+_TERM_RE = re.compile(r"^(?=.*[A-Z0-9])[A-Za-z0-9][A-Za-z0-9/+.-]*$")
+
+
+def query_terms(question: str) -> list[str]:
+    """Biological tokens from a natural-language question, in order: anything
+    with a digit, an uppercase run or a hyphen (STAT3, Tyr705, IL-6, Hep3B,
+    P-ERK, CST) plus the parser's keyword filters. Prose words are dropped
+    because the parser ANDs every term against the evidence columns."""
+    ql = question.lower()
+    terms = [k for k in _KEYWORDS if k in ql]
+    for tok in re.split(r"[\s,;?!()\[\]\"']+", question):
+        t = tok.strip(".:")
+        if len(t) < 2 or not _TERM_RE.match(t):
+            continue
+        if t.lower() in {"is", "in", "of", "the", "and", "or", "a", "an", "was", "were", "does", "do", "did", "which", "what"}:
+            continue
+        if not (any(c.isdigit() for c in t) or sum(c.isupper() for c in t) >= 2 or "-" in t or t.lower() in ql.split()):
+            continue
+        if t not in terms:
+            terms.append(t)
+    return terms
+
+
+async def _rows_for(q: str, table: str) -> list[dict]:
+    sql = guard_and_limit_sql(generate_bio_sql(q, table), 300, table)
+    return await run_readonly_query(sql)
+
+
 async def retrieve(question: str, doi: str | None, include_live: bool) -> list[dict]:
-    """Deterministic retrieval: parser + guard over the reviewed table (and live tier)."""
+    """Deterministic retrieval: biological terms from the question, parser +
+    guard over the reviewed table (and live tier). If the AND of all terms
+    finds nothing, back off by dropping the last term until something does,
+    so a wordy question still reaches the right experiment."""
     blocks: list[dict] = []
-    q = f"{question} {doi}" if doi else question
+    terms = query_terms(question) or [question]
     tables = [(settings.table_name, "reviewed")]
     if include_live:
         tables.append((settings.live_table_name, "live_unreviewed"))
     for table, tier in tables:
-        sql = guard_and_limit_sql(generate_bio_sql(q, table), 300, table)
-        try:
-            rows = await run_readonly_query(sql)
-        except Exception as e:  # live table may not exist yet
-            logger.warning("retrieval on %s failed: %s", table, e)
-            continue
+        rows: list[dict] = []
+        for n in range(len(terms), 0, -1):
+            q = " ".join(terms[:n]) + (f" {doi}" if doi else "")
+            try:
+                rows = await _rows_for(q, table)
+            except Exception as e:  # live table may not exist yet
+                logger.warning("retrieval on %s failed: %s", table, e)
+                rows = []
+                break
+            if rows:
+                break
         if doi:
             rows = [r for r in rows if (r.get("doi") or "").lower() == doi.lower()]
         blocks += evidence_blocks(rows, tier)

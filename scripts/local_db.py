@@ -126,6 +126,7 @@ def cmd_up() -> None:
         run_sql(uri, mig.read_text())
         print(f"applied {mig.name}")
     run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_feedback')
+    run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_ingest')  # migration 005 (experimental)
     print("schema + migrations applied (idempotent).")
     cmd_status()
 
@@ -186,6 +187,7 @@ def cmd_status() -> None:
     print(f"db: {DB_NAME} at {DATA_DIR}")
     print(f"western_blot_records rows: {n}")
     print(f"DB_READONLY_URL={readonly_uri(server)}")
+    print(f"DB_INGEST_URL={readonly_uri(server).replace('hive_readonly', 'hive_ingest')}   # experimental live tier")
 
 
 TEST_DB_NAME = "hiveblot_rlstest"
