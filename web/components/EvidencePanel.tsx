@@ -217,10 +217,10 @@ function conflictSummary(label: string, fe: FieldEvidence): string | null {
     `Neither independently settles it, so HiveBlot records no value rather than choosing.`;
 }
 
-function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey }: {
+function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey, readOnly = false }: {
   name: string; label: string; fe: FieldEvidence;
   all: Record<string, FieldEvidence>; recordId: number; paperId?: string | null;
-  prior?: PriorFeedback[]; stableRowKey?: string | null;
+  prior?: PriorFeedback[]; stableRowKey?: string | null; readOnly?: boolean;
 }) {
   const [mode, setMode] = useState<'idle' | 'correcting' | 'done'>('idle');
   const glyph = statusGlyph(fe.status);
@@ -282,7 +282,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
           <span style={{ fontFamily: MONO, fontSize: '9px', color: LABEL }}>via {srcName}</span>
         )}
         <span style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-          {mode === 'done' ? <Ack /> : mode === 'idle' && (
+          {readOnly ? null : mode === 'done' ? <Ack /> : mode === 'idle' && (
             <>
               <Btn color={TEAL} title="Correct / useful" onClick={() => send('correct')}>✓</Btn>
               <Btn color={RED} title="Incorrect — suggest a correction" onClick={() => setMode('correcting')}>✗</Btn>
@@ -308,8 +308,8 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {fe.candidates.map((c, i) => (
-              <button key={i}
-                onClick={() => send('incorrect', String(c.value ?? 'none'), 'picked from candidates')}
+              <button key={i} disabled={readOnly}
+                onClick={() => !readOnly && send('incorrect', String(c.value ?? 'none'), 'picked from candidates')}
                 style={{
                   background: 'rgba(255,255,255,.04)', border: '1px solid var(--border-strong)',
                   borderRadius: '4px', padding: '4px 10px', cursor: 'pointer', textAlign: 'left',
@@ -334,7 +334,13 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
 
 // --- main panel ----------------------------------------------------------------
 
-export default function EvidencePanel({ recordId }: { recordId: number }) {
+export default function EvidencePanel({ recordId, apiBase = '/api/record', readOnly = false }: {
+  recordId: number;
+  // EXPERIMENTAL live rows read from '/api/experimental/record' and carry no
+  // feedback controls (different id space from the reviewed corpus).
+  apiBase?: string;
+  readOnly?: boolean;
+}) {
   const [detail, setDetail] = useState<RecordDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [missingMode, setMissingMode] = useState<'idle' | 'open' | 'done'>('idle');
@@ -346,18 +352,20 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
 
   useEffect(() => {
     let alive = true;
-    fetch(`/api/record/${recordId}`)
+    fetch(`${apiBase}/${recordId}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d) => { if (alive) setDetail(d); })
       .catch((e) => { if (alive) setError(String(e.message || e)); });
     // Prior researcher feedback (rehydration). Failure is non-fatal: the
     // evidence still renders; only the annotations are absent.
-    fetch(`/api/record/${recordId}/feedback`)
-      .then((r) => (r.ok ? r.json() : { items: [] }))
-      .then((d) => { if (alive) setPriorFeedback(d.items || []); })
-      .catch(() => {});
+    if (!readOnly) {
+      fetch(`${apiBase}/${recordId}/feedback`)
+        .then((r) => (r.ok ? r.json() : { items: [] }))
+        .then((d) => { if (alive) setPriorFeedback(d.items || []); })
+        .catch(() => {});
+    }
     return () => { alive = false; };
-  }, [recordId]);
+  }, [recordId, apiBase, readOnly]);
 
   const priorByField = new Map<string, PriorFeedback[]>();
   for (const f of priorFeedback) {
@@ -427,7 +435,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
             // archive absent in a deployment) fall back to the filename note.
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`/api/record/${recordId}/crop`}
+              src={`${apiBase}/${recordId}/crop`}
               alt={`Panel crop for ${detail.raw_target_name ?? 'this record'}`}
               onError={() => setCropFailed(true)}
               style={{
@@ -456,7 +464,7 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
         {FIELD_LABELS.filter(([k]) => detail.fields[k]).map(([k, label]) => (
           <FieldRow key={k} name={k} label={label} fe={detail.fields[k]} all={detail.fields}
                     prior={priorByField.get(k)} stableRowKey={detail.stable_row_key}
-                    recordId={detail.id} paperId={detail.paper_id} />
+                    recordId={detail.id} paperId={detail.paper_id} readOnly={readOnly} />
         ))}
       </div>
 
@@ -535,12 +543,17 @@ export default function EvidencePanel({ recordId }: { recordId: number }) {
 
       {/* record-level actions */}
       <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {missingMode === 'done' ? <Ack /> : missingMode === 'idle' ? (
+        {readOnly && (
+          <span style={{ fontFamily: MONO, fontSize: '10px', color: GOLD }}>
+            live extraction — unreviewed; feedback is collected on the reviewed corpus only
+          </span>
+        )}
+        {!readOnly && (missingMode === 'done' ? <Ack /> : missingMode === 'idle' ? (
           <Btn color={TEAL} onClick={() => setMissingMode('open')}>+ Missing information?</Btn>
-        ) : null}
-        {flagMode === 'done' ? <Ack /> : flagMode === 'idle' ? (
+        ) : null)}
+        {!readOnly && (flagMode === 'done' ? <Ack /> : flagMode === 'idle' ? (
           <Btn color={GOLD} onClick={() => setFlagMode('open')}>⚑ Flag this result</Btn>
-        ) : null}
+        ) : null)}
         {priorRecordScope.length > 0 && (
           <span style={{ fontFamily: MONO, fontSize: '9px', color: GOLD }}>
             {priorRecordScope.length} prior record-level feedback item{priorRecordScope.length > 1 ? 's' : ''} on file

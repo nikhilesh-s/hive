@@ -34,3 +34,9 @@ app.add_middleware(
 
 app.include_router(internal.router)
 app.include_router(external.router)
+
+if settings.experimental_enabled:
+    # Live ingestion / discovery / paper QA / densitometry. Internal-key only.
+    from .experimental.router import router as experimental_router
+
+    app.include_router(experimental_router)

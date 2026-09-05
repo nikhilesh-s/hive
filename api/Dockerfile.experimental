@@ -1,0 +1,31 @@
+# HiveBlot EXPERIMENTAL API image: the beta API plus the ingestion engine
+# (OpenCV / PyMuPDF / model clients) so live DOI ingestion, paper QA and
+# densitometry run inside the API process. Build context = repo root:
+#   docker build -f api/Dockerfile.experimental -t hiveblot-api-experimental .
+# Deploy as a SECOND Render service (see research/DEMO_DAY_ARCHITECTURE.md);
+# the frozen beta service keeps api/Dockerfile.
+FROM python:3.13-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY api/requirements.txt ./requirements.txt
+COPY western_blot_miner/requirements.txt ./miner-requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt -r miner-requirements.txt
+
+COPY api/app ./app
+COPY api/db ./db
+COPY western_blot_miner ./western_blot_miner
+RUN rm -rf ./western_blot_miner/data && mkdir -p ./western_blot_miner/data
+
+# Reviewed crops, same path contract as the beta image.
+COPY api/crops/ /Users/niks/hive/western_blot_miner/data/pdf_runs/
+ENV CROP_BASE_DIR=/Users/niks/hive/western_blot_miner/data/pdf_runs
+# Live PDFs / runs are ephemeral here on purpose; rows + crops go to Postgres.
+ENV WBM_PDF_CACHE=/tmp/hiveblot_live_pdfs
+ENV EXPERIMENTAL_ENABLED=true
+
+EXPOSE 8000
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -65,7 +65,7 @@ def _function_name(func: exp.Func) -> str:
         return type(func).__name__.lower()
 
 
-def guard_and_limit_sql(raw_sql: str, requested_limit: int) -> str:
+def guard_and_limit_sql(raw_sql: str, requested_limit: int, table_name: str | None = None) -> str:
     """
     Raises SQLGuardError if raw_sql is anything other than a single SELECT
     against settings.table_name. Otherwise returns the SQL rewritten with a
@@ -89,11 +89,12 @@ def guard_and_limit_sql(raw_sql: str, requested_limit: int) -> str:
         if isinstance(node, DISALLOWED_NODE_TYPES):
             raise SQLGuardError(f"'{type(node).__name__}' is not allowed in a search query")
 
+    allowed = (table_name or settings.table_name).lower()
     tables = {t.name.lower() for t in stmt.find_all(exp.Table)}
     if not tables:
         raise SQLGuardError("Query must reference a table")
-    if tables != {settings.table_name.lower()}:
-        raise SQLGuardError(f"Query may only reference {settings.table_name}")
+    if tables != {allowed}:
+        raise SQLGuardError(f"Query may only reference {allowed}")
 
     for func in stmt.find_all(exp.Func):
         # Boolean connectors (AND / OR) subclass exp.Func in sqlglot >= 30
