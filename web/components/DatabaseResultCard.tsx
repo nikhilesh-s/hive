@@ -60,6 +60,10 @@ export interface LaneSummary {
 
 interface DatabaseResultCardProps {
   data: DatabaseResult;
+  // EXPERIMENTAL: row comes from the live, unreviewed tier. Badged, read
+  // from the live endpoints, and feedback controls are hidden (live ids are
+  // a different id space from the reviewed corpus).
+  live?: boolean;
   // When search results are grouped into one card per experiment (paper +
   // panel + target), `lanes` carries every lane of the group so a researcher
   // reads ONE experiment instead of N near-identical rows. Optional: a card
@@ -182,7 +186,8 @@ function experimentLabel(blotType?: string | null): string | null {
   return titleCase(blotType);
 }
 
-export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardProps) {
+export default function DatabaseResultCard({ data, lanes, live = false }: DatabaseResultCardProps) {
+  const apiBase = live ? '/api/experimental/record' : '/api/record';
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [cropFailed, setCropFailed] = useState(false);
   const headline = data.canonical_target || data.target;
@@ -254,7 +259,7 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
   const bandColor = bandText === 'present' ? TEAL : bandText === 'absent' ? RED : GOLD;
   // The record's OWN panel crop, served by the API from the reviewed crop
   // archive (never a stand-in image). Absent crop => honest placeholder.
-  const previewSrc = data.image_crop_ref && !cropFailed ? `/api/record/${data.id}/crop` : null;
+  const previewSrc = data.image_crop_ref && !cropFailed ? `${apiBase}/${data.id}/crop` : null;
   const reasons = review && review.label !== 'Supported' ? reviewReasons(data) : [];
   const designTag = deriveDesignTag(lanes, data.treatment_context);
   const sourceId = data.doi || data.paper_id;
@@ -280,6 +285,11 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
               </span>
             )}
           </div>
+          {live && (
+            <div className="hb-live-badge" title="Extracted live by the model + deterministic engine; no human review">
+              LIVE · UNREVIEWED
+            </div>
+          )}
 
           {data.canonical_target && data.target && data.canonical_target !== data.target && (
             <div className="hb-printed-target">as printed: {data.target}</div>
@@ -401,7 +411,7 @@ export default function DatabaseResultCard({ data, lanes }: DatabaseResultCardPr
       </div>
       {evidenceOpen && (
         <div id={`hb-evidence-${data.id}`} className="hb-result-card-evidence">
-          <EvidencePanel recordId={data.id} />
+          <EvidencePanel recordId={data.id} apiBase={apiBase} readOnly={live} />
         </div>
       )}
     </div>

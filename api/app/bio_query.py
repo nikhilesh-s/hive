@@ -37,6 +37,7 @@ TERM_COLUMNS = (
     "treatment_context",
     "antibody_target",
     "modification_label",
+    "doi",  # a pasted DOI finds a paper's rows ("more from this paper")
 )
 
 RESIDUE_NAMES = {"y": "Tyr", "s": "Ser", "t": "Thr",
@@ -93,7 +94,7 @@ def _term_clause(term: str) -> str:
     return f"({ors})"
 
 
-def generate_bio_sql(question: str) -> str:
+def generate_bio_sql(question: str, table_name: str | None = None) -> str:
     q = " " + question.strip() + " "
     clauses: list[str] = []
 
@@ -153,6 +154,6 @@ def generate_bio_sql(question: str) -> str:
     where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
     # Settled evidence first (needs_review=false), stable order within.
     return (
-        f"SELECT * FROM {settings.table_name}{where} "
+        f"SELECT * FROM {table_name or settings.table_name}{where} "
         f"ORDER BY needs_review ASC, id ASC"
     )

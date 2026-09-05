@@ -11,6 +11,7 @@ PAIRS = [
     ("migrations/002_feedback.sql", "supabase/migrations/20260701000003_feedback.sql"),
     ("migrations/003_stable_row_key.sql", "supabase/migrations/20260701000004_stable_row_key.sql"),
     ("migrations/004_secure_public_tables.sql", "supabase/migrations/20260901000005_secure_hiveblot_public_tables.sql"),
+    ("migrations/005_experimental_live_tables.sql", "supabase/migrations/20260905000006_experimental_live_tables.sql"),
 ]
 
 if __name__ == "__main__":
