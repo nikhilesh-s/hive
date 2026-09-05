@@ -16,7 +16,7 @@ value + status + source + verbatim wording), for wet-lab researchers who need
 to locate and compare blot evidence (antibody/target/context already
 published?). Beta target: UCSF wet-lab researchers.
 
-**2. Canonical branch.** `feature/bio-context-beta` on
+**2. Canonical branch.** `feature/bio-context-beta` (frozen beta) on
 `git@github.com:nikhilesh-s/hive.git`, in sync with origin. `main` predates the
 beta and must not be treated as current or merged into. Tip: run `git log -1`;
 the last four commits of this pass are `beaec0f` (RLS hardening), `393ffa6`
@@ -105,6 +105,31 @@ credentials → run the unseen-paper extraction evaluation.
 "Release freeze" below). On presentation day run the 6-step checklist in
 `research/UCSF_BETA_READINESS.md` §J. After UCSF, the first task is Nik's
 decision on the deferred corpus corrections QA-1…QA-5 (reviewed reseed).
+
+### EXPERIMENTAL track (2026-09-05) — branch `experimental/demo-day`
+
+The frozen beta above is unchanged. A parallel, clearly labelled track for
+UCSF demo day lives on `experimental/demo-day` (stack of
+`experimental/valency-live-ingest` → `experimental/paper-qa` →
+`experimental/densitometry`; `main` and `feature/bio-context-beta` untouched).
+Full design, demo flow, experiment plan and Nik's checklist:
+`research/DEMO_DAY_ARCHITECTURE.md`.
+
+| Piece | What it does | Where |
+|---|---|---|
+| Live DOI ingestion | DOI → open-access PDF (Europe PMC / Unpaywall) → the existing pipeline → rows in a SEPARATE `western_blot_records_live` tier (`review_tier='live_unreviewed'`), crops as bytes; background job with a stepper | `api/app/experimental/ingest.py`, `western_blot_miner/fulltext.py`, `migrations/005_experimental_live_tables.sql` (new `hive_ingest` role, RLS on), `/experimental/live` |
+| Paper discovery | Valency Bond MCP (bearer token, tool schema read at runtime) + PubMed Central OA search fallback | `api/app/valency.py`, `POST /experimental/papers/search` |
+| Grounded paper QA | biological terms from the question → same parser/guard → numbered evidence blocks → Claude answers only from them, citations validated; retrieval-only without a key | `api/app/experimental/ask.py`, `/experimental/ask` |
+| Densitometry | `POST /experimental-densitometry`: background-subtracted relative lane intensity on a crop/upload, region box, disclaimer, never stored | `western_blot_miner/densitometry.py`, `/experimental/densitometry` |
+
+State: scaffolded, tested (api 149 passed + RLS matrix 10 incl. live tier,
+densitometry 20/20 synthetic checks, tsc/lint clean), verified in the local
+browser. **Not deployed.** Needs from Nik, in order: `ANTHROPIC_API_KEY`
+(+ `WBM_LLM_BACKEND=anthropic`), `VALENCY_API_TOKEN`, migration 005 pushed +
+`hive_ingest` password + `DB_INGEST_URL`, a second Render service from
+`api/Dockerfile.experimental`, a Vercel preview of the branch. Experiment
+D1 ran (59.7% naive agreement, sanity only); L1 (live vs reviewed
+self-consistency) runs once a model key exists.
 
 ### Release freeze — final hosted verification (2026-09-02 ~06:00 UTC)
 
