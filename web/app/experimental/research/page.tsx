@@ -119,7 +119,7 @@ export default function ResearchPage() {
   async function loadRows(doi: string) {
     setRowsLoading(true);
     try {
-      const r = await post('/api/experimental/search', { query: doi });
+      const r = await post('/api/experimental/search', { query: doi, limit: 500 });
       const d = r.ok ? await r.json() : { results: [] };
       setRows(d.results || []);
     } finally {
