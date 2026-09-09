@@ -16,7 +16,7 @@ value + status + source + verbatim wording), for wet-lab researchers who need
 to locate and compare blot evidence (antibody/target/context already
 published?). Beta target: UCSF wet-lab researchers.
 
-**2. Canonical branch.** `feature/bio-context-beta` (frozen beta) on
+**2. Canonical branch.** `feature/bio-context-beta` (frozen beta; the UCSF demo runs from `experimental/ucsf-demo-2026-09-09`, see below) on
 `git@github.com:nikhilesh-s/hive.git`, in sync with origin. `main` predates the
 beta and must not be treated as current or merged into. Tip: run `git log -1`;
 the last four commits of this pass are `beaec0f` (RLS hardening), `393ffa6`
@@ -105,6 +105,71 @@ credentials → run the unseen-paper extraction evaluation.
 "Release freeze" below). On presentation day run the 6-step checklist in
 `research/UCSF_BETA_READINESS.md` §J. After UCSF, the first task is Nik's
 decision on the deferred corpus corrections QA-1…QA-5 (reviewed reseed).
+
+### UCSF demo track (2026-09-09) — branch `experimental/ucsf-demo-2026-09-09` — THE DEMO BRANCH
+
+Created from `experimental/demo-day` @ `439300a`. `feature/bio-context-beta`
+(frozen, hosted), `experimental/demo-day` and `main` are untouched. Exact
+demo path and fallback path: **`research/UCSF_DEMO_2026-09-09.md`**.
+Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
+
+**What works today (rehearsed locally, 2026-09-09):**
+- **Unified research page** `/experimental/research`: topic → papers with
+  discovery source (PubMed Central; Valency first once the token exists) and
+  an open-access-PDF chip → choose → extract live or **open an already-
+  extracted paper** → stepper → `LIVE · UNREVIEWED` cards with read-only
+  evidence panels (crop, sources, statuses, lanes) → question scoped to the
+  paper → cited answer over numbered evidence; model failure degrades to the
+  numbered evidence. Older pages (`/experimental/live`, `/ask`,
+  `/densitometry`) stay as diagnostics.
+- **Model backend `WBM_LLM_BACKEND=claude_cli`**: the authenticated local
+  Claude Code install via `claude -p` (JSON envelope, custom system prompt,
+  no tools for text; images written to a private temp dir with only Read
+  allowed; never `--bare`). Proven on real calls: text 6 s; the image path
+  read the reviewed STAT3 crop correctly. Extraction and paper QA share one
+  provider abstraction (`llm_client.complete_text`, `backend_status`).
+  `OPENAI_KEY` is optional; the OpenAI generator is lazy.
+- **Open-access acquisition** fixed: Europe PMC's own PDF render (retry /
+  backoff) → listed URL → legacy → Unpaywall (real `UNPAYWALL_EMAIL` only).
+  Discovery annotates `oa_pdf`; the UI refuses papers without a PDF.
+- **Parallel extraction** (`WBM_CONCURRENCY`, default 1; demo 4).
+- **Live loader** stores real JSONB, needs no UPDATE privilege; `reuse:true`
+  re-loads a finished run without a model call.
+- **Pre-warmed live tier (local DB):** `10.1111/1759-7714.13925` (PMC8088950,
+  31 candidate panels → 97 experiments / 334 lane rows) and
+  `10.1186/s12931-015-0285-4` (PMC4640373, 5 panels → 17 / 143, extracted in
+  ~1m50s with concurrency 4). Paper QA scoped to the second paper answered
+  with citations [E1]–[E12], all live-tier, and correctly said no phospho
+  claim exists in it.
+- **Experimental CI** `.github/workflows/experimental-ci.yml`: push/PR gates
+  (api + miner tests, RLS matrix on a Postgres service, tsc/lint/build,
+  hygiene) with no credentials; manual `workflow_dispatch` live Valency smoke
+  reads the `VALENCY_API_TOKEN` secret and skips cleanly when absent.
+- **`scripts/demo_check.py`** — PASS/WARN/FAIL pre-demo check (branch,
+  claude executable + real inference, env names, API, model backend, live
+  tier, discovery, reviewed retrieval, pre-warmed papers, QA, web).
+
+**Tests today (2026-09-09):** api **160 passed, 11 skipped** (the skips are
+the DB matrix, which ran separately: **11 passed** incl. live tier + loader
+JSONB check); biology 165, reconcile 21/21, loader enrichment ok, extract
+10/10, pipeline wiring **13/13** (parallel mode covered), stable-row-key
+34/34, densitometry 20/20, benchmark 34/34 (seed self-consistency only);
+`tsc` clean, lint 0/0, `next build` clean, `git diff --check` clean.
+`scripts/demo_check.py`: 18 PASS · 2 WARN (Valency token absent; the
+optional pre-warm warning cleared once papers loaded) · 0 FAIL.
+
+**Blocked / not done:**
+- `VALENCY_API_TOKEN` is not on this machine (no env file has it), so the
+  real Valency contract smoke could not run. `scripts/experiments/
+  valency_smoke.py` is ready (initialize, tools/list with schemas, query,
+  normalization, DOI→PMCID check, invalid-token check, PMC fallback); the
+  argument mapper reads the live schema. Discovery works via PMC meanwhile.
+- L1 self-consistency (`research/experiments/L1_live_ingest_eval.md`, claude_cli/
+  sonnet, 183 s, 9 panels → 20 records = the reviewed count): on matched lanes
+  protein identity 1.0, cell line 1.0, modification 0.83, experiment type 0.83,
+  antibody catalog 0.83, band state 0.86; lane-label matching is imperfect
+  (29 lanes matched). Not an accuracy claim; do not quote as one.
+- Nothing experimental is hosted; the demo runs on this laptop.
 
 ### EXPERIMENTAL track (2026-09-05) — branch `experimental/demo-day`
 
