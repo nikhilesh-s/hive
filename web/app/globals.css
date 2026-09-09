@@ -1661,3 +1661,8 @@ body {
 .hb-dens-table th { color: var(--text-subtle); font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.4px; padding: 6px 8px; text-align: left; text-transform: uppercase; }
 .hb-dens-table td { border-top: 1px solid var(--border); color: var(--text-primary); padding: 6px 8px; }
 .hb-dens-bar { background: var(--accent); border-radius: 2px; height: 10px; }
+
+/* EXPERIMENTAL: research page --------------------------------------------- */
+.hb-live-papers li.is-selected { background: var(--accent-faint); border-radius: 6px; padding-left: 10px; padding-right: 10px; }
+.hb-research-prewarmed { margin-top: 18px; }
+.hb-research-prewarmed summary { color: var(--accent); cursor: pointer; font-family: var(--font-sans), sans-serif; font-size: 13px; font-weight: 600; }

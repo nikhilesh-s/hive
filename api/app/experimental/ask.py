@@ -19,6 +19,9 @@ import os
 import re
 from typing import Callable
 
+import sys
+from pathlib import Path as _Path
+
 from ..bio_query import generate_bio_sql
 from ..config import settings
 from ..db import run_readonly_query
@@ -27,7 +30,10 @@ from ..sql_guard import guard_and_limit_sql
 
 logger = logging.getLogger("hive.experimental.ask")
 
-MODEL = os.environ.get("HIVEBLOT_QA_MODEL", "claude-opus-5")
+_REPO = _Path(__file__).resolve().parents[3]
+if str(_REPO) not in sys.path:  # western_blot_miner (provider plumbing) lives at the repo root
+    sys.path.insert(0, str(_REPO))
+
 MAX_EXPERIMENTS = 12
 _CITE_RE = re.compile(r"\[E(\d+)\]")
 
@@ -154,26 +160,17 @@ async def retrieve(question: str, doi: str | None, include_live: bool) -> list[d
 
 
 def _default_llm(system: str, user: str) -> tuple[str, str]:
-    """Claude via the official SDK. Returns (text, model). Refusals raise."""
-    import anthropic  # lazy: only needed when a key exists
+    """The configured provider (WBM_LLM_BACKEND: claude_cli | anthropic |
+    bedrock | openai), same plumbing as extraction. Returns (text, model)."""
+    from western_blot_miner import llm_client
 
-    client = anthropic.Anthropic()
-    try:  # server-side refusal fallback (routes by refusal category); SDKs without it fall through
-        resp = client.beta.messages.create(
-            model=MODEL, max_tokens=1200, system=system,
-            messages=[{"role": "user", "content": user}],
-            betas=["server-side-fallback-2026-07-01"], fallbacks="default")
-    except TypeError:
-        resp = client.messages.create(model=MODEL, max_tokens=1200, system=system,
-                                      messages=[{"role": "user", "content": user}])
-    if getattr(resp, "stop_reason", None) == "refusal":
-        raise RuntimeError("model declined to answer this question")
-    text = "".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", "") == "text")
-    return text.strip(), getattr(resp, "model", MODEL)
+    return llm_client.get_client().complete_text(system, user, max_tokens=1200)
 
 
 def llm_ready() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
+    from western_blot_miner import llm_client
+
+    return llm_client.backend_status()[0]
 
 
 async def answer(question: str, doi: str | None = None, include_live: bool = True,
@@ -186,7 +183,7 @@ async def answer(question: str, doi: str | None = None, include_live: bool = Tru
         out["note"] = "No matching evidence in the current HiveBlot tiers for this question."
         return out
     if llm is None and not llm_ready():
-        out["note"] = "Retrieval only: no model key configured (ANTHROPIC_API_KEY)."
+        out["note"] = "Retrieval only: no model backend configured (WBM_LLM_BACKEND=claude_cli for a local Claude Code login, or anthropic + ANTHROPIC_API_KEY)."
         return out
     user = "EVIDENCE RECORDS:\n" + "\n".join(f"[{b['ref']}] {b['text']}" for b in blocks) + \
            f"\n\nQUESTION: {question}\n\nAnswer from the records only, citing [E#]."

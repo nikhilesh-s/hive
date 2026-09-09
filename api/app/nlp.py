@@ -1,8 +1,20 @@
-from openai import OpenAI
-
 from .config import settings
 
-_client = OpenAI(api_key=settings.openai_key)
+# Created on first use, never at import: the experimental stack boots without
+# an OpenAI key (search falls back to the deterministic parser), and a
+# request that genuinely needs OpenAI fails here, clearly, not at startup.
+_client = None
+
+
+def _get_client():
+    global _client
+    if _client is None:
+        if not settings.openai_key:
+            raise RuntimeError("OPENAI_KEY is not configured; the NL->SQL generator is unavailable")
+        from openai import OpenAI  # lazy
+
+        _client = OpenAI(api_key=settings.openai_key)
+    return _client
 
 SQL_PROMPT = f"""
 You are an expert PostgreSQL query generator.
@@ -44,7 +56,7 @@ User Question:
 
 
 def generate_sql(question: str) -> str:
-    response = _client.chat.completions.create(
+    response = _get_client().chat.completions.create(
         model=settings.openai_model,
         messages=[
             {"role": "system", "content": SQL_PROMPT},

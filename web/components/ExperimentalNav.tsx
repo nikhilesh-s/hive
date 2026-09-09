@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const TABS: [string, string][] = [
+  ['/experimental/research', 'Research'],
   ['/experimental/live', 'Live extraction'],
   ['/experimental/ask', 'Ask the evidence'],
   ['/experimental/densitometry', 'Densitometry'],

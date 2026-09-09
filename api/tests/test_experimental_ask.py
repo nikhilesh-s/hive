@@ -86,8 +86,9 @@ def test_answer_without_model_returns_evidence_only(monkeypatch):
     monkeypatch.setattr(ask, "run_readonly_query", fake_query)
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("WBM_LLM_BACKEND", raising=False)
     out = _run(ask.answer("Is ERK phosphorylated after IL-6?", include_live=False))
-    assert out["answer"] is None and "no model key" in out["note"]
+    assert out["answer"] is None and "no model backend" in out["note"]
     assert [b["ref"] for b in out["evidence"]] == ["E1", "E2"]
 
 

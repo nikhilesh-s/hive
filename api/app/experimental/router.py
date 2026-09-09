@@ -17,6 +17,7 @@ from ..db import (
     fetch_live_crop,
     fetch_live_record,
     list_ingest_jobs,
+    list_live_papers,
 )
 from ..limiter import limiter
 from ..record_detail import build_record_detail
@@ -125,6 +126,16 @@ async def ingest_list():
         except Exception:
             pass
     return {"jobs": sorted(mem, key=lambda j: j["created_at"], reverse=True)[:20]}
+
+
+@router.get("/live/papers")
+async def live_papers():
+    """Papers already in the live tier (DOI, counts), newest first."""
+    try:
+        return {"papers": await list_live_papers()}
+    except Exception as e:
+        logger.warning("live papers listing failed: %s", e)
+        return {"papers": [], "error": "live tier unavailable"}
 
 
 @router.get("/ingest/{job_id}")

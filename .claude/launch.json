@@ -38,6 +38,15 @@
         "cd api && INTERNAL_API_KEY=$(grep '^INTERNAL_API_KEY' .env.cloud | cut -d= -f2-) ../.venv/bin/python -m uvicorn app.main:app --port 8010"
       ],
       "port": 8010
+    },
+    {
+      "name": "hiveblot-api-demo",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd api && WBM_LLM_BACKEND=claude_cli WBM_MODEL=${WBM_MODEL:-sonnet} INTERNAL_API_KEY=$(grep '^INTERNAL_API_KEY' .env.cloud | cut -d= -f2-) ../.venv/bin/python -m uvicorn app.main:app --port 8010"
+      ],
+      "port": 8010
     }
   ]
 }
