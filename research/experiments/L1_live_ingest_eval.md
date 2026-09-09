@@ -4,4 +4,4 @@ Same DOIs, same pipeline the demo runs, compared lane-by-lane with the human-rev
 
 | DOI | PMCID | candidates | records | seconds | matched lanes | only live | only reviewed | canonical_target | modification_label | experiment_type | cell_line | antibody_catalog_number | band_state |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 10.3892/br.2026.2108 | None | None | None | None | None | None | None | None | None | None | None | None | None |
+| 10.3892/br.2026.2108 | PMC12856536 | 9 | 20 | 183.5 | 29 | 35 | 64 | 1.0 | 0.828 | 0.828 | 0.0 | 0.655 | 0.862 |

@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 ID_CONVERTER = "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/"
 EUROPEPMC_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+EUROPEPMC_RENDER = "https://europepmc.org/articles/{pmcid}?pdf=render"  # Europe PMC's own PDF render
 EUROPEPMC_PDF = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextPDF"  # legacy; often 404 now
 UNPAYWALL = "https://api.unpaywall.org/v2/{doi}"
 DEFAULT_TIMEOUT = 60
@@ -79,8 +80,10 @@ def _download(url: str, dest: Path, timeout: int = DEFAULT_TIMEOUT, params: dict
             return str(dest.resolve())
         transient = resp.status_code in (429, 500, 502, 503, 504, 520) or b"Rate limit" in body[:200]
         if not transient:
-            return None
-        time.sleep(2 * (attempt + 1))
+            return None  # e.g. a publisher's HTML bot check: not a PDF, not retryable
+        retry_after = resp.headers.get("Retry-After")
+        wait = float(retry_after) if retry_after and retry_after.isdigit() else (5, 15, 30)[min(attempt, 2)]
+        time.sleep(wait)
     return None
 
 
@@ -143,22 +146,30 @@ def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> 
     pmcid = ids.get("pmcid")
     result = {"doi": doi, "pmid": ids.get("pmid"), "pmcid": pmcid, "pdf_path": None, "source": None, "tried": []}
     if pmcid:
-        # 1. Europe PMC's listed open-access PDF (the reliable path today)
+        # 1. Europe PMC's own render of the open-access article (works for
+        #    most PMC OA papers; rate-limited, hence the backoff)
+        result["tried"].append("europepmc_render")
+        path = _download(EUROPEPMC_RENDER.format(pmcid=pmcid), out_dir / f"{pmcid}.pdf", timeout)
+        if path:
+            result.update(pdf_path=path, source="europepmc")
+            return result
+        # 2. the PDF URL Europe PMC lists (often the publisher; some publishers
+        #    answer scripts with an HTML bot check, which is rejected as non-PDF)
         info = europepmc_fulltext([pmcid], timeout).get(pmcid) or {}
         if info.get("pdf_url"):
-            result["tried"].append("europepmc_pdf")
+            result["tried"].append("europepmc_listed_pdf")
             path = _download(info["pdf_url"], out_dir / f"{pmcid}.pdf", timeout)
             if path:
-                result.update(pdf_path=path, source="europepmc")
+                result.update(pdf_path=path, source="europepmc_listed")
                 return result
-        # 2. legacy REST PDF endpoint (kept; frequently 404)
+        # 3. legacy REST PDF endpoint (kept; frequently 404)
         result["tried"].append("europepmc_legacy")
         path = _download(EUROPEPMC_PDF.format(pmcid=pmcid), out_dir / f"{pmcid}.pdf", timeout)
         if path:
             result.update(pdf_path=path, source="europepmc")
             return result
     if doi and _has_real_email():
-        # 3. Unpaywall: every open-access location that offers a PDF
+        # 4. Unpaywall: every open-access location that offers a PDF
         result["tried"].append("unpaywall")
         try:
             resp = requests.get(UNPAYWALL.format(doi=doi), params={"email": _email()}, timeout=timeout)
@@ -225,6 +236,8 @@ def annotate_oa_pdf(papers: list[dict], timeout: int = DEFAULT_TIMEOUT) -> list[
     info = europepmc_fulltext([p["pmcid"] for p in papers if p.get("pmcid")], timeout)
     for p in papers:
         i = info.get(p.get("pmcid") or "") or {}
-        p["oa_pdf"] = bool(i.get("pdf_url"))
+        # Europe PMC marks the article open access => its own render is
+        # normally downloadable (publisher links may still bot-check scripts).
         p["is_oa"] = bool(i.get("is_oa"))
+        p["oa_pdf"] = bool(i.get("is_oa") or i.get("pdf_url"))
     return papers
