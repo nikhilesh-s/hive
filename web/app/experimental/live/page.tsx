@@ -105,7 +105,7 @@ export default function LivePage() {
 
   async function loadLive(q: string) {
     setLiveQuery(q);
-    const r = await fetch('/api/experimental/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q }) });
+    const r = await fetch('/api/experimental/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q, limit: 500 }) });
     if (!r.ok) return;
     const d = await r.json();
     setRows(d.results || []);

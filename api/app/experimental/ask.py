@@ -151,6 +151,16 @@ async def retrieve(question: str, doi: str | None, include_live: bool) -> list[d
                 break
             if rows:
                 break
+        if doi and not rows:
+            # Paper-scoped question whose terms match nothing in this paper
+            # (e.g. it asks about phosphorylation and the paper has none):
+            # fall back to the paper's own rows so the answer can say so
+            # from evidence instead of returning nothing.
+            try:
+                rows = await _rows_for(doi, table)
+            except Exception as e:
+                logger.warning("doi fallback on %s failed: %s", table, e)
+                rows = []
         if doi:
             rows = [r for r in rows if (r.get("doi") or "").lower() == doi.lower()]
         blocks += evidence_blocks(rows, tier)

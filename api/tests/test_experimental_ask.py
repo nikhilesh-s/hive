@@ -80,6 +80,18 @@ def test_retrieve_pins_tables_and_filters_doi(monkeypatch):
     assert all(b["tier"] == "reviewed" for b in blocks) and len(blocks) == 2
 
 
+def test_retrieve_falls_back_to_the_papers_rows_when_terms_miss(monkeypatch):
+    seen = []
+
+    async def fake_query(sql):
+        seen.append(sql)
+        return [] if "phospho" in sql else [ROWS[2]]      # the paper has no phospho rows
+    monkeypatch.setattr(ask, "run_readonly_query", fake_query)
+    blocks = _run(ask.retrieve("Is any phosphorylation claim unresolved?", "10.1186/other", include_live=False))
+    assert [b["doi"] for b in blocks] == ["10.1186/other"]
+    assert any("phospho" in s for s in seen) and any("10.1186/other" in s and "phospho" not in s for s in seen)
+
+
 def test_answer_without_model_returns_evidence_only(monkeypatch):
     async def fake_query(sql):
         return ROWS
