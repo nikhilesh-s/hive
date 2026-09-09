@@ -148,6 +148,19 @@ Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
 - **`scripts/demo_check.py`** — PASS/WARN/FAIL pre-demo check (branch,
   claude executable + real inference, env names, API, model backend, live
   tier, discovery, reviewed retrieval, pre-warmed papers, QA, web).
+- **Cold-open video (gitignored, local only):** `brag-output-2026-09-09-133715/
+  brag.mp4` (40 s, 1920x1080, ~3 MB, poster baked as frame 0; `brag.jpg`,
+  `share-copy.txt`, plan/brief and the Hyperframes composition sit beside
+  it; `brag-output*/` is in `.gitignore`). Six scenes: hook, wordmark +
+  "Experiment-level evidence, searchable.", the reviewed STAT3 Tyr705 card,
+  the MAPK1/MAPK3 Conflicting card, the research flow ending in a
+  `LIVE · UNREVIEWED` Beclin-1 card (values checked against the live rows
+  for PMC4640373: modification unresolved, conditions hypoxia / LC3B siRNA /
+  cisplatin) and a cited answer, then "Let's read one now." No accuracy
+  numbers, no densitometry. Play it, then switch to `/experimental/research`.
+  Regenerate: `cd brag-output-2026-09-09-133715/composition && npx -y
+  hyperframes@0.8.33 check && npx -y hyperframes@0.8.33 render --quality
+  high --output ../brag.mp4` (check passed 0 errors, contrast 21/21).
 
 **Tests today (2026-09-09):** api **160 passed, 11 skipped** (the skips are
 the DB matrix, which ran separately: **11 passed** incl. live tier + loader
