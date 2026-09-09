@@ -33,3 +33,6 @@ research/papers/*.pdf
 
 # Serena MCP local state
 .serena/
+
+# brag video renders (large, generated)
+brag-output*/
