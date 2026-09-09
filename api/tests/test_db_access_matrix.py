@@ -219,6 +219,31 @@ def test_live_tier_matrix(conn):
     assert len(rows) == 3 and all(r["relrowsecurity"] for r in rows)
 
 
+def test_live_loader_stores_real_jsonb(conn, monkeypatch):
+    """replace_live_rows through the API's ingest pool (json codec) must store
+    JSONB arrays/objects, not JSON strings (the double-encoding regression)."""
+    from app import db as appdb
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "db_ingest_url", DB_URL)
+    monkeypatch.setattr(settings, "live_table_name", "western_blot_records_live")
+    appdb._ingest_pool = None
+    rows = [{"paper_id": "10.1000/live", "doi": "10.1000/live", "target": "LC3B", "stable_row_key": "h:1",
+             "experiment_flags": ["standard_western"], "provenance": {"target": {"raw_target_name": "LC3B"}},
+             "image_crop_ref": "c.png", "job_id": "jsonjob", "review_tier": "live_unreviewed"}]
+    n = run(conn, appdb.replace_live_rows("10.1000/live", "jsonjob", rows, {"c.png": b"\x89PNG"},
+                                          {"experiment_flags", "provenance"}))
+    assert n == 1
+    got = run(conn, conn.fetchrow(
+        "SELECT jsonb_typeof(experiment_flags) f, jsonb_typeof(provenance) p FROM western_blot_records_live WHERE job_id='jsonjob'"))
+    assert (got["f"], got["p"]) == ("array", "object")
+    assert run(conn, conn.fetchval("SELECT count(*) FROM ingest_crops WHERE job_id='jsonjob'")) == 1
+    # re-load the same DOI replaces rows and crops without needing UPDATE
+    n = run(conn, appdb.replace_live_rows("10.1000/live", "jsonjob", rows, {"c.png": b"\x89PNG2"}, {"experiment_flags", "provenance"}))
+    assert n == 1 and run(conn, conn.fetchval("SELECT count(*) FROM western_blot_records_live WHERE doi='10.1000/live'")) == 1
+    run(conn, appdb.close_ingest_pool())
+
+
 def test_hive_roles_are_not_privileged(conn):
     rows = run(conn, conn.fetch(
         "SELECT rolname, rolsuper, rolbypassrls, rolcreaterole, rolcreatedb "

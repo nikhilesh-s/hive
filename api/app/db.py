@@ -147,6 +147,13 @@ async def get_ingest_pool() -> asyncpg.Pool:
     return _ingest_pool
 
 
+async def close_ingest_pool() -> None:
+    global _ingest_pool
+    if _ingest_pool is not None:
+        await _ingest_pool.close()
+        _ingest_pool = None
+
+
 async def count_live_rows() -> int:
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
@@ -211,9 +218,9 @@ async def upsert_ingest_job(job: dict) -> None:
 async def replace_live_rows(doi: str, job_id: str, rows: list[dict],
                             crops: dict[str, bytes], jsonb_cols: set[str]) -> int:
     """Delete this DOI's previous live rows/crops, insert the new ones (one
-    transaction). Unknown keys are dropped against the live table's columns."""
-    import json
-
+    transaction). Unknown keys are dropped against the live table's columns.
+    JSONB values are passed as Python objects: the pool's json codec encodes
+    them exactly once (a manual json.dumps here would store a JSON *string*)."""
     pool = await get_ingest_pool()
     table = settings.live_table_name
     async with pool.acquire() as conn:
@@ -239,12 +246,8 @@ async def replace_live_rows(doi: str, job_id: str, rows: list[dict],
                 vals, casts = [], []
                 for i, k in enumerate(keys, 1):
                     v = data[k]
-                    if k in jsonb_cols and v is not None:
-                        vals.append(json.dumps(v))
-                        casts.append(f"${i}::jsonb")
-                    else:
-                        vals.append(v)
-                        casts.append(f"${i}")
+                    vals.append(v)
+                    casts.append(f"${i}::jsonb" if k in jsonb_cols and v is not None else f"${i}")
                 await conn.execute(
                     f"INSERT INTO {table} ({', '.join(keys)}) VALUES ({', '.join(casts)})", *vals)
                 n += 1
