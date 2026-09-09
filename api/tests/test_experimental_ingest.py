@@ -236,6 +236,25 @@ def test_job_runs_the_pipeline_and_loads_live_rows(monkeypatch, tmp_path):
         assert r["review_tier"] == "live_unreviewed" and r["job_id"] == job.job_id and r["doi"] == "10.1000/abc"
 
 
+def test_job_reuse_loads_previous_run_without_model(monkeypatch, tmp_path):
+    monkeypatch.delenv("WBM_LLM_BACKEND", raising=False)
+    monkeypatch.setattr(ingest, "run_dir_for", lambda doi: tmp_path)
+    (tmp_path / "supabase_rows.json").write_text(json.dumps([
+        {"paper_id": "10.1000/abc", "target": "LC3B", "stable_row_key": "h1:1", "image_crop_ref": "x.png"},
+        {"paper_id": "10.1000/abc", "target": "LC3B", "stable_row_key": "h1:2", "image_crop_ref": "x.png"}]))
+    captured = {}
+
+    async def fake_replace(doi, job_id, rows, crops, jsonb_cols):
+        captured.update(rows=rows)
+        return len(rows)
+    monkeypatch.setattr(ingest.db, "replace_live_rows", fake_replace)
+    monkeypatch.setattr(settings, "db_ingest_url", "postgresql://hive_ingest:x@localhost/x")
+    job = ingest.start_job("10.1000/abc", reuse=True)
+    _run(ingest.run_job(job.job_id))
+    assert job.status == "done" and job.backend == "reuse" and job.rows == 2 and job.records == 1
+    assert all(r["review_tier"] == "live_unreviewed" for r in captured["rows"])
+
+
 # --- routes -----------------------------------------------------------------
 
 @pytest.fixture

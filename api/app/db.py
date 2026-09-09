@@ -226,10 +226,12 @@ async def replace_live_rows(doi: str, job_id: str, rows: list[dict],
             for oj in old_jobs:
                 if oj and oj != job_id:
                     await conn.execute("DELETE FROM ingest_crops WHERE job_id = $1", oj)
+            # hive_ingest has INSERT/DELETE but deliberately no UPDATE, so no
+            # ON CONFLICT DO UPDATE: clear this job's crops, then insert.
+            await conn.execute("DELETE FROM ingest_crops WHERE job_id = $1", job_id)
             for name, png in crops.items():
                 await conn.execute(
-                    "INSERT INTO ingest_crops (job_id, filename, png) VALUES ($1, $2, $3) "
-                    "ON CONFLICT (job_id, filename) DO UPDATE SET png = EXCLUDED.png", job_id, name, png)
+                    "INSERT INTO ingest_crops (job_id, filename, png) VALUES ($1, $2, $3)", job_id, name, png)
             n = 0
             for row in rows:
                 data = {k: v for k, v in row.items() if k in cols and k != "id"}

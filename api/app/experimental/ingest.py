@@ -58,6 +58,7 @@ class Job:
     rows: int | None = None
     backend: str | None = None
     error: str | None = None
+    reuse: bool = False       # load a previous run's rows without re-extracting
     created_at: str = field(default_factory=_now)
     updated_at: str = field(default_factory=_now)
 
@@ -74,11 +75,18 @@ def backend_ready() -> tuple[bool, str]:
     return llm_client.backend_status()
 
 
-def start_job(doi: str) -> Job:
+def run_dir_for(doi: str) -> Path:
+    """Where pdf_preprocess writes this DOI's run (mirrors _safe_path_segment)."""
+    import re
+
+    return REPO / "western_blot_miner" / "data" / "pdf_runs" / re.sub(r"[^A-Za-z0-9._-]+", "_", doi)
+
+
+def start_job(doi: str, reuse: bool = False) -> Job:
     doi = fulltext.normalize_doi(doi)
     if not doi:
         raise ValueError("not a DOI")
-    job = Job(job_id=uuid.uuid4().hex[:12], doi=doi)
+    job = Job(job_id=uuid.uuid4().hex[:12], doi=doi, reuse=reuse)
     JOBS[job.job_id] = job
     return job
 
@@ -103,6 +111,16 @@ async def run_job(job_id: str) -> Job:
     job = JOBS[job_id]
     loop = asyncio.get_running_loop()
     try:
+        prior = run_dir_for(job.doi) / "supabase_rows.json"
+        if job.reuse and prior.exists():
+            # Re-load an already-extracted run (demo resilience: no model call).
+            rows = json.loads(prior.read_text(encoding="utf-8"))
+            await _set(job, backend="reuse", candidates=None, rows=len(rows),
+                       records=len({str(r.get("stable_row_key", "")).split(":")[0] for r in rows}),
+                       status="loading", message="Loading the previous extraction of this paper (no model call)…")
+            await load_rows(job, rows, prior.parent)
+            await _set(job, status="done", message=f"{job.records} experiment record(s), {len(rows)} lane row(s) re-loaded. Unreviewed.")
+            return job
         ok, why = backend_ready()
         if not ok:
             raise RuntimeError(why)
