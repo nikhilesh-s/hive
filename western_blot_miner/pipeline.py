@@ -162,34 +162,60 @@ def run_records_stage(summary: dict, use_cache: bool = True, client=None, resolv
 
     queried = 0
     failures = 0
+    # WBM_CONCURRENCY > 1 reads several panels at once (each panel is an
+    # independent model call). Default 1 keeps the reviewed pipeline's exact
+    # sequential behaviour; the live demo sets 4. Results are appended to the
+    # jsonl under a lock, so the resumable cache semantics are unchanged.
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    concurrency = max(1, _env_int("WBM_CONCURRENCY", 1))
+    lock = threading.Lock()
+    todo = [(idx, cand) for idx, cand in enumerate(candidates, 1) if cand["candidate_path"] not in done]
+
+    def _one(item):
+        idx, cand = item
+        cpath = cand["candidate_path"]
+        panel_context = _panel_context(summary, cand, contexts.get(cpath, ""))
+        try:
+            image_url = vlm_extract.image_data_url(cpath, max_side=image_max_side)
+        except Exception:
+            image_url = None
+        try:
+            recs = extract_records.extract_panel(
+                panel_context, image_data_url=image_url,
+                client=client, resolver=resolver, escalate_client=escalate_client,
+            )
+        except Exception as exc:  # model/network failure -> record and continue
+            return idx, cpath, None, exc
+        return idx, cpath, recs, None
+
     with records_jsonl.open("a", encoding="utf-8") as handle:
-        for idx, cand in enumerate(candidates, 1):
-            cpath = cand["candidate_path"]
-            if cpath in done:
-                continue
-            queried += 1
-            panel_context = _panel_context(summary, cand, contexts.get(cpath, ""))
-            try:
-                image_url = vlm_extract.image_data_url(cpath, max_side=image_max_side)
-            except Exception:
-                image_url = None
-            try:
-                recs = extract_records.extract_panel(
-                    panel_context, image_data_url=image_url,
-                    client=client, resolver=resolver, escalate_client=escalate_client,
-                )
-            except Exception as exc:  # model/network failure -> record and continue
-                failures += 1
-                handle.write(json.dumps({"candidate_path": cpath, "error": str(exc)}) + "\n")
+        def _write(result):
+            nonlocal queried, failures
+            idx, cpath, recs, exc = result
+            with lock:
+                queried += 1
+                if exc is not None:
+                    failures += 1
+                    handle.write(json.dumps({"candidate_path": cpath, "error": str(exc)}) + "\n")
+                    handle.flush()
+                    print(f"  [{idx}/{len(candidates)}] {cpath}: extraction failed: {exc}", flush=True)
+                    return
+                for rec in recs:
+                    d = rec.model_dump(mode="json")
+                    d["candidate_path"] = cpath
+                    handle.write(json.dumps(d) + "\n")
                 handle.flush()
-                print(f"  [{idx}/{len(candidates)}] {cpath}: extraction failed: {exc}", flush=True)
-                continue
-            for rec in recs:
-                d = rec.model_dump(mode="json")
-                d["candidate_path"] = cpath
-                handle.write(json.dumps(d) + "\n")
-                handle.flush()
-            print(f"  [{idx}/{len(candidates)}] {cpath}: {len(recs)} record(s)", flush=True)
+                print(f"  [{idx}/{len(candidates)}] {cpath}: {len(recs)} record(s)", flush=True)
+
+        if concurrency == 1:
+            for item in todo:
+                _write(_one(item))
+        else:
+            with ThreadPoolExecutor(max_workers=concurrency) as pool:
+                for result in pool.map(_one, todo):
+                    _write(result)
 
     # Rebuild ALL records (cached + new) from the jsonl for the final artifacts.
     all_records = []
