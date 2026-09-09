@@ -148,35 +148,34 @@ Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
 - **`scripts/demo_check.py`** — PASS/WARN/FAIL pre-demo check (branch,
   claude executable + real inference, env names, API, model backend, live
   tier, discovery, reviewed retrieval, pre-warmed papers, QA, web).
-- **Cold-open video (gitignored, local only):** `brag-output-2026-09-09-133715/
-  brag.mp4` (40 s, 1920x1080, ~3 MB, poster baked as frame 0; `brag.jpg`,
-  `share-copy.txt`, plan/brief and the Hyperframes composition sit beside
-  it; `brag-output*/` is in `.gitignore`). Six scenes: hook, wordmark +
-  "Experiment-level evidence, searchable.", the reviewed STAT3 Tyr705 card,
-  the MAPK1/MAPK3 Conflicting card, the research flow ending in a
-  `LIVE · UNREVIEWED` Beclin-1 card (values checked against the live rows
-  for PMC4640373: modification unresolved, conditions hypoxia / LC3B siRNA /
-  cisplatin) and a cited answer, then "Let's read one now." No accuracy
-  numbers, no densitometry. Play it, then switch to `/experimental/research`.
-  Regenerate: `cd brag-output-2026-09-09-133715/composition && npx -y
-  hyperframes@0.8.33 check && npx -y hyperframes@0.8.33 render --quality
-  high --output ../brag.mp4` (check passed 0 errors, contrast 21/21).
-
 **Tests today (2026-09-09):** api **160 passed, 11 skipped** (the skips are
 the DB matrix, which ran separately: **11 passed** incl. live tier + loader
 JSONB check); biology 165, reconcile 21/21, loader enrichment ok, extract
 10/10, pipeline wiring **13/13** (parallel mode covered), stable-row-key
 34/34, densitometry 20/20, benchmark 34/34 (seed self-consistency only);
 `tsc` clean, lint 0/0, `next build` clean, `git diff --check` clean.
-`scripts/demo_check.py`: 18 PASS · 2 WARN (Valency token absent; the
-optional pre-warm warning cleared once papers loaded) · 0 FAIL.
+`scripts/demo_check.py`: 18 PASS · 2 WARN (Valency token absent locally) · 0 FAIL.
 
 **Blocked / not done:**
-- `VALENCY_API_TOKEN` is not on this machine (no env file has it), so the
-  real Valency contract smoke could not run. `scripts/experiments/
-  valency_smoke.py` is ready (initialize, tools/list with schemas, query,
-  normalization, DOI→PMCID check, invalid-token check, PMC fallback); the
-  argument mapper reads the live schema. Discovery works via PMC meanwhile.
+- **Valency contract verified live (2026-09-09, GitHub Actions run
+  34413782117, manual `run_live_valency=true`, secret `VALENCY_API_TOKEN`
+  set on the repo):** initialize → `valency-research-mcp 0.3.79`;
+  tools/list → 38 tools; `semantic_search_papers` takes `query` (required)
+  and `limit`, so `_arg_names` needed no change; the STAT3/IL-6/HCC query
+  returned 8 normalized results, 7 with DOIs, 4 resolving to a PMCID;
+  an invalid token is rejected with HTTP 401; PMC search answers
+  independently (3 hits) and locally without a token
+  (`valency_smoke.py` exits 2 with 5 PMC hits). Known gap: `year` is
+  `None` for every Valency result (normalizer does not find the year
+  field in the live shape) — cosmetic for discovery, not fixed. The token
+  is still not on this laptop, so local discovery uses PMC.
+- The `hygiene` job of `experimental-ci.yml` fails on every run of this
+  branch (push and dispatch alike): its credential-shape grep matches the
+  dummy localhost DSNs in `api/conftest.py:17` and
+  `api/tests/test_experimental_ingest.py` (`postgresql://hive_ingest:x@
+  localhost/x`). Not credentials. Fix is one workflow line (`| grep -v
+  '@localhost'` before the `||`) or drop the fake passwords from the
+  fixtures; left untouched on purpose.
 - L1 self-consistency (`research/experiments/L1_live_ingest_eval.md`, claude_cli/
   sonnet, 183 s, 9 panels → 20 records = the reviewed count): on matched lanes
   protein identity 1.0, cell line 1.0, modification 0.83, experiment type 0.83,
