@@ -48,6 +48,7 @@ class AskRequest(BaseModel):
 class IngestRequest(BaseModel):
     doi: str = Field(min_length=6, max_length=200)
     force: bool = False
+    reuse: bool = False   # load this DOI's previous extraction run without calling the model
 
 
 @router.get("/status")
@@ -110,10 +111,11 @@ async def papers_search(body: PaperSearchRequest):
 @limiter.limit("6/minute")
 async def ingest_start(request: Request, body: IngestRequest, background: BackgroundTasks):
     ok, why = ingest.backend_ready()
-    if not ok:
+    has_prior = (ingest.run_dir_for(ingest.fulltext.normalize_doi(body.doi)) / "supabase_rows.json").exists()
+    if not ok and not (body.reuse and has_prior):
         raise HTTPException(503, why)
     try:
-        job = ingest.start_job(body.doi)
+        job = ingest.start_job(body.doi, reuse=body.reuse and has_prior)
     except ValueError:
         raise HTTPException(400, "Not a DOI")
     background.add_task(ingest.run_job, job.job_id)
