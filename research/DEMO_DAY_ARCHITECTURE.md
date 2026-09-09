@@ -1,9 +1,10 @@
 # HiveBlot — demo-day architecture, experiments and plan (EXPERIMENTAL track)
 
-**Status:** scaffolded and tested on branch `experimental/demo-day` (stack of
-`experimental/valency-live-ingest` → `experimental/paper-qa` →
-`experimental/densitometry`). The frozen UCSF beta on
-`feature/bio-context-beta` is untouched. **Written 2026-09-05.**
+**Status:** scaffolded on `experimental/demo-day` (2026-09-05); made to run
+locally end-to-end on `experimental/ucsf-demo-2026-09-09` (2026-09-09: the
+unified `/experimental/research` page, the `claude_cli` model backend, fixed
+open-access PDF acquisition, CI, `scripts/demo_check.py`). The frozen UCSF
+beta on `feature/bio-context-beta` is untouched.
 
 Goal: at UCSF, a researcher names a paper they care about, HiveBlot reads it
 in front of them and returns experiment-level blot evidence they can
@@ -28,7 +29,7 @@ makes the beta credible.
         │           + PubMed Central OA search (NCBI E-utilities) as always-on fallback              │
         │                                                                                            │
         │ EXTRACT   POST /experimental/ingest {doi}  → background job                                │
-        │           DOI → NCBI idconv → Europe PMC PDF (else Unpaywall OA PDF)                        │
+        │           DOI → NCBI idconv → Europe PMC-listed OA PDF (else Unpaywall OA locations)         │
         │           → pdf_preprocess (PyMuPDF render, OpenCV panel candidates)                        │
         │           → run_records_stage (model claims → deterministic biology → Evidence Records)     │
         │           → rows tagged review_tier='live_unreviewed' + crops as bytes                      │
@@ -64,8 +65,10 @@ Design rules that keep the beta honest while adding live ingestion:
   reviewed corpus (`pipeline.run_records_stage`), so every status
   (SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING), provenance envelope and
   validation flag exists on live rows too. Nothing is a lighter "demo mode".
-- **Legal full text only.** Europe PMC and Unpaywall open-access locations.
-  A paywalled DOI fails fast with a clear message; nothing is scraped.
+- **Legal full text only.** The PDF Europe PMC lists for the PMCID, else
+  Unpaywall's open-access locations (only with a real `UNPAYWALL_EMAIL`).
+  Discovery marks `oa_pdf` so the UI offers extraction only where a PDF
+  exists; a paywalled DOI fails fast with a clear message; nothing is scraped.
 - **Same security model.** Every experimental route needs the internal key;
   new tables are RLS'd with explicit per-role policies; `hive_ingest` cannot
   touch the reviewed table or feedback (`test_db_access_matrix.py` covers it).
@@ -84,7 +87,7 @@ Files: `api/app/experimental/{ingest,router,ask,densitometry_router}.py`,
 
 | # | Item | Why | Where it goes |
 |---|---|---|---|
-| 1 | **Model key** `ANTHROPIC_API_KEY` (+ `WBM_LLM_BACKEND=anthropic`, optional `WBM_MODEL`, default `claude-opus-5`) | live extraction and paper QA call a model; without it the job fails fast ("no extraction model configured") and /ask returns retrieval only | experimental API service env |
+| 1 | **Model backend.** LOCAL demo: `WBM_LLM_BACKEND=claude_cli` uses the already-authenticated Claude Code install (no key; proven 2026-09-09 for text and for the image pathway on a real crop). HOSTED: `ANTHROPIC_API_KEY` + `WBM_LLM_BACKEND=anthropic`. Optional `WBM_MODEL`. | live extraction and paper QA call a model; without one the job fails fast and /ask returns retrieval only | local `api/.env` / experimental API service env |
 | 2 | **Valency token** `VALENCY_API_TOKEN` (Settings page in app.valency.io; Srushti) | semantic paper discovery; PMC fallback works without it | experimental API service env |
 | 3 | **Migration 005** on the beta project (`supabase db push`, after `--dry-run` shows only `20260905000006_experimental_live_tables.sql`) + `ALTER ROLE hive_ingest WITH PASSWORD '<generated>'` | live tables + role | Supabase |
 | 4 | `DB_INGEST_URL` (hive_ingest pooler DSN, session mode 5432) | the API's write path for the live tier | experimental API service env |

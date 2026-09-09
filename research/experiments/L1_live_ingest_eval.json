@@ -1,5 +1,529 @@
 {
   "10.3892/br.2026.2108": {
-    "error": "no open-access PDF"
+    "pmcid": "PMC12856536",
+    "candidates": 9,
+    "records": 20,
+    "failures": 0,
+    "seconds": 183.5,
+    "backend": "claude_cli",
+    "model": "sonnet",
+    "comparison": {
+      "live_rows": 113,
+      "reviewed_rows": 113,
+      "matched_lanes": 29,
+      "only_live": 35,
+      "only_reviewed": 64,
+      "per_field": {
+        "canonical_target": {
+          "agree": 29,
+          "total": 29,
+          "agreement": 1.0
+        },
+        "modification_label": {
+          "agree": 24,
+          "total": 29,
+          "agreement": 0.828
+        },
+        "experiment_type": {
+          "agree": 24,
+          "total": 29,
+          "agreement": 0.828
+        },
+        "cell_line": {
+          "agree": 0,
+          "total": 29,
+          "agreement": 0.0
+        },
+        "antibody_catalog_number": {
+          "agree": 19,
+          "total": 29,
+          "agreement": 0.655
+        },
+        "band_state": {
+          "agree": 25,
+          "total": 29,
+          "agreement": 0.862
+        }
+      },
+      "mismatches": [
+        {
+          "key": [
+            "actin",
+            "0min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "0min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4967"
+        },
+        {
+          "key": [
+            "actin",
+            "10min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "10min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4967"
+        },
+        {
+          "key": [
+            "actin",
+            "20min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "30min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "30min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4967"
+        },
+        {
+          "key": [
+            "actin",
+            "5min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "5min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4967"
+        },
+        {
+          "key": [
+            "actin",
+            "60min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "actin",
+            "60min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4967"
+        },
+        {
+          "key": [
+            "perk12",
+            "0min"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "0min"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "0min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "perk12",
+            "0min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "0min"
+          ],
+          "field": "band_state",
+          "live": "present",
+          "reviewed": "uncertain"
+        },
+        {
+          "key": [
+            "perk12",
+            "10min"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "10min"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "10min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "perk12",
+            "10min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "30min"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "30min"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "30min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "perk12",
+            "30min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "5min"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "5min"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "5min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "perk12",
+            "5min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "60min"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "60min"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "60min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "perk12",
+            "60min"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "0min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "0min"
+          ],
+          "field": "band_state",
+          "live": "absent",
+          "reviewed": "uncertain"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "10min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "10min"
+          ],
+          "field": "band_state",
+          "live": "uncertain",
+          "reviewed": "present"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "20min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "30min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "5min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "5min"
+          ],
+          "field": "band_state",
+          "live": "uncertain",
+          "reviewed": "present"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "60min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "0min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "10min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "20min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "30min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "5min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "pstat3tyr705",
+            "60min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "0min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "10min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "20min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "30min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "5min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        },
+        {
+          "key": [
+            "tstat3",
+            "60min"
+          ],
+          "field": "cell_line",
+          "live": "Hep3B cells",
+          "reviewed": "Hep3B"
+        }
+      ]
+    }
   }
 }

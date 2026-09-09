@@ -43,11 +43,22 @@ PDF_DIR = REPO / "western_blot_miner" / "data" / "live_pdfs"
 
 
 def norm(s) -> str:
-    return re.sub(r"[^a-z0-9]+", "", str(s or "").lower())
+    """Case/punctuation-insensitive compare; 'Hep3B cells' == 'Hep3B'."""
+    t = re.sub(r"\bcells?\b", "", str(s or "").lower())
+    return re.sub(r"[^a-z0-9]+", "", t)
 
 
-def key(row: dict) -> tuple[str, str]:
-    return norm(row.get("raw_target_name") or row.get("target")), norm(row.get("lane_condition") or row.get("condition"))
+def lane_key(s) -> str:
+    """Lane labels: '0 min' == '0' == '0min' (unit words dropped, numbers kept)."""
+    t = re.sub(r"\b(min|mins|minutes?|h|hr|hrs|hours?)\b", "", str(s or "").lower())
+    return re.sub(r"[^a-z0-9+\-]+", "", t)
+
+
+def key(row: dict) -> tuple[str, str, str]:
+    """(printed target, lane label, page): page keeps the same label on
+    different figures from colliding."""
+    return (norm(row.get("raw_target_name") or row.get("target")),
+            lane_key(row.get("lane_condition") or row.get("condition")), str(row.get("page") or ""))
 
 
 def compare(live: list[dict], reviewed: list[dict]) -> dict:
@@ -73,7 +84,25 @@ def compare(live: list[dict], reviewed: list[dict]) -> dict:
 
 
 def main(argv: list[str]) -> int:
-    dois = argv or list(REVIEWED)
+    compare_only = "--compare-only" in argv
+    dois = [a for a in argv if not a.startswith("--")] or list(REVIEWED)
+    if compare_only:
+        # Re-score the rows of the LAST run without calling a model.
+        results = {}
+        for doi in dois:
+            run_dir = REPO / "western_blot_miner" / "data" / "pdf_runs" / re.sub(r"[^A-Za-z0-9._-]+", "_", doi)
+            rows_path = run_dir / "supabase_rows.json"
+            if not rows_path.exists() or doi not in REVIEWED:
+                results[doi] = {"error": "no previous run"}
+                continue
+            live_rows = json.loads(rows_path.read_text())
+            reviewed = json.loads((REPO / "eval" / "demo" / REVIEWED[doi] / "supabase_rows.json").read_text())
+            results[doi] = {"comparison": compare(live_rows, reviewed), "records": len({r.get("stable_row_key", "").split(":")[0] for r in live_rows})}
+            print(doi, "per-field agreement:", {f: v["agreement"] for f, v in results[doi]["comparison"]["per_field"].items()},
+                  "matched", results[doi]["comparison"]["matched_lanes"], "only_live", results[doi]["comparison"]["only_live"],
+                  "only_reviewed", results[doi]["comparison"]["only_reviewed"])
+        (OUT / "L1_live_ingest_eval_rescored.json").write_text(json.dumps(results, indent=2, default=str))
+        return 0
     if not os.environ.get("WBM_LLM_BACKEND"):
         print("Set WBM_LLM_BACKEND (and credentials) — this experiment needs a live model.")
         return 2
