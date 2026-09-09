@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     # every endpoint now runs on the scoped Postgres roles below).
     supabase_url: str = ""
     supabase_key: str = ""
-    openai_key: str
+    # Optional: when set, /search uses the legacy OpenAI NL->SQL generator
+    # (still behind sql_guard). Empty => the deterministic bio_query parser.
+    openai_key: str = ""
 
     # Connection string for a Postgres role that only has SELECT on
     # western_blot_records. Used exclusively to execute the LLM-generated

@@ -30,7 +30,7 @@ REPO = Path(__file__).resolve().parents[3]
 if str(REPO) not in sys.path:  # `western_blot_miner` lives at the repo root
     sys.path.insert(0, str(REPO))
 
-from western_blot_miner import fulltext, pdf_preprocess, pipeline  # noqa: E402
+from western_blot_miner import fulltext, llm_client, pdf_preprocess, pipeline  # noqa: E402
 
 from .. import db  # noqa: E402
 
@@ -69,21 +69,9 @@ JOBS: dict[str, Job] = {}
 
 
 def backend_ready() -> tuple[bool, str]:
-    """Is a live model backend configured? (mock counts, for tests/dry runs)"""
-    backend = os.environ.get("WBM_LLM_BACKEND", "").lower()
-    env = os.environ
-    if backend == "anthropic":
-        ok = bool(env.get("ANTHROPIC_API_KEY") or env.get("ANTHROPIC_AUTH_TOKEN"))
-        return ok, "anthropic" if ok else "WBM_LLM_BACKEND=anthropic but no ANTHROPIC_API_KEY"
-    if backend == "bedrock":
-        ok = bool(env.get("AWS_ACCESS_KEY_ID") or env.get("AWS_PROFILE"))
-        return ok, "bedrock" if ok else "WBM_LLM_BACKEND=bedrock but no AWS credentials"
-    if backend in ("openai", "openai_compatible"):
-        ok = bool(env.get("WBM_LLM_API_KEY") or env.get("OPENAI_API_KEY"))
-        return ok, backend if ok else "WBM_LLM_BACKEND=openai but no WBM_LLM_API_KEY"
-    if backend == "mock":
-        return True, "mock"
-    return False, "No extraction model configured (set WBM_LLM_BACKEND + credentials)"
+    """Is a live model backend configured? One source of truth for extraction
+    and paper QA: western_blot_miner.llm_client.backend_status."""
+    return llm_client.backend_status()
 
 
 def start_job(doi: str) -> Job:
