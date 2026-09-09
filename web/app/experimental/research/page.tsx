@@ -16,6 +16,7 @@ import { groupResults, type DatabaseResult } from '@/lib/results';
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
   pmcid?: string | null; year?: string | null; venue?: string | null; url?: string | null; source?: string;
+  oa_pdf?: boolean; is_oa?: boolean;
 }
 interface Job {
   job_id: string; doi: string; status: string; message: string; pmcid?: string | null;
@@ -206,7 +207,7 @@ export default function ResearchPage() {
         <ul className="hb-live-papers">
           {papers.map((p, i) => {
             const have = ingested(p.doi);
-            const oa = !!p.pmcid;
+            const oa = !!p.oa_pdf;                      // Europe PMC lists a downloadable open-access PDF
             return (
               <li key={`${p.doi || p.title}-${i}`} className={selected?.doi && selected.doi === p.doi ? 'is-selected' : ''}>
                 <div className="hb-live-paper-title">{p.title || 'Untitled'}</div>
@@ -215,13 +216,18 @@ export default function ResearchPage() {
                   {p.year ? ` · ${p.year}` : ''}{p.venue ? ` · ${p.venue}` : ''}
                   {p.doi ? <> · <a href={`https://doi.org/${p.doi}`} target="_blank" rel="noreferrer">{p.doi}</a></> : ' · no DOI'}
                   <span className="hb-result-chip" style={{ marginLeft: 8 }}>{(p.source || '').startsWith('valency') ? 'Valency' : 'PMC'}</span>
-                  {oa && <span className="hb-result-chip" style={{ marginLeft: 6, color: 'var(--accent)' }}>open access · {p.pmcid}</span>}
+                  {oa ? (
+                    <span className="hb-result-chip" style={{ marginLeft: 6, color: 'var(--accent)' }}>open-access PDF · {p.pmcid}</span>
+                  ) : (
+                    <span className="hb-result-chip" style={{ marginLeft: 6 }}>{p.pmcid ? `${p.pmcid} · no downloadable PDF` : 'not in PMC · cannot extract'}</span>
+                  )}
                   {have && <span className="hb-live-badge" style={{ marginLeft: 6 }}>ALREADY EXTRACTED · {have.experiments} exp</span>}
                 </div>
                 {p.abstract && <p className="hb-live-abstract">{p.abstract.slice(0, 240)}{p.abstract.length > 240 ? '…' : ''}</p>}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <button type="button" className="hb-evidence-toggle" disabled={!p.doi || busy} onClick={() => choose(p)}>
-                    {have ? 'Open extracted evidence' : 'Choose this paper'}
+                  <button type="button" className="hb-evidence-toggle" disabled={!p.doi || busy || (!oa && !have)} onClick={() => choose(p)}
+                    title={!oa && !have ? 'HiveBlot only reads papers with a downloadable open-access PDF' : undefined}>
+                    {have ? 'Open extracted evidence' : oa ? 'Choose this paper' : 'No open-access PDF'}
                   </button>
                 </div>
               </li>

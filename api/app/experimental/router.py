@@ -91,6 +91,11 @@ async def papers_search(body: PaperSearchRequest):
             used.append("pmc")
         except Exception as e:
             errors["pmc"] = f"{type(e).__name__}: {e}"[:300]
+    if any((r.get("source") or "").startswith("valency") for r in results):
+        try:  # Valency results carry no PMCID; resolve + mark open-access PDFs
+            results = ingest.fulltext.annotate_oa_pdf(results)
+        except Exception as e:
+            errors["oa_check"] = f"{type(e).__name__}: {e}"[:200]
     seen, deduped = set(), []
     for r in results:
         key = r.get("doi") or r.get("title")
