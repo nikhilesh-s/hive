@@ -26,9 +26,11 @@ from . import config
 logger = logging.getLogger(__name__)
 
 ID_CONVERTER = "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/"
-EUROPEPMC_PDF = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextPDF"
+EUROPEPMC_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+EUROPEPMC_PDF = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextPDF"  # legacy; often 404 now
 UNPAYWALL = "https://api.unpaywall.org/v2/{doi}"
 DEFAULT_TIMEOUT = 60
+RETRIES = 3
 _DOI_RE = re.compile(r"10\.\d{4,9}/\S+", re.IGNORECASE)
 
 
@@ -39,43 +41,98 @@ def normalize_doi(value: str) -> str:
 
 
 def _email() -> str:
-    return os.environ.get("UNPAYWALL_EMAIL") or config.NCBI_EMAIL
+    """Contact address for polite API use. Unpaywall rejects placeholder
+    domains, so Unpaywall is skipped unless UNPAYWALL_EMAIL / NCBI_EMAIL is real."""
+    return os.environ.get("UNPAYWALL_EMAIL") or os.environ.get("NCBI_EMAIL") or config.NCBI_EMAIL
+
+
+def _has_real_email() -> bool:
+    e = _email()
+    return "@" in e and not e.endswith("example.com")
+
+
+def _headers() -> dict:
+    return {"User-Agent": f"Mozilla/5.0 (compatible; {config.NCBI_TOOL}/0.1; mailto:{_email()})"}
 
 
 def _is_pdf(content: bytes) -> bool:
-    return content[:5].startswith(b"%PDF")
+    return b"%PDF" in content[:1024]
 
 
 def _download(url: str, dest: Path, timeout: int = DEFAULT_TIMEOUT, params: dict | None = None) -> Optional[str]:
-    """GET ``url``; save to ``dest`` only if the body is a real PDF."""
+    """GET ``url`` (with retry/backoff on rate limits and 5xx); save to
+    ``dest`` only if the body is a real PDF."""
+    import time
+
     if dest.exists() and dest.stat().st_size > 0:
         return str(dest.resolve())
+    for attempt in range(RETRIES):
+        try:
+            resp = requests.get(url, params=params, timeout=timeout, allow_redirects=True, headers=_headers())
+        except requests.RequestException as error:
+            logger.debug("download failed %s: %s", url, error)
+            return None
+        body = resp.content or b""
+        if resp.status_code == 200 and _is_pdf(body):
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(body)
+            return str(dest.resolve())
+        transient = resp.status_code in (429, 500, 502, 503, 504, 520) or b"Rate limit" in body[:200]
+        if not transient:
+            return None
+        time.sleep(2 * (attempt + 1))
+    return None
+
+
+def europepmc_fulltext(pmcids: list[str], timeout: int = DEFAULT_TIMEOUT) -> dict[str, dict]:
+    """Europe PMC REST: {pmcid: {is_oa, pdf_url}} for up to 25 PMCIDs in one
+    call. The listed pdf URL is the legal open-access full text HiveBlot may
+    download; papers without one are not extractable."""
+    ids = [p for p in pmcids if p]
+    if not ids:
+        return {}
+    query = " OR ".join(f"PMCID:{p}" for p in ids[:25])
     try:
-        resp = requests.get(url, params=params, timeout=timeout, allow_redirects=True,
-                            headers={"User-Agent": f"{config.NCBI_TOOL} (mailto:{_email()})"})
-    except requests.RequestException as error:
-        logger.debug("download failed %s: %s", url, error)
-        return None
-    if resp.status_code != 200 or not resp.content or not _is_pdf(resp.content):
-        return None
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_bytes(resp.content)
-    return str(dest.resolve())
+        resp = requests.get(EUROPEPMC_SEARCH, timeout=timeout, headers=_headers(),
+                            params={"query": query, "format": "json", "resultType": "core", "pageSize": 25})
+        results = resp.json().get("resultList", {}).get("result", []) if resp.status_code == 200 else []
+    except (requests.RequestException, ValueError) as error:
+        logger.debug("europepmc search failed: %s", error)
+        return {}
+    out = {}
+    for r in results:
+        pdf = next((u.get("url") for u in (r.get("fullTextUrlList") or {}).get("fullTextUrl", [])
+                    if u.get("documentStyle") == "pdf" and u.get("url")), None)
+        out[r.get("pmcid")] = {"is_oa": r.get("isOpenAccess") == "Y", "pdf_url": pdf, "title": r.get("title")}
+    return out
 
 
-def resolve_ids(identifier: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
-    """DOI / PMID / PMCID -> {doi, pmid, pmcid} via the NCBI ID converter (empty on failure)."""
-    params = {"ids": identifier, "format": "json", "tool": config.NCBI_TOOL, "email": _email()}
+def resolve_ids_batch(identifiers: list[str], timeout: int = DEFAULT_TIMEOUT) -> dict[str, dict]:
+    """Up to 200 DOIs / PMIDs / PMCIDs -> {identifier(lower): {doi, pmid, pmcid}}."""
+    ids = [i for i in identifiers if i][:200]
+    if not ids:
+        return {}
+    params = {"ids": ",".join(ids), "format": "json", "tool": config.NCBI_TOOL, "email": _email()}
     try:
         resp = requests.get(ID_CONVERTER, params=params, timeout=timeout)
         records = resp.json().get("records", []) if resp.status_code == 200 else []
     except (requests.RequestException, ValueError) as error:
-        logger.debug("idconv failed for %s: %s", identifier, error)
+        logger.debug("idconv failed: %s", error)
         return {}
-    if not records or records[0].get("status") == "error":
-        return {}
-    rec = records[0]
-    return {"doi": (rec.get("doi") or "").lower() or None, "pmid": rec.get("pmid"), "pmcid": rec.get("pmcid")}
+    out = {}
+    for rec in records:
+        if rec.get("status") == "error":
+            continue
+        entry = {"doi": (rec.get("doi") or "").lower() or None, "pmid": rec.get("pmid"), "pmcid": rec.get("pmcid")}
+        for key in (rec.get("requested-id"), rec.get("doi"), rec.get("pmcid"), str(rec.get("pmid") or "")):
+            if key:
+                out[str(key).lower()] = entry
+    return out
+
+
+def resolve_ids(identifier: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """DOI / PMID / PMCID -> {doi, pmid, pmcid} via the NCBI ID converter (empty on failure)."""
+    return resolve_ids_batch([identifier], timeout).get(identifier.lower(), {})
 
 
 def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
@@ -84,24 +141,44 @@ def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> 
     out_dir = Path(out_dir)
     ids = resolve_ids(doi, timeout) if doi else {}
     pmcid = ids.get("pmcid")
-    result = {"doi": doi, "pmid": ids.get("pmid"), "pmcid": pmcid, "pdf_path": None, "source": None}
+    result = {"doi": doi, "pmid": ids.get("pmid"), "pmcid": pmcid, "pdf_path": None, "source": None, "tried": []}
     if pmcid:
+        # 1. Europe PMC's listed open-access PDF (the reliable path today)
+        info = europepmc_fulltext([pmcid], timeout).get(pmcid) or {}
+        if info.get("pdf_url"):
+            result["tried"].append("europepmc_pdf")
+            path = _download(info["pdf_url"], out_dir / f"{pmcid}.pdf", timeout)
+            if path:
+                result.update(pdf_path=path, source="europepmc")
+                return result
+        # 2. legacy REST PDF endpoint (kept; frequently 404)
+        result["tried"].append("europepmc_legacy")
         path = _download(EUROPEPMC_PDF.format(pmcid=pmcid), out_dir / f"{pmcid}.pdf", timeout)
         if path:
             result.update(pdf_path=path, source="europepmc")
             return result
-    if doi:
+    if doi and _has_real_email():
+        # 3. Unpaywall: every open-access location that offers a PDF
+        result["tried"].append("unpaywall")
         try:
             resp = requests.get(UNPAYWALL.format(doi=doi), params={"email": _email()}, timeout=timeout)
             data = resp.json() if resp.status_code == 200 else {}
         except (requests.RequestException, ValueError) as error:
             logger.debug("unpaywall failed for %s: %s", doi, error)
             data = {}
-        pdf_url = (data.get("best_oa_location") or {}).get("url_for_pdf")
-        if pdf_url:
+        locations = [data.get("best_oa_location") or {}] + list(data.get("oa_locations") or [])
+        seen = set()
+        for loc in locations:
+            pdf_url = (loc or {}).get("url_for_pdf")
+            if not pdf_url or pdf_url in seen:
+                continue
+            seen.add(pdf_url)
             path = _download(pdf_url, out_dir / f"{doi.replace('/', '_')}.pdf", timeout)
             if path:
-                result.update(pdf_path=path, source="unpaywall")
+                result.update(pdf_path=path, source=f"unpaywall:{loc.get('host_type', 'oa')}")
+                return result
+    elif doi:
+        result["tried"].append("unpaywall_skipped_no_contact_email")
     return result
 
 
@@ -133,4 +210,21 @@ def pmc_search(query: str, limit: int = 10, timeout: int = DEFAULT_TIMEOUT) -> l
             "pmcid": art.get("pmcid") or f"PMC{pid}", "venue": d.get("fulljournalname") or d.get("source"),
             "abstract": None, "source": "pmc",
         })
-    return out
+    return annotate_oa_pdf(out, timeout)
+
+
+def annotate_oa_pdf(papers: list[dict], timeout: int = DEFAULT_TIMEOUT) -> list[dict]:
+    """Add `pmcid` (via DOI when missing) and `oa_pdf` (Europe PMC lists a
+    downloadable PDF) so the UI only offers extraction where it can succeed."""
+    need = [p["doi"] for p in papers if p.get("doi") and not p.get("pmcid")]
+    if need:
+        ids = resolve_ids_batch(need, timeout)
+        for p in papers:
+            if p.get("doi") and not p.get("pmcid"):
+                p["pmcid"] = (ids.get(p["doi"].lower()) or {}).get("pmcid")
+    info = europepmc_fulltext([p["pmcid"] for p in papers if p.get("pmcid")], timeout)
+    for p in papers:
+        i = info.get(p.get("pmcid") or "") or {}
+        p["oa_pdf"] = bool(i.get("pdf_url"))
+        p["is_oa"] = bool(i.get("is_oa"))
+    return papers

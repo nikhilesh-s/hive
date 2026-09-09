@@ -83,7 +83,7 @@ def test_normalize_doi_forms():
     assert fulltext.normalize_doi("not a doi") == ""
 
 
-def test_fetch_pdf_prefers_europepmc_then_unpaywall(monkeypatch, tmp_path):
+def test_fetch_pdf_prefers_europepmc_listing_then_unpaywall(monkeypatch, tmp_path):
     class R:
         def __init__(self, status, content=b"", js=None, headers=None):
             self.status_code, self.content, self._js, self.headers = status, content, js, headers or {}
@@ -91,34 +91,77 @@ def test_fetch_pdf_prefers_europepmc_then_unpaywall(monkeypatch, tmp_path):
         def json(self):
             return self._js
 
+    def epmc(pmcid, pdf):
+        return R(200, js={"resultList": {"result": [{"pmcid": pmcid, "isOpenAccess": "Y", "title": "T",
+                 "fullTextUrlList": {"fullTextUrl": ([{"documentStyle": "pdf", "url": pdf}] if pdf else [])}}]}})
+
+    calls = []
+
     def fake_get(url, params=None, timeout=None, allow_redirects=True, headers=None):
+        calls.append(url)
         if "idconv" in url:
-            return R(200, js={"records": [{"doi": "10.1000/ABC", "pmid": "1", "pmcid": "PMC9"}]})
-        if url.endswith("PMC9/fullTextPDF"):
-            return R(200, content=b"%PDF-1.4 fake")
+            return R(200, js={"records": [{"requested-id": "10.1000/abc", "doi": "10.1000/ABC", "pmid": "1", "pmcid": "PMC9"}]})
+        if "europepmc/webservices/rest/search" in url:
+            return epmc("PMC9", "https://europepmc.org/articles/PMC9?pdf=render")
+        if url.endswith("PMC9?pdf=render"):
+            return R(200, content=b"\n%PDF-1.4 fake")        # marker not at byte 0 is still a PDF
         raise AssertionError(url)
 
     monkeypatch.setattr(fulltext.requests, "get", fake_get)
     got = fulltext.fetch_pdf("10.1000/abc", tmp_path)
-    assert got["source"] == "europepmc" and Path(got["pdf_path"]).name == "PMC9.pdf"
+    assert got["source"] == "europepmc" and Path(got["pdf_path"]).name == "PMC9.pdf" and got["tried"] == ["europepmc_pdf"]
+
+    # No Europe PMC PDF listed -> legacy endpoint 404 -> Unpaywall locations (needs a real contact email)
+    monkeypatch.setenv("UNPAYWALL_EMAIL", "someone@ucsf.edu")
 
     def fake_get2(url, params=None, timeout=None, allow_redirects=True, headers=None):
         if "idconv" in url:
-            return R(200, js={"records": [{"doi": "10.1000/xyz"}]})
+            return R(200, js={"records": [{"requested-id": "10.1000/xyz", "doi": "10.1000/xyz", "pmcid": "PMC10"}]})
+        if "europepmc/webservices/rest/search" in url:
+            return epmc("PMC10", None)
+        if url.endswith("PMC10/fullTextPDF"):
+            return R(404)
         if "unpaywall" in url:
-            return R(200, js={"best_oa_location": {"url_for_pdf": "https://oa.example/p.pdf"}})
-        if url == "https://oa.example/p.pdf":
+            return R(200, js={"best_oa_location": {"url_for_pdf": "https://pub.example/p.pdf", "host_type": "publisher"},
+                              "oa_locations": [{"url_for_pdf": "https://repo.example/p.pdf", "host_type": "repository"}]})
+        if url == "https://pub.example/p.pdf":
+            return R(200, content=b"<html>bot check</html>")        # publisher blocks scripts -> not a PDF
+        if url == "https://repo.example/p.pdf":
             return R(200, content=b"%PDF-1.7 x")
         raise AssertionError(url)
 
     monkeypatch.setattr(fulltext.requests, "get", fake_get2)
     got = fulltext.fetch_pdf("10.1000/xyz", tmp_path)
-    assert got["source"] == "unpaywall" and got["pdf_path"].endswith("10.1000_xyz.pdf")
+    assert got["source"] == "unpaywall:repository" and got["pdf_path"].endswith("10.1000_xyz.pdf")
+    assert got["tried"] == ["europepmc_pdf", "europepmc_legacy", "unpaywall"] or got["tried"] == ["europepmc_legacy", "unpaywall"]
 
+    # Placeholder contact email => Unpaywall is skipped, never called with a fake address
+    monkeypatch.setenv("UNPAYWALL_EMAIL", "western-blot-miner@example.com")
     monkeypatch.setattr(fulltext.requests, "get",
-                        lambda *a, **k: R(200, js={"records": [{"doi": "10.1000/none"}]}) if "idconv" in a[0]
+                        lambda url, **k: R(200, js={"records": [{"requested-id": "10.1000/none", "doi": "10.1000/none"}]}) if "idconv" in url
                         else R(404))
-    assert fulltext.fetch_pdf("10.1000/none", tmp_path)["pdf_path"] is None
+    got = fulltext.fetch_pdf("10.1000/none", tmp_path)
+    assert got["pdf_path"] is None and "unpaywall_skipped_no_contact_email" in got["tried"]
+
+
+def test_download_retries_rate_limits_then_gives_up(monkeypatch, tmp_path):
+    seen = []
+
+    class R:
+        def __init__(self, status, content):
+            self.status_code, self.content = status, content
+
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setattr(fulltext.requests, "get", lambda url, **k: (seen.append(url), R(200, b"Rate limit exceeded"))[1])
+    assert fulltext._download("https://x/pdf", tmp_path / "x.pdf") is None and len(seen) == fulltext.RETRIES
+
+
+def test_annotate_oa_pdf_marks_extractable_papers(monkeypatch):
+    monkeypatch.setattr(fulltext, "resolve_ids_batch", lambda dois, timeout=60: {"10.1000/a": {"pmcid": "PMC1"}})
+    monkeypatch.setattr(fulltext, "europepmc_fulltext", lambda ids, timeout=60: {"PMC1": {"is_oa": True, "pdf_url": "u"}})
+    papers = fulltext.annotate_oa_pdf([{"doi": "10.1000/a"}, {"doi": "10.1000/b"}, {"doi": None}])
+    assert papers[0]["pmcid"] == "PMC1" and papers[0]["oa_pdf"] is True
+    assert papers[1]["oa_pdf"] is False and papers[2]["oa_pdf"] is False
 
 
 # --- search guard pinned to the live table ----------------------------------
