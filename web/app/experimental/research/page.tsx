@@ -268,7 +268,7 @@ export default function ResearchPage() {
               </button>
               <span className="hb-live-note" style={{ margin: 0, alignSelf: 'center' }}>
                 {status?.model_backend_ready
-                  ? 'Open-access PDF → panel detection → model reads each panel → deterministic biology. Typically 1–3 minutes.'
+                  ? 'Open-access PDF → panel detection → the model reads each candidate panel (several in parallel) → deterministic biology. Roughly a minute per few panels; a figure-heavy paper can take 5–10 minutes, so an already-extracted paper is the safer live demo.'
                   : 'No model backend configured; open an already-extracted paper instead.'}
               </span>
             </div>

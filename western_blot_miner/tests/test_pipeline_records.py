@@ -75,6 +75,19 @@ def main():
         check("resume queries 0", result2["queried"] == 0)
         check("resume still 2 records", result2["records"] == 2)
 
+        # parallel mode (WBM_CONCURRENCY>1, live demo) yields the same artifacts
+        import os
+        os.environ["WBM_CONCURRENCY"] = "3"
+        try:
+            result3 = run_records_stage(summary, use_cache=False,
+                                        client=MockLLMClient(MODEL_OUTPUT), resolver=LocalMapResolver())
+        finally:
+            os.environ.pop("WBM_CONCURRENCY", None)
+        check("parallel run: 2 records, 1 queried, 0 failures",
+              result3["records"] == 2 and result3["queried"] == 1 and result3["failures"] == 0)
+        rows3 = json.loads((run_dir / "supabase_rows.json").read_text())
+        check("parallel run: identical rows", [r["stable_row_key"] for r in rows3] == [r["stable_row_key"] for r in rows])
+
     passed = sum(1 for _, ok in CHECKS if ok)
     failed = [n for n, ok in CHECKS if not ok]
     print(f"\n{passed}/{len(CHECKS)} pipeline-wiring checks passed")
