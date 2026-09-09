@@ -2,8 +2,9 @@
 
 Bedrock-first (correction 6): the default backend is Amazon Bedrock via the
 ``converse`` API, so the hackathon runs on Bedrock with no RunPod dependency.
-The same interface also targets Anthropic-direct, OpenAI, and any
-OpenAI-compatible server (vLLM/local), selected by ``WBM_LLM_BACKEND``.
+The same interface also targets Anthropic-direct, OpenAI, any
+OpenAI-compatible server (vLLM/local), and an already-authenticated local
+Claude Code install (``claude_cli``), selected by ``WBM_LLM_BACKEND``.
 
 A ``MockLLMClient`` returns canned structured output so the extraction and
 reconciliation logic is fully testable offline (no cloud, no keys).
@@ -50,6 +51,10 @@ class LLMClient:
         max_tokens: int = 4096,
         temperature: float = 0.0,
     ) -> dict[str, Any]:
+        raise NotImplementedError
+
+    def complete_text(self, system: str, user: str, max_tokens: int = 1200) -> tuple[str, str]:
+        """Plain-prose completion (paper QA). Returns (text, model name)."""
         raise NotImplementedError
 
 
@@ -111,6 +116,17 @@ class AnthropicClient(LLMClient):
         text = "".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", "") == "text")
         return _extract_json(text)
 
+    def complete_text(self, system, user, max_tokens=1200):
+        import anthropic  # lazy
+
+        client = anthropic.Anthropic()
+        resp = client.messages.create(model=self.model, max_tokens=max_tokens, system=system,
+                                      messages=[{"role": "user", "content": user}])
+        if getattr(resp, "stop_reason", None) == "refusal":
+            raise RuntimeError("model declined to answer (stop_reason=refusal)")
+        text = "".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", "") == "text")
+        return text.strip(), getattr(resp, "model", self.model)
+
 
 class OpenAICompatibleClient(LLMClient):
     """OpenAI or any OpenAI-compatible server (vLLM / local). Not RunPod-pinned."""
@@ -140,6 +156,126 @@ class OpenAICompatibleClient(LLMClient):
         resp.raise_for_status()
         return _extract_json(resp.json()["choices"][0]["message"]["content"])
 
+    def complete_text(self, system, user, max_tokens=1200):
+        import requests  # lazy
+
+        resp = requests.post(
+            f"{self.base_url}/chat/completions",
+            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+            json={"model": self.model, "max_tokens": max_tokens,
+                  "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]},
+            timeout=int(os.environ.get("WBM_LLM_TIMEOUT", "120")),
+        )
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip(), self.model
+
+
+class ClaudeCLIClient(LLMClient):
+    """Claude through an already-authenticated Claude Code install (`claude -p`).
+
+    For LOCAL development and demos with no ANTHROPIC_API_KEY: the CLI uses
+    the user's interactive Claude Code login. Print mode, JSON envelope, a
+    custom system prompt (keeps the context small), no session persistence,
+    no slash commands, and NO tools for text/JSON requests. Image requests
+    write the panel to a private temp directory, make that directory the
+    working directory, and allow exactly the Read tool so Claude can view
+    the file; the directory is deleted afterwards. Never `--bare` (that
+    would drop the login), never permission-skipping flags.
+    """
+
+    name = "claude_cli"
+    DEFAULT_MODEL = "sonnet"
+
+    def __init__(self, model: Optional[str] = None, executable: Optional[str] = None,
+                 timeout: Optional[int] = None, runner: Optional[Callable[..., tuple[int, str, str]]] = None):
+        import shutil
+
+        self.model = model or os.environ.get("WBM_MODEL") or self.DEFAULT_MODEL
+        self.executable = self.available(executable)
+        self.timeout = int(timeout or os.environ.get("WBM_LLM_TIMEOUT", "300"))
+        self._run = runner or self._subprocess
+
+    @staticmethod
+    def available(executable: Optional[str] = None) -> str:
+        """Path of a runnable `claude` (CLAUDE_CLI override, else PATH) or ''."""
+        import shutil
+
+        exe = executable or os.environ.get("CLAUDE_CLI") or "claude"
+        return shutil.which(exe) or ""
+
+    def _subprocess(self, args: list[str], cwd: str) -> tuple[int, str, str]:
+        import subprocess
+
+        env = dict(os.environ)
+        env.pop("CLAUDECODE", None)  # allow a nested launch from inside a Claude session
+        try:
+            proc = subprocess.run(args, cwd=cwd, capture_output=True, text=True,
+                                  timeout=self.timeout, stdin=subprocess.DEVNULL, env=env)
+        except subprocess.TimeoutExpired as e:
+            raise RuntimeError(f"claude CLI timed out after {self.timeout}s") from e
+        return proc.returncode, proc.stdout, proc.stderr
+
+    def _invoke(self, system: str, user: str, *, schema: Optional[dict] = None,
+                image_dir: Optional[str] = None) -> dict:
+        import tempfile
+
+        if not self.executable:
+            raise RuntimeError("claude CLI not found (set CLAUDE_CLI or install Claude Code)")
+        args = [self.executable, "-p", user, "--output-format", "json",
+                "--system-prompt", system, "--model", self.model,
+                "--no-session-persistence", "--disable-slash-commands"]
+        if image_dir:
+            args += ["--tools", "Read", "--allowedTools", "Read", "--add-dir", image_dir]
+            cwd = image_dir
+        else:
+            args += ["--tools", ""]
+            cwd = tempfile.mkdtemp(prefix="hiveblot-cli-")
+        if schema:
+            args += ["--json-schema", json.dumps(schema)]
+        rc, out, err = self._run(args, cwd)
+        if rc != 0:
+            raise RuntimeError(f"claude CLI exit {rc}: {(err or out)[-400:].strip()}")
+        try:
+            env = json.loads(out)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"claude CLI returned non-JSON output: {out[:200]!r}") from e
+        if isinstance(env, list):  # stream-style array: last message is the result
+            env = env[-1] if env else {}
+        if env.get("is_error") or env.get("subtype") not in (None, "success"):
+            raise RuntimeError(f"claude CLI error: {env.get('subtype')}: {str(env.get('result'))[:300]}")
+        return env
+
+    def _model_used(self, env: dict) -> str:
+        used = [m for m in (env.get("modelUsage") or {}) if "haiku" not in m] or list(env.get("modelUsage") or {})
+        return used[0] if used else self.model
+
+    def complete_json(self, system, user, image_data_url=None, max_tokens=8192, temperature=None):
+        import base64
+        import shutil
+        import tempfile
+
+        if not image_data_url:
+            env = self._invoke(system, user)
+            return _extract_json(str(env.get("result", "")))
+        media_type, data_b64 = _split_media_url(image_data_url)
+        ext = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif"}.get(media_type, "png")
+        tmpdir = tempfile.mkdtemp(prefix="hiveblot-panel-")
+        try:
+            path = os.path.join(tmpdir, f"panel.{ext}")
+            with open(path, "wb") as fh:
+                fh.write(base64.b64decode(data_b64))
+            prompt = (f"{user}\n\nThe Western blot panel image for this request is the file `{path}` "
+                      f"(the only file in your working directory). Use the Read tool to view it, "
+                      f"then answer with the JSON described above and nothing else.")
+            env = self._invoke(system, prompt, image_dir=tmpdir)
+            return _extract_json(str(env.get("result", "")))
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def complete_text(self, system, user, max_tokens=1200):
+        env = self._invoke(system, user)
+        return str(env.get("result", "")).strip(), self._model_used(env)
+
 
 class MockLLMClient(LLMClient):
     """Returns canned structured output. For offline tests / the benchmark."""
@@ -155,6 +291,31 @@ class MockLLMClient(LLMClient):
             return self._responder(system, user)
         return dict(self._responder)
 
+    def complete_text(self, system, user, max_tokens=1200):
+        out = self._responder(system, user) if callable(self._responder) else self._responder
+        return (out if isinstance(out, str) else json.dumps(out)), "mock"
+
+
+def backend_status(backend: Optional[str] = None) -> tuple[bool, str]:
+    """Is the configured backend usable right now? (ok, backend name | reason)."""
+    backend = (backend or os.environ.get("WBM_LLM_BACKEND", "")).lower()
+    env = os.environ
+    if backend == "claude_cli":
+        exe = ClaudeCLIClient.available()
+        return (True, "claude_cli") if exe else (False, "WBM_LLM_BACKEND=claude_cli but no `claude` executable found")
+    if backend == "anthropic":
+        ok = bool(env.get("ANTHROPIC_API_KEY") or env.get("ANTHROPIC_AUTH_TOKEN"))
+        return ok, "anthropic" if ok else "WBM_LLM_BACKEND=anthropic but no ANTHROPIC_API_KEY"
+    if backend == "bedrock":
+        ok = bool(env.get("AWS_ACCESS_KEY_ID") or env.get("AWS_PROFILE"))
+        return ok, "bedrock" if ok else "WBM_LLM_BACKEND=bedrock but no AWS credentials"
+    if backend in ("openai", "openai_compatible"):
+        ok = bool(env.get("WBM_LLM_API_KEY") or env.get("OPENAI_API_KEY") or env.get("OPENAI_KEY"))
+        return ok, backend if ok else "WBM_LLM_BACKEND=openai but no WBM_LLM_API_KEY"
+    if backend == "mock":
+        return True, "mock"
+    return False, "No extraction model configured (set WBM_LLM_BACKEND=claude_cli|anthropic|bedrock|openai + credentials)"
+
 
 def get_client(backend: Optional[str] = None, escalation: bool = False) -> LLMClient:
     backend = (backend or os.environ.get("WBM_LLM_BACKEND", "bedrock")).lower()
@@ -162,6 +323,8 @@ def get_client(backend: Optional[str] = None, escalation: bool = False) -> LLMCl
         return BedrockClient(model=DEFAULT_BEDROCK_ESCALATION_MODEL if escalation else None)
     if backend == "anthropic":
         return AnthropicClient()
+    if backend == "claude_cli":
+        return ClaudeCLIClient()
     if backend in ("openai", "openai_compatible"):
         return OpenAICompatibleClient()
     if backend == "mock":

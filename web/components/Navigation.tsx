@@ -52,9 +52,9 @@ export function Navigation() {
             LEARN
           </span>
         </Link>
-        <Link href="/experimental/live">
+        <Link href="/experimental/research">
           <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
-            LIVE
+            RESEARCH
           </span>
         </Link>
       </div>

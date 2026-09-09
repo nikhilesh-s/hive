@@ -153,6 +153,18 @@ async def count_live_rows() -> int:
         return await conn.fetchval(f"SELECT count(*) FROM {settings.live_table_name}")
 
 
+async def list_live_papers(limit: int = 50) -> list[dict]:
+    """Distinct DOIs in the live tier with row/experiment counts (for
+    "open an already-ingested paper" without re-extracting)."""
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT doi, max(title) AS title, max(job_id) AS job_id, count(*) AS rows, "
+            f"count(DISTINCT split_part(stable_row_key, ':', 1)) AS experiments, max(ingested_at) AS ingested_at "
+            f"FROM {settings.live_table_name} GROUP BY doi ORDER BY max(ingested_at) DESC LIMIT $1", limit)
+        return [{**dict(r), "ingested_at": r["ingested_at"].isoformat() if r["ingested_at"] else None} for r in rows]
+
+
 async def fetch_live_record(record_id: int) -> dict | None:
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
