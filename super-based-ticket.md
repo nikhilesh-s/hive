@@ -60,3 +60,15 @@ After UCSF demo. These items do not precede: demo readiness, `DEMO.md`, UCSF pre
 - `api/tests/test_db_access_matrix.py` (docstring: "Database access matrix for the two application tables (migration 004)") contains `test_rls_enabled_on_both_tables`, `test_policies_target_explicit_roles`, `test_public_client_roles_have_no_access`, `test_public_client_roles_get_no_future_tables`, `test_hive_readonly_reads_records_only`, `test_hive_feedback_is_insert_and_read_only_on_feedback`, `test_hive_roles_are_not_privileged`, and `test_down_migration_is_reversible`.
 - `migrations/005_experimental_live_tables.sql` (Supabase copy `20260905000006_experimental_live_tables.sql`) adds the `hive_ingest` role with RLS on the live tier per `HANDOFF.md` line 197; `test_live_tier_matrix` in the same test file covers it.
 - This is documentary evidence only, not a verification of the live project. The Security Advisor must be re-checked before any action.
+
+## Status check — 2026-09-09 (read-only, requested by Nik after the UCSF meeting)
+
+Checked through the Supabase Management API and `supabase db query --linked`
+(no changes made):
+
+- Project `zafombwswztvnjikcsdm` status: **ACTIVE_HEALTHY** (not paused), Postgres 17.6, us-east-1.
+- Security Advisor: **0 errors, 1 warning** (`extension_in_public`: `pg_trgm`, deferred on purpose). Neither `rls_disabled_in_public` nor `sensitive_columns_exposed` is present any more.
+- `pg_tables.rowsecurity` is `true` for both `public.western_blot_records` and `public.hiveblot_feedback`.
+- Row counts: 475 reviewed records; 1 feedback row (2026-08-18, a pre-launch test).
+
+Conclusion: Ticket 1 is resolved by migration 004 (verified live). Ticket 2 is not currently active; the 7-day inactivity risk remains while beta traffic is low, so the open questions above still stand.
