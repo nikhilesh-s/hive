@@ -106,6 +106,17 @@ credentials → run the unseen-paper extraction evaluation.
 `research/UCSF_BETA_READINESS.md` §J. After UCSF, the first task is Nik's
 decision on the deferred corpus corrections QA-1…QA-5 (reviewed reseed).
 
+### Post-UCSF sprint (2026-09-09 → ship 2026-09-16) — see `tickets/README.md`
+
+The UCSF meeting happened 2026-09-09. Three ticket tracks live in
+`tickets/` (feedback, densitometry, bio-qa) with a day-by-day timeline and
+the decisions Nik must make first (release vehicle, page naming, no reseed
+this week). Supabase `zafombwswztvnjikcsdm` verified 2026-09-09: ACTIVE,
+RLS on both tables, advisor 0 errors / 1 deferred WARN, 1 feedback row;
+feedback is pullable today with `supabase db query --linked` (details in
+`tickets/feedback.md`, `super-based-ticket.md`). The local demo stack
+(web :3000, API :8010, embedded Postgres) was shut down after the meeting.
+
 ### UCSF demo track (2026-09-09) — branch `experimental/ucsf-demo-2026-09-09` — THE DEMO BRANCH
 
 Created from `experimental/demo-day` @ `439300a`. `feature/bio-context-beta`
