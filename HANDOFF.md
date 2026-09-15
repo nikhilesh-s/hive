@@ -111,10 +111,14 @@ pytest 56 · biology / reconcile 21 / extract 10 / pipeline 13 /
 stable-row-key 34 green · tsc and lint clean.
 
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) one last run-of-show step-9 rehearsal including 9e
-(pairing) before the founder hard stop; (2) B-4 panel inventory if budget
-remains; (3) a Tally form built from the reviewed spec; (4) any P0/P1 the
-founder raises after the Tuesday review. D-5's author-value comparison is
+in priority order: (1) run-of-show step 9 was re-rehearsed 2026-09-15
+(4455 valid + pairing, 4686 refused) — repeat only after further analyzer
+changes; (2) B-4 needs a human: fill the three blank
+`eval/demo/*/panel_inventory.json` files (Tanvi), then rerun
+`scripts/experiments/panel_inventory_review.py` for the count-proxy recall /
+precision (report: `research/experiments/B4_panel_inventory_review.md`);
+(3) a Tally form built from the reviewed spec (external account, needs Nik);
+(4) any P0/P1 the founder raises after the Tuesday review. D-5's author-value comparison is
 closed as "n too small" (`research/experiments/D5_author_values.md`).
 Checkpoint rule from Nik (2026-09-15): commit and push after every coherent
 block and say so; sub-agents must report before they could hit a limit.

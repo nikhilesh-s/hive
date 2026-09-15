@@ -91,6 +91,14 @@ experiments" invariant.
   Srushti (panel) + Tanvi (adjudicate a sample of `not_stated`).
 
 ### B-4 · Panel inventory and CV recall measurement
+- Status 2026-09-15: scaffold landed. `scripts/experiments/panel_inventory_review.py`
+  writes blank `eval/demo/*/panel_inventory.json` templates and
+  `research/experiments/B4_panel_inventory_review.md` (per-page stored vs
+  model-sent candidates, a review list of unsent candidates on
+  western-mentioning pages). Recall / precision are blocked until Tanvi fills
+  the inventories. Known limit: `candidates.json` only stores crops above the
+  0.35 gate, so panels lost below it are visible only to the human inventory.
+  B-1 and B-2 are landed on `experimental/ucsf-demo-2026-09-09` with tests.
 - Acceptance: `eval/demo/*/panel_inventory.json` for all three papers (per
   page: Western panels, targets, lane counts); a script reporting recall and
   precision at current thresholds plus a sweep; below-threshold candidates
