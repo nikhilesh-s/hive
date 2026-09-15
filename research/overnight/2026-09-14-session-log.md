@@ -311,3 +311,10 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   STAT3 expression 59, CST 1:1000 no catalog filter. Not fixed (synonym expansion would be a new
   feature): pSTAT3 / beta-actin / SQSTM1 / ERK1/2 / 4E-BP1 notation gaps, and protein terms matching
   treatment text ("MEK/ERK inhibitor") by design.
+- `8cd3f88` verification: api 186 passed / 11 skipped; DB access matrix 11 passed against the local
+  scratch Postgres (`HIVE_DB_TEST_URL` from `scripts/local_db.py test-url`); the new rehydration WHERE
+  clause run on real Postgres inside a rolled-back transaction: record 42 + its key gets keyed + legacy
+  rows, record 42 with a different (reseeded) key gets only the legacy row, a caller without a key
+  matches by id, a key follows its record to a new id. Browser: /search?q=loading control shows
+  "Found 30 experiments (175 lane records)" (was 100 rows), no console errors; demo_check 19 PASS /
+  2 WARN / 0 FAIL.
