@@ -589,6 +589,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
 # --------------------------------------------------------------------------- #
 PAIR_METHOD_NAME = "hiveblot.densitometry.pair"
 PAIR_METHOD_VERSION = "0.1.0"
+# A control lane below this fraction of the strongest control lane makes the
+# ratio amplify that lane's noise: warned, not refused (under-loading is real).
+CONTROL_MIN_RELATIVE = 0.25
 PAIR_CAVEAT = (
     "Target ÷ loading control divides two uncalibrated within-image readings. The ratio is comparable "
     "only between lanes of this image, is not a protein amount, and is only meaningful if both strips "
@@ -631,6 +634,10 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
         if q != REFUSED and (t["quality"] == WARNING or c["quality"] == WARNING):
             q = WARNING
             lr += [x for x in t["reasons"] + c["reasons"] if x.startswith("unstable") or x.startswith("some clipped")]
+        if q != REFUSED and c["relative"] is not None and c["relative"] < CONTROL_MIN_RELATIVE:
+            q = WARNING
+            lr.append(f"control lane is weak ({c['relative']:.2f} of the strongest control lane); the ratio "
+                      "amplifies its noise")
         ratio = env = None
         if q != REFUSED and overall != REFUSED:
             ratio = t["relative"] / c["relative"]
@@ -674,6 +681,7 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
                             "envelopes -> normalized to the largest median ratio -> refusal when either strip "
                             "or lane is refused or the control lane has no signal",
                    "params": {"snr_min": SNR_MIN, "ratio_width_warn": 2 * STABILITY_WARN_WIDTH,
+                              "control_min_relative": CONTROL_MIN_RELATIVE,
                               "single_strip_method": f"{METHOD_NAME} {METHOD_VERSION}"}},
         "target": target, "control": control, "lanes": lanes,
         "quality": {"state": overall, "reasons": reasons},
