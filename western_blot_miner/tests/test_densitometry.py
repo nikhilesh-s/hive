@@ -1,5 +1,9 @@
-"""Synthetic-blot checks for the EXPERIMENTAL densitometry module.
+"""Synthetic-blot checks for the EXPERIMENTAL densitometry module (v0.2).
 Run: .venv/bin/python western_blot_miner/tests/test_densitometry.py
+
+Every check here is against a fixture with KNOWN structure; none of it is an
+accuracy claim about real figures. Real-crop behaviour (clipping/refusal on
+the reviewed corpus) is exercised in scripts/experiments/densitometry_real_crops.py.
 """
 import sys
 from pathlib import Path
@@ -8,7 +12,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from western_blot_miner import densitometry  # noqa: E402
+from western_blot_miner import densitometry as D  # noqa: E402
 
 CHECKS = []
 
@@ -17,9 +21,9 @@ def check(name, cond):
     CHECKS.append((name, bool(cond)))
 
 
-def synthetic(strengths, light_bg=True, w=400, h=120, band_y=60, sigma=6.0, noise=0.0, seed=0):
+def synthetic(strengths, light_bg=True, w=400, h=120, band_y=60, sigma=6.0, noise=0.0, seed=0, peak=200):
     """Dark bands on a light background (or inverted); Gaussian band per lane
-    with a known peak darkness, plus optional noise."""
+    with a known peak darkness, plus optional noise. peak > 235 clips."""
     rng = np.random.default_rng(seed)
     n = len(strengths)
     img = np.full((h, w), 235.0 if light_bg else 20.0)
@@ -28,67 +32,148 @@ def synthetic(strengths, light_bg=True, w=400, h=120, band_y=60, sigma=6.0, nois
     lane_w = w / n
     for i, s in enumerate(strengths):
         cx = (i + 0.5) * lane_w
-        band = s * 200 * np.exp(-((ys - band_y) ** 2) / (2 * sigma ** 2)) * (np.abs(xs - cx) < lane_w * 0.32)
+        band = s * peak * np.exp(-((ys - band_y) ** 2) / (2 * sigma ** 2)) * (np.abs(xs - cx) < lane_w * 0.32)
         img = img - band if light_bg else img + band
     if noise:
         img = img + rng.normal(0, noise, img.shape)
     return np.clip(img, 0, 255).astype(np.uint8)
 
 
-# 1. ordering + ratios recover the known strengths (dark-on-light)
+def equal_bounds(n, w=400, x0=0):
+    edges = np.linspace(x0, x0 + w, n + 1).round().astype(int)
+    return [[int(edges[i]), int(edges[i + 1])] for i in range(n)]
+
+
+# 1. ordering + ratios recover the known strengths (dark-on-light), explicit lanes
 img = synthetic([1.0, 0.5, 0.25, 0.0], noise=2.0)
-res = densitometry.analyze(img, lanes=4)
+res = D.analyze(img, lane_bounds=equal_bounds(4), lane_labels=["a", "b", "c", "d"])
 rel = [l["relative"] for l in res["lanes"]]
 check("four lanes", len(rel) == 4)
+check("lane_mode explicit", res["lane_mode"] == "explicit")
+check("labels carried", [l["label"] for l in res["lanes"]] == ["a", "b", "c", "d"])
 check("inverted for analysis (light background)", res["image"]["inverted_for_analysis"] is True)
 check("strongest lane is lane 1", rel[0] == 1.0)
 check("half-strength lane ~0.5", abs(rel[1] - 0.5) < 0.12)
 check("quarter-strength lane ~0.25", abs(rel[2] - 0.25) < 0.12)
 check("empty lane ~0", rel[3] < 0.08)
+check("empty lane flagged no-signal, not refused", res["lanes"][3]["quality"] == "ok" and any("no signal" in r for r in res["lanes"][3]["reasons"]))
+check("overall ok", res["quality"]["state"] == "ok")
 y0, y1 = res["band_row"]
 check("band row brackets y=60", y0 <= 60 <= y1)
+check("lane y bounds = band row", all(l["y0"] == y0 and l["y1"] == y1 for l in res["lanes"]))
+check("method metadata", res["method"]["name"] == D.METHOD_NAME and res["method"]["version"] == D.METHOD_VERSION
+      and res["method"]["params"]["clip_fraction_refuse"] == D.CLIP_FRACTION_REFUSE)
 
-# 2. auto lane detection finds the printed lanes
-res_auto = densitometry.analyze(synthetic([1.0, 0.7, 0.4], noise=1.0))
-check("auto-detected 3 lanes", len(res_auto["lanes"]) == 3)
-check("auto warning present", any("auto-detected" in w for w in res_auto["warnings"]))
+# 2. stability envelope brackets the point value; clean fixture is stable
+check("stability present", res["stability"] is not None and res["stability"]["runs"] > 5 and res["stability"]["ranking_stable"])
+for l in res["lanes"]:
+    e = l["stability"]
+    check(f"envelope brackets lane {l['index']}", e and e["relative_min"] - 1e-9 <= l["relative"] <= e["relative_max"] + 1e-9)
+check("clean fixture envelopes narrow", all((l["stability"]["relative_max"] - l["stability"]["relative_min"]) < 0.25 for l in res["lanes"]))
+res_nostab = D.analyze(img, lane_bounds=equal_bounds(4), stability=False)
+check("stability can be skipped", res_nostab["stability"] is None and all(l["stability"] is None for l in res_nostab["lanes"]))
 
-# 3. light bands on a dark background are handled without inversion
-res_dark = densitometry.analyze(synthetic([0.3, 1.0], light_bg=False), lanes=2)
+# 3. diagnostic fallbacks: count -> equal width, none -> auto, both warn
+res_eq = D.analyze(synthetic([1.0, 0.7, 0.4], noise=1.0), lanes=3)
+check("equal_width mode", res_eq["lane_mode"] == "equal_width" and len(res_eq["lanes"]) == 3)
+check("equal_width warns diagnostic", any("diagnostic" in w for w in res_eq["warnings"]))
+res_auto = D.analyze(synthetic([1.0, 0.7, 0.4], noise=1.0))
+check("auto-detected 3 lanes", res_auto["lane_mode"] == "auto" and len(res_auto["lanes"]) == 3)
+check("auto warns diagnostic", any("auto-detected" in w for w in res_auto["warnings"]))
+
+# 4. light bands on a dark background are handled without inversion
+res_dark = D.analyze(synthetic([0.3, 1.0], light_bg=False), lane_bounds=equal_bounds(2))
 check("no inversion on dark background", res_dark["image"]["inverted_for_analysis"] is False)
 check("dark-bg strongest is lane 2", res_dark["lanes"][1]["relative"] == 1.0 and res_dark["lanes"][0]["relative"] < 0.6)
 
-# 4. saturation is flagged
-sat = synthetic([1.0, 1.0], noise=0.0)
-sat[50:70, 20:140] = 0  # a fully clipped block in lane 1
-res_sat = densitometry.analyze(sat, lanes=2)
-check("saturation warning", any("saturated" in w for w in res_sat["warnings"]))
-check("lane 1 saturated_fraction > 0", res_sat["lanes"][0]["saturated_fraction"] > 0)
+# 5. clipping gates
+#    5a. reference lane clipped -> whole strip refused, relative None everywhere
+clip = synthetic([1.0, 0.5], peak=400)  # lane 1 peak far past black -> flat clipped core
+res_clip = D.analyze(clip, lane_bounds=equal_bounds(2))
+check("clipped lane detected", res_clip["lanes"][0]["clipped_fraction"] >= D.CLIP_FRACTION_REFUSE)
+check("reference clipped -> refused", res_clip["quality"]["state"] == "quantification_refused")
+check("refused -> no relative values", all(l["relative"] is None for l in res_clip["lanes"]))
+check("refusal reason names the lane", any("strongest lane (1)" in r for r in res_clip["quality"]["reasons"]))
+#    5b. non-reference lane clipped -> that lane refused, others measured, overall warning
+clip2 = synthetic([0.5, 1.0, 0.3], peak=200)
+clip2[57:61, 45:85] = 0  # a thin solid-black streak in lane 1's band core only
+res_clip2 = D.analyze(clip2, lane_bounds=equal_bounds(3))
+check("non-reference clipped lane refused", res_clip2["lanes"][0]["quality"] == "quantification_refused" and res_clip2["lanes"][0]["relative"] is None)
+check("other lanes still measured", res_clip2["lanes"][1]["relative"] == 1.0 and res_clip2["lanes"][2]["relative"] is not None)
+check("overall warning, not ok", res_clip2["quality"]["state"] == "warning")
+#    5c. clean fixture has ~no clipped pixels
+check("clean fixture unclipped", all(l["clipped_fraction"] < D.CLIP_FRACTION_WARN for l in res["lanes"]))
 
-# 5. two stacked band rows: row_index selects the second
+# 6. no signal anywhere -> refused
+blank = synthetic([0.0, 0.0, 0.0], noise=2.0)
+res_blank = D.analyze(blank, lane_bounds=equal_bounds(3))
+check("blank strip refused", res_blank["quality"]["state"] == "quantification_refused" and all(l["relative"] is None for l in res_blank["lanes"]))
+check("blank reason", any("no lane has signal" in r for r in res_blank["quality"]["reasons"]))
+
+# 7. geometry validation raises (never measures something else silently)
+def raises(fn):
+    try:
+        fn()
+    except ValueError:
+        return True
+    return False
+
+check("reversed lane bounds rejected", raises(lambda: D.analyze(img, lane_bounds=[[100, 50]])))
+check("overlapping lanes rejected", raises(lambda: D.analyze(img, lane_bounds=[[0, 120], [100, 200]])))
+check("lane outside region rejected", raises(lambda: D.analyze(img, region=(50, 20, 350, 100), lane_bounds=[[40, 120]])))
+check("too-narrow lane rejected", raises(lambda: D.analyze(img, lane_bounds=[[10, 12]])))
+check("tiny region rejected", raises(lambda: D.analyze(img, region=(10, 10, 14, 14))))
+check("label count mismatch rejected", raises(lambda: D.analyze(img, lane_bounds=equal_bounds(2), lane_labels=["x"])))
+check("empty lane list rejected", raises(lambda: D.analyze(img, lane_bounds=[])))
+
+# 8. two stacked band rows: row_index selects the second
 two = synthetic([1.0, 0.2], band_y=30)
 two2 = synthetic([0.2, 1.0], band_y=90)
 stacked = np.minimum(two, two2)
-r0 = densitometry.analyze(stacked, lanes=2, row_index=0)
-r1 = densitometry.analyze(stacked, lanes=2, row_index=1)
+r0 = D.analyze(stacked, lane_bounds=equal_bounds(2), row_index=0)
+r1 = D.analyze(stacked, lane_bounds=equal_bounds(2), row_index=1)
 check("two rows detected", len(r0["rows_detected"]) == 2)
-check("rows give opposite strongest lanes",
-      r0["lanes"][0]["relative"] != r1["lanes"][0]["relative"] and {r0["lanes"][0]["relative"], r1["lanes"][0]["relative"]} == {1.0, r0["lanes"][0]["relative"] if r0["lanes"][0]["relative"] != 1.0 else r1["lanes"][0]["relative"]})
+check("rows give opposite strongest lanes", r0["lanes"][0]["relative"] == 1.0 and r0["lanes"][1]["relative"] < 0.5
+      and r1["lanes"][1]["relative"] == 1.0 and r1["lanes"][0]["relative"] < 0.5)
 
-# 6. printed labels: a solid-black text row is ranked after the blot strip,
-#    and a region box confines the analysis (coordinates come back in full-image pixels)
+# 9. region + explicit lanes: coordinates come back in full-image pixels and
+#    the printed-label row under the blot is excluded by the box
 labelled = synthetic([1.0, 0.5], band_y=40, h=120)
 labelled[95:110, 60:340] = 0  # a black "lane label" text row under the blot
-r_lab = densitometry.analyze(labelled, lanes=2)
+r_lab = D.analyze(labelled, lanes=2)
 check("text row not chosen as band row", r_lab["band_row"][0] <= 40 <= r_lab["band_row"][1])
-r_reg = densitometry.analyze(labelled, lanes=2, region=(100, 20, 380, 70))
-check("region respected", r_reg["image"]["region"] == [100, 20, 380, 70] and r_reg["lanes"][0]["x0"] == 100 and r_reg["lanes"][-1]["x1"] == 380)
-check("region band row in full-image coords", r_reg["band_row"][0] >= 20 and r_reg["band_row"][1] <= 70)
+r_reg = D.analyze(labelled, region=(20, 20, 380, 70), lane_bounds=[[20, 180], [220, 380]])
+check("region echoed", r_reg["image"]["region"] == [20, 20, 380, 70])
+check("region size is the full image size", r_reg["image"]["width"] == 400 and r_reg["image"]["height"] == 120)
+check("lane x in full-image coords", r_reg["lanes"][0]["x0"] == 20 and r_reg["lanes"][1]["x1"] == 380)
+check("band row in full-image coords inside region", 20 <= r_reg["band_row"][0] and r_reg["band_row"][1] <= 70)
+check("gap between lanes allowed", r_reg["lanes"][0]["x1"] == 180 and r_reg["lanes"][1]["x0"] == 220)
+check("region + lanes measure the right lanes", r_reg["lanes"][0]["relative"] == 1.0 and abs(r_reg["lanes"][1]["relative"] - 0.5) < 0.12)
+# same strip, box moved by a few px: stable conclusion, envelopes overlap
+r_reg2 = D.analyze(labelled, region=(24, 24, 384, 74), lane_bounds=[[24, 184], [224, 384]])
+check("moved box keeps ordering", r_reg2["lanes"][0]["relative"] == 1.0 and r_reg2["quality"]["state"] == "ok")
+e1, e2 = r_reg["lanes"][1]["stability"], r_reg2["lanes"][1]["stability"]
+check("moved box inside first envelope", e1["relative_min"] - 0.05 <= r_reg2["lanes"][1]["relative"] <= e1["relative_max"] + 0.05)
 
-# 7. disclaimer always present, no Evidence Record fields
+# 10. ranking flip under perturbation -> refused: two identical bands
+#     (x 37-163 and 237-363), lane 1 drawn over the LEFT half of band 1 and
+#     lane 2 over the RIGHT half of band 2, so a +dx shift favours lane 1
+#     and a -dx shift favours lane 2. The reference lane is then undefined.
+tie = synthetic([1.0, 1.0], noise=0.0)
+res_flip = D.analyze(tie, lane_bounds=[[37, 100], [300, 363]])
+check("ranking flip detected", res_flip["stability"] is not None and res_flip["stability"]["ranking_stable"] is False)
+check("ranking flip refuses", res_flip["quality"]["state"] == "quantification_refused" and all(l["relative"] is None for l in res_flip["lanes"]))
+check("flip reason mentions perturbation", any("strongest lane changes" in r for r in res_flip["quality"]["reasons"]))
+# the same bands with lanes drawn over the whole of each band are stable
+res_tie_ok = D.analyze(tie, lane_bounds=[[30, 170], [230, 370]])
+check("full-band lanes on identical bands are stable", res_tie_ok["stability"]["ranking_stable"] and res_tie_ok["quality"]["state"] == "ok")
+
+# 11. disclaimer always present; encode/decode round trip; 16-bit input tolerated
 check("disclaimer", "uncalibrated" in res["disclaimer"] and "not a measurement of protein amount" in res["disclaimer"])
-check("encode/decode round trip", densitometry.decode_image(
+check("encode/decode round trip", D.decode_image(
     __import__("cv2").imencode(".png", img)[1].tobytes()).shape == img.shape)
+res16 = D.analyze((img.astype(np.uint16) * 257), lane_bounds=equal_bounds(4))
+check("16-bit input gives same ordering", [l["relative"] for l in res16["lanes"]][0] == 1.0)
 
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
