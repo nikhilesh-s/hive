@@ -151,16 +151,37 @@ def detect_band_rows(corrected: np.ndarray, gray: np.ndarray | None = None,
     return sorted(segs, key=score)
 
 
+TEXT_SOLID_FRACTION = 0.25
+TEXT_MAX_RUN_PX = 10     # glyph strokes are a few px wide at 350 DPI; bands run tens of px
+
+
+def _long_run_fraction(block: np.ndarray, min_run: int = TEXT_MAX_RUN_PX) -> float:
+    """Fraction of solid-dark pixels that sit in horizontal runs of at least
+    `min_run` px. Glyph strokes put most dark pixels in short runs; a clipped
+    band puts most of them in long runs even when speckle breaks a few."""
+    dark = block < 16
+    if not dark.any():
+        return 0.0
+    padded = np.zeros((dark.shape[0], dark.shape[1] + 2), dtype=np.int8)
+    padded[:, 1:-1] = dark
+    d = np.diff(padded, axis=1)
+    runs = np.flatnonzero(d == -1) - np.flatnonzero(d == 1)
+    return float(runs[runs >= min_run].sum() / runs.sum()) if runs.size else 0.0
+
+
 def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None = None) -> bool:
-    """Printed labels: solid-black glyphs and/or a tall block (stacked label
-    lines); blot bands are grey-scaled and thin. `total_h` is the FULL image
-    height: a strip boxed tightly by the researcher is not "tall" just
-    because the box is short."""
+    """Printed labels: solid-black pixels in SHORT horizontal runs (glyph
+    strokes), and/or a tall block (stacked label lines). A clipped band is
+    also solid black but runs for tens of pixels, so it is not text.
+    `total_h` is the FULL image height: a strip boxed tightly by the
+    researcher is not "tall" just because the box is short."""
     if gray is None:
         return False
     block = gray[a:b]
+    solid = (block < 16).mean() > TEXT_SOLID_FRACTION and _long_run_fraction(block) < 0.5
     # stacked label lines are >= ~40 px at the 350 DPI the crops are rendered at
-    return bool((block < 16).mean() > 0.25 or (b - a) > max(40, 0.1 * (total_h or gray.shape[0])))
+    tall = (b - a) > max(40, 0.1 * (total_h or gray.shape[0]))
+    return bool(solid or tall)
 
 
 def detect_lanes(row: np.ndarray, expected: int | None = None, max_lanes: int = 16) -> list[tuple[int, int]]:
