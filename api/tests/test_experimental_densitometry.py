@@ -281,3 +281,26 @@ def test_refused_pair_exposes_no_per_lane_relatives(client):
     for strip in ("target", "control"):
         if d[strip]["quality"]["state"] == "quantification_refused":
             assert all(l["relative"] is None and l["stability"] is None for l in d[strip]["lanes"])
+
+
+def test_result_echoes_the_request_so_an_export_replays(client):
+    """Track F: without the request, a diagnostic (equal-width) measurement
+    replayed from its export as explicit lanes and its quality rose from
+    warning to ok, and the stability flag and row index were lost."""
+    b64 = base64.b64encode(_png([1.0, 0.5, 0.2])).decode()
+    body = {"image_base64": b64, "lanes": 3, "stability": False, "row_index": 0}
+    first = client.post("/experimental-densitometry", json=body, headers=AUTH).json()
+    req = first["request"]
+    assert "image_base64" not in req and req["lanes"] == 3 and req["stability"] is False and req["row_index"] == 0
+    # the export (result + request, no image) replays to the same numbers and the same grade
+    replay = client.post("/experimental-densitometry", json={**req, "image_base64": b64}, headers=AUTH).json()
+    assert replay["quality"]["state"] == first["quality"]["state"]
+    assert [l["relative"] for l in replay["lanes"]] == [l["relative"] for l in first["lanes"]]
+    assert replay["lane_mode"] == first["lane_mode"] and replay["band_row"] == first["band_row"]
+    assert replay["source"]["image_sha256"] == first["source"]["image_sha256"]
+
+    bounds = [[0, 100], [100, 200], [200, 300]]
+    pair = client.post("/experimental-densitometry/pair", headers=AUTH, json={
+        "image_base64": b64, "target": {"region": [0, 0, 300, 45], "lane_bounds": bounds},
+        "control": {"region": [0, 45, 300, 90], "lane_bounds": bounds}}).json()
+    assert "image_base64" not in pair["request"] and pair["request"]["target"]["lane_bounds"] == bounds

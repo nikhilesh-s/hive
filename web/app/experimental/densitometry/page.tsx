@@ -137,6 +137,9 @@ export default function DensitometryPage() {
   const [laneCount, setLaneCount] = useState('');
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [upload, setUpload] = useState<string | null>(null);
+  // What the researcher actually chose: a TIFF is measured through its PNG preview,
+  // so the export would otherwise carry no hash of their file.
+  const [uploadFile, setUploadFile] = useState<{ name: string; source_sha256?: string } | null>(null);
   // natural size + displayed-per-natural scale, captured in handlers (never read from the ref during render)
   const [dims, setDims] = useState<{ w: number; h: number; sx: number } | null>(null);
   const [region, setRegion] = useState<Box | null>(null);
@@ -208,6 +211,7 @@ export default function DensitometryPage() {
         if (my !== seq.current) return; // another image was loaded meanwhile
         if (!r.ok) throw new Error(readableDetail(d.detail ?? d.error, r.status));
         setUpload(d.png_base64);
+        setUploadFile({ name: f.name, source_sha256: d.source_sha256 });
         setImgSrc(d.png_base64);
         resetGeometry(true);
       } catch (e2) {
@@ -340,7 +344,7 @@ export default function DensitometryPage() {
 
   function exportJson() {
     if (!res) return;
-    download(`hiveblot-densitometry-${stamp()}.json`, 'application/json', JSON.stringify({ ...res, exported_at: new Date().toISOString(), page: '/experimental/densitometry' }, null, 2));
+    download(`hiveblot-densitometry-${stamp()}.json`, 'application/json', JSON.stringify({ ...res, uploaded_file: uploadFile ?? undefined, exported_at: new Date().toISOString(), page: '/experimental/densitometry' }, null, 2));
   }
   function exportCsv() {
     if (!res) return;

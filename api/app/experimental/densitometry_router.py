@@ -158,6 +158,7 @@ async def experimental_densitometry_pair(request: Request, body: PairRequest):
         raise HTTPException(400, str(e))
     source["image_sha256"] = hashlib.sha256(png).hexdigest()
     result["source"] = source
+    result["request"] = body.model_dump(exclude={"image_base64"})  # replayable export, no image bytes
     result["stored"] = False
     return result
 
@@ -219,5 +220,10 @@ async def experimental_densitometry(request: Request, body: DensitometryRequest)
     source["image_sha256"] = hashlib.sha256(png).hexdigest()
     result["source"] = source
     result["lanes_requested"] = lanes
+    # The exported JSON must replay to the SAME result: without the request, a
+    # diagnostic equal-width measurement replayed as explicit lanes and its
+    # quality rose from warning to ok, and the stability flag and row index were
+    # lost. The image itself is never echoed (source.image_sha256 identifies it).
+    result["request"] = body.model_dump(exclude={"image_base64"})
     result["stored"] = False
     return result
