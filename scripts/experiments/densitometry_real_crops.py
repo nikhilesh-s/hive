@@ -41,7 +41,7 @@ for p in CROPS:
             "band_row": r["band_row"], "n_lanes_auto": len(lanes),
             "max_clipped_fraction": max(l["clipped_fraction"] for l in lanes),
             "lanes_refused": sum(l["quality"] == D.REFUSED for l in lanes),
-            "lanes_no_signal": sum(any("no signal" in x for x in l["reasons"]) for l in lanes),
+            "lanes_no_signal": sum(any(x.startswith("weak:") for x in l["reasons"]) for l in lanes),
             "state": r["quality"]["state"],
             "reasons": r["quality"]["reasons"],
             "ranking_stable": r["stability"]["ranking_stable"] if r["stability"] else None,

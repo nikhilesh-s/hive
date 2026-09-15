@@ -93,3 +93,11 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Real-crop gate checks (73 checks total) + `research/overnight/2026-09-14-summary.md`
   (densitometry state, limitations, branch audit, Nik's manual steps) — this commit.
 - Lead P (Tally / distribution review) running as a sub-agent; result folded in when it returns.
+- `94b9840` demo_check product-path check (record 4455), Lead P Tally/distribution review folded in,
+  L1 stale header (B-6).
+- Tight-box probe found the background kernel scaling with the box (ratios 0.5/0.25/0.1 read
+  0.62/0.54/0.56 in an 18 px box, state ok). Fixed in `2ff1b0f` (kernel from the whole image) together
+  with explicit `band_row` (API + UI select), overlay PNG export (UI sub-agent), 40 px floor on the
+  text-row test, run-of-show step 9 rewritten with concrete records (4455 valid / near tie, 4686 refused).
+  Browser-verified on record 4455 after an API restart.
+- Weak-lane flag reworded (a lane showing 0.4 was labelled "no signal"); summary updated — this commit.
