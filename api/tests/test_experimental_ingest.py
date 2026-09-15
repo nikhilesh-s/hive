@@ -166,6 +166,49 @@ def test_annotate_oa_pdf_marks_extractable_papers(monkeypatch):
     assert papers[1]["oa_pdf"] is False and papers[2]["oa_pdf"] is False
 
 
+# --- route boundaries -------------------------------------------------------
+
+def test_oversized_record_id_is_a_validation_error_not_a_500():
+    big = "99999999999999999999"
+    with TestClient(app) as c:
+        for path in (f"/experimental/records/{big}", f"/experimental/records/{big}/crop",
+                     f"/records/{big}", f"/records/{big}/crop", f"/records/{big}/feedback", "/experimental/records/0"):
+            assert c.get(path, headers=AUTH).status_code == 422, path
+        for path in ("/experimental-densitometry", "/experimental-densitometry/pair"):
+            assert c.post(path, json={"record_id": int(big)}, headers=AUTH).status_code == 422, path
+
+
+def test_delete_job_needs_the_ingest_db_and_a_finished_job(monkeypatch):
+    deleted = []
+
+    async def fake_delete(job_id):
+        deleted.append(job_id)
+        return 3
+    monkeypatch.setattr("app.experimental.router.delete_live_job", fake_delete)
+    job = ingest.start_job("10.3892/br.2026.2108")
+    with TestClient(app) as c:
+        monkeypatch.setattr(settings, "db_ingest_url", None)
+        assert c.delete(f"/experimental/ingest/{job.job_id}", headers=AUTH).status_code == 503
+        monkeypatch.setattr(settings, "db_ingest_url", "postgresql://hive_ingest:x@localhost/x")
+        job.status = "extracting"   # a running job would re-insert its rows after the delete
+        assert c.delete(f"/experimental/ingest/{job.job_id}", headers=AUTH).status_code == 409
+        assert deleted == []
+        job.status = "done"
+        r = c.delete(f"/experimental/ingest/{job.job_id}", headers=AUTH)
+        assert r.status_code == 200 and r.json()["rows_deleted"] == 3 and deleted == [job.job_id]
+
+
+def test_job_status_survives_an_api_restart(monkeypatch):
+    async def stored(limit=20):
+        return [{"job_id": "abc123def", "doi": "10.1/x", "status": "done", "created_at": "2026-09-15T10:00:00"}]
+    monkeypatch.setattr("app.experimental.router.list_ingest_jobs", stored)
+    monkeypatch.setattr(settings, "db_ingest_url", "postgresql://hive_ingest:x@localhost/x")
+    with TestClient(app) as c:
+        r = c.get("/experimental/ingest/abc123def", headers=AUTH)
+        assert r.status_code == 200 and r.json()["status"] == "done"
+        assert c.get("/experimental/ingest/nope12345", headers=AUTH).status_code == 404
+
+
 # --- search guard pinned to the live table ----------------------------------
 
 def test_live_search_is_pinned_to_the_live_table():
