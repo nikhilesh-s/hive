@@ -94,6 +94,10 @@ def test_coip_bait_from_lane_labels_is_image_evidence():
     bait = rec.experiment.ip_bait_protein
     assert bait.value == "PIK3CA"
     assert [x.type for x in bait.sources] == ["image"]
+    assert bait.sources[0].text in "Co-IP anti-PIK3CA"            # lane-label words only, no caption text
+    for src in rec.experiment.experiment_type.sources:
+        if src.type == "image":
+            assert src.text in "Co-IP anti-PIK3CA"
 
 
 def test_coip_bait_from_caption_is_caption_evidence_with_caption_text():

@@ -244,8 +244,9 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
             sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
                                   text=_around(caption, m.start())))
         else:
+            # window on the lane-label text alone so an image quote holds no caption words
             sources.append(Source(type="image", rank=RANK_IMAGE,
-                                  text=_around(panel_scoped, m.start())))
+                                  text=_around(lane_text, m.start() - len(caption) - 1)))
     elif biology._IP_LANE.search(lane_text):
         m = biology._IP_LANE.search(lane_text)
         flags.append("co_ip")
@@ -306,7 +307,7 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
                                text=_around(caption, panel_co_ip.start()))
                         if panel_co_ip.start() < len(caption) else
                         Source(type="image", rank=RANK_IMAGE,
-                               text=_around(panel_scoped, panel_co_ip.start())))
+                               text=_around(lane_text, panel_co_ip.start() - len(caption) - 1)))
         if bait:
             ip_bait = EvidenceField.supported(bait, 0.75, [bait_src])
     return ExperimentInfo(experiment_type=exp_type, experiment_flags=exp_flags, ip_bait_protein=ip_bait)
