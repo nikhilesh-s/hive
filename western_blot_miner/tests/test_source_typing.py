@@ -65,3 +65,16 @@ def test_sample_value_absent_from_caption_has_no_caption_source():
     s2 = _rec("STAT3 in NSCLC cell line H1299.", "", cell_line="H1299", organism="human").sample
     assert s2.cell_line.sources[0].type == "figure_caption" and "H1299" in s2.cell_line.sources[0].text
     assert s2.organism.sources[0].type == "model_target"
+
+
+
+def test_treatment_dose_from_model_wording_is_not_deterministic():
+    from western_blot_miner.record_builder import build_evidence_record
+    base = {"raw_target": "STAT3", "model_claims": {"antibodies": [], "bands": [],
+            "treatment_name": "IL-6", "treatment_context": "Hep3B cells treated with IL-6 (10 ng/ml) for 30 min"}}
+    para = build_evidence_record({**base, "texts": {"caption": "Figure 1. STAT3 after cytokine.", "methods": ""}})
+    assert para.treatment.dose.value is not None
+    assert [x.type for x in para.treatment.dose.sources] == ["model_target"]
+    verb = build_evidence_record({**base, "texts": {"caption": "Hep3B cells treated with IL-6 (10 ng/ml) for 30 min", "methods": ""}})
+    assert [x.type for x in verb.treatment.dose.sources] == ["deterministic"]
+    assert verb.treatment.dose.value == para.treatment.dose.value
