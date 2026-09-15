@@ -56,7 +56,7 @@ check("strongest lane is lane 1", rel[0] == 1.0)
 check("half-strength lane ~0.5", abs(rel[1] - 0.5) < 0.12)
 check("quarter-strength lane ~0.25", abs(rel[2] - 0.25) < 0.12)
 check("empty lane ~0", rel[3] < 0.08)
-check("empty lane flagged no-signal, not refused", res["lanes"][3]["quality"] == "ok" and any("no signal" in r for r in res["lanes"][3]["reasons"]))
+check("empty lane flagged weak, not refused", res["lanes"][3]["quality"] == "ok" and any(r.startswith("weak:") for r in res["lanes"][3]["reasons"]))
 check("overall ok", res["quality"]["state"] == "ok")
 y0, y1 = res["band_row"]
 check("band row brackets y=60", y0 <= 60 <= y1)

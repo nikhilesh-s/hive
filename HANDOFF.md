@@ -61,7 +61,14 @@ printed-text warning; record-crop path verified in the browser on the local DB
 real-crop gate checks added to the test script. Full state, limitations,
 branch audit and Nik's manual steps: **`research/overnight/2026-09-14-summary.md`**.
 
-**Tests (2026-09-15):** densitometry 73/73 · api 164 passed / 11 skipped (DB
+**Later in window 2:** background kernel sized from the whole image (a tight
+box collapsed ratios toward 1 while reporting ok — the most serious bug found
+this push); explicit `band_row` in API/UI; overlay PNG export; demo_check
+exercises the product path on record 4455; run-of-show step 9 rewritten with
+concrete records (4455 valid strip + β-actin near tie, 4686 clipped refusal);
+Tally/distribution specs reviewed and trimmed to ~5 min; L1 marked stale.
+
+**Tests (2026-09-15):** densitometry 77/77 · api 165 passed / 11 skipped (DB
 matrix needs `HIVE_DB_TEST_URL`) · miner pytest 56 · biology / reconcile 21 /
 loader / extract 10 / pipeline 13 / stable-row-key 34 all green · benchmark
 34/34 · `tsc` clean · lint 0/0 · `next build` clean · `git diff --check` clean.
@@ -74,12 +81,14 @@ not on this laptop (PMC fallback works); nothing experimental is hosted;
 re-run.
 
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) fold the Lead P Tally/distribution review into
-`tickets/` if it is still uncommitted; (2) UI row picker (click a detected
-row from `rows_detected` instead of typing `row_index`); (3) author-value
-comparison ticket D-5 second half (LC3B-II:ACTB bar charts as an offset with
-n, "n too small" allowed); (4) overlay PNG in the export; (5) B-6 stale L1
-report cleanup.
+in priority order: (1) a second adversarial pass on v0.2 after the kernel
+change (tight boxes, light-on-dark uploads, JPEG uploads via the UI); (2) UI
+row picker (click a detected row from `rows_detected` instead of typing
+`row_index`); (3) author-value comparison, ticket D-5 second half
+(LC3B-II:ACTB bar charts as an offset with n, "n too small" allowed);
+(4) TIFF upload preview for researchers' own imager files; (5) `/about` and
+`/learn` copy: mention the experimental densitometry route without changing
+the Evidence Record statement.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 
