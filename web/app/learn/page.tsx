@@ -107,7 +107,10 @@ export default function Learn() {
           protein up- or down-regulated. That is densitometry, and it is out of scope by
           design: an intensity read off a figure without the original exposure is not a
           measurement. If a lane is faint or hard to judge from the published image it is
-          marked uncertain rather than guessed.
+          marked uncertain rather than guessed. The experimental densitometry page is the
+          one exception, and it is kept apart from the records: it reports uncalibrated,
+          within-one-image relative band darkness with a quality state, refuses clipped or
+          unstable readings, and writes nothing back.
         </p>
         <p className="hb-page-p">
           When a panel is a time course or dose series, the panel-level dose or duration
