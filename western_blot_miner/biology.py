@@ -187,12 +187,15 @@ _INPUT_BLOT = re.compile(r"\binput\b", re.IGNORECASE)
 
 # Catalog number: "#9145", "cat. no. 9145", "ab32157", "sc-482".
 _CATALOG = re.compile(
-    r"(?:\bcat(?:alog)?\.?\s*(?:no\.?|#|number)?\s*|#)\s*([A-Za-z]{0,3}[-\s]?\d{3,7})",
+    # full digit run plus an optional 1-2 letter suffix ("5174s", "20200728"), never a truncated prefix
+    r"(?:\bcat(?:alog)?\.?\s*(?:no\.?|#|number)?\s*|#)\s*([A-Za-z]{0,3}[-\s]?\d{3,}[A-Za-z]{0,2})(?![\w-])",
     re.IGNORECASE,
 )
 _CATALOG_VENDORCODE = re.compile(r"\b(ab\d{3,7}|sc[-\s]?\d{3,7})\b", re.IGNORECASE)
 # Antibody dilution: "1:1000".
-_DILUTION = re.compile(r"\b1\s?:\s?(\d{2,6})\b")
+# "1:1,000" and "1:100,000" keep their thousands groups (callers strip the commas);
+# "1:500, 1:1000" still yields two separate values.
+_DILUTION = re.compile(r"\b1\s?:\s?(\d{1,3}(?:,\d{3})+|\d{2,6})(?!\d|,\d{3}\b)")
 # Molecular weight: "86 kDa", "~120 kDa".
 _KDA = re.compile(r"(~?\s?\d{1,4}(?:\.\d+)?)\s?kDa", re.IGNORECASE)
 # Dose: "20 ng/mL", "10 uM", "0.2 umol/L".

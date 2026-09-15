@@ -454,6 +454,13 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
     for p in mentions:
         end = min([b for b in bounds if b > p], default=len(text))
         scopes.append(text[p:end])
+    # The same target named with its own parenthesised metadata in two separate
+    # scopes is two antibodies ("anti-PIK3CA (4249, CST); anti-PIK3CA (sc-293172,
+    # Santa Cruz)"): a value visible in one scope says nothing about which
+    # antibody this record used, and a value the regexes cannot see in the other
+    # scope would make a disagreement look like agreement. Abstain.
+    if sum(1 for sc in scopes if "(" in sc) >= 2:
+        return {}
     scope = " | ".join(scopes)
 
     def one(vals):
@@ -468,7 +475,7 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
         "vendor": one(vendors),
         "catalog_number": one(cats),
         "clone": one([m.group(1) for m in re.finditer(r"\bclone\s+([A-Za-z0-9\-]+)", scope, re.IGNORECASE)]),
-        "dilution": one([f"1:{m.group(1)}" for m in biology._DILUTION.finditer(scope)]),
+        "dilution": one([f"1:{m.group(1).replace(',', '')}" for m in biology._DILUTION.finditer(scope)]),
     }
 
 

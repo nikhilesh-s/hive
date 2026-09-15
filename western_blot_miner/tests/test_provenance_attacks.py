@@ -126,3 +126,33 @@ def test_band_pattern_source_follows_where_it_was_read():
     assert bc.band_pattern.value == "doublet"
     assert [s.type for s in bc.band_pattern.sources] == ["figure_caption"]
     assert bc.band_pattern.sources[0].text in "Figure 3. STAT3 appeared as a doublet in all lanes."
+
+
+
+def test_catalog_numbers_are_not_truncated():
+    from western_blot_miner.supabase_loader import extract_antibody
+    assert extract_antibody("anti-ubiquitin (1:400 dilution; cat. no. 20200728, Yurogen)")["catalog_number"] == "20200728"
+    assert extract_antibody("GAPDH (cat. no. 5174s, Cell Signaling)")["catalog_number"] == "5174s"
+    assert extract_antibody("ACTB (#8457S)")["catalog_number"] == "8457S"
+    assert extract_antibody("STAT3 (cat. no. 12640abc)")["catalog_number"] is None   # not a catalog shape: abstain
+
+
+def test_comma_grouped_dilutions_are_read_whole():
+    from western_blot_miner.supabase_loader import extract_antibody
+    assert extract_antibody("TUBA1B (1:100,000 dilution; cat. no. ab108629)")["dilution"] == "1:100000"
+    assert extract_antibody("p-STAT3 (Tyr705; 1:1,000; CST #9145)")["dilution"] == "1:1000"
+    assert extract_antibody("anti-STAT3 (1:500), secondary 1:2000")["dilution"] == "1:500"
+
+
+def test_two_antibodies_against_the_same_target_abstain():
+    text = ("Antibodies: anti-PIK3CA (4249) from Cell Signaling Technology; "
+            "anti-PIK3CA (SC-293172) from Santa Cruz Biotechnology.")
+    rec = build_evidence_record({
+        "raw_target": "PIK3CA", "texts": {"caption": "", "methods": text},
+        "model_claims": {"antibodies": [{"target": "PIK3CA", "role": "detection", "catalog": "4249",
+                                         "vendor": "Cell Signaling", "source": {"type": "methods", "rank": 3, "text": text}}],
+                         "bands": []},
+    })
+    ab = rec.antibodies[0]
+    assert ab.catalog_number.value == "4249" and ab.catalog_number.candidates == []
+    assert ab.vendor.candidates == []
