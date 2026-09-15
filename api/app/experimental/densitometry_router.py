@@ -30,7 +30,7 @@ MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
 
 class DensitometryRequest(BaseModel):
-    record_id: int | None = None
+    record_id: int | None = Field(default=None, ge=1, le=2**63 - 1)  # bigint; larger was a 500
     live: bool = False                       # record_id refers to the live tier
     image_base64: str | None = Field(default=None, max_length=12_000_000)
     # DIAGNOSTIC: equal-width slicing of the region into this many lanes.
@@ -101,7 +101,7 @@ class StripSpec(BaseModel):
 
 
 class PairRequest(BaseModel):
-    record_id: int | None = None
+    record_id: int | None = Field(default=None, ge=1, le=2**63 - 1)
     live: bool = False
     image_base64: str | None = Field(default=None, max_length=12_000_000)
     target: StripSpec

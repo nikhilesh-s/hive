@@ -7,6 +7,7 @@ Free to change shape as the frontend's needs change.
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import Path as PathParam
 
 from ..auth import require_internal_key
 from ..config import settings
@@ -71,7 +72,7 @@ async def search(request: Request, body: SearchRequest):
 
 @router.get("/records/{record_id}", response_model=RecordDetail,
             dependencies=[Depends(require_internal_key)])
-async def record_detail(record_id: int):
+async def record_detail(record_id: int = PathParam(ge=1, le=2**63 - 1)):  # bigint; larger was a 500
     """Full provenance for ONE record — the 'Why does HiveBlot say this?'
     payload: field-level evidence envelopes (value/status/sources/candidates),
     antibodies with detection-vs-association confidence, per-lane bands, and
@@ -88,7 +89,7 @@ async def record_detail(record_id: int):
 
 
 @router.get("/records/{record_id}/crop", dependencies=[Depends(require_internal_key)])
-async def record_crop(record_id: int):
+async def record_crop(record_id: int = PathParam(ge=1, le=2**63 - 1)):
     """The record's own panel crop (the actual blot the evidence refers to).
 
     The path comes from the record's `image_crop_ref` column — never from the
@@ -121,7 +122,7 @@ async def record_crop(record_id: int):
 
 @router.get("/records/{record_id}/feedback", response_model=RecordFeedbackResponse,
             dependencies=[Depends(require_internal_key)])
-async def record_feedback(record_id: int):
+async def record_feedback(record_id: int = PathParam(ge=1, le=2**63 - 1)):
     """Prior researcher feedback for one record (rehydration after refresh).
     Reads hiveblot_feedback only; the Evidence Record is immutable here."""
     if not settings.db_feedback_url:

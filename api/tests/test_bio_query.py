@@ -123,7 +123,23 @@ def test_short_gene_symbol_does_not_match_inside_a_word():
     sql = generate_bio_sql("MYC 10.3892/br.2026.2108")
     assert "lower(treatment_name) SIMILAR TO '%myc([^a-z]%)?'" in sql
     assert "treatment_name ILIKE '%MYC%'" not in sql
-    assert "doi ILIKE '%10.3892/br.2026.2108%'" in sql      # long terms and DOIs stay substring
-    assert "target ILIKE '%STAT3%'" in generate_bio_sql("STAT3")
+    assert "lower(doi) = '10.3892/br.2026.2108'" in sql
+    assert "target ILIKE '%STAT3%'" in generate_bio_sql("STAT3")   # longer terms stay substring
     guarded = _guarded("MYC")
     assert "SIMILAR TO" in guarded and isinstance(sqlglot.parse_one(guarded, read="postgres"), exp.Select)
+
+
+def test_pasted_doi_is_an_exact_paper_filter():
+    # Regression: a DOI was split into substring terms, so '(00)' became a
+    # Ser92 site filter, '_' was stripped, and a truncated DOI matched a longer one.
+    sql = generate_bio_sql("10.1016/S0092-8674(00)81683-9")
+    assert "lower(doi) = '10.1016/s0092-8674(00)81683-9'" in sql
+    assert "residue" not in sql and "ILIKE" not in sql
+    for pasted in ("https://doi.org/10.1234/ABC_def.", "doi: 10.1234/abc_def", "https://dx.doi.org/10.1234/abc_def"):
+        sql = generate_bio_sql(pasted)
+        assert "lower(doi) = '10.1234/abc_def'" in sql and "ILIKE" not in sql, pasted   # no leftover prefix term
+    sql = generate_bio_sql("phospho STAT3 Tyr705 10.3892/br.2026.2108")
+    assert "residue_position = 705" in sql and "lower(doi) = '10.3892/br.2026.2108'" in sql
+    assert "lower(doi) = '10.1234/x;drop'" in generate_bio_sql("10.1234/x';DROP")   # quote cannot close the literal
+    for q in ("10.1016/S0092-8674(00)81683-9", "phospho STAT3 10.3892/br.2026.2108", "10.1234/x';DROP"):
+        _guarded(q)

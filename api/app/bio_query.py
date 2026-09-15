@@ -105,9 +105,31 @@ def _term_clause(term: str) -> str:
     return f"({ors})"
 
 
+# The URL / "doi:" prefix is consumed with the DOI; left behind it became an AND term matching nothing.
+_DOI_IN_QUERY_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)?\b(10\.\d{4,9}/\S+)", re.IGNORECASE)
+
+
+def _doi_clause(q: str) -> tuple[str | None, str]:
+    """A pasted DOI is an exact paper filter. It is taken out of the question
+    first, so its characters never become a phospho site ('s0092-8674(00)'
+    read as Ser92) or a substring that also matches a longer DOI ('...2227'
+    inside '...2227-4'), and '_' / '()' in it survive."""
+    m = _DOI_IN_QUERY_RE.search(q)
+    if not m:
+        return None, q
+    doi = m.group(1).rstrip(".,;?!")
+    if doi.count(")") > doi.count("("):
+        doi = doi.rstrip(")")
+    doi = re.sub(r"[\\'\x00-\x1f]", "", doi).lower()
+    return f"lower(doi) = '{doi}'", q[: m.start()] + " " + q[m.end():]
+
+
 def generate_bio_sql(question: str, table_name: str | None = None) -> str:
     q = " " + question.strip() + " "
     clauses: list[str] = []
+    doi, q = _doi_clause(q)
+    if doi:
+        clauses.append(doi)
 
     # Phospho-site notation (Tyr705 / Y705 / Ser 473) -> residue + position.
     site = _SITE_RE.search(q)
