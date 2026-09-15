@@ -77,8 +77,43 @@ async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, di
     return crop.read_bytes(), n_lanes, row
 
 
+class PreviewRequest(BaseModel):
+    image_base64: str = Field(max_length=40_000_000)
+
+
+@router.post("/experimental-densitometry/preview")
+@limiter.limit("60/minute")
+async def experimental_densitometry_preview(request: Request, body: PreviewRequest):
+    """Browsers cannot display TIFF (the usual imager export). Decode any
+    OpenCV-readable upload and return an 8-bit PNG data URL for display; the
+    measurement then runs on that PNG, which is exactly the 8-bit grayscale
+    the analyzer would derive from the original (16-bit -> //257, no
+    stretch). Nothing is stored."""
+    import cv2
+
+    try:
+        raw = base64.b64decode(body.image_base64.split(",", 1)[-1], validate=False)
+    except Exception:
+        raise HTTPException(400, "image_base64 is not valid base64")
+    if len(raw) > 3 * MAX_IMAGE_BYTES:
+        raise HTTPException(413, "image too large")
+    try:
+        gray = densitometry._to_gray(densitometry.decode_image(raw))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    ok, buf = cv2.imencode(".png", gray)
+    if not ok:
+        raise HTTPException(400, "could not encode preview")
+    png = buf.tobytes()
+    if len(png) > MAX_IMAGE_BYTES:
+        raise HTTPException(413, "decoded image too large for the preview")
+    return {"png_base64": "data:image/png;base64," + base64.b64encode(png).decode(),
+            "width": int(gray.shape[1]), "height": int(gray.shape[0]),
+            "source_sha256": hashlib.sha256(raw).hexdigest(), "stored": False}
+
+
 @router.post("/experimental-densitometry")
-@limiter.limit("20/minute")
+@limiter.limit("60/minute")
 async def experimental_densitometry(request: Request, body: DensitometryRequest):
     if body.record_id is None and not body.image_base64:
         raise HTTPException(400, "Provide record_id or image_base64")
