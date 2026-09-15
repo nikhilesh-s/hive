@@ -237,3 +237,80 @@ def test_ask_route(monkeypatch):
         r = c.post("/experimental/ask", json={"question": "Is STAT3 phosphorylated?", "doi": "10.3892/br.2026.2108"}, headers=AUTH)
         assert r.status_code == 200 and r.json()["doi"] == "10.3892/br.2026.2108"
         assert c.post("/experimental/ask", json={"question": "x"}, headers=AUTH).status_code == 422
+
+
+# --- status check: answer wording vs the cited records' statuses ---------------
+
+STATUS_ROWS = [
+    # E1: STAT3 phospho-Tyr705, supported, settled
+    {"id": 11, "paper_id": "10.1/p", "doi": "10.1/p", "target": "P-STAT3 (Tyr705)", "canonical_target": "STAT3",
+     "modification_type": "phosphorylation", "modification_label": "phospho-Tyr705", "modification_status": "SUPPORTED",
+     "stable_row_key": "s1:1", "lane_condition": "IL-6", "band_state": "present", "needs_review": False},
+    # E2: ERK, modification CONFLICTING, needs review
+    {"id": 12, "paper_id": "10.1/p", "doi": "10.1/p", "target": "P-ERK 1/2", "canonical_target": "MAPK1/MAPK3",
+     "modification_status": "CONFLICTING", "stable_row_key": "s2:1", "lane_condition": "0 min", "band_state": "present",
+     "needs_review": True, "anomaly_flags": [{"code": "MODIFICATION_CONFLICT", "severity": "high", "detail": "Sources disagree."}]},
+    # E3: GAPDH, modification not stated
+    {"id": 13, "paper_id": "10.1/p", "doi": "10.1/p", "target": "GAPDH", "canonical_target": "Gapdh",
+     "modification_status": "MISSING", "experiment_type": "loading_control", "western_blot_type": "total_protein",
+     "stable_row_key": "s3:1", "lane_condition": "ctrl", "band_state": "present", "needs_review": False},
+]
+
+
+def _status_blocks(tier="reviewed"):
+    blocks = ask.evidence_blocks(STATUS_ROWS, tier)
+    for i, b in enumerate(blocks, 1):
+        b["ref"] = f"E{i}"
+    return blocks
+
+
+def test_status_check_flags_contradictions_with_cited_statuses():
+    blocks = _status_blocks()
+    w = lambda t: ask.status_warnings(t, blocks)
+    # CONFLICTING presented as settled
+    assert any("E2 has a CONFLICTING" in x for x in w("ERK is phosphorylated after IL-6 [E2]."))
+    assert any("E2 has a CONFLICTING" in x for x in w("ERK is total protein. [E2]"))
+    # SUPPORTED phosphorylation denied
+    assert any("denies phosphorylation" in x for x in w("STAT3 is not phosphorylated at Tyr705 [E1]."))
+    # MISSING modification called total protein / a phosphorylation nobody recorded
+    assert any("do not state a modification" in x for x in w("GAPDH is an unmodified total protein [E3]."))
+    assert any("none of its cited records" in x for x in w("GAPDH is phosphorylated in these cells [E3]."))
+    # certain language on a needs-review record
+    assert any("needs review" in x for x in w("The blot clearly establishes the ERK time course [E2]."))
+    # valid E-number, wrong evidence
+    assert any("names gapdh" in x for x in w("GAPDH was used as the loading control [E1]."))
+    # intensity language on categorical bands
+    assert any("intensity" in x for x in w("STAT3 phosphorylation increased after IL-6 [E1]."))
+    # records disagree: a settled claim citing a supported and a conflicting record is still flagged
+    assert any("E2 has a CONFLICTING" in x for x in w("STAT3 and ERK are both phosphorylated [E1, E2]."))
+
+
+def test_status_check_stays_quiet_on_faithful_answers():
+    blocks = _status_blocks()
+    good = ("STAT3 is phosphorylated at Tyr705 after IL-6 [E1]. ERK phosphorylation is unresolved: the sources "
+            "disagree on phospho vs total [E2]. GAPDH was blotted as the loading control; its modification is not "
+            "stated [E3].")
+    assert ask.status_warnings(good, blocks) == []
+    assert ask.status_warnings("Not settled. ERK modification is conflicting across records [E2].", blocks) == []
+    # Known limit: partial support inside one sentence is not detectable lexically.
+    assert ask.status_warnings("STAT3 is phosphorylated at Tyr705 in 12 cell lines [E1].", blocks) == []
+
+
+def test_status_check_live_records_must_be_called_unreviewed(monkeypatch):
+    blocks = _status_blocks("live_unreviewed")
+    assert any("unreviewed" in x for x in ask.status_warnings("STAT3 is phosphorylated at Tyr705 [E1].", blocks))
+    assert ask.status_warnings("In an unreviewed extraction, STAT3 is phosphorylated at Tyr705 [E1].", blocks) == []
+
+
+def test_answer_reports_status_warnings_and_missing_is_not_total(monkeypatch):
+    async def fake_query(sql):
+        return STATUS_ROWS
+    monkeypatch.setattr(ask, "run_readonly_query", fake_query)
+    prompts = []
+    out = _run(ask.answer("Is ERK phosphorylated?", include_live=False,
+                          llm=lambda s, u: (prompts.append(u) or "ERK is phosphorylated [E2].", "m")))
+    assert out["status_warnings"] and "Status check" in out["note"] and "not a verification" in out["note"]
+    assert "total_protein" not in prompts[0]           # legacy western_blot_type never reaches the model
+    out = _run(ask.answer("Is ERK phosphorylated?", include_live=False,
+                          llm=lambda s, u: ("ERK phosphorylation is unresolved [E2].", "m")))
+    assert out["status_warnings"] == [] and out["note"] is None
