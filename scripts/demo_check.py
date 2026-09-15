@@ -139,9 +139,21 @@ def main() -> int:
     ev = len(q.get("evidence", [])) if st == 200 else 0
     rec("PASS" if ev else "FAIL", "paper QA retrieval", f"{ev} evidence blocks; answer={'yes' if q.get('answer') else 'none'}; cited={q.get('cited')}; {q.get('note') or ''}")
 
-    # 9. optional densitometry
+    # 9. optional densitometry: diagnostic call on the first search hit, then the
+    #    product path (region + researcher lanes) on the STAT3 panel of record 4455
+    #    if that record exists locally (P-STAT3 (Ser727) strip, panel C)
     st, d = http("POST", f"{a.api}/experimental-densitometry", {"record_id": (s.get("results") or [{}])[0].get("id")}, key)
-    rec("PASS" if st == 200 else "WARN", "densitometry (optional)", f"HTTP {st}")
+    rec("PASS" if st == 200 else "WARN", "densitometry (optional, diagnostic lanes)", f"HTTP {st} · {d.get('quality', {}).get('state', '?') if st == 200 else ''}")
+    edges = [793, 894, 996, 1098, 1199, 1301, 1402]
+    st, d = http("POST", f"{a.api}/experimental-densitometry",
+                 {"record_id": 4455, "region": [793, 120, 1402, 185],
+                  "lane_bounds": [[edges[i], edges[i + 1]] for i in range(6)]}, key)
+    if st == 200:
+        q = d.get("quality", {}).get("state")
+        rec("PASS" if q == "ok" and d.get("lane_mode") == "explicit" else "WARN", "densitometry (region + lanes, record 4455)",
+            f"state={q} · lanes={d.get('lane_mode')} · ranking_stable={(d.get('stability') or {}).get('ranking_stable')}")
+    else:
+        rec("WARN", "densitometry (region + lanes, record 4455)", f"HTTP {st} (record 4455 not in this DB?)")
 
     # 10. web
     for path in ("/", "/experimental/research", "/api/experimental/status"):
