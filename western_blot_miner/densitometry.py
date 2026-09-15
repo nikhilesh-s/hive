@@ -285,7 +285,20 @@ def _flank(corrected, x0, x1, y0, y1):
     return base, max(1.4826 * mad, 0.5), int(sum(b.size for b in cands))
 
 
-def _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise):
+def _profile(corrected, x0, x1, y0, y1, oy):
+    """Vertical profile of the opening-corrected signal in this lane (row
+    means) over the band row plus two flank widths each side, so a researcher
+    can see the band and the rows the baseline came from. Full-image y."""
+    m = max(FLANK_MIN_PX, round(FLANK_FRACTION * (y1 - y0)))
+    hh = corrected.shape[0]
+    a, b = max(0, y0 - 2 * m), min(hh, y1 + 2 * m)
+    vals = corrected[a:b, x0:x1].mean(axis=1) if x1 > x0 else np.zeros(b - a)
+    return {"y0": int(a + oy), "values": [round(float(v), 2) for v in vals],
+            "flank": [[int(max(0, y0 - 2 * m) + oy), int(max(0, y0 - m) + oy)],
+                      [int(min(hh, y1 + m) + oy), int(min(hh, y1 + 2 * m) + oy)]]}
+
+
+def _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise, with_profile=False):
     """Per-lane sums over the band row. Bounds and the returned coordinates
     are in FULL-image pixels; y0/y1 are region-local. `noise` is the box-wide
     fallback (baseline, sigma) used only when a lane has no flank rows."""
@@ -314,6 +327,7 @@ def _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bo
             "flank_baseline": round(flank_base, 3), "flank_rows": fl[2] if fl else 0,
             "corrected": float(box_cor.sum()), "clipped_fraction": round(clipped, 4),
             "core_pixels": n_core, "snr": round(float(snr), 2) if np.isfinite(snr) else None,
+            **({"profile": _profile(corrected, x0, x1, y0, y1, oy)} if with_profile else {}),
         })
     return out
 
@@ -403,7 +417,7 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         raise ValueError(f"{len(labels)} lane labels for {len(bounds)} lanes")
 
     noise = _noise_stats(corrected, y0, y1)
-    base = _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise)
+    base = _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise, with_profile=True)
     if any(l["flank_rows"] == 0 for l in base):
         warnings.append("no membrane rows above/below the band inside the box for some lanes: the flank baseline "
                         "and noise could not be estimated there (opening-only background); include a margin of "
