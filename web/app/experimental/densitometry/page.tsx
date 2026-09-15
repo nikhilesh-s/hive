@@ -197,22 +197,25 @@ export default function DensitometryPage() {
   const bounds = region ? laneBounds(region, dividers) : [];
   const canMeasure = !!imgSrc && !busy && (diagnostic || !!region);
 
-  async function analyze() {
+  async function analyze(rowOverride?: number, regionOverride?: Box) {
+    const rowIdx = rowOverride ?? rowIndex;
+    const reg = regionOverride ?? region;
     setBusy(true);
     setErr(null);
     setRes(null);
     try {
       const anyLabel = labels.some((l) => l.trim());
-      const useFullRow = fullRow && !!region;
+      const useFullRow = fullRow && !!reg;
+      const lb = reg ? laneBounds(reg, dividers) : [];
       const body: Record<string, unknown> = {
-        region,
-        lane_bounds: diagnostic ? null : bounds,
-        lane_labels: diagnostic || !anyLabel ? null : bounds.map((_, i) => (labels[i] ?? '').trim()),
+        region: reg,
+        lane_bounds: diagnostic ? null : lb,
+        lane_labels: diagnostic || !anyLabel ? null : lb.map((_, i) => (labels[i] ?? '').trim()),
         lanes: diagnostic ? Number(laneCount) || null : null,
-        row_index: rowIndex,
+        row_index: rowIdx,
         stability,
       };
-      if (useFullRow) body.band_row = [region![1], region![3]];
+      if (useFullRow) body.band_row = [reg![1], reg![3]];
       if (upload) body.image_base64 = upload;
       else { body.record_id = Number(recordId); body.live = live; }
       const r = await fetch('/api/experimental/densitometry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -341,6 +344,9 @@ export default function DensitometryPage() {
                 {res ? (
                   <>
                     {res.image.region && <rect x={res.image.region[0]} y={res.image.region[1]} width={res.image.region[2] - res.image.region[0]} height={res.image.region[3] - res.image.region[1]} className="hb-dens-region" />}
+                    {band && !usedFullRow && res.rows_detected.map(([a, b], i) => (a === res.band_row[0] && b === res.band_row[1]) ? null : (
+                      <rect key={`alt-${i}`} x={band[0]} y={a} width={band[1] - band[0]} height={b - a} className={`hb-dens-row-alt${res.rows_text_like?.[i] ? ' is-text' : ''}`} />
+                    ))}
                     {band && <rect x={band[0]} y={res.band_row[0]} width={band[1] - band[0]} height={res.band_row[1] - res.band_row[0]} className="hb-dens-row" />}
                     {res.lanes.map((l) => (
                       <g key={l.index}>
@@ -388,7 +394,7 @@ export default function DensitometryPage() {
           )}
           {diagnostic && <p className="hb-live-note" style={{ color: 'var(--warning)' }}>Diagnostic mode: lanes are sliced equal-width from the box (or auto-detected without a box) instead of using your dividers. Lane geometry is a guess; do not report these numbers.</p>}
           <div className="hb-live-form" style={{ marginTop: 12 }}>
-            <button type="button" onClick={analyze} disabled={!canMeasure}>{busy ? 'Measuring…' : 'Measure'}</button>
+            <button type="button" onClick={() => analyze()} disabled={!canMeasure}>{busy ? 'Measuring…' : 'Measure'}</button>
           </div>
           {err && <p className="hb-live-error">{err}</p>}
         </section>
@@ -405,6 +411,24 @@ export default function DensitometryPage() {
               {res.image.inverted_for_analysis ? 'dark bands on light background' : 'light bands on dark background'}
               {res.stability && ` · stability: ±${res.stability.perturbation_px.x}px lanes / ±${res.stability.perturbation_px.y}px row × ${res.stability.runs} runs, ranking ${res.stability.ranking_stable ? 'stable' : res.stability.reference_tie_lanes?.length ? `near tie between lanes ${res.stability.reference_tie_lanes.join('/')}` : 'UNSTABLE'}`}
             </p>
+            {!usedFullRow && res.rows_detected.length > 1 && (
+              <p className="hb-live-note hb-dens-rows">
+                The box contains several band rows (faint dashed in the overlay). Click one to re-box that strip alone (its height plus a margin) and measure it:{' '}
+                {res.rows_detected.map(([a, b], i) => {
+                  const current = a === res.band_row[0] && b === res.band_row[1];
+                  return (
+                    <button key={i} type="button" className={current ? 'is-active' : ''} disabled={busy} onClick={() => {
+                      const r0 = res.image.region ?? [0, 0, dims?.w ?? 0, dims?.h ?? 0];
+                      const m = b - a;
+                      const boxed: Box = [r0[0], Math.max(r0[1], a - m), r0[2], Math.min(r0[3], b + m)];
+                      setRegion(boxed); setRowIndex(0); analyze(0, boxed);
+                    }} aria-label={`Re-box and measure band row ${i}`}>
+                      row {i}: y {a}–{b}{res.rows_text_like?.[i] ? ' (text?)' : ''}{current ? ' (measured)' : ''}
+                    </button>
+                  );
+                })}
+              </p>
+            )}
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table className="hb-dens-table">

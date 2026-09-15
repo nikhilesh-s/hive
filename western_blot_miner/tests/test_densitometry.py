@@ -134,6 +134,11 @@ r_two = D.analyze(two_in_box, region=(0, 25, 400, 95), lane_bounds=equal_bounds(
 check("full-box band_row over two strips warns", any("spans 2 detected band rows" in w for w in r_two["warnings"]))
 r_one = D.analyze(two_in_box, region=(0, 25, 400, 95), lane_bounds=equal_bounds(2))
 check("detection inside the same box picks one strip", r_one["band_row"][1] - r_one["band_row"][0] < 30 and not any("spans" in w for w in r_one["warnings"]))
+check("a box with two strips is at least a warning", r_one["quality"]["state"] != "ok"
+      and any("contains 2 band rows" in r for r in r_one["quality"]["reasons"] + r_one["warnings"]))
+r_single = D.analyze(two_in_box, region=(0, 25, 400, 60), lane_bounds=equal_bounds(2))
+check("re-boxing one strip clears the multi-row warning", r_single["quality"]["state"] == "ok"
+      and not any("band rows" in w for w in r_single["warnings"]))
 
 # 8. two stacked band rows: row_index selects the second
 two = synthetic([1.0, 0.2], band_y=30)
