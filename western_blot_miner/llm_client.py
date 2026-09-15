@@ -221,9 +221,14 @@ class ClaudeCLIClient(LLMClient):
 
         if not self.executable:
             raise RuntimeError("claude CLI not found (set CLAUDE_CLI or install Claude Code)")
+        # --setting-sources project: the operator's USER settings (plugins, hooks,
+        # output styles) must not shape extraction or answers. On the demo laptop
+        # a user style hook turned paper-QA answers into clipped non-grammatical
+        # prose; the login is unaffected (unlike --bare).
         args = [self.executable, "-p", user, "--output-format", "json",
                 "--system-prompt", system, "--model", self.model,
-                "--no-session-persistence", "--disable-slash-commands"]
+                "--no-session-persistence", "--disable-slash-commands",
+                "--setting-sources", "project"]
         if image_dir:
             args += ["--tools", "Read", "--allowedTools", "Read", "--add-dir", image_dir]
             cwd = image_dir
