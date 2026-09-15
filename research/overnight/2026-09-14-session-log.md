@@ -138,3 +138,8 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   from 2026-09-01 / 09-05; left standing, not suppressed.
 - New rule from Nik: checkpoint commit + push after every coherent block and tell him; sub-agent
   prompts must require an early progress report.
+- Re-rehearsed record 4686 refusal after the v0.3 / text-row changes: refused, clipped 30–56%, no
+  false printed-text warning.
+- B-4 scaffold: `scripts/experiments/panel_inventory_review.py`, blank inventory templates for the
+  three reviewed papers, review report; recall/precision blocked on the human inventory; crop-gate
+  visibility limit stated in the report.
