@@ -94,14 +94,17 @@ not on this laptop (PMC fallback works); nothing experimental is hosted;
 `scripts/local_db.py up` prints a harmless "policy already exists" error on
 re-run.
 
+**Latest (2026-09-15):** opening kernel floored at 61 px after a third
+adversarial pass (strips closer than a band height on small images); `next
+build` clean with the dev server stopped; `scripts/demo_check.py` green
+(see session log for the count).
+
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) `npm run build` with the dev server stopped, then
-`scripts/demo_check.py` and one last run-of-show rehearsal before the founder
-hard stop; (2) author-value comparison, ticket D-5 second half (LC3B-II:ACTB
-bar charts as an offset with n, "n too small" allowed); (3) a third
-adversarial pass aimed at the flank baseline (bands touching the box edge,
-strips closer than one band height, smiling bands); (4) B-4 panel inventory
-if budget remains.
+in priority order: (1) one last run-of-show step-9 rehearsal in the browser
+before the founder hard stop (records 4455 valid, 4686 refused, export);
+(2) author-value comparison, ticket D-5 second half (LC3B-II:ACTB bar charts
+as an offset with n, "n too small" allowed); (3) B-4 panel inventory if
+budget remains; (4) a Tally form built from the reviewed spec.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 

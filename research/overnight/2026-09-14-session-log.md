@@ -115,3 +115,6 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - TIFF uploads (imager exports) via `POST /experimental-densitometry/preview` → 8-bit PNG data URL;
   measurement on the preview equals the TIFF (test); rate limit 60/min; browser-verified with a 16-bit
   synthetic TIFF.
+- Third adversarial pass on the flank baseline: opening kernel floored at 61 px (`6901354`); all
+  cases within 0.04. `next build` clean with the dev server stopped; `scripts/demo_check.py` on the
+  restarted stack: 19 PASS · 2 WARN (Valency token absent) · 0 FAIL.
