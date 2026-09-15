@@ -234,3 +234,8 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   current builder. Recovered 92 values, 92 agree with the reviewed claims, 0 disagreements, 0 fills where
   the reviewed claim was empty; abstained on 24/60 (STAT3 paper), 5/60 (SMG paper), 99/100 (co-IP paper,
   whose methods list many antibodies in one sentence). Agreement with reviewed claims, not accuracy.
+- Final-code checks on the restarted stack: demo_check 19 PASS / 2 WARN / 0 FAIL; step-9 rehearsal
+  (4455 valid 0.5-0.6 / 1.0 / 0.3 / 0.0 / 0.0-0.1 / 0.3; beta-actin pairing warning; 4686 refused) all
+  requests 200 (the only 4xx in the tab were the deliberate probes); /experimental/research opens an
+  already-extracted paper with 17 LIVE · UNREVIEWED cards and a working evidence panel. CI green on adfcf81.
+- In progress: read-only paper-QA grounding/citation attack child.
