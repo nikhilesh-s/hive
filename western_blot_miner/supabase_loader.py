@@ -335,7 +335,7 @@ def extract_antibody(text: str) -> dict[str, Any]:
     cat = biology._CATALOG.search(text) or biology._CATALOG_VENDORCODE.search(text)
     catalog_number = cat.group(1).strip() if cat else None
     dil = biology._DILUTION.search(text)
-    dilution = f"1:{dil.group(1)}" if dil else None
+    dilution = f"1:{dil.group(1).replace(',', '')}" if dil else None
     clone_m = re.search(r"\bclone\s+([A-Za-z0-9\-]+)", text, re.IGNORECASE)
     clone = clone_m.group(1) if clone_m else None
     return {
