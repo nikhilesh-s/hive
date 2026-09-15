@@ -17,9 +17,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 });
   }
   try {
-    const raw = await request.json();
+    const raw = await request.json().catch(() => null);
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
     const body: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(raw || {})) {
+    for (const [k, v] of Object.entries(raw)) {
       if (ALLOWED_KEYS.has(k)) body[k] = v;
     }
     const resp = await fetch(`${BACKEND_URL}/feedback`, {

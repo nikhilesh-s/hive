@@ -166,6 +166,15 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         raise HTTPException(400, err)
     if not settings.db_feedback_url:
         raise HTTPException(503, "Feedback storage is not configured (DB_FEEDBACK_URL)")
+    if body.record_id is not None and body.stable_row_key:
+        # Both keys are stored and rehydration matches on them, so they must name the same record.
+        try:
+            row = await fetch_record_by_id(body.record_id)
+        except Exception as e:
+            logger.exception("feedback record check failed")
+            raise HTTPException(500, "Record lookup failed") from e
+        if row is not None and row.get("stable_row_key") and row["stable_row_key"] != body.stable_row_key:
+            raise HTTPException(400, "record_id and stable_row_key refer to different records")
     # Column names come from this fixed dict — never from client-supplied keys.
     fields = {
         "app_version": "beta-local",

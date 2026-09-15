@@ -108,7 +108,10 @@ async def fetch_feedback_for_record(record_id: int,
             "SELECT feedback_id, created_at, feedback_scope, stable_row_key, "
             "field_name, model_value, feedback_type, suggested_value, comment, "
             "session_id FROM hiveblot_feedback "
-            "WHERE record_id = $1 OR (stable_row_key IS NOT NULL AND stable_row_key = $2) "
+            # A row with a stable key matches only by that key: after a reseed the serial id
+            # can belong to a different record. Rows without one (legacy) match by id.
+            "WHERE (stable_row_key IS NOT NULL AND stable_row_key = $2) "
+            "OR (record_id = $1 AND (stable_row_key IS NULL OR $2::text IS NULL)) "
             "ORDER BY feedback_id",
             record_id, stable_row_key,
         )

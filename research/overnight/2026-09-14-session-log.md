@@ -290,3 +290,24 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   already-extracted papers: Failed to reach backend" and the live page alerts "Live tier search failed".
   tsc and lint clean. API restarted on HEAD: demo_check 19 PASS / 2 WARN / 0 FAIL. CI green on d056c83,
   da0f5c9, e4936f3.
+- Third read-only attack child (main search, evidence panel, feedback) confirmed: (1) the web proxy sent
+  no limit, so results were cut at 100 lane rows mid-experiment with no notice ("loading control" 175
+  rows -> 100, one card 2 of 5 lanes); (2) vendor + catalog found only numeric catalogs (Sigma A1978,
+  abcam ab108629, Santa Cruz sc-398486, 5174s all 0 rows); (3) notation gaps (pSTAT3, beta-actin,
+  SQSTM1, ERK1/2, 4E-BP1) and `_esc` stripping kappa/alpha ("IκBα" -> "ib", matching -ib drug names);
+  (4) "STAT3 expression" 0 rows, "T24" parsed as Thr24, "HEK 293 CST" / "CST 1:1000" parsed as
+  catalogs; (5) main search page had no stale-response guard; (6) /api/search and /api/feedback gave
+  502 for invalid JSON, a NUL byte in feedback passed validation and fails in Postgres, and a record_id
+  with another record's stable_row_key was accepted and rehydrated on both records. Held: DOI rule, site
+  notation, short-symbol rule, CONFLICTING rows included and badged, MW always labelled expected,
+  categorical bands, review reasons present.
+- Fixes (this block): the proxy asks for 500 rows and the API drops the trailing partial experiment and
+  returns `truncated`, shown as a note on the page; a catalog is read only directly after a vendor (any
+  "ab"/"sc-"/letter prefix and suffix), `antibody_catalog_number` is a term column, dilutions are not
+  terms; T24/Y79 stay terms; letters of any script survive `_esc`; expression/level/protein/knockdown
+  words are stopwords; search page request token (implementation child); proxies 400 on invalid JSON;
+  feedback rejects NUL and mismatched record keys; rehydration matches a keyed row only by its stable key.
+  Local corpus: Sigma A1978 50, abcam ab108629 31, Santa Cruz sc-398486 53, 5174s 31, CST 9145 18,
+  STAT3 expression 59, CST 1:1000 no catalog filter. Not fixed (synonym expansion would be a new
+  feature): pSTAT3 / beta-actin / SQSTM1 / ERK1/2 / 4E-BP1 notation gaps, and protein terms matching
+  treatment text ("MEK/ERK inhibitor") by design.
