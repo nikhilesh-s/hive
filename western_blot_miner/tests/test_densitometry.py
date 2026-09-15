@@ -142,6 +142,9 @@ labelled = synthetic([1.0, 0.5], band_y=40, h=120)
 labelled[95:110, 60:340] = 0  # a black "lane label" text row under the blot
 r_lab = D.analyze(labelled, lanes=2)
 check("text row not chosen as band row", r_lab["band_row"][0] <= 40 <= r_lab["band_row"][1])
+check("text row flagged in rows_text_like", r_lab["rows_text_like"][0] is False and True in r_lab["rows_text_like"])
+r_txt = D.analyze(labelled, lanes=2, band_row=(95, 110))
+check("forcing the text row warns", any("printed text" in w for w in r_txt["warnings"]))
 r_reg = D.analyze(labelled, region=(20, 20, 380, 70), lane_bounds=[[20, 180], [220, 380]])
 check("region echoed", r_reg["image"]["region"] == [20, 20, 380, 70])
 check("region size is the full image size", r_reg["image"]["width"] == 400 and r_reg["image"]["height"] == 120)
@@ -155,15 +158,35 @@ check("moved box keeps ordering", r_reg2["lanes"][0]["relative"] == 1.0 and r_re
 e1, e2 = r_reg["lanes"][1]["stability"], r_reg2["lanes"][1]["stability"]
 check("moved box inside first envelope", e1["relative_min"] - 0.05 <= r_reg2["lanes"][1]["relative"] <= e1["relative_max"] + 0.05)
 
-# 10. ranking flip under perturbation -> refused: two identical bands
-#     (x 37-163 and 237-363), lane 1 drawn over the LEFT half of band 1 and
-#     lane 2 over the RIGHT half of band 2, so a +dx shift favours lane 1
-#     and a -dx shift favours lane 2. The reference lane is then undefined.
+# 9b. polarity comes from the whole image: a tight box around dense dark bands
+#     (region mean < 127) must still be read as dark-on-light
+dense = synthetic([0.95, 0.95, 0.9, 0.95], peak=235, sigma=20.0, h=60, band_y=30)
+r_dense = D.analyze(dense, region=(0, 10, 400, 50), lane_bounds=equal_bounds(4))
+check("dense dark strip keeps light-background polarity", r_dense["image"]["inverted_for_analysis"] is True
+      and D._to_gray(dense)[10:50].mean() < 127)
+check("dense strip band row brackets the bands", r_dense["band_row"][0] <= 30 <= r_dense["band_row"][1])
+check("a tightly boxed strip is not called printed text", not any("printed text" in w for w in r_reg["warnings"]))
+
+# 10a. near-tie reference flip -> WARNING, values kept: two identical bands
+#      (x 37-163 and 237-363), lane 1 drawn over the LEFT half of band 1 and
+#      lane 2 over the RIGHT half of band 2, so a +dx shift favours lane 1
+#      and a -dx shift favours lane 2. Both were ~1.0 at baseline: a tie.
 tie = synthetic([1.0, 1.0], noise=0.0)
 res_flip = D.analyze(tie, lane_bounds=[[37, 100], [300, 363]])
 check("ranking flip detected", res_flip["stability"] is not None and res_flip["stability"]["ranking_stable"] is False)
-check("ranking flip refuses", res_flip["quality"]["state"] == "quantification_refused" and all(l["relative"] is None for l in res_flip["lanes"]))
-check("flip reason mentions perturbation", any("strongest lane changes" in r for r in res_flip["quality"]["reasons"]))
+check("near tie is a warning with values kept", res_flip["quality"]["state"] == "warning" and all(l["relative"] is not None for l in res_flip["lanes"]))
+check("tie lanes named", res_flip["stability"]["reference_tie_lanes"] == [1, 2] and any("near tie" in r for r in res_flip["quality"]["reasons"]))
+# 10b. severe reference flip -> REFUSED: lane 2 is half of lane 1 at the drawn
+#      geometry, but a solid-black block sits just outside lane 2's right edge,
+#      so a +dx shift makes lane 2 the strongest. Geometry chose the reference.
+sev = np.full((120, 600), 235, dtype=np.uint8)
+sev[54:66, 20:120] = 195          # lane 1: darkness 40 over 100 px
+sev[54:66, 220:270] = 195         # lane 2: darkness 40 over 50 px (relative 0.5)
+sev[54:66, 400:440] = 0           # black block right of lane 2's edge (x1 = 400)
+res_sev = D.analyze(sev, lane_bounds=[[0, 200], [200, 400]])
+check("severe flip detected", res_sev["stability"] is not None and res_sev["stability"]["ranking_stable"] is False)
+check("severe flip refuses", res_sev["quality"]["state"] == "quantification_refused" and all(l["relative"] is None for l in res_sev["lanes"]))
+check("severe flip reason", any("clearly weaker" in r for r in res_sev["quality"]["reasons"]))
 # the same bands with lanes drawn over the whole of each band are stable
 res_tie_ok = D.analyze(tie, lane_bounds=[[30, 170], [230, 370]])
 check("full-band lanes on identical bands are stable", res_tie_ok["stability"]["ranking_stable"] and res_tie_ok["quality"]["state"] == "ok")

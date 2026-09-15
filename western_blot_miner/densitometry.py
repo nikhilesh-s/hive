@@ -127,7 +127,7 @@ def _segments_above(mask: np.ndarray) -> list[tuple[int, int]]:
 
 
 def detect_band_rows(corrected: np.ndarray, gray: np.ndarray | None = None,
-                     min_height: int = 4) -> list[tuple[int, int]]:
+                     min_height: int = 4, total_h: int | None = None) -> list[tuple[int, int]]:
     """Horizontal bands of signal, strongest first. Rows that are mostly
     pure black/white pixels are printed text (lane labels, row labels), not
     bands; they are pushed to the end so auto mode lands on a blot strip."""
@@ -137,20 +137,22 @@ def detect_band_rows(corrected: np.ndarray, gray: np.ndarray | None = None,
     thr = prof.mean() + 0.5 * prof.std()
     segs = [(a, b) for a, b in _segments_above(prof > thr) if b - a >= min_height]
 
-    total_h = corrected.shape[0]
-
     def score(seg):
         a, b = seg
-        textlike = 0.0
-        if gray is not None:
-            block = gray[a:b]
-            solid = (block < 16).mean()
-            # printed labels: solid-black glyphs and/or a tall block (stacked
-            # label lines); blot bands are grey-scaled and thin
-            textlike = float(solid > 0.25 or (b - a) > 0.1 * total_h)
-        return (textlike, -prof[a:b].sum())
+        return (float(row_text_like(gray, a, b, total_h)), -prof[a:b].sum())
 
     return sorted(segs, key=score)
+
+
+def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None = None) -> bool:
+    """Printed labels: solid-black glyphs and/or a tall block (stacked label
+    lines); blot bands are grey-scaled and thin. `total_h` is the FULL image
+    height: a strip boxed tightly by the researcher is not "tall" just
+    because the box is short."""
+    if gray is None:
+        return False
+    block = gray[a:b]
+    return bool((block < 16).mean() > 0.25 or (b - a) > 0.1 * (total_h or gray.shape[0]))
 
 
 def detect_lanes(row: np.ndarray, expected: int | None = None, max_lanes: int = 16) -> list[tuple[int, int]]:
@@ -219,7 +221,10 @@ def _region_arrays(gray_full: np.ndarray, region):
     h, w = gray.shape
     if h < MIN_REGION_PX or w < MIN_REGION_PX:
         raise ValueError("image too small")
-    inverted = bool(gray.mean() > 127)  # light background: darkness is signal
+    # Polarity from the WHOLE image, not the box: a tight box around dense
+    # dark bands has a dark mean even though the figure is light-background,
+    # and the flipped polarity would then measure the gaps between bands.
+    inverted = bool(gray_full.mean() > 127)  # light background: darkness is signal
     signal = ((255 - gray) if inverted else gray).astype(np.float32)
     k = max(5, (min(h, w) // 4) | 1)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
@@ -293,7 +298,7 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     gray, signal, background, corrected, inverted, ox, oy, kernel_px = _region_arrays(gray_full, reg)
     h, w = gray.shape
 
-    rows = detect_band_rows(corrected, gray)
+    rows = detect_band_rows(corrected, gray, total_h=H)
     warnings: list[str] = []
     if band_row is not None:
         y0, y1 = int(band_row[0]) - oy, int(band_row[1]) - oy
@@ -308,6 +313,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     y0, y1 = max(0, y0), min(h, y1)
     if y1 - y0 < 2:
         raise ValueError("band row too thin")
+    if row_text_like(gray, y0, y1, H):
+        warnings.append("the selected band row looks like printed text (solid black glyphs or a tall block), "
+                        "not a blot strip; draw the region around the membrane only")
 
     if lane_bounds is not None:
         bounds = validate_lane_bounds(lane_bounds, ox, ox + w)
@@ -397,7 +405,16 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
             env.append({"relative_min": round(min(vals), 4), "relative_median": round(statistics.median(vals), 4),
                         "relative_max": round(max(vals), 4)} if vals else None)
         ranking_stable = len(set(top_ids)) == 1
-        stab = {"perturbation_px": {"x": int(dx), "y": int(dy)}, "runs": len(runs), "ranking_stable": ranking_stable}
+        # A reference change is a near tie when every alternative winner was
+        # already within STABILITY_WARN_WIDTH of the top at baseline: the
+        # relative values then stay valid to within their envelopes and only
+        # the ordering of the tied lanes is unresolved (warning). A winner
+        # that was clearly weaker at baseline means the geometry, not the
+        # bands, chose the reference (refuse).
+        other_tops = sorted({t for t in top_ids if t is not None and t != top_idx})
+        severe_flip = any(rel[t] is None or rel[t] < 1 - STABILITY_WARN_WIDTH for t in other_tops)
+        stab = {"perturbation_px": {"x": int(dx), "y": int(dy)}, "runs": len(runs), "ranking_stable": ranking_stable,
+                "reference_tie_lanes": sorted([top_idx + 1] + [t + 1 for t in other_tops]) if other_tops and not severe_flip else []}
         for l, e in zip(base, env):
             l["stability"] = e
             if e and (e["relative_max"] - e["relative_min"]) > STABILITY_WARN_WIDTH:
@@ -405,10 +422,16 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
                                     f"under +/-{dx}px lane / +/-{dy}px row perturbation")
                 if l["quality"] == OK:
                     l["quality"] = WARNING
-        if not ranking_stable:
+        if not ranking_stable and severe_flip:
             overall = REFUSED
-            overall_reasons.append(f"the strongest lane changes under +/-{dx}px lane / +/-{dy}px row perturbation; "
-                                   "the relative scale is not defined for this geometry")
+            overall_reasons.append(f"the strongest lane changes under +/-{dx}px lane / +/-{dy}px row perturbation to a lane "
+                                   "that was clearly weaker at the drawn geometry; the relative scale is not defined here")
+        elif not ranking_stable:
+            tie = ", ".join(str(i) for i in stab["reference_tie_lanes"])
+            overall_reasons.append(f"lanes {tie} are a near tie for strongest (within {STABILITY_WARN_WIDTH:.0%}); their order "
+                                   "is not resolved by this image, other lanes' relative values hold within their ranges")
+            if overall == OK:
+                overall = WARNING
     else:
         for l in base:
             l["stability"] = None
@@ -454,6 +477,7 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
                   "region": [ox, oy, ox + w, oy + h] if reg is not None else None},
         "band_row": [int(y0 + oy), int(y1 + oy)],
         "rows_detected": [[int(a + oy), int(b + oy)] for a, b in rows],
+        "rows_text_like": [row_text_like(gray, a, b, H) for a, b in rows],
         "lane_mode": lane_mode,
         "lanes": base,
         "quality": {"state": overall, "reasons": overall_reasons},

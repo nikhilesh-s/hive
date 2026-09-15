@@ -141,7 +141,7 @@
    "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
-    "the strongest lane changes under +/-32px lane / +/-2px row perturbation; the relative scale is not defined for this geometry"
+    "the strongest lane changes under +/-32px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here"
    ],
    "ranking_stable": false
   },
