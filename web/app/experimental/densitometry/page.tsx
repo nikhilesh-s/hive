@@ -19,11 +19,11 @@ interface Lane {
 interface Result {
   method: { name: string; version: string; steps: string; params: Record<string, number | string> };
   image: { width: number; height: number; inverted_for_analysis: boolean; region: number[] | null };
-  band_row: [number, number]; rows_detected: number[][];
+  band_row: [number, number]; rows_detected: number[][]; rows_text_like?: boolean[];
   lane_mode: 'explicit' | 'equal_width' | 'auto';
   lanes: Lane[];
   quality: { state: Quality; reasons: string[] };
-  stability: { perturbation_px: { x: number; y: number }; runs: number; ranking_stable: boolean } | null;
+  stability: { perturbation_px: { x: number; y: number }; runs: number; ranking_stable: boolean; reference_tie_lanes?: number[] } | null;
   warnings: string[]; disclaimer: string;
   source: { record_id?: number; tier?: string; target?: string; crop?: string; printed_lanes?: number | null; upload?: boolean };
   lanes_requested: number | null; stored: boolean;
@@ -347,9 +347,9 @@ export default function DensitometryPage() {
             <h3>{QUALITY_LABEL[res.quality.state]}</h3>
             {res.quality.reasons.length > 0 && <ul className="hb-page-list">{res.quality.reasons.map((r) => <li key={r}>{r}</li>)}</ul>}
             <p className="hb-live-note">
-              {res.method.name} v{res.method.version} · lanes: {res.lane_mode} · band row y {res.band_row[0]}–{res.band_row[1]} · {res.rows_detected.length} row(s) detected ·{' '}
+              {res.method.name} v{res.method.version} · lanes: {res.lane_mode} · band row y {res.band_row[0]}–{res.band_row[1]} · {res.rows_detected.length} row(s) detected{res.rows_text_like?.filter(Boolean).length ? ` (${res.rows_text_like.filter(Boolean).length} look like printed text)` : ''} ·{' '}
               {res.image.inverted_for_analysis ? 'dark bands on light background' : 'light bands on dark background'}
-              {res.stability && ` · stability: ±${res.stability.perturbation_px.x}px lanes / ±${res.stability.perturbation_px.y}px row × ${res.stability.runs} runs, ranking ${res.stability.ranking_stable ? 'stable' : 'UNSTABLE'}`}
+              {res.stability && ` · stability: ±${res.stability.perturbation_px.x}px lanes / ±${res.stability.perturbation_px.y}px row × ${res.stability.runs} runs, ranking ${res.stability.ranking_stable ? 'stable' : res.stability.reference_tie_lanes?.length ? `near tie between lanes ${res.stability.reference_tie_lanes.join('/')}` : 'UNSTABLE'}`}
             </p>
           </div>
           <div style={{ overflowX: 'auto' }}>
