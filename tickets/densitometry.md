@@ -84,11 +84,11 @@ diagnostics) · D-3 done (band-core clip gate 2 % warn / 10 % refuse within
 8 DN, `relative: null` when refused; thresholds justified on synthetic
 fixtures in `research/experiments/D2_clip_threshold_study.md`, not yet on
 Butler 2019 — D-7 still owns the real threshold) · D-4 done (perturbation
-envelope, ranges in the UI, near-tie vs severe reference flip) · D-5 half
-done (D1 retired with a header; synthetic recovery study landed; the
-author-value comparison is NOT done — every candidate strip is clipped past
-the gate in the reviewed papers, so the honest expected result is "n too
-small"; still to be written up) · D-6 done except the page-naming decision
+envelope, ranges in the UI, near-tie vs severe reference flip) · D-5 done
+with the allowed outcome (D1 retired with a header; synthetic recovery study
+landed; author-value comparison written up as "n too small" in
+`research/experiments/D5_author_values.md`: 12 of 93 detected rows on the
+LC3B/ACTB crops pass the gates, no LC3B + ACTB pair does) · D-6 done except the page-naming decision
 (page still says "Experimental densitometry", Nik decides D-1 naming) ·
 D-7 open. Also landed beyond the tickets: per-lane flank baseline, vertical
 profile sparkline, row re-boxing, TIFF uploads, overlay PNG export. Current

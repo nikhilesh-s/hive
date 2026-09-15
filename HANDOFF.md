@@ -102,9 +102,10 @@ build` clean with the dev server stopped; `scripts/demo_check.py` green
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
 in priority order: (1) one last run-of-show step-9 rehearsal in the browser
 before the founder hard stop (records 4455 valid, 4686 refused, export);
-(2) author-value comparison, ticket D-5 second half (LC3B-II:ACTB bar charts
-as an offset with n, "n too small" allowed); (3) B-4 panel inventory if
-budget remains; (4) a Tally form built from the reviewed spec.
+(2) B-4 panel inventory if budget remains; (3) a Tally form built from the
+reviewed spec; (4) any P0/P1 the founder raises after the Tuesday review.
+D-5's author-value comparison is closed as "n too small"
+(`research/experiments/D5_author_values.md`).
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 
