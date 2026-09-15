@@ -136,6 +136,19 @@ table; `[E1, E2]` is a citation and phantom refs are reported in `invalid_cited`
 renders "not stated". Open gap: citations are checked for existence, not for agreement with the cited
 record's status.
 
+**Final pre-demo hardening (2026-09-15 16:00-19:00 PT):** paper-QA answers now get a labelled, deterministic
+status check (`cb4caeb`) — a sentence whose wording contradicts the statuses of the records it cites
+(CONFLICTING stated as settled, a supported phosphorylation denied, a not-stated modification called total,
+certainty on a needs-review record, intensity language, live records cited without "unreviewed", a target
+named that only uncited records carry) adds a warning to the note. It is lexical, NOT semantic: partial
+support inside one sentence is undetectable and stays a documented limit. The `claude -p` backend now runs
+with `--setting-sources project` (`85b20b2`) so the operator's own Claude Code plugins / hooks / output
+styles cannot shape extraction or answers — a user style hook was turning demo answers into clipped prose.
+co-IP classification no longer settles on page-level caption prose (`afc9f19`): a single
+"Immunoprecipitation (IP) assays ..." sentence had been making 47 records co_ip with bait "IP" on a live
+re-extraction. Short-symbol search boundaries were measured and left as they are (0 rows would change);
+the limit is documented in `bio_query._term_clause`.
+
 **Search hardening (`da0f5c9`, `e4936f3`):** a short gene symbol no longer matches inside a word (MYC
 returned 86 Rapamycin/Bafilomycin rows); a pasted DOI is an exact paper filter (before, a truncated DOI
 showed another paper's rows on the research page and "(00)" in a DOI parsed as a Ser92 site); record ids
