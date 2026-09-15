@@ -193,6 +193,29 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
     assert client.post("/feedback", json=good).status_code in (401, 403)
 
 
+def test_feedback_rejects_nul_and_mismatched_record_keys(client, monkeypatch):
+    import app.routers.internal as internal
+    inserted = []
+
+    async def fake_insert(fields):
+        inserted.append(fields)
+        return 9
+
+    async def fake_record(record_id):
+        return {"id": record_id, "stable_row_key": "abc:1"}
+    monkeypatch.setattr(internal, "insert_feedback", fake_insert)
+    monkeypatch.setattr(internal, "fetch_record_by_id", fake_record)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+    base = {"feedback_scope": "record", "record_id": 42, "feedback_type": "other"}
+    # a NUL byte passed validation and failed in Postgres as a 500
+    assert client.post("/feedback", json={**base, "comment": "a\x00b"}, headers=AUTH).status_code == 400
+    # a record_id with another record's stable_row_key would rehydrate on both records
+    r = client.post("/feedback", json={**base, "stable_row_key": "zzz:9"}, headers=AUTH)
+    assert r.status_code == 400 and "different records" in r.json()["detail"]
+    assert inserted == []
+    assert client.post("/feedback", json={**base, "stable_row_key": "abc:1"}, headers=AUTH).status_code == 200
+
+
 def test_feedback_503_when_unconfigured(client, monkeypatch):
     monkeypatch.setattr(settings, "db_feedback_url", "")
     good = {"feedback_scope": "ui", "comment": "hi"}

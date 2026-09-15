@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SearchInput } from '@/components/SearchInput';
 import DatabaseResultCard, { type LaneSummary } from '@/components/DatabaseResultCard';
 import FiltersBar, {
@@ -88,12 +88,17 @@ interface SearchResponse {
   count: number;
   results: DatabaseResult[];
   question?: string;
+  truncated?: boolean;
 }
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<DatabaseResult[]>([]);
+  const [truncated, setTruncated] = useState(false);
+  // Each search takes the next sequence number; a response that comes back
+  // after a newer search (or a clear) started is dropped.
+  const seq = useRef(0);
   const [loading, setLoading] = useState(false);
   // Set ~4 s into a search: the only slow path is the free-tier API waking up.
   const [slow, setSlow] = useState(false);
@@ -101,14 +106,6 @@ export default function SearchPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<SearchFilters>(emptySearchFilters);
   const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(emptySearchFilters);
-
-  // Support /search?q=… (home-page searches route here so there is ONE
-  // results surface — the Evidence Record card, not the legacy table).
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get('q');
-    if (q) handleSearch(q);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (!filtersOpen) return;
@@ -132,9 +129,12 @@ export default function SearchPage() {
 
   const clearResults = () => {
     setQuery('');
+    seq.current++;
     setShowResults(false);
     setResults([]);
+    setTruncated(false);
     setError(null);
+    setLoading(false);
     clearSearchUrl();
   };
 
@@ -152,6 +152,7 @@ export default function SearchPage() {
     url.searchParams.set('q', searchQuery);
     window.history.replaceState(null, '', url.toString());
 
+    const my = ++seq.current;
     setLoading(true);
     setSlow(false);
     setError(null);
@@ -170,16 +171,32 @@ export default function SearchPage() {
       }
 
       const data: SearchResponse = await response.json();
+      if (my !== seq.current) return; // a newer search started meanwhile
       setResults(data.results || []);
+      setTruncated(data.truncated === true);
     } catch (err) {
+      if (my !== seq.current) return;
       setError(err instanceof Error ? err.message : 'An error occurred');
       setResults([]);
+      setTruncated(false);
     } finally {
       window.clearTimeout(slowTimer);
-      setSlow(false);
-      setLoading(false);
+      if (my === seq.current) {
+        setSlow(false);
+        setLoading(false);
+      }
     }
   }
+
+  // Support /search?q=… (home-page searches route here so there is ONE
+  // results surface — the Evidence Record card, not the legacy table).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    // One-shot mount read of ?q=; the search sets its own loading state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (q) handleSearch(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePrimarySearch = (searchQuery: string) => {
     setDraftFilters(emptySearchFilters());
@@ -286,6 +303,11 @@ export default function SearchPage() {
                       return `Found ${n} experiment${n !== 1 ? 's' : ''} (${results.length} lane record${results.length !== 1 ? 's' : ''})`;
                     })()}
               </p>
+              {!loading && truncated && (
+                <p className="hb-live-note">
+                  Showing the first {groups.length} experiment{groups.length !== 1 ? 's' : ''}; refine the search to see the rest.
+                </p>
+              )}
               {filterChips.length > 0 && (
                 <div className="hb-active-filters" aria-label="Active filters">
                   {filterChips.map((chip) => (

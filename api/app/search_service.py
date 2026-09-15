@@ -49,9 +49,22 @@ async def execute_search(query: str, limit: int, table_name: str | None = None) 
         logger.exception("Read-only query execution failed")
         raise HTTPException(500, "Search query failed") from e
 
+    truncated = len(results) >= max(1, min(limit, settings.max_search_limit))
+    if truncated:
+        # The row cap can cut the last experiment mid-lanes, and a cut time course
+        # misstates the design: drop that experiment's partial lanes and say so.
+        last = _experiment_key(results[-1])
+        results = [r for r in results if _experiment_key(r) != last] or results
+
     return SearchResponse(
         question=query,
         generated_sql=safe_sql,
         count=len(results),
         results=results,
+        truncated=truncated,
     )
+
+
+def _experiment_key(row: dict) -> str:
+    srk = row.get("stable_row_key")  # "<experiment>:<lane>"
+    return srk.split(":")[0] if srk else f"{row.get('paper_id')}|{row.get('id')}"

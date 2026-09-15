@@ -142,9 +142,14 @@ showed another paper's rows on the research page and "(00)" in a DOI parsed as a
 bounded to bigint (422, not 500); deleting a running live job is refused (409), and 503 without the
 ingest DB. Research/live pages (`035bbb1`): late responses cannot land on a newer paper; failed
 listings/searches/job polls show an alert instead of an empty list; every experimental proxy answers
-invalid JSON with 400.
+invalid JSON with 400. Main search (third attack pass): results are no longer cut at 100 lane rows
+mid-experiment (500-row cap, trailing partial experiment dropped, `truncated` note); vendor catalogs
+like "Santa Cruz sc-398486" / "abcam ab108629" are found; "T24", "HEK 293 CST", "CST 1:1000" and
+"IκBα" are no longer misparsed; the search page drops stale responses; feedback rejects NUL bytes and a
+record_id paired with another record's stable_row_key. Known, not fixed (would need synonym expansion):
+pSTAT3 / beta-actin / SQSTM1 / ERK1/2 / 4E-BP1 spellings return nothing.
 
-**Tests (latest):** densitometry 116 checks · api 182 passed / 11 skipped · miner
+**Tests (latest):** densitometry 116 checks · api 186 passed / 11 skipped · miner
 pytest 133 · demo_check 19 PASS / 2 WARN / 0 FAIL · biology / reconcile 21 / extract 10 / pipeline 13 /
 stable-row-key 34 green · tsc and lint clean.
 
