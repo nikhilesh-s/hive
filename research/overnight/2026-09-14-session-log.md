@@ -186,6 +186,15 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   second anti-PIK3CA antibody's catalog/vendor as candidates; fixed and verified on the sweep.
 - `4c98e6e` page error line visible before an image loads (corrupt TIFF on a fresh page), readable
   FastAPI validation errors, lead copy no longer says "not loading-control normalized" above the pairing.
-- In progress: provenance child on pre-existing source typing (418 antibody "methods" sources not in
-  methods, 75 treatment "caption" sources not in the caption, 113 sample/organism caption snippets that
-  never name the value).
+- `c42f1ee` pre-existing source typing fixed (child): a Source is typed methods / figure_caption only
+  when its text is verbatim there (whitespace, soft hyphen, dash variants folded), else model_target;
+  backstop only over verbatim text. Sweep: caption-not-substring 75 -> 0, snippet-lacks-value 113 -> 0,
+  methods-not-substring 418 -> 40 (U+2011 hyphen variants, verbatim under the new rule). No value,
+  status or candidate changed on the three papers.
+- `e6e86ad` conflict probe: "pVHL" / "pRB" in a caption read as a glued phospho prefix, creating a false
+  phospho-vs-total conflict; fixed. Caption Ser727 vs antibody Tyr705 and caption total vs phospho
+  antibody correctly stay CONFLICTING with candidates.
+- `0396aee` evidence panel / Learn / About label model_target as "model reading", not "row label".
+- Checked clean: 128 stored context blobs have line-start headers (no split leaks); 81 MP bomb PNG is a
+  400 in 0.1 s; overlay PNG strokes land on returned lane/region coordinates; property harnesses rerun
+  after the caveat changes (150 + 80 fixtures) hold; first fully green CI run on `7d92dfa`.
