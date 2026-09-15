@@ -1,51 +1,85 @@
 # HiveBlot overnight FABLE orchestrator — 2026-09-14 → 2026-09-15
 
 **Target ship:** Wednesday, 2026-09-16  
-**Source branch:** `experimental/ucsf-demo-2026-09-09`  
-**Purpose:** use one long Claude Code session to convert the post-UCSF notes and ticket backlog into a Wednesday-ready beta package without sacrificing biological validity.
+**Working source:** `experimental/ucsf-demo-2026-09-09`  
+**Overnight goal:** convert the current post-UCSF plans into a tested, reviewable Wednesday package while preserving biological validity and ~20% of the active Claude five-hour usage window for Nik's next-day review.
 
-This file is an execution brief, not a product claim. Read `CLAUDE.md`, `AGENTS.md`, and `HANDOFF.md` before doing anything. The repository's biological non-negotiables override this file if they conflict.
-
----
-
-## 0. Mission
-
-By the end of this run, leave Nik and the team with a **tested, reviewable Wednesday package**, not a pile of speculative code.
-
-The package has four outcomes:
-
-1. **UCSF feedback package:** a complete Tally form specification that Yashvi/Srushti/Nik can build manually, optimized for distribution beyond the current two researchers and across multiple UCSF labs.
-2. **Experimental band-reading improvement:** make the existing experimental densitometry path scientifically defensible as a *band-reading aid* — user-defined region/lanes, saturation refusal, uncertainty/ranges where justified, honest copy, no fake quantitation.
-3. **Biological-accuracy improvement:** land the highest-leverage plumbing fixes already identified in `tickets/bio-qa.md`, especially caption/methods separation and deterministic antibody recovery, with tests.
-4. **Release handoff:** one concise status document, clean commits, green relevant tests, and a precise Wednesday checklist. Do **not** deploy production or run irreversible production migrations unless Nik explicitly does that later.
-
-The latest meeting note (`meeting_notes`) is now binding product context: researchers were promised a structured feedback form by Wednesday and the team discussed a densitometry direction. The existing `tickets/` plan remains useful, but this brief changes one product choice: **the structured end-of-session survey for Wednesday will be external Tally, not an in-app survey.** Do not spend this overnight run rebuilding F-4 inside the app unless it is needed for another acceptance test.
+This is the primary overnight execution brief. It is not permission to deploy production, reseed the reviewed corpus, or invent scientific ground truth.
 
 ---
 
-## 1. Current state to assume, then verify
+## 0. Start here — authority and read budget
 
-Before editing, verify each statement against the branch and current HEAD. If any is stale, write the corrected fact into the session log and adapt.
+Read in this order:
 
-- `main` is stale and must not be touched.
-- `feature/bio-context-beta` is the stable hosted-beta lineage; the experimental UCSF branch contains newer live-ingest, QA, and band-reading work.
-- `experimental/ucsf-demo-2026-09-09` is the current UCSF/demo lineage and contains the newest meeting note.
-- The reviewed corpus is ~475 rows / 93 experiment groups / 3 papers and must not be silently reseeded during this run.
-- Live rows remain clearly badged `LIVE · UNREVIEWED`.
-- Existing post-UCSF tracks are:
-  - Track F: feedback (`tickets/feedback.md`)
-  - Track D: band reading / densitometry (`tickets/densitometry.md`)
-  - Track B: biological QA (`tickets/bio-qa.md`)
-- The current quantitative densitometry output is **not calibrated** and has known clipping, lane-placement, and reproducibility problems. Do not rescue it by better wording alone; fix the failure modes or refuse quantification.
-- The most important bio-QA plumbing gaps are already documented: caption/methods separation, deterministic antibody backstop, unmeasured panel recall, and stale/limited evaluation.
+1. `CLAUDE.md`
+2. `AGENTS.md`
+3. `HANDOFF.md`
+4. `research/OVERNIGHT_SOURCE_MAP_2026-09-14.md`
+5. `meeting_notes`
+6. `tickets/README.md`
+7. `tickets/feedback.md`
+8. `tickets/densitometry.md`
+9. `tickets/bio-qa.md`
+10. `tickets/tally-ucsf-beta-feedback.md`
+11. `tickets/ucsf-beta-distribution.md`
 
-Run a short `git log`, inspect the files above, and produce a 10–20 line `research/overnight/2026-09-14-session-log.md` before implementation begins.
+Then stop broad reading and execute.
+
+Do **not** ingest every file in `research/` at startup. Many August delegation/QA documents are historically useful but superseded as current task lists. Open a Tier 2/3 document from `OVERNIGHT_SOURCE_MAP` only when it can change a concrete implementation or validation decision.
+
+Before any edit, verify branch/HEAD and whether a ticket was already implemented after it was written.
 
 ---
 
-## 2. Branch and safety protocol
+## 1. Mission
 
-Create a task branch from the current UCSF demo branch if one does not already exist:
+By stop time, leave Nik with a **tested Wednesday package**, not a pile of prototypes.
+
+Highest-value outcomes:
+
+1. **Band reading:** improve the existing experimental path until it behaves like a defensible research aid: researcher-defined region/lanes, saturation/clipping refusal, honest uncertainty, no fake calibrated quantitation.
+2. **Biological QA:** land the highest-leverage extraction-plumbing fixes already identified in `tickets/bio-qa.md`, especially caption/methods separation and deterministic antibody recovery, with provenance-safe tests.
+3. **Feedback readiness:** review/polish the already-created Tally spec and multi-lab distribution plan; do not rebuild them from scratch.
+4. **Integration:** clean commits, exact tests, adversarial QA, and a concise Tuesday/Wednesday handoff.
+
+Latest binding product context comes from `meeting_notes`: a structured feedback form and the band-reading/densitometry direction were promised for the next Wednesday follow-up.
+
+### Product vocabulary
+
+Until real calibration exists, user-facing language is **Band reading (experimental)**, not calibrated densitometry.
+
+A refusal is a valid successful result when pixels cannot support quantification.
+
+---
+
+## 2. Non-negotiables
+
+Repository rules in `AGENTS.md` and `HANDOFF.md` win over this file.
+
+In particular:
+
+- biological validity is priority #1;
+- never infer phosphorylation from a protein-name prefix;
+- a model claim is not ground truth;
+- `CONFLICTING` never silently picks a winner;
+- missing source evidence never becomes a guessed value;
+- expected MW ≠ observed/reported MW;
+- band presence ≠ densitometry;
+- reviewed and `LIVE · UNREVIEWED` tiers stay visibly distinct;
+- the reviewed 475-row corpus is not silently reseeded tonight;
+- agreement with the reviewed corpus is not unseen-paper accuracy;
+- no secrets in commits/docs/logs;
+- no AI co-author trailers;
+- no production deploy or irreversible production DB change in this run.
+
+Do not touch `main`.
+
+---
+
+## 3. Branch protocol
+
+From the newest remote UCSF demo branch:
 
 ```bash
 git switch experimental/ucsf-demo-2026-09-09
@@ -53,389 +87,329 @@ git pull --ff-only
 git switch -c overnight/ucsf-2026-09-14
 ```
 
-If the task branch already exists, inspect it before continuing. Never force-push. Never rebase shared branches. Never touch `main`.
+If that task branch already exists, inspect it first; do not recreate or overwrite it.
 
-Commit in coherent phase-sized commits. Prefer one commit per track plus a final integration/handoff commit. Do not add AI co-author trailers.
+Use coherent commits by track. Never force-push shared history.
 
-**No production side effects during this overnight run:**
-- no production deployment;
-- no destructive DB changes;
-- no hosted-corpus reseed;
-- no secrets committed or printed into docs;
-- no sending emails/forms/messages on Nik's behalf.
-
-The desired endpoint is PR-ready / cherry-pick-ready work that Nik can inspect and deploy tomorrow.
+At the end, update `HANDOFF.md` according to repository rules and push the task branch.
 
 ---
 
-## 3. Usage governor — target 80% of the active five-hour Claude window
+## 4. Usage governor — target 80%, preserve 20%
 
-Nik wants this session to use approximately **80% of one five-hour usage window while preserving a 20% reserve**.
+Nik wants roughly **80% of one active five-hour Claude usage window consumed on useful work**, leaving ~20% for review/fixes.
 
-Treat 80% as a **hard spending ceiling and target, never as a reason to manufacture useless work**.
+This is a **ceiling + target**, not an instruction to waste tokens.
 
-### If Claude exposes usage telemetry
+### If first-party usage telemetry is available
 
-At startup:
-1. Read the current window usage / remaining quota using whatever first-party usage indicator is actually available.
-2. Write the starting value and the 80% stop point to the session log.
-3. Re-check at major checkpoints.
+At startup, record:
+- current usage/remaining allowance;
+- the estimated 80% stop point;
+- whether the five-hour window reset time is visible.
 
-Checkpoints:
-- ~20% used: recon and first implementation should be underway.
-- ~40% used: at least one high-value code path should be implemented and tested.
-- ~60% used: stop broad exploration; finish chosen work.
-- ~72% used: freeze scope; no new feature tracks.
-- ~78% used: stop spawning new sub-agents and begin final integration, deterministic tests, docs, and commits.
-- **80% used: stop model-intensive work.** Only finish deterministic commands that are already in progress, then write the handoff.
+Re-check after every major phase.
+
+Operational checkpoints:
+
+- **~15–20% used:** recon complete; first implementation underway.
+- **~35–40%:** at least one P0 track implemented + narrow tests green.
+- **~55–60%:** both core engineering tracks should be active or one should be clearly blocked; stop general exploration.
+- **~70–72%:** scope freeze. No new feature track.
+- **~77–78%:** stop spawning sub-agents; integration, tests, adversarial review, docs only.
+- **80%:** stop model-intensive work. Finish deterministic commands already running, write handoff, commit/push.
 
 ### If exact usage telemetry is not available
 
-Do **not** pretend exact 80% control exists. Use **four hours of active orchestration inside the five-hour window as a conservative proxy**, keep the same phase checkpoints, and record that the percentage could not be verified.
+Do not claim exact control. Use **~4 hours of active orchestration inside the five-hour window as the proxy**, preserve the remaining hour, and log that the 80% figure could not be verified.
 
-Never burn tokens solely to hit a number. The reserve exists so Nik can inspect/fix the output after the run.
+Never burn context or run useless literature review just to hit 80%.
 
 ---
 
-## 4. FABLE recursive loop
+## 5. FABLE recursive loop
 
-The orchestrator and every sub-agent use the same loop. Repeat it until the assigned acceptance criteria are met, the next improvement is lower-value than another track, or the usage governor tells the agent to stop.
+The orchestrator and every sub-agent repeat this loop until acceptance criteria are met, the next pass is lower-value than another track, or the usage governor freezes scope.
 
 ### F — Frame
-- What exact researcher or engineering problem am I solving?
-- What is the smallest defensible outcome that moves Wednesday forward?
-- Which repository rule or scientific claim could this accidentally violate?
+Ask:
+- What exact researcher/engineering problem am I solving?
+- What is the smallest defensible Wednesday outcome?
+- What scientific/product invariant could I accidentally violate?
 
 ### A — Audit
-- Read the relevant code, ticket, tests, and existing research note before proposing new architecture.
-- Reproduce the current failure when possible.
-- Distinguish a real bug from missing validation, missing data, or a misleading metric.
+- Read the relevant ticket, code, tests, and **only** the research note needed for this task.
+- Reproduce the current failure when practical.
+- Distinguish code bug vs missing data vs missing validation vs misleading metric.
+- Check whether an older Markdown finding was already fixed in `UCSF_BETA_READINESS.md` or later commits.
 
 ### B — Build
 - Implement the smallest coherent improvement.
-- Preserve provenance, abstention, conflict handling, and reviewed/unreviewed separation.
-- Add or update tests with the implementation, not later.
+- Add/update tests in the same pass.
+- Preserve provenance and abstention.
+- Prefer removing a misleading output over polishing it.
 
 ### L — Learn
-Ask all four questions explicitly after each meaningful pass:
-1. **How can I improve this project/process without increasing complexity for its own sake?**
-2. **How can I make this more biologically accurate or scientifically honest?**
-3. **What do I need to learn next, and which primary resource should I use?** Prefer the paper itself, figure/caption/methods, UniProt, NCBI/PMC/BioC documentation, and peer-reviewed methodology already cited in `research/` over generic summaries.
-4. **How do I produce the best product while staying inside the remaining usage budget?**
+After each meaningful pass answer, briefly:
 
-Write one short answer to each in the sub-agent handoff. Do not turn learning into endless literature review.
+1. **How can this project/process be improved without adding complexity for its own sake?**
+2. **How can this be more biologically accurate or scientifically honest?**
+3. **What must I learn next, and what is the best primary source?**
+4. **What is the highest-value next action given the remaining usage budget?**
+
+Primary-source order:
+- source paper figure/caption/methods/supplement;
+- existing repo QA + reproducible fixtures;
+- UniProt / NCBI/PMC/BioC docs;
+- peer-reviewed methodology already catalogued by the repo;
+- only then broader external material.
+
+Do not turn `Learn` into unlimited research.
 
 ### E — Evaluate
-- Run the narrowest relevant tests first, then the broader required suite.
-- For biological changes: test both a positive case and an abstention/conflict case.
-- For image analysis: test clean + clipped/saturated + misboxed/edge cases.
-- For UI: test failure states, not just the happy path.
-- Ask: "What would make a UCSF researcher distrust this?" and address the highest-severity answer.
+- narrow tests first, then required broad suites;
+- positive + abstention/conflict case for biology changes;
+- clean + clipped/saturated + misboxed cases for band reading;
+- happy + failure state for UI/API work;
+- ask: **What would make a UCSF researcher distrust this output?**
 
-Then recurse only if the next pass is still among the highest-value uses of the remaining budget.
+Fix the highest-severity answer before recursing.
 
 ---
 
-## 5. Orchestrator topology
+## 6. Sub-agent topology
 
-Use sub-agents if the environment supports them. If it does not, run the same roles sequentially. The orchestrator owns scope, branch state, integration, and budget; sub-agents do focused work and return concise handoffs.
+Use sub-agents if supported; otherwise execute roles sequentially. The main orchestrator owns scope, git state, budget, and integration.
 
-Do not allow two agents to edit the same files simultaneously.
+Never let two agents modify the same files concurrently.
 
-### Agent R — Release/repo integrator
-**Role:** source-of-truth keeper.
+### Agent R — Repo/release integrator
 
-First tasks:
-- map the current branch/commit graph relevant to `feature/bio-context-beta`, `experimental/ucsf-demo-2026-09-09`, and the overnight task branch;
-- confirm what has actually been implemented since the 09-09 tickets were written;
-- create/update the session log;
-- maintain a live checklist of changed files, tests, and blockers;
-- integrate other agents' work and resolve conflicts.
+Owns:
+- branch/commit map;
+- whether Sept. tickets are still current;
+- session log;
+- integration and conflict resolution;
+- final test matrix;
+- final handoff.
 
-Do not redesign features. Do not deploy production.
+Create:
+`research/overnight/2026-09-14-session-log.md`
 
-### Agent T — Tally feedback-product spec
-**Role:** turn researcher feedback into a manual form Nik's team can build tomorrow.
+The first log entry should state authoritative HEAD, branch, existing uncommitted work, and current ticket reality.
 
-Primary deliverable:
-- create `tickets/tally-ucsf-beta-feedback.md` following the acceptance criteria in section 7 below.
+### Agent D — Band-reading engineer
 
-Use Tally's current capabilities conservatively: multi-page form, conditional logic, hidden fields / URL parameters, progress bar, and completion redirect are appropriate. The actual Tally form must be built manually outside this run.
+Read first:
+`tickets/densitometry.md`
 
-Optimize for a broad UCSF researcher cohort, not just the current two contacts. The form should work for wet-lab researchers, computational biologists, postdocs, graduate students, staff scientists, and PIs without becoming generic.
+Then inspect the actual current code/tests before assuming the audit is still exact.
 
-### Agent D — Experimental band-reading engineer
-**Role:** execute the highest-value subset of Track D.
+Priority:
 
-Priority order:
-1. D-1 — forward researcher `region` end-to-end.
-2. D-2 — explicit researcher-defined lane boundaries on the user path.
-3. D-3 — saturation/clip refusal gate.
-4. D-6 — honest refusal card + method/export block.
-5. D-4 — uncertainty/range output **only if** D-1..D-3 are stable and tested.
-6. D-5 research cleanup only if budget remains.
+1. **D-1** — forward researcher `region` end-to-end.
+2. **D-2** — explicit researcher-defined lane boundaries on the user path; retire equal-width whole-crop slicing as the default user path.
+3. **D-3** — saturation/clipping refusal gate on the actual band core.
+4. **D-6** — honest refusal card + method metadata + JSON export, no DB storage.
+5. **D-4** — uncertainty/ranges only if D-1..D-3 are stable and tested.
+6. D-5 cleanup/study only if budget remains.
 
-Non-negotiables:
-- page/product language says **Band reading (experimental)**, not calibrated densitometry;
-- no numeric ratio when saturation/instability makes it indefensible;
-- no DB storage this week;
-- never treat loading-control normalization as solved;
-- the old 59.7% agreement number is not a quality claim and must not appear in product copy.
+Rules:
+- no loading-control-normalization claim;
+- no DB write for measurements tonight;
+- no two-decimal pseudo-precision on unstable values;
+- no numeric ratio when saturated/clipped/unstable;
+- old D1 `59.7%` is historical failure context, never a product-quality claim.
 
-A refusal is a successful output when the image cannot support quantification.
+For algorithmic thresholds, cite the fixture/data/method that justifies them. Do not choose a magic number and call it scientific.
 
 ### Agent B — Biological QA engineer
-**Role:** improve correctness of the extraction path before adding breadth.
 
-Priority order:
-1. B-1 — restore caption / methods separation.
-2. B-2 — deterministic antibody backstop without overwriting model evidence.
-3. B-6 — correct/delete stale L1 reporting.
-4. B-5 — run the existing `compare_records.py` harness only after the code path is stable and only if budget permits.
+Read first:
+`tickets/bio-qa.md`
 
-Optional only after those:
-- B-4 measurement scaffolding if the required panel inventory is already present and trustworthy.
+Priority:
 
-Do not tackle B-3/B-7/B-8/reseed during this overnight unless all Wednesday-critical items are complete and the usage governor has ample room.
+1. **B-1** — restore real caption vs methods separation in the live extraction path.
+2. **B-2** — deterministic antibody backstop in the record path when the model returned empty; never overwrite an existing/conflicting claim.
+3. **B-6** — correct/delete stale L1 reporting.
+4. **B-5** — existing `compare_records.py` three-repeat harness only if code is stable and budget remains.
+5. B-4 measurement scaffolding only if the trusted panel inventory already exists.
 
-For every biological field changed, verify provenance and the `SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING` behavior. Never convert a paper-silent null into a guessed value.
+Defer B-3/B-7/B-8 and reseeding unless all Wednesday P0 work is genuinely complete.
 
-### Agent Q — Adversarial QA / scientific reviewer
-**Role:** attack the integrated result after implementation.
+For each changed field verify:
+- source type is correct (`figure_caption` vs `methods` etc.);
+- verbatim source text is real source text, not model paraphrase;
+- `SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING` semantics remain honest;
+- no parser fallback converts paper silence into a value.
 
-Do not write major features. Review diffs and try to falsify claims.
+Historical QA (`independent_scientific_qa.md`) is valuable for **failure classes**, but its old counts/status are not current truth. Check the Sept. readiness report before resurrecting any old finding.
 
-Checklist:
-- can a clipped blot still produce a fake-looking quantitative number?
-- can the region/lane UI send coordinates inconsistent with the API?
-- can a caption claim be mislabeled as methods?
-- can deterministic antibody parsing overwrite conflicting model/paper evidence?
-- can a live unreviewed row look reviewed anywhere?
-- can feedback copy solicit unpublished/sensitive lab data unnecessarily?
-- do failure states tell the user the truth?
-- are docs claiming any unseen-paper accuracy?
+### Agent F — Feedback/product reviewer
 
-Return a severity-ranked list. The orchestrator fixes P0/P1 issues before final handoff.
+Do **not** recreate the form. Review and improve:
+- `tickets/tally-ucsf-beta-feedback.md`
+- `tickets/ucsf-beta-distribution.md`
+
+Use current Tally capabilities only if a form mechanic matters. Keep the form short and branch-heavy.
+
+Acceptance:
+- normal path under ~5 minutes;
+- wrong-extraction path captures enough public-paper detail to reproduce;
+- non-user/non-Western paths are short;
+- hidden `ref/lab/cohort/beta_version/source` fields are coherent;
+- no unpublished/confidential data requested;
+- form separates product usefulness, biological corrections, and validation-collaboration signal;
+- distribution strategy favors warm multi-lab referrals over cold-spam response count.
+
+If specs are already good, stop quickly and return budget to engineering.
+
+### Agent Q — Adversarial scientific/product reviewer
+
+Runs after integration. Do not build major features.
+
+Try to break the result:
+- can clipped/saturated signal still produce fake-looking quantitation?
+- can region/lane coordinate state desync across browser/proxy/API?
+- can captions still be mislabeled as methods?
+- can antibody recovery overwrite model/source disagreement?
+- can a live row look reviewed?
+- can a correction or form solicit unpublished data unnecessarily?
+- are zero-result/coverage messages scoped honestly?
+- did any doc/UI start implying unseen-paper accuracy?
+- did any change remove provenance to simplify UX?
+
+Return P0/P1/P2 findings. P0/P1 must be fixed or explicitly block completion.
 
 ---
 
-## 6. Priority stack for this run
+## 7. Priority stack
 
-### P0 — Wednesday blockers
+### P0 — Wednesday-critical
 
-1. Complete `tickets/tally-ucsf-beta-feedback.md`.
-2. Implement and test D-1 region forwarding.
-3. Implement the D-2 researcher-defined lane path far enough that automatic equal-width whole-crop slicing is no longer the default user path.
-4. Implement D-3 quantification refusal for saturated/clipped signal.
-5. Implement B-1 caption/methods separation.
-6. Implement B-2 deterministic antibody backstop.
-7. Produce an integration/handoff report with exact tests and remaining manual Wednesday steps.
+1. D-1 region forwarding, with tests.
+2. D-2 user-defined lane path, with API/UI contract tests.
+3. D-3 saturation/clipping refusal, with no numeric output when refused.
+4. B-1 caption/methods separation, with provenance tests.
+5. B-2 deterministic antibody backstop, with non-overwrite/conflict tests.
+6. Tally + multi-lab specs reviewed and build-ready.
+7. integrated regression/adversarial review + founder handoff.
 
-### P1 — high-value if P0 is green
+### P1 — only after P0 is green
 
 - D-6 refusal/method/export UX.
-- D-4 uncertainty ranges instead of fake precision.
+- D-4 ranges / stability instead of point precision.
 - F-1 feedback export script.
-- F-2 capture zero-result searches.
-- F-3 result-level useful / not useful.
+- F-2 zero-result search feedback capture.
+- F-3 result-level useful/not-useful.
 - B-6 stale L1 cleanup.
-- B-5 existing comparison harness run.
+- B-5 existing comparison-harness run.
 
 ### P2 — explicitly defer unless everything above is done
 
 - calibrated densitometry claims;
 - loading-control normalization;
-- hosted-corpus reseed;
-- B-3 null provenance redesign;
-- B-7 escalation redesign;
-- B-8 sample/tissue routing;
+- reviewed-corpus reseed;
+- null-provenance redesign B-3;
+- escalation redesign B-7;
+- sample/tissue routing B-8;
+- broad schema expansion;
+- literature-scale claims;
 - unseen-paper accuracy claims;
-- major schema expansion;
-- autonomous production deployment.
+- production deployment.
 
 ---
 
-## 7. Tally spec acceptance criteria
+## 8. Evaluation gates
 
-Agent T must create a builder-ready spec, not vague survey ideas.
+`HANDOFF.md` commands are authoritative. Discover the current test commands instead of inventing a parallel suite.
 
-The spec must include:
+### Band-reading gate
 
-### A. Goal and audience
-- Goal: measure **usefulness, trust, biological correctness, missing fields, workflow fit, and demand for band-reading tools**.
-- Audience: UCSF researchers across multiple labs and seniority levels.
-- Core completion target: ~4 minutes; deep-feedback branch ≤7 minutes.
-- Explicit note: do not paste unpublished/confidential lab data.
+Must include:
+- region round-trip test;
+- explicit lane-boundary API test;
+- real-crop boundary sanity on multiple reviewed crops if fixtures are available;
+- clipped/saturated case returns `quantification_refused` with **no numeric ratio**;
+- clean synthetic case retains expected qualitative ordering;
+- web typecheck/lint on changed route/page;
+- honest method metadata/export if D-6 lands.
 
-### B. Form structure
-Use 5 short sections/pages:
-1. Researcher context
-2. What they tried in HiveBlot
-3. Scientific trust/correctness
-4. Band-reading interest and ground-truth collaboration
-5. Overall value + follow-up
+### Bio-QA gate
 
-### C. Branching logic
-At minimum:
-- did not use beta → skip detailed correctness questions and ask what blocked testing;
-- found an incorrect extraction → reveal DOI/figure/field/detail follow-up;
-- does not work with Western blots → skip detailed band-reading questions;
-- willing to follow up → reveal contact field + consent language;
-- willing to contribute a public evaluation paper → reveal DOI/PMCID field;
-- willing to help with a dilution-series ground truth → reveal lab/protocol follow-up question.
+Must include:
+- non-empty real figure-caption context reaches the record builder when source has a legend;
+- methods context remains typed as methods;
+- known empty-model antibody case recovers expected catalog/vendor from target-scoped source text;
+- existing/conflicting model/source antibody evidence is not overwritten;
+- biological engine tests + benchmark required by repo rules.
 
-### D. Hidden fields / tracking
-Define URL parameters such as:
-- `ref`
-- `lab`
-- `cohort`
-- `beta_version`
-- `source`
+### Integration gate
 
-These must track distribution without requiring respondents to identify themselves. Include example link patterns, but do not put real private contact data in the repo.
-
-### E. Questions
-Include exact wording, answer type, required/optional state, and rationale for every question.
-
-Must cover:
-- role / lab type / frequency of Western blot use;
-- whether they actually used the beta;
-- what task/search they attempted;
-- whether results were relevant/useful;
-- field-importance ranking or matrix;
-- specific wrong/missing data with a reproducible public reference when possible;
-- whether `Supported / Needs review / Conflicting` communicates the right thing;
-- trust threshold for `LIVE · UNREVIEWED` evidence;
-- usefulness of provenance/crop/caption/methods;
-- band-reading use cases and acceptable refusal behavior;
-- interest in providing public evaluation papers or a known dilution series;
-- top missing feature;
-- estimated time saved / workflow value;
-- permission for follow-up + optional contact.
-
-### F. Manual build checklist
-Include exact Tally builder actions, logic test cases, mobile/desktop QA, test submissions, export check, and final share-link preparation.
-
-### G. Distribution plan
-Prepare one base link and parameterized links by channel/lab/cohort so Nik can measure where feedback came from. Make the form easy to forward inside a lab.
-
-### H. Wednesday success metric
-A successful first wave means:
-- form builds without logic dead-ends;
-- one team member can complete the normal path in <5 minutes;
-- one "wrong extraction" path captures enough detail to reproduce the issue;
-- one "not a Western blot user" path stays short;
-- exported responses preserve the hidden source fields;
-- the team can separate product feedback from biological-correction feedback.
-
----
-
-## 8. Broader UCSF researcher distribution — prepare, do not send
-
-The current beta should not depend on feedback from one lab or two people. Produce a short internal note (`tickets/ucsf-beta-distribution.md`) that turns the current contacts into a **referral graph** rather than a closed beta list.
-
-The note should propose:
-- ask current contacts to forward one single Tally + beta link to 2–3 labmates who actually inspect Western blots;
-- intentionally recruit different roles: postdoc/grad student/staff scientist/PI and at least one computational researcher;
-- include Verba/Jura-network researchers already connected to the project, then expand through their introductions rather than cold-spamming UCSF;
-- use hidden `ref`/`lab`/`cohort` parameters to measure response source;
-- ask for one public paper each that represents a real workflow they care about;
-- separate "general product tester" from "biology adjudicator" and "band-reading ground-truth collaborator" cohorts.
-
-Do not scrape emails or send outreach in this run.
-
----
-
-## 9. Scientific learning queue
-
-Learning is allowed only when it resolves a current implementation or validation question. Use primary sources first.
-
-### For extraction / biology
-1. The source paper itself: figure, caption, methods, supplementary/source data.
-2. UniProt reviewed records for protein identity/aliases, without guessing across ambiguous families.
-3. NCBI/PMC/BioC docs for retrieval semantics.
-4. Existing repository scientific QA and known failure examples before external browsing.
-
-### For band reading
-1. `tickets/densitometry.md` and the real-crop failures already documented.
-2. The Butler/Misleading Westerns evaluation material already catalogued in `eval/candidates.json`.
-3. Published source data / author-provided quantification from the reviewed papers where available.
-4. A real dilution-series dataset before claiming calibrated quantitation.
-
-For every source used to justify an algorithmic threshold or biological rule, record the citation or repository path in the relevant research note.
-
----
-
-## 10. Test and evaluation gates
-
-The exact commands in `HANDOFF.md` are authoritative; discover and use them rather than inventing a parallel suite.
-
-At minimum, before final handoff:
-
-### Band-reading changes
-- unit tests for region forwarding;
-- explicit lane-boundary API tests;
-- at least five real reviewed crops for boundary sanity if fixtures permit;
-- clipped/saturated fixture returns `quantification_refused` and no numeric ratio;
-- clean synthetic case still returns expected qualitative ordering;
-- web typecheck/lint for the changed page/proxy.
-
-### Bio-QA changes
-- pipeline test proving non-empty caption reaches the record builder where a figure legend exists;
-- test proving methods remain methods rather than being relabeled;
-- antibody backstop recovers a known catalog on an empty-model case;
-- backstop does not overwrite an existing/conflicting model value;
-- biological test suite + benchmark required by `AGENTS.md`.
-
-### Integration
-- relevant API suite;
+- relevant API tests;
 - web typecheck/lint/build as practical;
-- no new secrets or generated artifacts in git;
-- review `git diff --check`;
-- Agent Q adversarial review with P0/P1 resolved.
-
-If a broad test fails for a pre-existing unrelated reason, reproduce it on the source branch and document it. Do not hide failures.
+- `git diff --check`;
+- no secrets/generated junk;
+- no production change;
+- Agent Q review complete;
+- any unrelated pre-existing failure reproduced on source branch and documented rather than hidden.
 
 ---
 
-## 11. Deliverables at stop time
+## 9. Wednesday feedback package
 
-The orchestrator should leave all of the following:
+The external form already lives as a build spec in:
+`tickets/tally-ucsf-beta-feedback.md`
 
-1. `tickets/tally-ucsf-beta-feedback.md` — complete manual Tally specification.
-2. `tickets/ucsf-beta-distribution.md` — multi-lab distribution/referral plan.
-3. Implemented/tested P0 code changes that were feasible within the budget.
-4. `research/overnight/2026-09-14-session-log.md` — starting state, usage checkpoints, decisions, agent handoffs, tests.
-5. `research/overnight/2026-09-14-summary.md` — founder-facing concise summary:
+The distribution/referral strategy lives in:
+`tickets/ucsf-beta-distribution.md`
+
+Do not spend engineering time reproducing those questions in-app tonight. The existing in-product feedback system remains useful for field/record/search corrections; Tally is the session-level instrument.
+
+For the first UCSF wave, optimize for varied workflows across multiple labs/roles rather than maximum submissions. Ask warm contacts to forward to 2–3 relevant labmates and request public evaluation papers when appropriate.
+
+---
+
+## 10. Deliverables at stop time
+
+Must leave:
+
+1. tested P0 engineering changes that were feasible;
+2. reviewed/polished Tally + multi-lab distribution specs;
+3. `research/overnight/2026-09-14-session-log.md`;
+4. `research/overnight/2026-09-14-summary.md` with:
    - what changed;
    - what is biologically safer now;
-   - what is demo-ready;
+   - what is demo/Wednesday-ready;
    - what is not ready and why;
-   - exact manual steps Nik/Yashvi/Srushti must do Tuesday/Wednesday;
-   - commit SHAs;
+   - exact manual Tuesday/Wednesday actions;
    - test commands/results;
-   - remaining blockers ranked P0/P1/P2.
-6. Updated `HANDOFF.md` following repository rules.
-7. Clean pushed task branch. No production deploy.
+   - commit SHAs;
+   - P0/P1/P2 blockers;
+5. updated `HANDOFF.md`;
+6. clean pushed task branch.
+
+Do not deploy production.
 
 ---
 
-## 12. Stop conditions
+## 11. Stop conditions
 
-Stop early if any of these happen:
-- usage reaches the 80% ceiling;
-- a change requires production credentials or irreversible migration to validate;
-- biological correctness cannot be established from available evidence;
-- continuing would require inventing ground truth;
-- integration tests expose a P0 whose fix is more valuable than remaining feature work.
+Stop/hand off when:
+- usage hits the 80% ceiling;
+- ~4 active hours elapse if usage cannot be measured;
+- continuing needs production credentials/irreversible mutation;
+- biology cannot be established from evidence;
+- proceeding requires invented ground truth;
+- a P0 regression becomes the highest-value task;
+- remaining tasks are lower-value than preserving the review reserve.
 
-When stopping, prefer an honest, tested partial completion over a broad unfinished implementation.
+A tested partial result is better than unfinished breadth.
 
 ---
 
-## 13. Final orchestrator report format
-
-End the Claude session with this exact structure:
+## 12. Final Claude report format
 
 ```text
 STATUS: COMPLETE / PARTIAL / BLOCKED
@@ -443,8 +417,12 @@ STATUS: COMPLETE / PARTIAL / BLOCKED
 USAGE:
 - Start:
 - End:
-- 80% target measurable? yes/no
+- Exact 80% measurable? yes/no
 - Reserve preserved:
+
+SOURCE STATE:
+- Source branch/head:
+- Task branch/head:
 
 SHIPPED ON TASK BRANCH:
 - ...
@@ -452,13 +430,16 @@ SHIPPED ON TASK BRANCH:
 BIOLOGICAL SAFETY IMPROVEMENTS:
 - ...
 
-TALLY / UCSF FEEDBACK PACKAGE:
-- ...
-
 BAND-READING STATUS:
 - ...
 
+TALLY / UCSF FEEDBACK PACKAGE:
+- ...
+
 TESTS:
+- ...
+
+ADVERSARIAL REVIEW:
 - ...
 
 NOT DONE / DO NOT CLAIM:
@@ -469,11 +450,11 @@ TUESDAY/WEDNESDAY MANUAL ACTIONS FOR NIK:
 2. ...
 3. ...
 
-BRANCH + COMMITS:
+COMMITS:
 - ...
 
 NEXT SINGLE BEST TASK:
 - ...
 ```
 
-The report must be factual. Never label "implemented" when only a plan or spec exists.
+Report facts only. Never call a plan "implemented" or an agreement metric "accuracy".
