@@ -259,3 +259,34 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   contradict the cited record's status (e.g. assert phospho-Ser727 while citing a CONFLICTING record);
   there is no per-claim status check. api 177 passed / 11 skipped; tsc and lint clean; the restarted local
   stack answers the STAT3 question with 12 blocks and no note, "Show GAPDH" returns the 5 GAPDH blocks.
+- Browser: /experimental/ask "Is ERK phosphorylation settled in the IL-6 time course?" answered "Not
+  settled ... [E2][E3]" on claude-sonnet-5 with no phantom citations. CI green on d056c83.
+- `da0f5c9` search false positives (core search, not only experimental): '%MYC%' matched Rapamycin /
+  Bafilomycin treatments, so MYC returned 90 local rows of which 4 were MYC. Terms of <= 4 characters that
+  end in a letter now use `lower(col) SIMILAR TO '%term([^a-z]%)?'` (the guard rejects regex operators;
+  SIMILAR TO needs no new allowlisted function). Local corpus, 31 short terms, both tiers: 336 off-target
+  rows dropped, 0 lost whose name fields start with the term. Ceiling: left side is still substring
+  (ERK matches PERK). demo_check 19 PASS / 2 WARN / 0 FAIL after the change.
+- Second read-only attack child (experimental live / research / ingest routes and pages) found:
+  DOI searched as substring terms (a truncated DOI showed another paper's 384 rows; '(00)' parsed as a
+  Ser92 site; '_' stripped), failures rendered as empty lists, stale responses landing on a newer
+  selection in the research page, 500 on an oversized record id, DELETE without the ingest DB = 500,
+  deleting a running job, job status 404 after an API restart, invalid JSON to proxies = 500. Held: auth
+  on every route, key never reaches the browser, proxy paths allowlisted, no SQL injection, live rows
+  badged everywhere, Valency/PMC failures surfaced.
+- `e4936f3` API side: a DOI (bare, doi:, doi.org URL) is extracted first and filtered exactly; every
+  DOI in both local tiers returns exactly its paper's rows. Record ids bounded to bigint on all record
+  routes and densitometry / feedback bodies (422, was 500). DELETE job: 503 without ingest DB, 409 while
+  running. Job status falls back to persisted jobs. api 182 passed / 11 skipped. Browser: truncated DOI
+  -> 0 rows (was another paper's 384), doi.org URL in capitals -> the paper's 384 rows, main search MYC
+  -> 8 rows (BEX2 co-IP + MYC), oversized record id -> 422.
+- `035bbb1` web side (implementation child, reviewed and adjusted by the lead): request tokens on the
+  research page (rows, extraction start, job poll, ask) and live page (live-tier search); visible alerts
+  for failed live-papers listing, record load, paper search and extraction start; job poll stops on 404
+  or after ~10 s of backend errors (the child's version failed the job on one transient error; changed);
+  all seven experimental proxies answer invalid JSON with 400 (the lead extended the child's three to
+  densitometry, pair, preview and ask). Browser: opening two papers back to back shows only the second
+  paper's rows/scope/count; with the API stopped the research page alerts "Could not list
+  already-extracted papers: Failed to reach backend" and the live page alerts "Live tier search failed".
+  tsc and lint clean. API restarted on HEAD: demo_check 19 PASS / 2 WARN / 0 FAIL. CI green on d056c83,
+  da0f5c9, e4936f3.
