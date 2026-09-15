@@ -775,6 +775,13 @@ def caption_modification_for_core(core: str, text: str) -> Optional[dict]:
     while idx != -1:
         pre = text[max(0, idx - 12): idx]
         post = text[idx + len(core): idx + len(core) + 14]
+        # "pVHL" / "pRB" in a caption is the protein's NAME (core VHL / RB), not a
+        # glued phospho prefix: the same exception the target-name guard uses.
+        if (idx >= 1 and low[idx - 1] == "p" and (idx < 2 or not low[idx - 2].isalpha())
+                and f"p{core_low}" in NON_PHOSPHO_P_NAMES):
+            states.add("bare")
+            idx = low.find(core_low, idx + 1)
+            continue
         st = _mention_state(pre, post)
         states.add(st["type"])
         if st.get("site"):
