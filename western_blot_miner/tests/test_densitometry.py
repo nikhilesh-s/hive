@@ -303,6 +303,13 @@ check("pair: non-refused lanes keep their relatives", pr_e["lanes"][0]["target_r
 ctl_labelled = D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(4), lane_labels=["w", "x", "y", "z"])
 check("pair: control-only labels are carried", [l["label"] for l in D.pair_ratio(D.analyze(pair_img, region=(0, 10, 400, 60),
       lane_bounds=equal_bounds(4)), ctl_labelled)["lanes"]] == ["w", "x", "y", "z"])
+shifted = D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=[[60, 160], [160, 260], [260, 360], [360, 400]])
+pr_s = D.pair_ratio(D.analyze(pair_img, region=(0, 10, 400, 60), lane_bounds=equal_bounds(4)), shifted)
+check("pair: offset control lanes warn", pr_s["quality"]["state"] != "ok" and any("offset from the target lane" in x for x in pr_s["warnings"]))
+tl_lab = D.analyze(pair_img, region=(0, 10, 400, 60), lane_bounds=equal_bounds(4), lane_labels=["a", "b", "c", "d"])
+pr_lab = D.pair_ratio(tl_lab, ctl_labelled)
+check("pair: differing target/control labels warn", any("labels differ" in x for x in pr_lab["warnings"]))
+check("pair: aligned geometry does not warn about offsets", not any("offset" in x for x in pr["warnings"]))
 check("pair: lane count mismatch raises", raises(lambda: D.pair_ratio(tgt, D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(2)))))
 
 # 14. decoding and pixel types: empty / corrupt data, unsupported depths, float

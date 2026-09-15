@@ -133,6 +133,9 @@ async def experimental_densitometry_pair(request: Request, body: PairRequest):
     stored; the same-membrane caveat is always in `warnings`."""
     if body.record_id is None and not body.image_base64:
         raise HTTPException(400, "Provide record_id or image_base64")
+    if len(body.target.lane_bounds) != len(body.control.lane_bounds):
+        raise HTTPException(400, f"target has {len(body.target.lane_bounds)} lanes, control has "
+                                 f"{len(body.control.lane_bounds)}; use the same lane boundaries")
     png, _, source = await _load_image(body)
     loop = asyncio.get_running_loop()
 
