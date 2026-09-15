@@ -77,6 +77,72 @@ async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, di
     return crop.read_bytes(), n_lanes, row
 
 
+class StripSpec(BaseModel):
+    """One strip of the image for the loading-control pairing."""
+    region: list[int] = Field(min_length=4, max_length=4)
+    lane_bounds: list[list[int]] = Field(min_length=1, max_length=24)
+    lane_labels: list[str] | None = Field(default=None, max_length=24)
+    band_row: list[int] | None = Field(default=None, min_length=2, max_length=2)
+    row_index: int = Field(default=0, ge=0, le=15)
+
+
+class PairRequest(BaseModel):
+    record_id: int | None = None
+    live: bool = False
+    image_base64: str | None = Field(default=None, max_length=12_000_000)
+    target: StripSpec
+    control: StripSpec
+    stability: bool = True
+
+
+async def _load_image(body) -> tuple[bytes, int | None, dict]:
+    """(png bytes, printed lane count or None, source dict) for a record id or an upload."""
+    if body.record_id is not None:
+        png, default_lanes, row = await _record_png(body.record_id, body.live)
+        return png, default_lanes, {"record_id": body.record_id, "tier": "live_unreviewed" if body.live else "reviewed",
+                                    "target": row.get("target"), "crop": str(row.get("image_crop_ref")).rsplit("/", 1)[-1],
+                                    "printed_lanes": default_lanes}
+    try:
+        png = base64.b64decode(body.image_base64.split(",", 1)[-1], validate=False)
+    except Exception:
+        raise HTTPException(400, "image_base64 is not valid base64")
+    if len(png) > MAX_IMAGE_BYTES:
+        raise HTTPException(413, "image too large")
+    return png, None, {"upload": True}
+
+
+@router.post("/experimental-densitometry/pair")
+@limiter.limit("60/minute")
+async def experimental_densitometry_pair(request: Request, body: PairRequest):
+    """Target strip ÷ loading-control strip on the SAME image, same lane
+    bounds. Two single-strip analyses, then densitometry.pair_ratio. Never
+    stored; the same-membrane caveat is always in `warnings`."""
+    if body.record_id is None and not body.image_base64:
+        raise HTTPException(400, "Provide record_id or image_base64")
+    png, _, source = await _load_image(body)
+    loop = asyncio.get_running_loop()
+
+    def _run():
+        img = densitometry.decode_image(png)
+        out = []
+        for spec in (body.target, body.control):
+            labels = [str(x)[:40] for x in spec.lane_labels] if spec.lane_labels else None
+            out.append(densitometry.analyze(img, region=tuple(spec.region), lane_bounds=spec.lane_bounds,
+                                            lane_labels=labels, row_index=spec.row_index,
+                                            band_row=tuple(spec.band_row) if spec.band_row else None,
+                                            stability=body.stability))
+        return densitometry.pair_ratio(out[0], out[1])
+
+    try:
+        result = await loop.run_in_executor(None, _run)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    source["image_sha256"] = hashlib.sha256(png).hexdigest()
+    result["source"] = source
+    result["stored"] = False
+    return result
+
+
 class PreviewRequest(BaseModel):
     image_base64: str = Field(max_length=40_000_000)
 
@@ -117,21 +183,7 @@ async def experimental_densitometry_preview(request: Request, body: PreviewReque
 async def experimental_densitometry(request: Request, body: DensitometryRequest):
     if body.record_id is None and not body.image_base64:
         raise HTTPException(400, "Provide record_id or image_base64")
-    default_lanes = None
-    source: dict = {}
-    if body.record_id is not None:
-        png, default_lanes, row = await _record_png(body.record_id, body.live)
-        source = {"record_id": body.record_id, "tier": "live_unreviewed" if body.live else "reviewed",
-                  "target": row.get("target"), "crop": str(row.get("image_crop_ref")).rsplit("/", 1)[-1],
-                  "printed_lanes": default_lanes}
-    else:
-        try:
-            png = base64.b64decode(body.image_base64.split(",", 1)[-1], validate=False)
-        except Exception:
-            raise HTTPException(400, "image_base64 is not valid base64")
-        if len(png) > MAX_IMAGE_BYTES:
-            raise HTTPException(413, "image too large")
-        source = {"upload": True}
+    png, default_lanes, source = await _load_image(body)
     lanes = None if body.lane_bounds else (body.lanes or default_lanes)
     labels = [str(x)[:40] for x in body.lane_labels] if body.lane_labels else None
     loop = asyncio.get_running_loop()

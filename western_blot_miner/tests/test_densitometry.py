@@ -250,6 +250,40 @@ if stat3.is_file() and bex2.is_file():
 else:
     print("  (real-crop checks skipped: api/crops not present)")
 
+# 13. loading-control pairing: a target strip with known ratios over a
+#     uniform control strip in the same image -> normalized ratios recover
+#     the target's pattern; a control lane with no signal refuses that lane;
+#     a refused control strip refuses the pairing.
+pair_img = np.minimum(synthetic([1.0, 0.5, 0.25, 0.0], band_y=35, h=160), synthetic([0.8, 0.8, 0.8, 0.8], band_y=110, h=160))
+tgt = D.analyze(pair_img, region=(0, 10, 400, 60), lane_bounds=equal_bounds(4), lane_labels=["a", "b", "c", "d"])
+ctl = D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(4))
+pr = D.pair_ratio(tgt, ctl)
+check("pair: valid", pr["quality"]["state"] == "ok" and pr["method"]["name"] == D.PAIR_METHOD_NAME)
+check("pair: labels carried", [l["label"] for l in pr["lanes"]] == ["a", "b", "c", "d"])
+nz = [l["normalized"] for l in pr["lanes"]]
+check("pair: normalized ratios follow the target", nz[0] == 1.0 and abs(nz[1] - 0.5) < 0.12 and abs(nz[2] - 0.25) < 0.12 and nz[3] < 0.1)
+check("pair: envelopes bracket the median", all(l["normalized_min"] - 1e-9 <= l["normalized"] <= l["normalized_max"] + 1e-9 for l in pr["lanes"]))
+check("pair: same-membrane caveat always present", pr["warnings"][0] == D.PAIR_CAVEAT)
+# uneven loading: control lane 2 is half -> normalized target/control for lane 2 doubles relative to the flat case
+uneven = np.minimum(synthetic([1.0, 0.5, 0.25, 0.0], band_y=35, h=160), synthetic([0.8, 0.4, 0.8, 0.8], band_y=110, h=160))
+pr_u = D.pair_ratio(D.analyze(uneven, region=(0, 10, 400, 60), lane_bounds=equal_bounds(4)),
+                    D.analyze(uneven, region=(0, 85, 400, 135), lane_bounds=equal_bounds(4)))
+check("pair: uneven loading corrected", abs(pr_u["lanes"][1]["normalized"] - 1.0) < 0.15 and abs(pr_u["lanes"][0]["normalized"] - 1.0) < 0.15
+      and abs(pr_u["lanes"][2]["normalized"] - 0.25) < 0.12)
+# control lane 4 empty -> that lane's ratio is refused, others stand
+ctl_empty = D.analyze(np.minimum(synthetic([1.0, 0.5, 0.25, 0.3], band_y=35, h=160), synthetic([0.8, 0.8, 0.8, 0.0], band_y=110, h=160)),
+                      region=(0, 85, 400, 135), lane_bounds=equal_bounds(4))
+tgt2 = D.analyze(np.minimum(synthetic([1.0, 0.5, 0.25, 0.3], band_y=35, h=160), synthetic([0.8, 0.8, 0.8, 0.0], band_y=110, h=160)),
+                 region=(0, 10, 400, 60), lane_bounds=equal_bounds(4))
+pr_e = D.pair_ratio(tgt2, ctl_empty)
+check("pair: empty control lane refused, others measured", pr_e["lanes"][3]["quality"] == "quantification_refused" and pr_e["lanes"][3]["normalized"] is None
+      and pr_e["lanes"][0]["normalized"] == 1.0 and pr_e["quality"]["state"] == "warning")
+# clipped control strip -> pairing refused
+ctl_clip = D.analyze(synthetic([1.0, 1.0, 1.0, 1.0], peak=400), lane_bounds=equal_bounds(4))
+pr_c = D.pair_ratio(tgt, ctl_clip)
+check("pair: refused control strip refuses the pairing", pr_c["quality"]["state"] == "quantification_refused" and all(l["normalized"] is None for l in pr_c["lanes"]))
+check("pair: lane count mismatch raises", raises(lambda: D.pair_ratio(tgt, D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(2)))))
+
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
 for n in failed:

@@ -195,3 +195,40 @@ def test_tiff_preview_returns_8bit_png_and_measures_the_same(client):
     assert [l["corrected"] for l in ra.json()["lanes"]] == [l["corrected"] for l in rb.json()["lanes"]]
     assert client.post("/experimental-densitometry/preview", json={"image_base64": "zz"}, headers=AUTH).status_code == 400
     assert client.post("/experimental-densitometry/preview", json={"image_base64": b64}).status_code == 401
+
+
+def _two_strip_png(w=400, h=160):
+    import cv2
+
+    img = np.full((h, w), 235.0)
+    ys, xs = np.arange(h)[:, None], np.arange(w)[None, :]
+    for band_y, strengths in ((35, [1.0, 0.5, 0.25, 0.0]), (110, [0.8, 0.8, 0.8, 0.8])):
+        for i, s in enumerate(strengths):
+            cx = (i + 0.5) * 100
+            img -= s * 200 * np.exp(-((ys - band_y) ** 2) / 72.0) * (np.abs(xs - cx) < 32)
+    ok, buf = cv2.imencode(".png", np.clip(img, 0, 255).astype(np.uint8))
+    assert ok
+    return buf.tobytes()
+
+
+def test_pair_endpoint_target_over_control(client):
+    b64 = base64.b64encode(_two_strip_png()).decode()
+    lanes = [[0, 100], [100, 200], [200, 300], [300, 400]]
+    body = {"image_base64": b64,
+            "target": {"region": [0, 10, 400, 60], "lane_bounds": lanes, "lane_labels": ["a", "b", "c", "d"]},
+            "control": {"region": [0, 85, 400, 135], "lane_bounds": lanes}}
+    r = client.post("/experimental-densitometry/pair", json=body, headers=AUTH)
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["method"]["name"] == "hiveblot.densitometry.pair" and d["stored"] is False
+    assert d["quality"]["state"] == "ok" and d["warnings"][0].startswith("Target ÷ loading control")
+    assert d["target"]["lane_mode"] == "explicit" and d["control"]["image"]["region"] == [0, 85, 400, 135]
+    nz = [l["normalized"] for l in d["lanes"]]
+    assert nz[0] == 1.0 and abs(nz[1] - 0.5) < 0.12 and abs(nz[2] - 0.25) < 0.12 and nz[3] < 0.1
+    assert [l["label"] for l in d["lanes"]] == ["a", "b", "c", "d"]
+    assert len(d["source"]["image_sha256"]) == 64
+    # lane-count mismatch and bad geometry are 400s
+    bad = {**body, "control": {"region": [0, 85, 400, 135], "lane_bounds": [[0, 200], [200, 400]]}}
+    assert client.post("/experimental-densitometry/pair", json=bad, headers=AUTH).status_code == 400
+    assert client.post("/experimental-densitometry/pair", json={**body, "image_base64": None}, headers=AUTH).status_code == 400
+    assert client.post("/experimental-densitometry/pair", json=body).status_code == 401
