@@ -222,36 +222,29 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
     flags: list[str] = []
     sources: list[Source] = []
 
-    # co-IP requires PANEL-SCOPED evidence: an IP-role antibody claim, co-IP
-    # wording in this panel's caption, or IP:/IgG/input markers printed on the
-    # panel's own lanes. A methods paragraph mentioning immunoprecipitation is
-    # page-level context — real papers discuss their co-IP next to unrelated
-    # expression blots, and that wording must NOT reclassify every panel on the
-    # page (it mislabeled whole autophagy/mTOR panels as co_ip). Methods-only
-    # mentions are preserved as a non-settling "co_ip_context" flag.
+    # co-IP requires PANEL evidence: an IP-role antibody claim, or co-IP /
+    # IP:/IgG/input markers printed on the panel's own lanes. Page-level text
+    # is context only, never a classification: a methods paragraph, and the
+    # caption channel too -- it is the retrieval's figure-text section, which on
+    # a real paper (PMC12706926) is the same results prose for 11 of 15 panels,
+    # so one "Immunoprecipitation (IP) assays ..." sentence turned 47 records
+    # co_ip with bait "IP". Such mentions stay a non-settling "co_ip_context" flag.
     panel_scoped = f"{caption}\n{lane_text}"
+    lane_co_ip = biology._CO_IP.search(lane_text) or biology._IP_LANE.search(lane_text)
     if ip_abs:
         flags.append("co_ip")
         ab0 = ip_abs[0]
         sources.append(Source(type="antibody", rank=RANK_ANTIBODY,
                               text=ab0.get("source", {}).get("text", ab0.get("target", "IP antibody"))))
-    elif biology._CO_IP.search(panel_scoped):
-        m = biology._CO_IP.search(panel_scoped)
+    elif lane_co_ip:
         flags.append("co_ip")
-        # lane_text is the model's reading of labels printed on the image, not
-        # caption text: type it as image evidence when the hit falls there.
-        if m.start() < len(caption):
-            sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
-                                  text=_around(caption, m.start())))
-        else:
-            # window on the lane-label text alone so an image quote holds no caption words
-            sources.append(Source(type="image", rank=RANK_IMAGE,
-                                  text=_around(lane_text, m.start() - len(caption) - 1)))
-    elif biology._IP_LANE.search(lane_text):
-        m = biology._IP_LANE.search(lane_text)
-        flags.append("co_ip")
+        # lane_text is the model's reading of labels printed on the image
         sources.append(Source(type="image", rank=RANK_IMAGE,
-                              text=_around(lane_text, m.start())))
+                              text=_around(lane_text, lane_co_ip.start())))
+    elif biology._CO_IP.search(caption):
+        m = biology._CO_IP.search(caption)
+        flags.append("co_ip_context")
+        sources.append(Source(type="figure_caption", rank=RANK_CAPTION, text=_around(caption, m.start())))
     elif biology._CO_IP.search(methods):
         m = biology._CO_IP.search(methods)
         flags.append("co_ip_context")
@@ -879,8 +872,11 @@ def _first_gene_after(text: str, pos: int) -> Optional[str]:
     m = re.search(r"anti-?([A-Z][A-Za-z0-9]{1,7})", text[pos: pos + 60])
     if m:
         return biology.core_symbol(m.group(1))
-    m = re.search(r"\b([A-Z]{2,}[0-9]?)\b", text[pos: pos + 40])
-    return m.group(1) if m else None
+    # assay abbreviations are not proteins: "Immunoprecipitation (IP) assays" gave bait "IP"
+    for m in re.finditer(r"\b([A-Z]{2,}[0-9]?)\b", text[pos: pos + 40]):
+        if m.group(1).upper() not in {"IP", "IB", "WB", "IGG", "CO", "INPUT", "WCL", "HA"}:
+            return m.group(1)
+    return None
 
 
 def identity_sample(mc: dict) -> str:
