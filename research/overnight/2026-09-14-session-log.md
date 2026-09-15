@@ -229,3 +229,8 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   CST #4967, 1:2000, Cell Signaling with a deterministic source quoting "beta‑actin (1:2,000; CST #4967)";
   phospho and total STAT3 rows abstain (one sentence names both). Stored-corpus sweep: 0 value changes.
   This is B-2's original acceptance case, now met on the live path.
+- Backstop agreement audit (no model calls, `scratchpad/live_one/strip_replay.py`): blanked vendor /
+  catalog / dilution / clone in the stored reviewed claims and replayed them on contexts rebuilt with the
+  current builder. Recovered 92 values, 92 agree with the reviewed claims, 0 disagreements, 0 fills where
+  the reviewed claim was empty; abstained on 24/60 (STAT3 paper), 5/60 (SMG paper), 99/100 (co-IP paper,
+  whose methods list many antibodies in one sentence). Agreement with reviewed claims, not accuracy.
