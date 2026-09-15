@@ -1,6 +1,6 @@
 # UCSF HiveBlot beta — multi-lab distribution plan
 
-**Target first wave:** Wednesday, 2026-09-16 onward  
+**Target first wave:** Wednesday, 2026-09-16 onward
 **Goal:** get useful feedback from multiple researcher types and labs without turning the beta into indiscriminate cold outreach.
 
 This is an internal distribution plan. It prepares the referral structure; it does not authorize sending messages automatically.
@@ -85,7 +85,8 @@ When the team follows up with an engaged researcher, the most useful request is:
 - try one or two searches relevant to your actual work;
 - fill out the short feedback form;
 - if possible, forward the same beta + form to 2–3 labmates who regularly inspect Western blots;
-- optionally suggest one **public** paper that represents a workflow HiveBlot should be able to handle.
+- optionally suggest one **public** paper that represents a workflow HiveBlot should be able to handle;
+- if you run blots, optionally try `/experimental/densitometry` on a public figure and answer the short optional block in the form (Q15a–c). Do not use unpublished blots.
 
 This creates a chain of relevant testers while keeping the product inside warm introductions.
 
@@ -105,7 +106,8 @@ Track:
 - trust requirements for `LIVE · UNREVIEWED` records;
 - public evaluation-paper suggestions;
 - willingness to follow up;
-- willingness to help with band-reading validation.
+- willingness to help with band-reading validation;
+- densitometry refusal/warning clarity and trust in a within-image relative number with a range (Q15b–c).
 
 Separate **product feedback** from **biological correction signal** when summarizing.
 

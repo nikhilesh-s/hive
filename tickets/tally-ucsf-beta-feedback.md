@@ -1,9 +1,9 @@
 # UCSF HiveBlot beta — Tally feedback form spec
 
-**Target send:** Wednesday, 2026-09-16  
-**Build surface:** Tally, built manually  
-**Audience:** UCSF researchers testing or evaluating HiveBlot  
-**Normal-path completion:** ~4 minutes  
+**Target send:** Wednesday, 2026-09-16
+**Build surface:** Tally, built manually
+**Audience:** UCSF researchers testing or evaluating HiveBlot
+**Normal-path completion:** ~4–5 minutes (path A: 21 questions, 8 required; ~8 s per select, ~15 s per multi-select, ~40 s per long text; confirm in the timed team test in §7)
 **Deep correction / validation path:** ≤7 minutes
 
 This document is the source spec for the external beta feedback form. It does **not** replace the in-product correction controls; it collects session-level product, scientific-trust, and validation feedback that is easier to analyze across labs.
@@ -57,7 +57,7 @@ Create these hidden fields:
 | Field | Purpose | Example values |
 |---|---|---|
 | `ref` | who/channel generated this link | `direct`, `lab_forward`, `team_followup` |
-| `lab` | distribution cohort, not necessarily respondent identity | `verba`, `jura`, `other_ucsf`, `unknown` |
+| `lab` | distribution cohort, not necessarily respondent identity — use neutral labels (`lab_a`, `lab_b`), never a PI surname | `lab_a`, `lab_b`, `other_ucsf`, `unknown` |
 | `cohort` | intended tester cohort | `wetlab`, `computational`, `pi`, `mixed` |
 | `beta_version` | product version under test | `2026-09-16` |
 | `source` | outreach channel | `email`, `meeting`, `slack`, `forward`, `qr` |
@@ -65,7 +65,7 @@ Create these hidden fields:
 Example pattern:
 
 ```text
-https://tally.so/r/FORMID?ref=lab_forward&lab=verba&cohort=wetlab&beta_version=2026-09-16&source=email
+https://tally.so/r/FORMID?ref=lab_forward&lab=lab_a&cohort=wetlab&beta_version=2026-09-16&source=email
 ```
 
 Do not encode personal emails, private researcher identifiers, or unpublished project names in the URL.
@@ -127,6 +127,7 @@ Only show Q5–Q8 in full if Q1 = `Yes, I used it`.
 - **Type:** long text
 - **Required:** yes for users; optional otherwise
 - **Placeholder:** `e.g., find phospho-STAT3 blots in a liver cancer cell line, check whether an antibody catalog has worked in published experiments`
+- **Help text:** `One or two sentences is enough.`
 - **Why:** gives the real job-to-be-done rather than forcing our taxonomy.
 
 ## Q6. How useful were the results for that task?
@@ -140,7 +141,7 @@ Only show Q5–Q8 in full if Q1 = `Yes, I used it`.
   - I could not find a relevant result
 
 ## Q7. Which parts of a HiveBlot record are most valuable to you?
-- **Type:** ranking if convenient; otherwise multi-select with `pick up to 5`
+- **Type:** multi-select, `pick up to 3` (do not use ranking — 11 items to rank is the slowest question on the form)
 - **Required:** no
 - **Options:**
   - Protein / normalized target identity
@@ -211,8 +212,8 @@ Show a short reminder:
 
 #### Q12a. Public paper reference
 - **Type:** short text
-- **Required:** no
-- **Prompt:** `DOI or PMCID if available`
+- **Required:** yes (on this branch only)
+- **Prompt:** `DOI or PMCID — it is shown on the HiveBlot record`
 
 #### Q12b. Figure / panel / result
 - **Type:** short text
@@ -227,6 +228,7 @@ Show a short reminder:
 #### Q12d. What should the result have said, or why is the current result misleading?
 - **Type:** long text
 - **Required:** yes
+- **Help text:** `What HiveBlot showed, and what the paper actually reports (the expected value).`
 - **Reminder:** `Please use public paper information only.`
 
 This branch must collect enough information for the team to reproduce the correction without contacting the respondent.
@@ -278,6 +280,38 @@ Intro copy:
   - Still provide a numeric estimate
   - Not sure
 
+### Optional block — experimental densitometry page (`/experimental/densitometry`)
+
+Only the gate (Q15a) is on the normal path; Q15b–c appear only on `Yes`. Do not describe your own unpublished blots here — answer about the tool's behaviour only.
+
+#### Q15a. Did you try the experimental densitometry page (draw a strip and lanes, get a within-image relative band signal)?
+- **Show if:** Q1 = `Yes, I used it`
+- **Type:** single select
+- **Required:** no
+- **Options:** Yes; No; I did not know it existed
+
+#### Q15b. When it refused or warned (clipped/saturated image, near-tie reference lane, text row), did the reason make sense?
+- **Show if:** Q15a = Yes
+- **Type:** single select
+- **Required:** no
+- **Options:**
+  - Yes — I understood why and what to change
+  - Partly — I saw the state but not what to do about it
+  - No — I did not understand it
+  - It never refused or warned on my image
+  - I did not notice those states
+
+#### Q15c. Would you trust a within-image relative band number reported with a range (e.g., lane 3 ≈ 0.6× reference, range 0.5–0.7) for exploratory use?
+- **Show if:** Q15a = Yes
+- **Type:** single select
+- **Required:** no
+- **Options:**
+  - Yes, as reported
+  - Only if I can see the strip/lanes I drew next to the number
+  - Only relative to a loading control on the same blot
+  - No — I would redo it in ImageJ/Fiji
+  - Not sure
+
 ## Q16. Would you be willing to suggest a **publicly available** paper/source-data example that would be useful for evaluating this feature?
 - **Type:** single select
 - **Required:** no
@@ -300,6 +334,7 @@ Do not ask for unpublished measurements in this form. This only records willingn
 # PAGE 5 — Overall value and follow-up
 
 ## Q18. If HiveBlot covered the literature relevant to your work, where would it save you the most time?
+- **Show if:** Q1 is not `Yes, I used it` (users already answered this concretely in Q5/Q6; keeps the normal path short)
 - **Type:** single select + Other
 - **Required:** no
 - **Options:**
@@ -325,11 +360,13 @@ Do not ask for unpublished measurements in this form. This only records willingn
 ## Q20. What is the single most important thing we should improve next?
 - **Type:** long text
 - **Required:** yes
+- **Help text:** `One sentence is fine.`
 
 ## Q21. May we contact you to follow up about your feedback or a validation example?
 - **Type:** single select
 - **Required:** yes
 - **Options:** Yes; No
+- **Note:** no preselected option; contact is collected only after an explicit `Yes`. Do not add an email field anywhere else on the form.
 
 ### Conditional Q21a. Contact
 - **Show if:** Yes
@@ -367,12 +404,13 @@ Optional button: **Return to HiveBlot beta**.
 
 ### Required logic test cases
 
-- **A — active wet-lab tester, no correction:** normal ~4-minute path.
+- **A — active wet-lab tester, no correction, Q15a = No, follow-up No:** normal path, 21 questions, timed <5 minutes. If the timed test fails, cut in this order before adding anything: Q17 (fold into a Q21 `Yes` branch), Q4, Q13.
 - **B — active tester, wrong extraction:** Q12a–d appear and capture reproducible detail.
 - **C — opened but did not test:** blocker question appears; detailed correctness is skipped.
 - **D — did not use beta:** short expectations path.
 - **E — rare/never Western user:** band-reading page skipped.
 - **F — follow-up yes:** contact appears and becomes required; follow-up no keeps contact hidden.
+- **G — densitometry user:** Q15a = Yes shows Q15b–c; Q15a = No/unknown shows nothing extra.
 
 No path should dead-end or require an irrelevant answer.
 
