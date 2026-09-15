@@ -77,6 +77,23 @@ parameters, code version, who drew the box), never on the Evidence Record,
 and `web/app/about/page.tsx:91,115` + `web/app/learn/page.tsx:106-108`
 change in the same PR. **No DB write this week.**
 
+## Status 2026-09-15 (UCSF push, method `hiveblot.densitometry` v0.3.0)
+
+D-1 done · D-2 done (explicit `lane_bounds` + labels; count/auto are labelled
+diagnostics) · D-3 done (band-core clip gate 2 % warn / 10 % refuse within
+8 DN, `relative: null` when refused; thresholds justified on synthetic
+fixtures in `research/experiments/D2_clip_threshold_study.md`, not yet on
+Butler 2019 — D-7 still owns the real threshold) · D-4 done (perturbation
+envelope, ranges in the UI, near-tie vs severe reference flip) · D-5 half
+done (D1 retired with a header; synthetic recovery study landed; the
+author-value comparison is NOT done — every candidate strip is clipped past
+the gate in the reviewed papers, so the honest expected result is "n too
+small"; still to be written up) · D-6 done except the page-naming decision
+(page still says "Experimental densitometry", Nik decides D-1 naming) ·
+D-7 open. Also landed beyond the tickets: per-lane flank baseline, vertical
+profile sparkline, row re-boxing, TIFF uploads, overlay PNG export. Current
+state and limitations: `research/overnight/2026-09-14-summary.md`.
+
 ## Tickets (ordered by dependency)
 
 ### D-1 · Forward `region` from the web proxy to the API
