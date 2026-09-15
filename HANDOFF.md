@@ -112,7 +112,9 @@ numbers, comma-grouped dilutions, abstain on two antibodies against one target (
 page errors visible before an image loads, readable validation errors, lead copy consistent with
 the pairing (`4c98e6e`). Pre-existing source typing fixed (`c42f1ee`): a source is methods/caption only if its
 text is verbatim there, otherwise "model reading" (UI label `0396aee`); caption "pVHL"/"pRB" no
-longer read as phospho (`e6e86ad`).
+longer read as phospho (`e6e86ad`); treatment dose/duration from model wording are model readings
+(`9080341`); co-IP bait from lane labels is image evidence with lane-only quotes (`8f766fe`,
+`1d6c431`); CI lint fix for unescaped JSX apostrophes (`29bf167`) — run lint with pipefail.
 
 **Loading-control pairing (2026-09-15, browser-verified):** analyzer
 `pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
