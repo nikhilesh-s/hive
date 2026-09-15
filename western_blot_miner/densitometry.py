@@ -66,6 +66,8 @@ FLANK_MIN_PX = 3
 # Minimum lane width in pixels; narrower lanes are geometry errors.
 MIN_LANE_WIDTH_PX = 3
 MIN_REGION_PX = 8
+# An explicit band row thinner than this puts the flank baseline inside the band.
+THIN_BAND_ROW_PX = 6
 # Perturbation scale for the stability study: fraction of the median lane
 # width (x) and of the band-row height (y), floored at 2 px. Reviewed crops
 # are 500-2600 px wide with 6-12 lanes, so this is 3-10 px, the order of a
@@ -463,6 +465,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
             caveats.append("lane boundaries were auto-detected from the intensity profile (diagnostic); define lanes explicitly for a measurement")
         elif lane_mode == "equal_width":
             caveats.append("lanes are equal-width slices of the selected region (diagnostic); define lanes explicitly for a measurement")
+    if len(bounds) == 1:
+        caveats.append("only one lane: its relative value is 1 by definition and compares nothing; "
+                       "define at least two lanes")
     labels = list(lane_labels) if lane_labels else []
     if labels and len(labels) != len(bounds):
         raise ValueError(f"{len(labels)} lane labels for {len(bounds)} lanes")
@@ -497,8 +502,11 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     overall_reasons: list[str] = []
     if top <= 0 or all(l["snr"] is not None and l["snr"] < SNR_MIN for l in base):
         overall = REFUSED
+        thin_hint = (f" (the chosen band row is only {y1 - y0} px tall, so the baseline rows beside it are "
+                     "probably still inside the band; choose a taller row or let the row be detected)"
+                     if band_row is not None and y1 - y0 < THIN_BAND_ROW_PX else "")
         overall_reasons.append("no lane has signal above background in the selected row"
-                               + (f" ({multi_row_note})" if multi_row_note else ""))
+                               + (f" ({multi_row_note})" if multi_row_note else "") + thin_hint)
     elif base[top_idx]["quality"] == REFUSED:
         overall = REFUSED
         overall_reasons.append(f"the strongest lane ({top_idx + 1}) is clipped, so nothing can be expressed relative to it")
