@@ -207,3 +207,12 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   setting a target gives "target has 6 lanes, control has 5"; diagnostic mode disables pairing with a hint.
 - `29bf167` CI lint failure on 9080341 (unescaped apostrophes from 0396aee). Cause of the miss: local lint
   was piped through `tail`, hiding the exit code. Lint is now always run with pipefail.
+- `f329bc2` CI gap: the pytest-style miner regression suites never ran in CI (only a fixed script list);
+  added a CI step (green on f329bc2) and a local corpus rebuild test (record_ids stable, deterministic,
+  caption/methods quotes verbatim). Rebuild is byte-identical across PYTHONHASHSEED values; 93/93 ids stable.
+- Checked clean: no API / web / loader consumer selects evidence by source type (only the panel label map),
+  so the model-reading retyping cannot drop evidence; local stack restarted on HEAD, demo_check 19 PASS /
+  2 WARN / 0 FAIL.
+- Soft-saturation probe (not a code defect, documented limit): a tanh exposure knee compresses ratios
+  (0.5 / 0.25 / 0.1 -> 0.67 / 0.37 / 0.17) with 0% clipped pixels and a "valid" card; core flatness does
+  not separate it from clean or real strips, so no gate. Only a dilution-series calibration (D-7) can bound it.
