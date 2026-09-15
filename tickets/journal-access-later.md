@@ -1,6 +1,6 @@
 # Later ticket — journal / full-text access indicator
 
-**Status:** DEFERRED — not part of the 2026-09-16 Wednesday push.  
+**Status:** DEFERRED — not part of the 2026-09-16 Wednesday push.\
 **Priority:** Week 2+ only after densitometry, B-1/B-2, feedback packaging, and active-branch consolidation are stable.
 
 ## Why this exists
