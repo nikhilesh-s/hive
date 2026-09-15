@@ -8,7 +8,7 @@ Method `hiveblot.densitometry` v0.3.0; `scripts/experiments/densitometry_real_cr
 - crops with a row whose band core is clipped past the 10% gate: 21 / 21
 - rows refused because the reference lane moves under perturbation: 4
 
-| paper | crop | row | y | lanes (auto) | max clipped core | refused lanes | no-signal lanes | ranking stable | state | reasons |
+| paper | crop | row | y | lanes (auto) | max clipped core | refused lanes | weak lanes | ranking stable | state | reasons |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 10.1186_s12964-025-02385-8 | page_004_cand_0025.png | 0 | 620–661 | 3 | 93% | 2 | 1 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
 | 10.1186_s12964-025-02385-8 | page_004_cand_0025.png | 1 | 278–319 | 6 | 100% | 4 | 2 | False | warning | lanes 3, 4, 6 are a near tie for strongest (within 25%); their order is not resolved by this image, other lanes' relative values hold within their ranges |

@@ -135,7 +135,7 @@ down → PMC search fills the list automatically (`sources_used` shows which).
 ```bash
 cd api && ../.venv/bin/python -m pytest -q                       # 147 passed (+ RLS matrix below)
 HIVE_DB_TEST_URL=$(.venv/bin/python scripts/local_db.py test-url) .venv/bin/python -m pytest api/tests/test_db_access_matrix.py -v   # 10, incl. live tier
-.venv/bin/python western_blot_miner/tests/test_densitometry.py   # 61/61 synthetic-blot checks (v0.2: lanes, gates, stability)
+.venv/bin/python western_blot_miner/tests/test_densitometry.py   # 84/84 checks (v0.3: lanes, gates, stability, flank baseline, real crops)
 cd web && npx tsc --noEmit && npm run lint                       # clean
 ```
 
