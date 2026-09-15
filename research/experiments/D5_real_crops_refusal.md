@@ -3,7 +3,7 @@
 Method `hiveblot.densitometry` v0.3.0; `scripts/experiments/densitometry_real_crops.py`. No densitometry ground truth exists for these figures, so this reports only what the gates DO on real published panels: refuse, warn, or accept. Band rows and lanes are auto-detected here (diagnostic); a researcher's hand-drawn strip and lanes are the product path and will change the lane count, not the clipping.
 
 - crops: 21 · band rows probed (up to 6 per crop): 112
-- row states: quantification_refused 81, warning 31
+- row states: quantification_refused 82, warning 30
 - crops with at least one refused row: 20 / 21
 - crops with a row whose band core is clipped past the 10% gate: 21 / 21
 - rows refused because the reference lane moves under perturbation: 4
@@ -99,29 +99,29 @@ Method `hiveblot.densitometry` v0.3.0; `scripts/experiments/densitometry_real_cr
 | 10.3892_ijmm.2022.5188 | page_011_cand_0057.png | 3 | 238–259 | 5 | 51% | 4 | 1 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0057.png | 4 | 419–425 | 1 | 0% | 0 | 0 | True | warning | the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0057.png | 5 | 494–499 | 3 | 12% | 1 | 0 | False | quantification_refused | the strongest lane changes under +/-18px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 0 | 429–433 | 2 | 0% | 0 | 1 | False | quantification_refused | the strongest lane changes under +/-32px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 1 | 438–472 | 4 | 64% | 4 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 2 | 364–395 | 6 | 68% | 6 | 0 | None | quantification_refused | the strongest lane (5) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 3 | 516–545 | 7 | 75% | 7 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 4 | 289–317 | 3 | 63% | 3 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 0 | 438–472 | 4 | 64% | 4 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 1 | 364–395 | 6 | 68% | 6 | 0 | None | quantification_refused | the strongest lane (5) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 2 | 516–545 | 7 | 75% | 7 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 3 | 289–317 | 3 | 63% | 3 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0058.png | 4 | 429–433 | 2 | 0% | 0 | 1 | False | quantification_refused | the strongest lane changes under +/-32px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 0 | 229–272 | 2 | 31% | 2 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 1 | 389–419 | 5 | 63% | 5 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 2 | 307–331 | 4 | 65% | 4 | 2 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 3 | 211–222 | 1 | 0% | 0 | 0 | True | warning | the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 4 | 343–353 | 1 | 0% | 0 | 0 | True | warning | the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 5 | 426–436 | 1 | 0% | 0 | 0 | True | warning | the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 0 | 282–309 | 4 | 60% | 4 | 0 | None | quantification_refused | the strongest lane (4) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 1 | 212–236 | 5 | 35% | 3 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 2 | 196–202 | 1 | 0% | 0 | 0 | True | warning | the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 3 | 243–247 | 1 | 0% | 0 | 1 | None | quantification_refused | no lane has signal above background in the selected row (the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry) |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 4 | 356–384 | 3 | 64% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 5 | 439–466 | 4 | 64% | 4 | 0 | None | quantification_refused | the strongest lane (4) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 2 | 476–501 | 1 | 60% | 1 | 0 | None | quantification_refused | the strongest lane (1) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 3 | 307–331 | 4 | 65% | 4 | 2 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 4 | 211–222 | 1 | 0% | 0 | 0 | True | warning | the box contains 8 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0060.png | 5 | 343–353 | 1 | 0% | 0 | 0 | True | warning | the box contains 8 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 0 | 356–384 | 3 | 64% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 1 | 439–466 | 4 | 64% | 4 | 0 | None | quantification_refused | the strongest lane (4) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 2 | 282–309 | 4 | 60% | 4 | 0 | None | quantification_refused | the strongest lane (4) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 3 | 212–236 | 5 | 35% | 3 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 4 | 196–202 | 1 | 0% | 0 | 0 | True | warning | the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0062.png | 5 | 243–247 | 1 | 0% | 0 | 1 | None | quantification_refused | no lane has signal above background in the selected row (the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry) |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 0 | 273–310 | 4 | 60% | 4 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
 | 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 1 | 210–239 | 5 | 66% | 5 | 0 | None | quantification_refused | the strongest lane (2) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 2 | 242–253 | 1 | 55% | 1 | 0 | None | quantification_refused | the strongest lane (1) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 3 | 200–205 | 1 | 2% | 0 | 0 | True | warning | the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 4 | 359–386 | 3 | 61% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
-| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 5 | 439–466 | 3 | 64% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 2 | 359–386 | 3 | 61% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 3 | 439–466 | 3 | 64% | 3 | 0 | None | quantification_refused | the strongest lane (3) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 4 | 242–253 | 1 | 55% | 1 | 0 | None | quantification_refused | the strongest lane (1) is clipped, so nothing can be expressed relative to it |
+| 10.3892_ijmm.2022.5188 | page_011_cand_0063.png | 5 | 200–205 | 1 | 2% | 0 | 0 | True | warning | the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry |
 
 ## Reading this
 
