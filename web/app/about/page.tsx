@@ -78,7 +78,7 @@ export default function About() {
           Not a single answer, but a container. Each important field (protein identity,
           phosphosite, cell line, organism, treatment, dose, duration, antibody,
           molecular weight) carries its own value, a status, the source it came from
-          (caption, methods, antibody entry, the row label, UniProt) and the wording
+          (caption, methods, antibody entry, the model's own reading, UniProt) and the wording
           that supports it. The normalized value and the wording as printed in the
           paper are both kept, so every normalization is auditable and reversible.
         </p>

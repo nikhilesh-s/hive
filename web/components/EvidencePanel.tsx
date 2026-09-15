@@ -97,7 +97,7 @@ const FIELD_LABELS: [string, string][] = [
 
 const SOURCE_NAMES: Record<string, string> = {
   antibody: 'antibody', figure_caption: 'caption', methods: 'methods',
-  model_target: 'row label', image: 'image', uniprot_reference: 'UniProt',
+  model_target: 'model reading', image: 'image', uniprot_reference: 'UniProt',
 };
 
 function statusGlyph(status?: string | null): { g: string; color: string; title: string } | null {
