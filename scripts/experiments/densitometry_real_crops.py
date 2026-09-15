@@ -70,7 +70,7 @@ md = ["# D5 — refusal behaviour on the 21 reviewed crops (diagnostic geometry)
       f"- crops with at least one refused row: {crops_with_refusal} / {len(CROPS)}",
       f"- crops with a row whose band core is clipped past the {D.CLIP_FRACTION_REFUSE:.0%} gate: {crops_with_clip} / {len(CROPS)}",
       f"- rows refused because the reference lane moves under perturbation: {summary['rows_refused_for_ranking_instability']}",
-      "", "| paper | crop | row | y | lanes (auto) | max clipped core | refused lanes | no-signal lanes | ranking stable | state | reasons |",
+      "", "| paper | crop | row | y | lanes (auto) | max clipped core | refused lanes | weak lanes | ranking stable | state | reasons |",
       "|---|---|---|---|---|---|---|---|---|---|---|"]
 for x in rows:
     md.append(f"| {x['paper']} | {x['crop']} | {x['row_index']} | {x['band_row'][0]}–{x['band_row'][1]} | {x['n_lanes_auto']} | "

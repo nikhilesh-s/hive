@@ -262,7 +262,7 @@ Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
 the DB matrix, which ran separately: **11 passed** incl. live tier + loader
 JSONB check); biology 165, reconcile 21/21, loader enrichment ok, extract
 10/10, pipeline wiring **13/13** (parallel mode covered), stable-row-key
-34/34, densitometry 20/20, benchmark 34/34 (seed self-consistency only);
+34/34, densitometry 20/20 (v0.1 then; 84/84 at v0.3, see the UCSF push block), benchmark 34/34 (seed self-consistency only);
 `tsc` clean, lint 0/0, `next build` clean, `git diff --check` clean.
 `scripts/demo_check.py`: 18 PASS · 2 WARN (Valency token absent locally) · 0 FAIL.
 
