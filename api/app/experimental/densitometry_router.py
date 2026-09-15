@@ -43,6 +43,10 @@ class DensitometryRequest(BaseModel):
     # region, ordered left to right. The product path; `lanes` is the fallback.
     lane_bounds: list[list[int]] | None = Field(default=None, min_length=1, max_length=24)
     lane_labels: list[str] | None = Field(default=None, max_length=24)
+    # Researcher-chosen band row [y0, y1] in full-image pixels (e.g. the full
+    # height of a tightly drawn box); when absent the strongest row inside the
+    # region is detected and `row_index` picks among detected rows.
+    band_row: list[int] | None = Field(default=None, min_length=2, max_length=2)
     # Re-run the integration over small geometry perturbations and report an
     # envelope per lane (see densitometry.py).
     stability: bool = True
@@ -102,6 +106,7 @@ async def experimental_densitometry(request: Request, body: DensitometryRequest)
                                                row_index=body.row_index,
                                                region=tuple(body.region) if body.region else None,
                                                lane_bounds=body.lane_bounds, lane_labels=labels,
+                                               band_row=tuple(body.band_row) if body.band_row else None,
                                                stability=body.stability))
     except ValueError as e:
         raise HTTPException(400, str(e))
