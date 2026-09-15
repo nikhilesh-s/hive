@@ -69,6 +69,95 @@ def _clean(text: str) -> str:
     return " ".join(str(text).split()).translate(_DELIMS)
 
 
+_RESIDUE_WORD = re.compile(r"^p?(?:thr|tyr|ser|phospho|total)\d*$", re.I)
+
+
+def _target_names(row: dict) -> set[str]:
+    """Protein names a sentence could use for this record: canonical symbols
+    and the printed label's word tokens (P-STAT3 (Ser727) -> STAT3)."""
+    names = set()
+    for v in (row.get("canonical_target"), row.get("target")):
+        for tok in re.findall(r"\w[\w-]*", str(v or "")):
+            tok = re.sub(r"^(?:p|t|phospho|total)-", "", tok, flags=re.I)
+            if len(tok) >= 3 and not tok.isdigit() and not _RESIDUE_WORD.match(tok):
+                names.add(tok.lower())
+    return names
+
+
+# --- status check -----------------------------------------------------------
+# Lexical, not semantic: flags sentences whose wording contradicts the
+# structured statuses of the records they cite. It cannot tell whether a
+# cited record supports every part of a sentence; a clean result is not a
+# verification.
+_UNCERTAIN = re.compile(r"unresolved|conflict|ambiguous|disput|not settled|unsettled|uncertain|disagree|unclear|"
+                        r"undetermined|cannot be (?:determined|resolved)|competing|needs? review|not (?:yet )?reviewed", re.I)
+_MOD_WORDS = re.compile(r"phospho|\btotal\b|unmodified|modif", re.I)
+_SAYS_TOTAL = re.compile(r"\btotal[ -]protein\b|\bunmodified\b|\bnon-?phosphorylated\b", re.I)
+_DENIES_PHOSPHO = re.compile(r"\bnot\s+(?:\w+\s+)?phosphorylated\b|\bunphosphorylated\b|\bno\s+phosphorylation\b|"
+                             r"\bnon-?phosphorylated\b|n't\s+(?:\w+\s+)?phosphorylated\b", re.I)
+_SAYS_PHOSPHO = re.compile(r"\b(?:is|are|was|were|be|been|becomes?|became)\s+(?:\w+\s+)?phosphorylated\b|"
+                           r"\bphosphorylation\b[^.;]*?\b(?:is|was|were)\s+(?:confirmed|demonstrated|shown|detected|"
+                           r"established|present|induced)\b", re.I)
+_CERTAIN = re.compile(r"\bconfirm\w*|\bdefinitive\w*|\bclearly\b|\bestablish\w*|\bproven?\b|\bproves\b|\bconclusive\w*", re.I)
+_QUANT = re.compile(r"\b(?:increas|decreas|upregulat|up-regulat|downregulat|down-regulat|stronger|weaker|fold[- ]change)\w*", re.I)
+
+
+def _sentences(text: str) -> list[str]:
+    out: list[str] = []
+    for part in re.split(r"(?<=[.!?])\s+", text):
+        if out and re.fullmatch(r"(?:\[E\d+(?:\s*,\s*E\d+)*\]\s*)+[.!?]?", part.strip()):
+            out[-1] += " " + part  # "claim. [E2]" -> the citation belongs to the claim
+        else:
+            out.append(part)
+    return out
+
+
+def status_warnings(text: str, blocks: list[dict]) -> list[str]:
+    by_ref = {b["ref"]: b for b in blocks}
+    warnings: list[str] = []
+
+    def add(w: str) -> None:
+        if w not in warnings:
+            warnings.append(w)
+    for s in _sentences(text):
+        refs = sorted({r.strip() for g in _CITE_RE.findall(s) for r in g.split(",")} & by_ref.keys(),
+                      key=lambda r: int(r[1:]))
+        if not refs:
+            continue
+        bare = _CITE_RE.sub(" ", s)
+        cited = [by_ref[r] for r in refs]
+        if _UNCERTAIN.search(bare):
+            continue  # the sentence already says it is unsettled
+        for r, b in zip(refs, cited):
+            st = b["status"]
+            if st["modification_status"] in ("CONFLICTING", "AMBIGUOUS") and _MOD_WORDS.search(bare):
+                add(f"{r} has a {st['modification_status']} modification, but a sentence citing it states the modification as settled.")
+            if st["needs_review"] and _CERTAIN.search(bare):
+                add(f"{r} needs review, but a sentence citing it uses certain language (confirmed / established).")
+        phospho = [st for st in (b["status"] for b in cited)
+                   if st["modification_type"] == "phosphorylation" and st["modification_status"] == "SUPPORTED"]
+        if _DENIES_PHOSPHO.search(bare) and phospho:
+            add(f"A sentence denies phosphorylation while citing a record with a supported phosphorylation ({', '.join(refs)}).")
+        elif _SAYS_PHOSPHO.search(bare) and not _DENIES_PHOSPHO.search(bare) and not any(
+                b["status"]["modification_type"] == "phosphorylation" or b["status"]["modification_status"] in ("CONFLICTING", "AMBIGUOUS")
+                for b in cited):
+            add(f"A sentence states a phosphorylation that none of its cited records ({', '.join(refs)}) records.")
+        if _SAYS_TOTAL.search(bare) and all(b["status"]["modification_status"] in (None, "MISSING")
+                                            and not b["status"]["modification_label"] for b in cited):
+            add(f"A sentence calls the protein total / unmodified, but the cited records ({', '.join(refs)}) do not state a modification.")
+        low = bare.lower()
+        named = {b["ref"] for b in blocks
+                 if any(re.search(rf"(?<![\w-]){re.escape(n)}(?![a-z])", low) for n in b["status"]["names"])}
+        if named and not named & set(refs):
+            names = sorted({n for b in blocks if b["ref"] in named for n in b["status"]["names"]})
+            add(f"A sentence names {', '.join(names)} but cites {', '.join(refs)}, which are records for other targets.")
+    if _QUANT.search(_CITE_RE.sub(" ", text)):
+        add("The answer uses intensity / regulation language; the evidence records only say present / absent / uncertain.")
+    if any(b["tier"] != "reviewed" and b["ref"] in text for b in blocks) and "unreviewed" not in text.lower():
+        add("The answer cites live extraction records without saying they are unreviewed.")
+    return warnings
+
+
 def evidence_blocks(rows: list[dict], tier: str = "reviewed") -> list[dict]:
     """Group lane rows into experiments and render one compact block each."""
     groups: dict[str, list[dict]] = {}
@@ -97,12 +186,17 @@ def evidence_blocks(rows: list[dict], tier: str = "reviewed") -> list[dict]:
         blocks.append({
             "key": key, "tier": tier, "record_id": f.get("id"), "doi": f.get("doi") or f.get("paper_id"),
             "title": f.get("title"), "lanes": len(lanes),
+            # structured statuses for the post-answer status check (never shown to the model)
+            "status": {"modification_status": mod_status, "modification_type": f.get("modification_type"),
+                       "modification_label": f.get("modification_label"), "needs_review": bool(rec.review_reasons),
+                       "names": sorted(_target_names(f))},
             "headline": f"{f.get('canonical_target') or f.get('target')}{' · ' + mod if mod else ''}",
             "text": _clean(
                 f"target={f.get('canonical_target') or f.get('target')} (as printed: {f.get('target')}; "
                 f"protein status {f.get('protein_status') or 'n/a'}; UniProt {f.get('uniprot_id') or 'none'}); "
                 # MISSING means the sources did not say -- not "total protein"
-                f"modification={mod or 'not stated'}; experiment={f.get('experiment_type') or f.get('western_blot_type') or 'n/a'}; "
+                # legacy western_blot_type says "total_protein" for any non-phospho row, incl. MISSING
+                f"modification={mod or 'not stated'}; experiment={f.get('experiment_type') or 'n/a'}; "
                 f"sample={f.get('cell_line') or f.get('sample') or 'n/a'}; organism={f.get('organism') or 'n/a'}; "
                 f"treatment={treat or 'not reported'}; antibody={ab or 'not reported'}; "
                 f"MW={', '.join(mw) or 'not reported'}; lanes[{len(lanes)}]: {_lane_text(lanes)}; "
@@ -222,6 +316,7 @@ def llm_ready() -> bool:
 async def answer(question: str, doi: str | None = None, include_live: bool = True,
                  llm: Callable[[str, str], tuple[str, str]] | None = None) -> dict:
     out = {"question": question, "doi": doi, "evidence": [], "answer": None, "cited": [], "invalid_cited": [],
+           "status_warnings": [],
            "model": None, "note": None}
     try:
         blocks = await retrieve(question, doi, include_live)
@@ -259,5 +354,9 @@ async def answer(question: str, doi: str | None = None, include_live: bool = Tru
         notes.append("The model answered without citing any record; treat the answer as unsupported.")
     if out["invalid_cited"]:
         notes.append(f"It cites records that were not shown ({', '.join(out['invalid_cited'])}); treat those claims as unsupported.")
+    out["status_warnings"] = status_warnings(text, blocks)
+    if out["status_warnings"]:
+        notes.append("Status check (wording vs. the cited records' statuses; lexical, not a verification): "
+                     + " ".join(out["status_warnings"]))
     out["note"] = " ".join(notes) or None
     return out
