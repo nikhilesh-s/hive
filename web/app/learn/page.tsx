@@ -124,7 +124,7 @@ export default function Learn() {
         <p className="hb-page-p">
           The evidence panel tags each field with its source: <span style={{ fontFamily: MONO }}>caption</span>,{' '}
           <span style={{ fontFamily: MONO }}>methods</span>, <span style={{ fontFamily: MONO }}>antibody</span> (the reagent
-          entry), <span style={{ fontFamily: MONO }}>model reading</span> (the extractor's own wording or its reading of the
+          entry), <span style={{ fontFamily: MONO }}>model reading</span> (the extractor&apos;s own wording or its reading of the
           printed row label, used when the words are not found verbatim in the caption or methods),{' '}
           <span style={{ fontFamily: MONO }}>image</span> (the panel itself, for lane conditions and band presence) or{' '}
           <span style={{ fontFamily: MONO }}>UniProt</span> (canonical name, accession, expected mass). Where the source is
