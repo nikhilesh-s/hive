@@ -7,6 +7,66 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## UCSF PUSH STATE (2026-09-14 → founder hard stop Tue 2026-09-15 19:00 PT) — READ FIRST
+
+**Active integration branch: `experimental/ucsf-demo-2026-09-09`** (the only
+branch new work lands on; `experimental/densitometry`, `experimental/paper-qa`,
+`experimental/valency-live-ingest`, `experimental/demo-day` are historical
+pointers already contained in it; `feature/bio-context-beta` = frozen hosted
+beta; `main` is stale). Launcher: `CLAUDE_RUN_2026-09-14.md`. Plan:
+`research/OVERNIGHT_ORCHESTRATOR_2026-09-14.md`. Running log:
+`research/overnight/2026-09-14-session-log.md`. Latest commit: `git log -1`
+(this block written at `7238a8f`).
+
+**Shipped this push (window 1, 2026-09-14 night):**
+- **Densitometry v0.2** (`western_blot_miner/densitometry.py`,
+  `api/app/experimental/densitometry_router.py`,
+  `web/app/api/experimental/densitometry/route.ts`,
+  `web/app/experimental/densitometry/page.tsx`): region reaches the analyzer
+  (D-1 fixed); researcher-defined `lane_bounds` + `lane_labels` are the product
+  path, count/auto lanes are labelled diagnostics; per-lane contract (raw,
+  background, corrected, relative, clipped_fraction, snr, quality, reasons,
+  stability envelope); gates: band-core clipping warn 2% / refuse 10% within
+  8 DN of the floor, robust-SNR no-signal, invalid geometry = HTTP 400;
+  whole-strip refusal (`relative: null` everywhere) when the reference lane is
+  clipped, no lane has signal, or the strongest lane changes under ±5% lane
+  width / ±10% row height perturbation; method name/version/thresholds and
+  image sha256 in every response; UI drag-region, seeded/draggable dividers,
+  labels, quality-coloured overlay, quality card, ranges not two-decimal
+  points, JSON/CSV export. Verified end-to-end in the local browser (refusal
+  on a clipped lane; valid 1.0 / 0.5 / 0.25 / 0 recovery).
+- **Validation:** `research/experiments/D2_clip_threshold_study.md` (synthetic
+  known ratios: gate fires at 18% clipped core with 3.9% ratio error, before
+  the 13–95% error regime; JPEG floor smearing does not hide clipping; jitter
+  envelope) and `research/experiments/D5_real_crops_refusal.md` (21 reviewed
+  crops, auto geometry: 21/21 have a clipped row past the gate, 78/112 rows
+  refused, 15 ok, 19 warning — refusing is the feature on published figures).
+  D1's 59.7% is retired with a header; never quote it.
+- **B-1** `pipeline._split_text_context`: caption/methods routed separately;
+  `figure_caption` sources are real caption text. **B-2**
+  `record_builder._antibody_info`: deterministic vendor/catalog/dilution/clone
+  backstop only when the model left the field empty (source type
+  `deterministic`, rank below methods, confidence 0.6); disagreement is kept
+  as a candidate, never overwrites.
+
+**Tests (2026-09-14):** densitometry 61/61 · api 164 passed / 11 skipped (DB
+matrix needs `HIVE_DB_TEST_URL`) · miner pytest 54 · biology / reconcile 21 /
+loader / extract 10 / pipeline 13 / stable-row-key 34 all green · benchmark
+34/34 · `tsc` clean · lint 0/0 · `next build` clean · `git diff --check` clean.
+
+**Not done / known:** record-crop path of the densitometry page not re-verified
+in the browser this window (needs the local DB; upload path verified); no
+loading-control pairing, no cross-image comparison, nothing stored (reserved
+intensity columns stay NULL); `experimental-ci.yml` hygiene job still trips on
+the dummy localhost DSNs (one-line fix pending); Valency token not on this
+laptop (PMC fallback works); nothing experimental is hosted.
+
+**EXACT NEXT TASK:** apply the adversarial (Lead Q) P0/P1 findings on
+densitometry + B-1/B-2 if any remain in the session log, then continue the
+recursive grind per the launcher (candidates in priority order: CI hygiene
+one-liner; `rows_detected` text-row flag + UI hint; record-crop path browser
+check with the local DB; overnight summary `research/overnight/2026-09-14-summary.md`).
+
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 
 **1. What is HiveBlot?** A biologically accurate Western blot evidence search
