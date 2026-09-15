@@ -136,8 +136,16 @@ table; `[E1, E2]` is a citation and phantom refs are reported in `invalid_cited`
 renders "not stated". Open gap: citations are checked for existence, not for agreement with the cited
 record's status.
 
-**Tests (latest):** densitometry 116 checks · api 177 passed / 11 skipped · miner
-pytest 56 · biology / reconcile 21 / extract 10 / pipeline 13 /
+**Search hardening (`da0f5c9`, `e4936f3`):** a short gene symbol no longer matches inside a word (MYC
+returned 86 Rapamycin/Bafilomycin rows); a pasted DOI is an exact paper filter (before, a truncated DOI
+showed another paper's rows on the research page and "(00)" in a DOI parsed as a Ser92 site); record ids
+bounded to bigint (422, not 500); deleting a running live job is refused (409), and 503 without the
+ingest DB. Research/live pages (`035bbb1`): late responses cannot land on a newer paper; failed
+listings/searches/job polls show an alert instead of an empty list; every experimental proxy answers
+invalid JSON with 400.
+
+**Tests (latest):** densitometry 116 checks · api 182 passed / 11 skipped · miner
+pytest 133 · demo_check 19 PASS / 2 WARN / 0 FAIL · biology / reconcile 21 / extract 10 / pipeline 13 /
 stable-row-key 34 green · tsc and lint clean.
 
 **EXACT NEXT TASK:** the Wednesday package is feature-complete and hardened. Before the demo:
