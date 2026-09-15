@@ -292,6 +292,10 @@ def test_status_check_stays_quiet_on_faithful_answers():
             "stated [E3].")
     assert ask.status_warnings(good, blocks) == []
     assert ask.status_warnings("Not settled. ERK modification is conflicting across records [E2].", blocks) == []
+    # naming a modification is not claiming one: this real answer sentence must not warn
+    listing = ("Two targets were blotted: STAT3, probed for phospho-Tyr705 [E1] and phospho-Ser727 [E1]; "
+               "and MAPK1/MAPK3 (printed as P-ERK 1/2) [E2].")
+    assert ask.status_warnings(listing, blocks) == []
     # Known limit: partial support inside one sentence is not detectable lexically.
     assert ask.status_warnings("STAT3 is phosphorylated at Tyr705 in 12 cell lines [E1].", blocks) == []
 

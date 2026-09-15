@@ -318,6 +318,56 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   matches by id, a key follows its record to a new id. Browser: /search?q=loading control shows
   "Found 30 experiments (175 lane records)" (was 100 rows), no console errors; demo_check 19 PASS /
   2 WARN / 0 FAIL. (CI on 8cd3f88 was cancelled by the next push; ec395b9 and later carry it.)
+## Final pre-demo hardening window (2026-09-15 16:00-19:00 PT), from 811e94c
+
+- Track A (paper-QA status grounding, `cb4caeb`): citations were checked for existence only. `status_warnings()`
+  now compares each sentence's wording with the structured statuses of the records that sentence cites and
+  adds a labelled note (lexical, not a verification): CONFLICTING/AMBIGUOUS stated as settled; a supported
+  phosphorylation denied, or a phosphorylation no cited record holds; a not-stated modification called
+  total/unmodified; certainty words on a needs-review record; a sentence naming a target only uncited
+  records carry; intensity/regulation language; live records cited without the word "unreviewed". Nine
+  adversarial fixtures + faithful-answer fixtures in api/tests/test_experimental_ask.py. On six real
+  claude_cli answers to the demo questions it raised zero warnings. NOT detectable and documented: partial
+  support inside one sentence. Also: evidence blocks no longer fall back to legacy `western_blot_type`,
+  which reads "total_protein" for any non-phospho row (a MISSING modification would have reached the model
+  as total protein).
+- Model output was being shaped by the operator's own Claude Code user settings (`85b20b2`): a user-level
+  output-style hook turned paper-QA answers into clipped non-grammatical prose ("E1 mark modification
+  CONFLICTING"). `claude -p` now runs with `--setting-sources project` (login unaffected, unlike `--bare`);
+  demo_check's probe too. A/B on the production call path confirmed normal prose after the change, and the
+  image path still reads a crop through the Read tool (all six printed row labels recovered).
+- Track B (search false positives, read-only child): 106 symbol-table runs over both tiers (475 reviewed +
+  861 live rows), 1975 on-target vs 326 off-target matches. Every off-target row is a symbol named in
+  treatment / context / sample / catalog text (design), not a symbol matched inside a longer word: "MEK/ERK
+  inhibitor U0126", "siATG5", "siBEX2#1", "LC3B siRNA", "Bisindolylmaleimide II", catalog "ab108629".
+  A left-boundary rule removes 0 of them and loses 0 on-target rows, cannot separate pERK from PERK under
+  lower(), and would newly drop KRAS/BRAF/siMYC. Decision: documented as a limit in `_term_clause`, no code
+  change. KIT/MET/RAF/RB/VHL/JUN/FOS/RAS/p53/PTEN/mTOR/GSK3/CDK1 match no rows at all in this corpus.
+- Track E (provenance sweep, read-only child): 93 records, 2931 sources, 475 flattened rows rebuilt from
+  stored claims with current code. 0 violations: caption sources verbatim in caption (307), methods sources
+  verbatim after dash folding only (40, all U+2011 artefacts), image sources quote lane labels or the
+  model's band notes, no model reading typed as caption/methods, CONFLICTING/AMBIGUOUS keep candidates and
+  null scalars, expected MW only from UniProt, bands categorical. Determinism: two in-process rebuilds and
+  PYTHONHASHSEED 0 vs 1 subprocesses identical; record_id sets equal the stored sets (20/20, 20/20, 53/53);
+  475 stable_row_keys identical and unique per (record, lane).
+- Regression found by Track E and fixed (`afc9f19`): the "caption" channel is the retrieval's figure-text
+  section, which on PMC12706926 is the same results paragraph for 11 of 15 panels. Its one
+  "Immunoprecipitation (IP) assays with either PIK3CA or BEX2" sentence classified 47 expression records as
+  co_ip and set ip_bait_protein to "IP". co_ip now settles only on panel evidence (IP-role antibody, or
+  co-IP / IP: / IgG markers printed on the lanes); caption-channel wording joins methods-only wording as the
+  non-settling co_ip_context flag, and the bait lookup skips IP/IB/WB/IgG/input/WCL. After the fix the
+  co-IP paper rebuilds to exactly the stored records: 6 co_ip, bait PIK3CA, 0 records differing on
+  (experiment_type, bait). Benchmark unchanged at 34/34. The stored demo DB was never affected (it is
+  loaded from the stored records); a LIVE extraction would have reproduced the error.
+- Track D (bounded local fuzz): 631 requests over the web proxies and the API (empty/invalid JSON, null
+  fields, oversized and negative ids, huge strings, NUL and control characters, malformed lane arrays and
+  regions, mismatched labels, malformed DOIs, Unicode biology text, dash variants, Greek symbols, empty
+  terms) plus 33 malformed-image and geometry cases (truncated PNG, header-only, GIF/SVG/PDF bytes, 1x1,
+  1x4000, RGBA, 16-bit TIFF, inverted/zero-area/NaN regions, reversed and overlapping lane bounds, 400
+  bounds, label/bound mismatch, lanes 0 and 1000, band_row 1e9, pair geometry mismatches): zero 5xx, all
+  rejected as 400/422. Note for anyone re-running this: `api/.env`'s INTERNAL_API_KEY is NOT the key the
+  demo launcher uses (it takes it from `.env.cloud`, same as the web proxy), so direct API calls with the
+  former return 401.
 - Same cap defect in paper QA: `_rows_for` capped rows at 300, so a paper-scoped question on a 384-row
   live paper handed the model a partial lane strip for the last experiment. The partial trailing
   experiment is now dropped there too (shared `_experiment_key`); regression test; api 187 passed.
