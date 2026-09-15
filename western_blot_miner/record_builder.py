@@ -646,7 +646,10 @@ def _band_pattern_fields(b: dict, core: str, caption: str, lane_text: str,
         caption_derived = lane_hit is None
         pattern, count, raw = hit["pattern"], hit["count"], hit["raw"]
         hedged = hit["hedged"]
-        src = [Source(type="figure_caption", rank=RANK_CAPTION, text=raw)]
+        # lane_text is the model's reading of the lane label printed on the
+        # image, not caption text: only a caption-derived hit is caption evidence
+        src = ([Source(type="figure_caption", rank=RANK_CAPTION, text=raw)] if caption_derived
+               else [Source(type="image", rank=RANK_IMAGE, text=raw)])
         conf = 0.6 if hedged else 0.8
     # A caption describes the PANEL; on a multi-lane panel it cannot settle any
     # single lane's pattern ("a doublet appeared after rapamycin" must not
@@ -673,7 +676,8 @@ def _bands(mc, core: str = "", caption: str = "") -> list[BandObservation]:
         # condition ("30 min", "IL-6 + / CL-E 30"). Ambiguous within one lane
         # (>1 value) -> leave MISSING rather than pick one. Never inferred from
         # the panel-level blob.
-        lane_src = [Source(type="figure_caption", rank=RANK_CAPTION, text=cond_text)]
+        # the lane condition is read off the printed lane label on the image
+        lane_src = [Source(type="image", rank=RANK_IMAGE, text=cond_text)]
         lane_doses = extract_dose_series(cond_text)
         lane_durs = extract_duration_series(cond_text)
         lane_dose_f = lane_dose_unit_f = EvidenceField.missing()
