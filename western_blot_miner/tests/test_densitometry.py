@@ -278,6 +278,12 @@ tgt2 = D.analyze(np.minimum(synthetic([1.0, 0.5, 0.25, 0.3], band_y=35, h=160), 
 pr_e = D.pair_ratio(tgt2, ctl_empty)
 check("pair: empty control lane refused, others measured", pr_e["lanes"][3]["quality"] == "quantification_refused" and pr_e["lanes"][3]["normalized"] is None
       and pr_e["lanes"][0]["normalized"] == 1.0 and pr_e["quality"]["state"] == "warning")
+# a weak (but not empty) control lane is warned, not refused
+weak_c = np.minimum(synthetic([1.0, 0.5, 0.25, 0.1], band_y=35, h=160), synthetic([0.8, 0.8, 0.8, 0.08], band_y=110, h=160))
+pr_w = D.pair_ratio(D.analyze(weak_c, region=(0, 10, 400, 60), lane_bounds=equal_bounds(4)),
+                    D.analyze(weak_c, region=(0, 85, 400, 135), lane_bounds=equal_bounds(4)))
+check("pair: weak control lane warned", pr_w["lanes"][3]["quality"] == "warning" and any("control lane is weak" in r for r in pr_w["lanes"][3]["reasons"])
+      and pr_w["lanes"][3]["normalized"] is not None and pr_w["quality"]["state"] == "warning")
 # clipped control strip -> pairing refused
 ctl_clip = D.analyze(synthetic([1.0, 1.0, 1.0, 1.0], peak=400), lane_bounds=equal_bounds(4))
 pr_c = D.pair_ratio(tgt, ctl_clip)

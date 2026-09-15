@@ -122,3 +122,6 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   densitometry_author_values.py` → `research/experiments/D5_author_values.md`, 12 of 93 detected rows on
   the ten LC3B/ACTB crops pass the gates and no crop has a passing LC3B + ACTB pair ("n too small").
   Final browser rehearsal of run-of-show step 9 (4455 valid, 4686 refused) passed on the restarted stack.
+- Loading-control pairing: `pair_ratio` + `POST /experimental-densitometry/pair` (`e0d1239`), nine
+  synthetic checks, real record 4455 P-STAT3 ÷ β-actin normalized 0.69/1.0/0.31/0.04/0.04/0.33; UI
+  section 4 built by the UI sub-agent (verified below when it lands). `local_db.py up` re-run is clean.

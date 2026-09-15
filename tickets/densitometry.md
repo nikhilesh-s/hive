@@ -91,7 +91,12 @@ landed; author-value comparison written up as "n too small" in
 LC3B/ACTB crops pass the gates, no LC3B + ACTB pair does) · D-6 done except the page-naming decision
 (page still says "Experimental densitometry", Nik decides D-1 naming) ·
 D-7 open. Also landed beyond the tickets: per-lane flank baseline, vertical
-profile sparkline, row re-boxing, TIFF uploads, overlay PNG export. Current
+profile sparkline, row re-boxing, TIFF uploads, overlay PNG export, and an
+optional loading-control pairing on the experimental page (target ÷ control
+on the same image, ranges, refusals, same-membrane caveat) — the Evidence
+Record data model and the reserved intensity columns are untouched
+(finding 5 stands for the records; the page-level pairing needs no strip
+y-position in the records because the researcher draws both strips). Current
 state and limitations: `research/overnight/2026-09-14-summary.md`.
 
 ## Tickets (ordered by dependency)
