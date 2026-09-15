@@ -68,7 +68,15 @@ exercises the product path on record 4455; run-of-show step 9 rewritten with
 concrete records (4455 valid strip + β-actin near tie, 4686 clipped refusal);
 Tally/distribution specs reviewed and trimmed to ~5 min; L1 marked stale.
 
-**Tests (2026-09-15):** densitometry 77/77 · api 165 passed / 11 skipped (DB
+**Method v0.3.0 (2026-09-15):** per-lane flank baseline (membrane rows one
+band-height above/below the band, lower of the two medians) on top of the
+rolling-ball opening, flank MAD as the noise scale; synthetic unclipped ratio
+error 7.4% → ≤1.8%, tight and re-boxed real strips agree within 0.04; a box
+with no membrane margin warns; a multi-strip box is at least a warning and the
+UI's row buttons re-box the chosen strip. About/Learn name the experimental
+route without changing the Evidence Record statement.
+
+**Tests (2026-09-15):** densitometry 81/81 · api 165 passed / 11 skipped (DB
 matrix needs `HIVE_DB_TEST_URL`) · miner pytest 56 · biology / reconcile 21 /
 loader / extract 10 / pipeline 13 / stable-row-key 34 all green · benchmark
 34/34 · `tsc` clean · lint 0/0 · `next build` clean · `git diff --check` clean.
@@ -81,14 +89,13 @@ not on this laptop (PMC fallback works); nothing experimental is hosted;
 re-run.
 
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) a second adversarial pass on v0.2 after the kernel
-change (tight boxes, light-on-dark uploads, JPEG uploads via the UI); (2) UI
-row picker (click a detected row from `rows_detected` instead of typing
-`row_index`); (3) author-value comparison, ticket D-5 second half
+in priority order: (1) browser re-check of the v0.3.0 numbers on record 4455
+after restarting the API (`hiveblot-api-demo`), then a rehearsal of run-of-show
+step 9 end to end; (2) author-value comparison, ticket D-5 second half
 (LC3B-II:ACTB bar charts as an offset with n, "n too small" allowed);
-(4) TIFF upload preview for researchers' own imager files; (5) `/about` and
-`/learn` copy: mention the experimental densitometry route without changing
-the Evidence Record statement.
+(3) TIFF upload preview for researchers' own imager files; (4) a per-lane
+vertical profile sparkline in the UI so a researcher can see the band and the
+flank rows the baseline came from; (5) B-4 panel inventory if budget remains.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 

@@ -1,16 +1,15 @@
 {
  "summary": {
-  "method_version": "0.2.0",
+  "method_version": "0.3.0",
   "crops": 21,
   "band_rows_probed": 112,
   "state_counts": {
-   "quantification_refused": 78,
-   "warning": 19,
-   "ok": 15
+   "quantification_refused": 81,
+   "warning": 31
   },
   "crops_with_at_least_one_refused_row": 20,
   "crops_with_a_row_clipped_past_refuse_gate": 21,
-  "rows_refused_for_ranking_instability": 1
+  "rows_refused_for_ranking_instability": 4
  },
  "rows": [
   {
@@ -26,9 +25,9 @@
     661
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.924,
+   "max_clipped_fraction": 0.9292,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -48,14 +47,14 @@
     319
    ],
    "n_lanes_auto": 6,
-   "max_clipped_fraction": 0.6435,
+   "max_clipped_fraction": 1.0,
    "lanes_refused": 4,
-   "lanes_no_signal": 0,
-   "state": "quantification_refused",
+   "lanes_no_signal": 2,
+   "state": "warning",
    "reasons": [
-    "the strongest lane (1) is clipped, so nothing can be expressed relative to it"
+    "lanes 3, 4, 6 are a near tie for strongest (within 25%); their order is not resolved by this image, other lanes' relative values hold within their ranges"
    ],
-   "ranking_stable": null
+   "ranking_stable": false
   },
   {
    "paper": "10.1186_s12964-025-02385-8",
@@ -70,9 +69,9 @@
     553
    ],
    "n_lanes_auto": 4,
-   "max_clipped_fraction": 0.461,
+   "max_clipped_fraction": 0.9142,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (4) is clipped, so nothing can be expressed relative to it"
@@ -114,12 +113,12 @@
     164
    ],
    "n_lanes_auto": 5,
-   "max_clipped_fraction": 0.4831,
+   "max_clipped_fraction": 0.9005,
    "lanes_refused": 5,
-   "lanes_no_signal": 4,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
-    "the strongest lane (1) is clipped, so nothing can be expressed relative to it"
+    "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
    ],
    "ranking_stable": null
   },
@@ -136,14 +135,14 @@
     343
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.5035,
+   "max_clipped_fraction": 1.0,
    "lanes_refused": 1,
    "lanes_no_signal": 1,
-   "state": "quantification_refused",
+   "state": "warning",
    "reasons": [
-    "the strongest lane changes under +/-32px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here"
+    "the box contains 11 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
-   "ranking_stable": false
+   "ranking_stable": true
   },
   {
    "paper": "10.1186_s12964-025-02385-8",
@@ -158,12 +157,12 @@
     736
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.7735,
+   "max_clipped_fraction": 0.9428,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 2,
    "state": "quantification_refused",
    "reasons": [
-    "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
+    "no lane has signal above background in the selected row (the box contains 13 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry)"
    ],
    "ranking_stable": null
   },
@@ -180,9 +179,9 @@
     464
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.7695,
+   "max_clipped_fraction": 0.9451,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -224,9 +223,9 @@
     575
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.9893,
+   "max_clipped_fraction": 1.0,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 2,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
@@ -246,12 +245,12 @@
     504
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.9782,
+   "max_clipped_fraction": 1.0,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
-    "the strongest lane (1) is clipped, so nothing can be expressed relative to it"
+    "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
    ],
    "ranking_stable": null
   },
@@ -268,12 +267,12 @@
     603
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.896,
+   "max_clipped_fraction": 1.0,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
-    "the strongest lane (1) is clipped, so nothing can be expressed relative to it"
+    "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
    ],
    "ranking_stable": null
   },
@@ -312,7 +311,7 @@
     319
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.4263,
+   "max_clipped_fraction": 0.5103,
    "lanes_refused": 2,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -422,9 +421,9 @@
     751
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.413,
+   "max_clipped_fraction": 0.4893,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
@@ -466,9 +465,9 @@
     507
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.4257,
+   "max_clipped_fraction": 0.4623,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
@@ -576,7 +575,7 @@
     745
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.5646,
+   "max_clipped_fraction": 0.6587,
    "lanes_refused": 2,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -599,13 +598,13 @@
    ],
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.2772,
-   "lanes_refused": 1,
+   "lanes_refused": 2,
    "lanes_no_signal": 0,
-   "state": "warning",
+   "state": "quantification_refused",
    "reasons": [
-    "one or more lanes carry a warning; read the per-lane reasons"
+    "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
    ],
-   "ranking_stable": true
+   "ranking_stable": null
   },
   {
    "paper": "10.1186_s12964-025-02385-8",
@@ -625,7 +624,7 @@
    "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
-    "no lane has signal above background in the selected row"
+    "no lane has signal above background in the selected row (the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry)"
    ],
    "ranking_stable": null
   },
@@ -732,7 +731,7 @@
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.2139,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -754,7 +753,7 @@
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.3663,
    "lanes_refused": 1,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "warning",
    "reasons": [
     "one or more lanes carry a warning; read the per-lane reasons"
@@ -887,8 +886,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -906,7 +907,7 @@
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.2,
    "lanes_refused": 1,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (1) is clipped, so nothing can be expressed relative to it"
@@ -929,8 +930,10 @@
    "max_clipped_fraction": 0.0033,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 2 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -949,8 +952,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 2 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -1054,9 +1059,9 @@
     723
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.3797,
+   "max_clipped_fraction": 0.5041,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -1076,9 +1081,9 @@
     842
    ],
    "n_lanes_auto": 4,
-   "max_clipped_fraction": 0.268,
+   "max_clipped_fraction": 0.2713,
    "lanes_refused": 4,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (4) is clipped, so nothing can be expressed relative to it"
@@ -1098,7 +1103,7 @@
     1249
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.5273,
+   "max_clipped_fraction": 0.6158,
    "lanes_refused": 2,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -1122,7 +1127,7 @@
    "n_lanes_auto": 5,
    "max_clipped_fraction": 0.3048,
    "lanes_refused": 5,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (4) is clipped, so nothing can be expressed relative to it"
@@ -1142,9 +1147,9 @@
     640
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.3854,
+   "max_clipped_fraction": 0.4629,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
@@ -1164,9 +1169,9 @@
     763
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.4197,
+   "max_clipped_fraction": 0.4918,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -1208,7 +1213,7 @@
     1024
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.4728,
+   "max_clipped_fraction": 0.5623,
    "lanes_refused": 2,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -1230,7 +1235,7 @@
     360
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.3742,
+   "max_clipped_fraction": 0.5044,
    "lanes_refused": 3,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -1253,13 +1258,13 @@
    ],
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.2488,
-   "lanes_refused": 1,
-   "lanes_no_signal": 0,
-   "state": "warning",
+   "lanes_refused": 2,
+   "lanes_no_signal": 1,
+   "state": "quantification_refused",
    "reasons": [
-    "one or more lanes carry a warning; read the per-lane reasons"
+    "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
    ],
-   "ranking_stable": true
+   "ranking_stable": null
   },
   {
    "paper": "10.1186_s12964-025-02385-8",
@@ -1340,9 +1345,9 @@
     1003
    ],
    "n_lanes_auto": 3,
-   "max_clipped_fraction": 0.5337,
+   "max_clipped_fraction": 0.6012,
    "lanes_refused": 3,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (3) is clipped, so nothing can be expressed relative to it"
@@ -1409,8 +1414,10 @@
    "max_clipped_fraction": 0.0177,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -1426,7 +1433,7 @@
     167
    ],
    "n_lanes_auto": 4,
-   "max_clipped_fraction": 0.3669,
+   "max_clipped_fraction": 0.4937,
    "lanes_refused": 3,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -1453,7 +1460,7 @@
    "lanes_no_signal": 0,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1472,10 +1479,12 @@
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.0048,
    "lanes_refused": 0,
-   "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
-   "ranking_stable": true
+   "lanes_no_signal": 1,
+   "state": "warning",
+   "reasons": [
+    "lanes 1, 2 are a near tie for strongest (within 25%); their order is not resolved by this image, other lanes' relative values hold within their ranges"
+   ],
+   "ranking_stable": false
   },
   {
    "paper": "10.3892_br.2026.2108",
@@ -1490,7 +1499,7 @@
     493
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.2066,
+   "max_clipped_fraction": 0.2475,
    "lanes_refused": 1,
    "lanes_no_signal": 0,
    "state": "quantification_refused",
@@ -1514,10 +1523,10 @@
    "n_lanes_auto": 3,
    "max_clipped_fraction": 0.3255,
    "lanes_refused": 2,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1539,7 +1548,7 @@
    "lanes_no_signal": 0,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1561,7 +1570,7 @@
    "lanes_no_signal": 0,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1644,9 +1653,9 @@
     296
    ],
    "n_lanes_auto": 2,
-   "max_clipped_fraction": 0.0266,
+   "max_clipped_fraction": 0.0412,
    "lanes_refused": 0,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "warning",
    "reasons": [
     "one or more lanes carry a warning; read the per-lane reasons"
@@ -1671,7 +1680,7 @@
    "lanes_no_signal": 0,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1713,8 +1722,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -1779,7 +1790,7 @@
    "lanes_no_signal": 0,
    "state": "warning",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
    ],
    "ranking_stable": true
   },
@@ -1799,8 +1810,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 3 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -1904,9 +1917,9 @@
     259
    ],
    "n_lanes_auto": 5,
-   "max_clipped_fraction": 0.4923,
+   "max_clipped_fraction": 0.5135,
    "lanes_refused": 4,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 1,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -1929,8 +1942,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 6 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -1949,11 +1964,11 @@
    "max_clipped_fraction": 0.1176,
    "lanes_refused": 1,
    "lanes_no_signal": 0,
-   "state": "warning",
+   "state": "quantification_refused",
    "reasons": [
-    "a non-reference lane is clipped and reports no relative value"
+    "the strongest lane changes under +/-18px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here"
    ],
-   "ranking_stable": true
+   "ranking_stable": false
   },
   {
    "paper": "10.3892_ijmm.2022.5188",
@@ -1970,10 +1985,12 @@
    "n_lanes_auto": 2,
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
-   "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
-   "ranking_stable": true
+   "lanes_no_signal": 1,
+   "state": "quantification_refused",
+   "reasons": [
+    "the strongest lane changes under +/-32px lane / +/-2px row perturbation to a lane that was clearly weaker at the drawn geometry; the relative scale is not defined here"
+   ],
+   "ranking_stable": false
   },
   {
    "paper": "10.3892_ijmm.2022.5188",
@@ -2120,9 +2137,9 @@
     331
    ],
    "n_lanes_auto": 4,
-   "max_clipped_fraction": 0.6316,
+   "max_clipped_fraction": 0.6468,
    "lanes_refused": 4,
-   "lanes_no_signal": 0,
+   "lanes_no_signal": 2,
    "state": "quantification_refused",
    "reasons": [
     "the strongest lane (2) is clipped, so nothing can be expressed relative to it"
@@ -2145,8 +2162,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -2165,8 +2184,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -2185,8 +2206,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 7 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -2249,8 +2272,10 @@
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {
@@ -2268,10 +2293,12 @@
    "n_lanes_auto": 1,
    "max_clipped_fraction": 0.0,
    "lanes_refused": 0,
-   "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
-   "ranking_stable": true
+   "lanes_no_signal": 1,
+   "state": "quantification_refused",
+   "reasons": [
+    "no lane has signal above background in the selected row (the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry)"
+   ],
+   "ranking_stable": null
   },
   {
    "paper": "10.3892_ijmm.2022.5188",
@@ -2399,8 +2426,10 @@
    "max_clipped_fraction": 0.0189,
    "lanes_refused": 0,
    "lanes_no_signal": 0,
-   "state": "ok",
-   "reasons": [],
+   "state": "warning",
+   "reasons": [
+    "the box contains 4 band rows; only the chosen row is integrated and its baseline comes from the rows next to it - box one strip to check the geometry"
+   ],
    "ranking_stable": true
   },
   {

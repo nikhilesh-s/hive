@@ -13,7 +13,10 @@ Method (deterministic, OpenCV/NumPy), version in METHOD_VERSION:
   1. grayscale; if the image is light-background/dark-band (the common
      case) invert so signal = darkness
   2. background = morphological opening with a large kernel (rolling-ball
-     style) over the selected region; corrected = signal - background
+     style, radius from the whole image) over the selected region, then a
+     per-lane flank baseline (median of the rows just above and below the
+     band row in that lane) so membrane grey is not counted as signal when
+     the box also contains white space; corrected = signal - both
   3. band row = the strongest contiguous horizontal band of corrected signal
      (or a caller-supplied row / the n-th detected row)
   4. lanes = researcher-supplied x bounds (the product path); equal-width
@@ -42,7 +45,7 @@ from typing import Any
 import numpy as np
 
 METHOD_NAME = "hiveblot.densitometry"
-METHOD_VERSION = "0.2.0"
+METHOD_VERSION = "0.3.0"
 
 # Pixel values at or beyond this distance from the signal extreme count as
 # clipped (8-bit; 0 = pure black on a light background). Journal PNG/JPEG
@@ -53,8 +56,12 @@ CLIP_THRESHOLD_DN = 8
 CLIP_FRACTION_WARN = 0.02
 CLIP_FRACTION_REFUSE = 0.10
 # Corrected signal of a lane must exceed this many robust-sigma of the
-# off-band residual to count as signal.
+# flank residual (rows just above/below the band, same lane) to count as signal.
 SNR_MIN = 3.0
+# Flank = this fraction of the band-row height on each side (min 3 rows); its
+# median is the per-lane membrane baseline, its MAD the noise scale.
+FLANK_FRACTION = 0.5
+FLANK_MIN_PX = 3
 # Minimum lane width in pixels; narrower lanes are geometry errors.
 MIN_LANE_WIDTH_PX = 3
 MIN_REGION_PX = 8
@@ -238,17 +245,39 @@ def _region_arrays(gray_full: np.ndarray, region):
     return gray, signal, background, corrected, inverted, ox, oy, k
 
 
+def _flank(corrected, x0, x1, y0, y1):
+    """(baseline, sigma, n) from membrane rows near the band in this lane: a
+    block of rows above and one below, each separated from the band row by a
+    gap of the same height so band tails do not leak in. The lower of the two
+    medians is the baseline (the other may hold a neighbouring strip). None
+    when the box has no such rows -- the researcher must include a margin."""
+    m = max(FLANK_MIN_PX, round(FLANK_FRACTION * (y1 - y0)))
+    hh = corrected.shape[0]
+    blocks = [corrected[max(0, y0 - 2 * m):max(0, y0 - m), x0:x1].ravel(),
+              corrected[min(hh, y1 + m):min(hh, y1 + 2 * m), x0:x1].ravel()]
+    cands = [b for b in blocks if b.size >= 10]
+    if not cands:
+        return None
+    best = min(cands, key=lambda b: float(np.median(b)))
+    base = float(np.median(best))
+    mad = float(np.median(np.abs(best - base)))
+    return base, max(1.4826 * mad, 0.5), int(sum(b.size for b in cands))
+
+
 def _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise):
     """Per-lane sums over the band row. Bounds and the returned coordinates
-    are in FULL-image pixels; y0/y1 are region-local."""
+    are in FULL-image pixels; y0/y1 are region-local. `noise` is the box-wide
+    fallback (baseline, sigma) used only when a lane has no flank rows."""
     clip_val = 0 if inverted else 255
     out = []
     for i, (fx0, fx1) in enumerate(bounds, 1):
         x0, x1 = fx0 - ox, fx1 - ox
         box_sig = signal[y0:y1, x0:x1]
         box_bg = background[y0:y1, x0:x1]
-        box_cor = corrected[y0:y1, x0:x1]
         box_raw = gray[y0:y1, x0:x1]
+        fl = _flank(corrected, x0, x1, y0, y1)
+        flank_base, noise_sigma = (fl[0], fl[1]) if fl else (0.0, None)
+        box_cor = np.clip(corrected[y0:y1, x0:x1] - flank_base, 0, None)
         peak = float(box_cor.max()) if box_cor.size else 0.0
         core = box_cor >= 0.5 * peak if peak > 0 else np.zeros_like(box_cor, dtype=bool)
         n_core = int(core.sum())
@@ -257,11 +286,11 @@ def _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bo
         else:
             clipped = 0.0
         mean_cor = float(box_cor.mean()) if box_cor.size else 0.0
-        noise_med, noise_sigma = noise
-        snr = (mean_cor - noise_med) / noise_sigma
+        snr = mean_cor / noise_sigma if noise_sigma else float("nan")
         out.append({
             "index": i, "x0": int(fx0), "x1": int(fx1), "y0": int(y0 + oy), "y1": int(y1 + oy),
-            "raw": float(box_sig.sum()), "background": float(box_bg.sum()),
+            "raw": float(box_sig.sum()), "background": float(box_bg.sum() + flank_base * box_sig.size),
+            "flank_baseline": round(flank_base, 3), "flank_rows": fl[2] if fl else 0,
             "corrected": float(box_cor.sum()), "clipped_fraction": round(clipped, 4),
             "core_pixels": n_core, "snr": round(float(snr), 2) if np.isfinite(snr) else None,
         })
@@ -332,8 +361,8 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         warnings.append("the selected band row looks like printed text (solid black glyphs or a tall block), "
                         "not a blot strip; draw the region around the membrane only")
     n_blot_rows = sum(1 for a, b in rows if not row_text_like(gray, a, b, H))
-    multi_row_note = (f"the box contains {n_blot_rows} band rows; background and noise are estimated across all "
-                      "of them - box one strip for a measurement") if n_blot_rows >= 2 else None
+    multi_row_note = (f"the box contains {n_blot_rows} band rows; only the chosen row is integrated and its "
+                      "baseline comes from the rows next to it - box one strip to check the geometry") if n_blot_rows >= 2 else None
     if multi_row_note:
         warnings.append(multi_row_note)
 
@@ -354,6 +383,10 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
 
     noise = _noise_stats(corrected, y0, y1)
     base = _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise)
+    if any(l["flank_rows"] == 0 for l in base):
+        warnings.append("no membrane rows above/below the band inside the box for some lanes: the flank baseline "
+                        "and noise could not be estimated there (opening-only background); include a margin of "
+                        "at least the band height above and below the strip")
     top, rel = _relative(base)
     top_idx = int(np.argmax([l["corrected"] for l in base])) if top > 0 else None
 
@@ -488,12 +521,14 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         "method": {
             "name": METHOD_NAME, "version": METHOD_VERSION,
             "steps": "grayscale -> polarity -> morphological-opening background -> band row -> "
-                     "lane boxes -> integrated corrected intensity (relative to the strongest lane) "
+                     "lane boxes -> per-lane flank baseline (median of the rows just above/below the band) "
+                     "-> integrated corrected intensity (relative to the strongest lane) "
                      "-> clip/SNR gates -> geometry perturbation envelope",
             "params": {
                 "background_kernel_px": int(kernel_px), "clip_threshold_dn": CLIP_THRESHOLD_DN,
                 "clip_fraction_warn": CLIP_FRACTION_WARN, "clip_fraction_refuse": CLIP_FRACTION_REFUSE,
-                "snr_min": SNR_MIN, "noise_baseline": round(noise[0], 3), "noise_sigma": round(noise[1], 3),
+                "snr_min": SNR_MIN, "flank_fraction": FLANK_FRACTION, "flank_min_px": FLANK_MIN_PX,
+                "box_noise_baseline": round(noise[0], 3), "box_noise_sigma": round(noise[1], 3),
                 "min_lane_width_px": MIN_LANE_WIDTH_PX, "stability_warn_width": STABILITY_WARN_WIDTH,
                 "perturb_fraction_x": PERTURB_FRACTION_X, "perturb_fraction_y": PERTURB_FRACTION_Y,
             },
