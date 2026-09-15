@@ -46,3 +46,36 @@ def test_backstop_over_methods_abstains_for_phospho_and_total_of_one_protein():
     for target in ("P-STAT3 (Tyr705)", "total STAT3"):
         ab = _actin(target=target, text=f"{target} antibody (model summary)")
         assert ab.catalog_number.value is None and ab.dilution.value is None, target
+
+
+
+def test_same_reagent_sentence_repeated_by_retrieval_is_one_mention():
+    repeated = REAGENT + "\n\n- " + REAGENT[20:] + "\n\n" + REAGENT[:REAGENT.index("#4967") + 5]
+    ab = build_evidence_record({
+        "raw_target": "\u03b2-actin", "texts": {"caption": "", "methods": repeated},
+        "model_claims": {"antibodies": [{"target": "\u03b2-actin", "role": "detection",
+                                         "source": {"type": "methods", "rank": 3, "text": "beta-actin (model summary)"}}],
+                         "bands": []},
+    }).antibodies[0]
+    assert ab.catalog_number.value == "4967"
+
+
+def test_two_different_antibodies_against_the_same_target_still_abstain():
+    two = ("Membranes were probed with \u03b2-actin (1:2,000; CST #4967). "
+           "Other blots used \u03b2-actin (1:5,000; Sigma A5441) as the loading control.")
+    ab = build_evidence_record({
+        "raw_target": "\u03b2-actin", "texts": {"caption": "", "methods": two},
+        "model_claims": {"antibodies": [{"target": "\u03b2-actin", "role": "detection",
+                                         "source": {"type": "methods", "rank": 3, "text": "beta-actin (model summary)"}}],
+                         "bands": []},
+    }).antibodies[0]
+    assert ab.catalog_number.value is None and ab.dilution.value is None
+
+
+
+def test_overlapping_keyword_windows_become_one_snippet():
+    from western_blot_miner.pdf_preprocess import REAGENT_KEYWORDS, retrieve_relevant_text_snippets
+    paper = "Intro text. " * 200 + REAGENT + " Discussion. " * 200
+    out = retrieve_relevant_text_snippets(paper, REAGENT_KEYWORDS, max_snippets=3, window=450)
+    assert out.count("#4967") == 1          # 'primary antibod' + 'antibodies against' + 'dilution'? one span
+    assert out.count("\n\n- ") == 0          # a single merged snippet

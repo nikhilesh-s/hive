@@ -475,7 +475,14 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
     # Santa Cruz)"): a value visible in one scope says nothing about which
     # antibody this record used, and a value the regexes cannot see in the other
     # scope would make a disagreement look like agreement. Abstain.
-    if sum(1 for sc in scopes if "(" in sc) >= 2:
+    # Retrieval overlap and nearby-page text can repeat the SAME sentence, and a
+    # snippet window can truncate one copy: identical (or prefix) scopes are one
+    # mention, not two antibodies.
+    norm_sc = [re.sub(r"\s+", " ", fold(sc)).strip() for sc in scopes]
+    distinct = [n for i, n in enumerate(norm_sc)
+                if n and not any(j != i and (m.startswith(n) and (len(m) > len(n) or j < i))
+                                 for j, m in enumerate(norm_sc))]
+    if sum(1 for n in distinct if "(" in n) >= 2:
         return {}
     scope = " | ".join(scopes)
     quote = next((sc for sc in scopes if "(" in sc), scopes[0]).strip()   # verbatim slice of `text`
