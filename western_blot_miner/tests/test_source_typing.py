@@ -100,6 +100,21 @@ def test_coip_bait_from_lane_labels_is_image_evidence():
             assert src.text in "Co-IP anti-PIK3CA"
 
 
+def test_caption_channel_coip_prose_is_context_not_classification():
+    # PMC12706926: the caption channel carried the same results paragraph for 11
+    # of 15 panels, and its co-IP sentence made 47 expression records co_ip with bait "IP".
+    prose = ("We first evaluated the interaction between BEX2 and PIK3CA in 293FT cells. "
+             "Immunoprecipitation (IP) assays with either PIK3CA or BEX2 tags verified their interaction.")
+    rec = _coip_record(prose, "DMSO")
+    assert rec.experiment.experiment_type.value != "co_ip"
+    assert "co_ip_context" in (rec.experiment.experiment_flags.value or [])
+    assert rec.experiment.ip_bait_protein.value is None
+    # the same prose next to printed IP lane markers settles co_ip, but "IP" is never the bait
+    rec = _coip_record(prose, "IgG")
+    assert rec.experiment.experiment_type.value == "co_ip"
+    assert rec.experiment.ip_bait_protein.value != "IP"
+
+
 def test_coip_bait_from_caption_is_caption_evidence_with_caption_text():
     caption = "Figure 4. Co-IP with anti-PIK3CA pulled down p85 in H1299 cells."
     rec = _coip_record(caption, "IgG")
