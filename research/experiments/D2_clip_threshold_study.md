@@ -8,24 +8,24 @@ Lane 1 (reference) peak darkness is pushed past the 8-bit floor; lane 2 is alway
 
 | ref peak | measured lane2/lane1 | error | ref clipped core | lane quality | strip state |
 |---|---|---|---|---|---|
-| 120 | 0.491 | -1.8% | 0.0% | ok | ok |
-| 160 | 0.495 | -1.1% | 0.0% | ok | ok |
-| 200 | 0.496 | -0.9% | 0.0% | ok | ok |
-| 230 | 0.495 | -1.0% | 17.5% | quantification_refused | quantification_refused |
-| 235 | 0.492 | -1.6% | 23.2% | quantification_refused | quantification_refused |
-| 238 | 0.493 | -1.4% | 27.8% | quantification_refused | quantification_refused |
-| 240 | 0.494 | -1.2% | 33.9% | quantification_refused | quantification_refused |
-| 245 | 0.497 | -0.7% | 38.1% | quantification_refused | quantification_refused |
-| 250 | 0.501 | 0.2% | 37.3% | quantification_refused | quantification_refused |
-| 260 | 0.51 | 1.9% | 47.0% | quantification_refused | quantification_refused |
-| 300 | 0.546 | 9.3% | 59.8% | quantification_refused | quantification_refused |
-| 350 | 0.601 | 20.2% | 64.7% | quantification_refused | quantification_refused |
-| 400 | 0.661 | 32.1% | 76.1% | quantification_refused | quantification_refused |
-| 500 | 0.783 | 56.7% | 78.7% | quantification_refused | quantification_refused |
-| 700 | 0.874 | 74.8% | 87.4% | quantification_refused | quantification_refused |
-| 1000 | 0.972 | 94.5% | 91.3% | quantification_refused | quantification_refused |
+| 120 | 0.5 | 0.0% | 0.0% | ok | ok |
+| 160 | 0.5 | -0.0% | 0.0% | ok | ok |
+| 200 | 0.5 | 0.0% | 0.0% | ok | ok |
+| 230 | 0.5 | 0.0% | 16.5% | quantification_refused | quantification_refused |
+| 235 | 0.5 | 0.0% | 20.7% | quantification_refused | quantification_refused |
+| 238 | 0.501 | 0.2% | 24.3% | quantification_refused | quantification_refused |
+| 240 | 0.502 | 0.3% | 29.5% | quantification_refused | quantification_refused |
+| 245 | 0.504 | 0.8% | 33.3% | quantification_refused | quantification_refused |
+| 250 | 0.507 | 1.3% | 33.3% | quantification_refused | quantification_refused |
+| 260 | 0.514 | 2.7% | 46.1% | quantification_refused | quantification_refused |
+| 300 | 0.547 | 9.3% | 52.9% | quantification_refused | quantification_refused |
+| 350 | 0.597 | 19.5% | 64.3% | quantification_refused | quantification_refused |
+| 400 | 0.655 | 31.1% | 68.4% | quantification_refused | quantification_refused |
+| 500 | 0.761 | 52.3% | 71.4% | quantification_refused | quantification_refused |
+| 700 | 0.829 | 65.8% | 80.1% | quantification_refused | quantification_refused |
+| 1000 | 0.865 | 73.1% | 84.0% | quantification_refused | quantification_refused |
 
-Gates: warn at 2% of band-core pixels within 8 DN of the floor, refuse at 10%. On this fixture the first refused row has a clipped core of 18% and a ratio error of -1.0%; the largest error on any row still reported as ok is 1.8% (the unclipped floor of this method: Gaussian tails and background estimation, not clipping). The refuse gate is therefore conservative: it fires while the error is still small and before peak 300 where the ratio error reaches 9.3% and keeps growing to 94.5%. A Gaussian band clips a large core fraction almost as soon as its peak crosses the floor, which is why the table has no gentle 2-10% regime; real bands with flatter tops clip more gradually, which the warn gate is for. These are first-generation defaults to be re-derived on a real dilution series (ticket D-7).
+Gates: warn at 2% of band-core pixels within 8 DN of the floor, refuse at 10%. On this fixture the first refused row has a clipped core of 17% and a ratio error of 0.0%; the largest error on any row still reported as ok is 0.0% (the unclipped floor of this method: Gaussian tails and background estimation, not clipping). The refuse gate is therefore conservative: it fires while the error is still small and before peak 300 where the ratio error reaches 9.3% and keeps growing to 73.1%. A Gaussian band clips a large core fraction almost as soon as its peak crosses the floor, which is why the table has no gentle 2-10% regime; real bands with flatter tops clip more gradually, which the warn gate is for. These are first-generation defaults to be re-derived on a real dilution series (ticket D-7).
 
 ## 2. JPEG re-encoding of a clipped core still trips the gate
 
@@ -34,7 +34,7 @@ Gates: warn at 2% of band-core pixels within 8 DN of the floor, refuse at 10%. O
 | 95 | 200 | 28 | 0.0% | ok |
 | 95 | 350 | 0 | 64.7% | quantification_refused |
 | 85 | 200 | 31 | 0.0% | ok |
-| 85 | 350 | 0 | 64.6% | quantification_refused |
+| 85 | 350 | 0 | 64.7% | quantification_refused |
 | 75 | 200 | 33 | 0.0% | ok |
 | 75 | 350 | 0 | 64.6% | quantification_refused |
 | 60 | 200 | 30 | 0.0% | ok |
@@ -42,29 +42,29 @@ Gates: warn at 2% of band-core pixels within 8 DN of the floor, refuse at 10%. O
 
 ## 3. Lane-edge jitter on an unclipped 4-lane fixture
 
-Truth [1.0, 0.5, 0.25, 0.1]. Analyzer's own envelope at ±{'x': 6, 'y': 2} px: lane 1 1.00–1.00, lane 2 0.49–0.50, lane 3 0.24–0.25, lane 4 0.09–0.09
+Truth [1.0, 0.5, 0.25, 0.1]. Analyzer's own envelope at ±{'x': 6, 'y': 2} px: lane 1 1.00–1.00, lane 2 0.50–0.50, lane 3 0.24–0.26, lane 4 0.10–0.10
 
 | shift px | relative min | relative max | max abs error vs truth |
 |---|---|---|---|
-| ±0 | [1.0, 0.491, 0.239, 0.09] | [1.0, 0.491, 0.239, 0.09] | 0.011 |
-| ±2 | [1.0, 0.491, 0.239, 0.09] | [1.0, 0.491, 0.239, 0.09] | 0.011 |
-| ±4 | [1.0, 0.491, 0.238, 0.09] | [1.0, 0.491, 0.239, 0.09] | 0.012 |
-| ±6 | [1.0, 0.491, 0.238, 0.089] | [1.0, 0.491, 0.239, 0.09] | 0.012 |
-| ±8 | [1.0, 0.491, 0.239, 0.089] | [1.0, 0.491, 0.249, 0.09] | 0.011 |
-| ±12 | [1.0, 0.491, 0.239, 0.089] | [1.0, 0.492, 0.249, 0.09] | 0.011 |
-| ±16 | [1.0, 0.489, 0.238, 0.089] | [1.0, 0.491, 0.248, 0.089] | 0.012 |
-| ±24 | [1.0, 0.491, 0.248, 0.087] | [1.0, 0.529, 0.258, 0.099] | 0.029 |
+| ±0 | [1.0, 0.498, 0.254, 0.099] | [1.0, 0.498, 0.254, 0.099] | 0.004 |
+| ±2 | [1.0, 0.498, 0.254, 0.099] | [1.0, 0.499, 0.254, 0.099] | 0.004 |
+| ±4 | [1.0, 0.498, 0.253, 0.099] | [1.0, 0.499, 0.254, 0.099] | 0.004 |
+| ±6 | [1.0, 0.498, 0.253, 0.099] | [1.0, 0.499, 0.254, 0.099] | 0.004 |
+| ±8 | [1.0, 0.498, 0.253, 0.099] | [1.0, 0.499, 0.255, 0.099] | 0.005 |
+| ±12 | [1.0, 0.498, 0.253, 0.099] | [1.0, 0.499, 0.255, 0.099] | 0.005 |
+| ±16 | [1.0, 0.498, 0.253, 0.098] | [1.0, 0.5, 0.255, 0.099] | 0.005 |
+| ±24 | [1.0, 0.5, 0.252, 0.097] | [1.0, 0.539, 0.276, 0.109] | 0.039 |
 
 ## 4. JPEG re-encoding of the unclipped fixture
 
 | JPEG q | relative | max abs error vs truth | max clipped core |
 |---|---|---|---|
-| 100 | [1.0, 0.49, 0.239, 0.091] | 0.011 | 0.0% |
-| 95 | [1.0, 0.492, 0.238, 0.088] | 0.012 | 0.0% |
-| 85 | [1.0, 0.493, 0.236, 0.094] | 0.014 | 0.0% |
-| 75 | [1.0, 0.493, 0.243, 0.092] | 0.008 | 0.0% |
-| 60 | [1.0, 0.498, 0.242, 0.106] | 0.008 | 0.0% |
-| 40 | [1.0, 0.487, 0.248, 0.096] | 0.013 | 0.0% |
+| 100 | [1.0, 0.502, 0.248, 0.1] | 0.002 | 0.0% |
+| 95 | [1.0, 0.504, 0.254, 0.104] | 0.004 | 0.0% |
+| 85 | [1.0, 0.499, 0.247, 0.104] | 0.004 | 0.0% |
+| 75 | [1.0, 0.501, 0.253, 0.098] | 0.003 | 0.0% |
+| 60 | [1.0, 0.498, 0.251, 0.101] | 0.002 | 0.0% |
+| 40 | [1.0, 0.512, 0.261, 0.112] | 0.012 | 0.0% |
 
 ## What this does and does not show
 
