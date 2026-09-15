@@ -1668,7 +1668,8 @@ body {
 .hb-dens-label.is-warning { fill: var(--warning); }
 .hb-dens-label.is-refused { fill: var(--error); }
 .hb-dens-controls { align-items: center; display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 12px; }
-.hb-dens-controls input:not([type='checkbox']), .hb-dens-labels input { background: var(--input-background); border: 1px solid var(--border-strong); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono), monospace; font-size: 12px; min-height: 30px; padding: 0 8px; width: 80px; }
+.hb-dens-controls input:not([type='checkbox']), .hb-dens-select, .hb-dens-labels input { background: var(--input-background); border: 1px solid var(--border-strong); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono), monospace; font-size: 12px; min-height: 30px; padding: 0 8px; width: 80px; }
+.hb-dens-select { width: auto; }
 .hb-dens-labels { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .hb-dens-labels label { align-items: center; color: var(--text-subtle); display: inline-flex; font-family: var(--font-mono), monospace; font-size: 11px; gap: 4px; }
 .hb-dens-labels input { width: 96px; }

@@ -152,7 +152,8 @@ def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None =
     if gray is None:
         return False
     block = gray[a:b]
-    return bool((block < 16).mean() > 0.25 or (b - a) > 0.1 * (total_h or gray.shape[0]))
+    # stacked label lines are >= ~40 px at the 350 DPI the crops are rendered at
+    return bool((block < 16).mean() > 0.25 or (b - a) > max(40, 0.1 * (total_h or gray.shape[0])))
 
 
 def detect_lanes(row: np.ndarray, expected: int | None = None, max_lanes: int = 16) -> list[tuple[int, int]]:
@@ -226,7 +227,11 @@ def _region_arrays(gray_full: np.ndarray, region):
     # and the flipped polarity would then measure the gaps between bands.
     inverted = bool(gray_full.mean() > 127)  # light background: darkness is signal
     signal = ((255 - gray) if inverted else gray).astype(np.float32)
-    k = max(5, (min(h, w) // 4) | 1)
+    # Rolling-ball radius from the WHOLE image, not the box: a tight box
+    # around one strip would otherwise shrink the kernel below the band
+    # height, the opening would absorb the band into "background", and the
+    # ratios would collapse toward 1 while still looking valid.
+    k = max(5, (min(H, W) // 4) | 1)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
     background = cv2.morphologyEx(signal, cv2.MORPH_OPEN, kernel)
     corrected = np.clip(signal - background, 0, None)
@@ -302,6 +307,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     warnings: list[str] = []
     if band_row is not None:
         y0, y1 = int(band_row[0]) - oy, int(band_row[1]) - oy
+        if y0 < 0 or y1 > h or y1 - y0 < 2:
+            raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is outside the selected region "
+                             f"[{oy}, {oy + h}] or too thin")
     elif rows:
         if row_index >= len(rows):
             warnings.append(f"row_index {row_index} out of range; {len(rows)} band row(s) detected, using the strongest")

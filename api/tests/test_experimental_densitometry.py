@@ -154,3 +154,17 @@ def test_record_path_refuses_crops_outside_base_dir(client, monkeypatch, tmp_pat
         return {"id": record_id, "image_crop_ref": str(outside), "provenance": {}}
     monkeypatch.setattr(dr, "fetch_record_by_id", fake_fetch)
     assert client.post("/experimental-densitometry", json={"record_id": 1}, headers=AUTH).status_code == 404
+
+
+def test_explicit_band_row_is_used_and_validated(client):
+    b64 = base64.b64encode(_png([1.0, 0.5], w=300, h=90)).decode()
+    body = {"image_base64": b64, "region": [0, 20, 300, 70], "lane_bounds": [[0, 150], [150, 300]], "band_row": [20, 70]}
+    r = client.post("/experimental-densitometry", json=body, headers=AUTH)
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["band_row"] == [20, 70] and all(l["y0"] == 20 and l["y1"] == 70 for l in d["lanes"])
+    assert d["lanes"][0]["relative"] == 1.0 and abs(d["lanes"][1]["relative"] - 0.5) < 0.15
+    # a band row outside the region / reversed / too thin is a 400, never a silent remeasure
+    for bad in ([70, 20], [80, 81], [200, 300]):
+        r = client.post("/experimental-densitometry", json={**body, "band_row": bad}, headers=AUTH)
+        assert r.status_code == 400, bad

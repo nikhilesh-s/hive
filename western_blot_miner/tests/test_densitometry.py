@@ -125,6 +125,10 @@ check("too-narrow lane rejected", raises(lambda: D.analyze(img, lane_bounds=[[10
 check("tiny region rejected", raises(lambda: D.analyze(img, region=(10, 10, 14, 14))))
 check("label count mismatch rejected", raises(lambda: D.analyze(img, lane_bounds=equal_bounds(2), lane_labels=["x"])))
 check("empty lane list rejected", raises(lambda: D.analyze(img, lane_bounds=[])))
+check("band_row outside region rejected", raises(lambda: D.analyze(img, region=(0, 20, 400, 100), lane_bounds=equal_bounds(2), band_row=(10, 60))))
+check("reversed band_row rejected", raises(lambda: D.analyze(img, lane_bounds=equal_bounds(2), band_row=(80, 40))))
+r_br = D.analyze(img, region=(0, 20, 400, 100), lane_bounds=equal_bounds(2), band_row=(30, 90))
+check("explicit band_row honoured in full-image coords", r_br["band_row"] == [30, 90] and r_br["lanes"][0]["y0"] == 30)
 
 # 8. two stacked band rows: row_index selects the second
 two = synthetic([1.0, 0.2], band_y=30)
@@ -214,9 +218,12 @@ if stat3.is_file() and bex2.is_file():
           and r_p["image"]["inverted_for_analysis"] is True and 120 <= r_p["band_row"][0] < r_p["band_row"][1] <= 185)
     check("real P-STAT3 strip: no clipping, all lanes have signal", all(l["clipped_fraction"] < D.CLIP_FRACTION_WARN for l in r_p["lanes"])
           and all(l["relative"] is not None for l in r_p["lanes"]))
-    r_t = D.analyze(img_s, region=(793, 227, 1402, 292), lane_bounds=six)      # T-Stat3, panel C: lanes 1-2 near tie
-    check("real T-Stat3 strip: near tie is a warning with values", r_t["quality"]["state"] == "warning"
-          and r_t["stability"]["reference_tie_lanes"] == [1, 2] and all(l["relative"] is not None for l in r_t["lanes"]))
+    r_t = D.analyze(img_s, region=(793, 227, 1402, 292), lane_bounds=six)      # T-Stat3, panel C: even loading
+    check("real T-Stat3 strip: valid, all lanes within 0.85-1.0", r_t["quality"]["state"] == "ok"
+          and all(l["relative"] is not None and l["relative"] >= 0.85 for l in r_t["lanes"]))
+    r_a = D.analyze(img_s, region=(793, 335, 1402, 400), lane_bounds=six)      # beta-actin, panel C: near-tie reference
+    check("real beta-actin strip: near tie is a warning with values", r_a["quality"]["state"] == "warning"
+          and len(r_a["stability"]["reference_tie_lanes"]) >= 2 and all(l["relative"] is not None for l in r_a["lanes"]))
     img_b = D.decode_image(bex2.read_bytes())
     r_c = D.analyze(img_b, region=(0, 530, img_b.shape[1], 582), lanes=6)       # clipped strip (diagnostic lanes)
     check("real clipped strip refuses", r_c["quality"]["state"] == "quantification_refused"
