@@ -65,3 +65,25 @@ def test_caption_claim_two_sites_assigns_no_site():
 def test_single_site_caption_still_resolves():
     m = biology.detect_modification("p-STAT3", caption="p-STAT3 Tyr705 blot; p-AKT Ser473 blot")
     assert (m["residue"], m["residue_position"]) == ("Tyr", 705)
+
+
+
+def test_caption_p_names_are_not_glued_phospho_prefixes():
+    from western_blot_miner.biology import caption_modification_for_core, core_symbol
+    assert caption_modification_for_core(core_symbol("pVHL"), "pVHL expression in 786-O cells.") is None
+    assert caption_modification_for_core(core_symbol("pRB"), "pRB levels were unchanged.") is None
+    # a real glued phospho prefix in a caption still counts
+    got = caption_modification_for_core(core_symbol("pSTAT3"), "pSTAT3 (Tyr705) increased after IL-6.")
+    assert got is not None and got["modification_type"] == "phosphorylation"
+
+
+def test_pvhl_record_has_no_phospho_conflict():
+    from western_blot_miner.record_builder import build_evidence_record
+    rec = build_evidence_record({
+        "raw_target": "pVHL", "texts": {"caption": "pVHL expression in 786-O cells.", "methods": "anti-VHL (CST #68547)"},
+        "model_claims": {"antibodies": [{"target": "pVHL", "role": "detection",
+                                         "source": {"type": "methods", "rank": 3, "text": "anti-VHL (CST #68547)"}}],
+                         "bands": []},
+    })
+    mt = rec.modification.modification_type
+    assert mt.value is None and "phosphorylation" not in [c.value for c in (mt.candidates or [])]
