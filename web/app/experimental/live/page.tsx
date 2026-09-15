@@ -50,22 +50,38 @@ export default function LivePage() {
   const [startErr, setStartErr] = useState<string | null>(null);
   const [rows, setRows] = useState<DatabaseResult[]>([]);
   const [liveQuery, setLiveQuery] = useState('');
+  const [rowsErr, setRowsErr] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const timer = useRef<number | null>(null);
+  // Live-tier searches and ingest starts record the sequence number they began
+  // with; a newer one bumps it, so a late search response never overwrites newer rows.
+  const seq = useRef(0);
+  const pollFails = useRef(0);
 
   useEffect(() => {
     fetch('/api/experimental/status').then((r) => r.json()).then(setStatus).catch(() => setStatus(null));
   }, []);
 
-  // Poll the running job every 2 s; stop on a terminal state.
+  // Poll the running job every 2 s; stop on a terminal state or when the job can no longer be read.
   useEffect(() => {
     if (!job || job.status === 'done' || job.status === 'failed') return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       setElapsed(Math.round((Date.now() - started) / 1000));
-      const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
-      if (!r.ok) return;
-      const j: Job = await r.json();
+      let j: Job | null = null;
+      let fail = 'backend unreachable';
+      try {
+        const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
+        if (r.ok) j = await r.json();
+        else fail = r.status === 404 ? 'the job no longer exists (the API may have restarted)' : `backend returned ${r.status}`;
+      } catch { /* fail stays 'backend unreachable' */ }
+      if (!j) {
+        // a 404 is final; ride out a transient 502 / network blip for ~10 s before giving up
+        if (fail.startsWith('backend') && ++pollFails.current < 5) return;
+        setJob((cur) => cur && { ...cur, status: 'failed', error: `Lost track of this job: ${fail}.` });
+        return;
+      }
+      pollFails.current = 0;
       setJob(j);
       if (j.status === 'done') loadLive(j.doi);
     }, 2000);
@@ -79,36 +95,52 @@ export default function LivePage() {
     if (!query.trim()) return;
     setSearching(true);
     setPapers([]);
+    setSources([]);
     try {
       const r = await fetch('/api/experimental/papers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, limit: 8 }) });
       const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
       setPapers(d.results || []);
       setSources(d.sources_used || []);
       setSearchErr(d.errors || {});
+    } catch (e2) {
+      setSearchErr({ search: e2 instanceof Error ? e2.message : 'request failed' });
     } finally {
       setSearching(false);
     }
   }
 
   async function startIngest(target: string) {
+    seq.current++; // drop any pending live-tier search so its rows cannot reappear
     setStartErr(null);
     setRows([]);
-    const r = await fetch('/api/experimental/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doi: target }) });
-    const d = await r.json();
-    if (!r.ok) {
-      setStartErr(d.detail || d.error || `Backend returned ${r.status}`);
-      return;
+    setRowsErr(null);
+    try {
+      const r = await fetch('/api/experimental/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doi: target }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
+      setElapsed(0);
+      setJob(d);
+    } catch (e2) {
+      setStartErr(e2 instanceof Error ? e2.message : 'Request failed');
     }
-    setElapsed(0);
-    setJob(d);
   }
 
   async function loadLive(q: string) {
+    const my = ++seq.current;
     setLiveQuery(q);
-    const r = await fetch('/api/experimental/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q, limit: 500 }) });
-    if (!r.ok) return;
-    const d = await r.json();
-    setRows(d.results || []);
+    setRowsErr(null);
+    try {
+      const r = await fetch('/api/experimental/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q, limit: 500 }) });
+      const d = await r.json();
+      if (my !== seq.current) return; // a newer search or extraction started meanwhile
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
+      setRows(d.results || []);
+    } catch (e2) {
+      if (my !== seq.current) return;
+      setRows([]);
+      setRowsErr(`Live tier search failed: ${e2 instanceof Error ? e2.message : 'request failed'}`);
+    }
   }
 
   const groups = groupResults(rows);
@@ -142,6 +174,9 @@ export default function LivePage() {
           <button type="submit" disabled={searching || !query.trim()}>{searching ? 'Searching…' : 'Search papers'}</button>
         </form>
         {sources.length > 0 && <p className="hb-live-note">Sources: {sources.join(' + ')}{Object.keys(searchErr).length ? ` · errors: ${Object.entries(searchErr).map(([k, v]) => `${k}: ${v}`).join('; ')}` : ''}</p>}
+        {!searching && sources.length === 0 && Object.keys(searchErr).length > 0 && (
+          <p className="hb-live-error" role="alert">Paper search failed · {Object.entries(searchErr).map(([k, v]) => `${k}: ${v}`).join('; ')}</p>
+        )}
         <ul className="hb-live-papers">
           {papers.map((p, i) => (
             <li key={`${p.doi || p.title}-${i}`}>
@@ -191,6 +226,7 @@ export default function LivePage() {
           <input value={liveQuery} onChange={(e) => setLiveQuery(e.target.value)} placeholder="Search the live tier (a DOI, a protein, a cell line…)" aria-label="Live tier search" />
           <button type="submit" disabled={!liveQuery.trim()}>Search live tier</button>
         </form>
+        {rowsErr && <p className="hb-live-error" role="alert">{rowsErr}</p>}
         {rows.length > 0 && (
           <p className="hb-results-count">Found {groups.length} experiment{groups.length !== 1 ? 's' : ''} ({rows.length} lane record{rows.length !== 1 ? 's' : ''}) in the live tier</p>
         )}

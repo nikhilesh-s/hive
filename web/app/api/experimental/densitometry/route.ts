@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { proxyJson } from '@/lib/experimentalProxy';
 export async function POST(request: NextRequest) {
-  const { record_id, live, image_base64, region, lane_bounds, lane_labels, lanes, row_index, band_row, stability } = await request.json();
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== 'object') return NextResponse.json({ detail: 'Invalid JSON body' }, { status: 400 });
+  const { record_id, live, image_base64, region, lane_bounds, lane_labels, lanes, row_index, band_row, stability } = body;
   if (record_id == null && !image_base64) return NextResponse.json({ error: 'record_id or image_base64 required' }, { status: 400 });
   return proxyJson('/experimental-densitometry', {
     method: 'POST',
