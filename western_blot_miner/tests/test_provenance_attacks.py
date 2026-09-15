@@ -99,3 +99,30 @@ def test_ip_lane_marker_is_image_evidence():
     ip_sources = [s for f in (r.experiment.experiment_type, r.experiment.experiment_flags)
                   for s in f.sources if "IgG" in s.text]
     assert ip_sources and all(s.type == "image" for s in ip_sources)
+
+
+
+def _band_record(cond, caption="", band_extra=None):
+    band = {"lane_index": 1, "lane_condition": cond, "band_state": "present", **(band_extra or {})}
+    return build_evidence_record({
+        "raw_target": "STAT3", "texts": {"caption": caption, "methods": ""},
+        "model_claims": {"antibodies": [], "bands": [band]},
+    })
+
+
+def test_lane_condition_dose_and_duration_are_image_evidence_not_caption():
+    b = _band_record("IL-6 10 ng/ml 30 min", caption="Figure 3. STAT3 in Hep3B cells.").bands[0]
+    for f in (b.lane_condition, b.lane_dose, b.lane_duration):
+        assert f.value is not None
+        assert [s.type for s in f.sources] == ["image"]
+        assert f.sources[0].text == "IL-6 10 ng/ml 30 min"
+
+
+def test_band_pattern_source_follows_where_it_was_read():
+    bl = _band_record("doublet", caption="Figure 3. STAT3.").bands[0]
+    assert bl.band_pattern.value == "doublet"
+    assert [s.type for s in bl.band_pattern.sources] == ["image"]
+    bc = _band_record("DMSO", caption="Figure 3. STAT3 appeared as a doublet in all lanes.").bands[0]
+    assert bc.band_pattern.value == "doublet"
+    assert [s.type for s in bc.band_pattern.sources] == ["figure_caption"]
+    assert bc.band_pattern.sources[0].text in "Figure 3. STAT3 appeared as a doublet in all lanes."
