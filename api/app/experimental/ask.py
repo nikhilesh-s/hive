@@ -128,9 +128,12 @@ def status_warnings(text: str, blocks: list[dict]) -> list[str]:
         cited = [by_ref[r] for r in refs]
         if _UNCERTAIN.search(bare):
             continue  # the sentence already says it is unsettled
+        # a sentence that merely NAMES a modification ("probed for phospho-Tyr705", "P-ERK 1/2")
+        # asserts nothing; only a claim about the protein's state can contradict a status
+        claims_modification = bool(_SAYS_PHOSPHO.search(bare) or _SAYS_TOTAL.search(bare) or _DENIES_PHOSPHO.search(bare))
         for r, b in zip(refs, cited):
             st = b["status"]
-            if st["modification_status"] in ("CONFLICTING", "AMBIGUOUS") and _MOD_WORDS.search(bare):
+            if st["modification_status"] in ("CONFLICTING", "AMBIGUOUS") and claims_modification:
                 add(f"{r} has a {st['modification_status']} modification, but a sentence citing it states the modification as settled.")
             if st["needs_review"] and _CERTAIN.search(bare):
                 add(f"{r} needs review, but a sentence citing it uses certain language (confirmed / established).")
