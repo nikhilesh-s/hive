@@ -118,3 +118,7 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Third adversarial pass on the flank baseline: opening kernel floored at 61 px (`6901354`); all
   cases within 0.04. `next build` clean with the dev server stopped; `scripts/demo_check.py` on the
   restarted stack: 19 PASS · 2 WARN (Valency token absent) · 0 FAIL.
+- D-5 author-value comparison closed with the allowed outcome: `scripts/experiments/
+  densitometry_author_values.py` → `research/experiments/D5_author_values.md`, 12 of 93 detected rows on
+  the ten LC3B/ACTB crops pass the gates and no crop has a passing LC3B + ACTB pair ("n too small").
+  Final browser rehearsal of run-of-show step 9 (4455 valid, 4686 refused) passed on the restarted stack.
