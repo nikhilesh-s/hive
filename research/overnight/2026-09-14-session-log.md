@@ -368,6 +368,23 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   rejected as 400/422. Note for anyone re-running this: `api/.env`'s INTERNAL_API_KEY is NOT the key the
   demo launcher uses (it takes it from `.env.cloud`, same as the web proxy), so direct API calls with the
   former return 401.
+- Track F (export / reproducibility, read-only child): rebuilding a request from the exported JSON alone and
+  re-POSTing gives 0 diffs for the valid 4455 strip, the beta-actin warning, the 4686 refusal and the
+  target/control pair (image sha256, region, lane bounds, band row, method + version, thresholds, per-lane
+  values, quality, refusal reasons all identical). CSV formula injection is impossible for the OWASP set
+  (`=`, `+`, `-`, `@`, tab, CR, DDE `=cmd|...` all prefixed with `'`; leading-space and Unicode-minus
+  variants are inert in Excel / LibreOffice / Sheets); refusal rows carry empty relatives with the clipping
+  reason intact. Overlay PNG geometry matches the returned lane bounds and band row with 0.00 px centre
+  offset (max 1 px anti-aliasing).
+  Three real gaps, two fixed here: (G2) a diagnostic equal-width measurement replayed from its export as
+  explicit lanes and its quality rose warning -> ok; (G3) the stability flag was not exported, so a replay
+  could warn or refuse where the original did not; both fixed by echoing the request in the response
+  (`result["request"]`, image bytes excluded) - verified on the live stack, the diagnostic case now replays
+  identical including lane_mode, band row and the diagnostic warning. (G1b) a TIFF is measured through its
+  PNG preview, so the export held no hash of the researcher's own file: the page now keeps
+  `uploaded_file: {name, source_sha256}`. (G1, documented not fixed) an upload's bytes are not in the
+  export, so an upload is only reproducible if the operator keeps the file; the export now at least names
+  it and carries both hashes.
 - Same cap defect in paper QA: `_rows_for` capped rows at 300, so a paper-scoped question on a 384-row
   live paper handed the model a partial lane strip for the last experiment. The partial trailing
   experiment is now dropped there too (shared `_experiment_key`); regression test; api 187 passed.
