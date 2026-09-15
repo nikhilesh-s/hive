@@ -175,6 +175,7 @@ class SearchResponse(BaseModel):
     generated_sql: str
     count: int
     results: list[WesternBlotRecord]
+    truncated: bool = False  # the row cap was hit; the last partial experiment was dropped
 
 
 # --- record detail ("Why does HiveBlot say this?") --------------------------
@@ -304,6 +305,8 @@ class FeedbackSubmission(BaseModel):
     def validate_scope(self) -> str | None:
         """Scope-specific requirements; returns an error string or None."""
         s = self.feedback_scope
+        if any("\x00" in v for v in self.model_dump().values() if isinstance(v, str)):
+            return "text fields may not contain NUL characters"  # Postgres text rejects them (was a 500)
         if s not in FEEDBACK_SCOPES:
             return f"feedback_scope must be one of {sorted(FEEDBACK_SCOPES)}"
         if s == "field":

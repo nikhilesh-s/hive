@@ -37,6 +37,7 @@ TERM_COLUMNS = (
     "treatment_context",
     "antibody_target",
     "modification_label",
+    "antibody_catalog_number",  # "sc-398486", "ab108629", "5174s" typed without a vendor
     "doi",  # a pasted DOI finds a paper's rows ("more from this paper")
 )
 
@@ -64,9 +65,16 @@ STOPWORDS = {
     "a", "an", "and", "show", "me", "find", "papers", "paper", "evidence",
     "cells", "cell", "detect", "detected", "detection", "antibody",
     "antibodies", "data", "records", "record", "results", "human",
+    # measurement / perturbation words: as AND terms they matched nothing ("STAT3 expression" -> 0 rows)
+    "expression", "expressed", "level", "levels", "protein", "proteins", "knockdown", "knockout",
 }
 
 _SITE_RE = re.compile(r"\b(tyr|ser|thr|y|s|t)\s?-?(\d{2,4})\b", re.IGNORECASE)
+# Cell lines spelled like a one-letter site stay search terms (T24 bladder, Y79 retinoblastoma).
+_SITE_LIKE_CELL_LINES = {"t24", "y79"}
+# A catalog number is trusted only directly after a vendor: "CST 9145", "abcam ab108629",
+# "Santa Cruz sc-398486", "Sigma A1978", "CST #5174s" -- not "HEK 293 CST" or "CST 1:1000".
+_VENDOR_CATALOG_RE = re.compile(r"\s*#?\s*([A-Za-z]{0,3}-?\d{3,7}[A-Za-z]?)\b")
 # Only the explicit WORD "phospho" adds a modification filter. A "p-" prefix
 # ("P-ERK", "p-AKT") stays a plain term: the printed row label matches it
 # directly, and adding a phospho filter would EXCLUDE rows whose modification
@@ -77,14 +85,16 @@ _COIP_RE = re.compile(r"\bco-?ip\b|\bimmunoprecipitat\w*", re.IGNORECASE)
 _LOADING_RE = re.compile(r"\bloading[\s-]?controls?\b", re.IGNORECASE)
 _NEEDS_REVIEW_RE = re.compile(r"\bneeds?[\s-]?review\b", re.IGNORECASE)
 _CATALOG_RE = re.compile(r"#\s?(\d{3,7})\b")
-_BARE_NUM_RE = re.compile(r"\b(\d{3,7})\b")
+_DILUTION_RE = re.compile(r"\d+:[\d,]+")
 
 
 def _esc(term: str) -> str:
     """Sanitize a term for embedding in an ILIKE literal. Defense-in-depth:
     the output still passes through sql_guard AST validation + the read-only
     role, but we never build a literal from raw user text anyway."""
-    term = re.sub(r"[^A-Za-z0-9µβ/+.\- ]", "", term)
+    # Letters of any script survive (IκBα, α-tubulin): stripping κ/α turned "IκBα" into "ib",
+    # which matched every kinase-inhibitor drug name. '_' and '%' are ILIKE wildcards: removed.
+    term = re.sub(r"[^\w/+.\- ]|_", "", term)
     return term.replace("'", "''").strip()
 
 
@@ -132,12 +142,13 @@ def generate_bio_sql(question: str, table_name: str | None = None) -> str:
         clauses.append(doi)
 
     # Phospho-site notation (Tyr705 / Y705 / Ser 473) -> residue + position.
-    site = _SITE_RE.search(q)
-    if site:
-        residue = RESIDUE_NAMES[site.group(1).lower()]
-        position = int(site.group(2))
+    sites = [m for m in _SITE_RE.finditer(q) if m.group(0).lower() not in _SITE_LIKE_CELL_LINES]
+    if sites:
+        residue = RESIDUE_NAMES[sites[0].group(1).lower()]
+        position = int(sites[0].group(2))
         clauses.append(f"(residue ILIKE '{residue}' AND residue_position = {position})")
-        q = _SITE_RE.sub(" ", q)
+        for m in reversed(sites):
+            q = q[: m.start()] + " " + q[m.end():]
 
     # Modification / experiment-type keywords.
     if _PHOSPHO_RE.search(q):
@@ -160,25 +171,26 @@ def generate_bio_sql(question: str, table_name: str | None = None) -> str:
         q = _NEEDS_REVIEW_RE.sub(" ", q)
 
     # Antibody vendor + catalog number.
-    vendor_hit = None
+    after_vendor = None
     for alias in sorted(VENDORS, key=len, reverse=True):
         m = re.search(rf"\b{re.escape(alias)}\b", q, re.IGNORECASE)
         if m:
-            vendor_hit = VENDORS[alias]
-            clauses.append(f"antibody_vendor ILIKE '%{_esc(vendor_hit)}%'")
+            clauses.append(f"antibody_vendor ILIKE '%{_esc(VENDORS[alias])}%'")
+            after_vendor = _VENDOR_CATALOG_RE.match(q, m.end())
             q = q[: m.start()] + " " + q[m.end():]
             break
     cat = _CATALOG_RE.search(q)
-    if not cat and vendor_hit:
-        cat = _BARE_NUM_RE.search(q)  # "CST 9145" — number only trusted next to a vendor
     if cat:
         clauses.append(f"antibody_catalog_number ILIKE '%{_esc(cat.group(1))}%'")
         q = q.replace(cat.group(0), " ")
+    elif after_vendor:
+        clauses.append(f"antibody_catalog_number ILIKE '%{_esc(after_vendor.group(1))}%'")
+        q = q.replace(after_vendor.group(1), " ", 1)
 
     # Remaining free-text terms: AND between terms, OR across bio columns.
     for token in re.split(r"[\s,;]+", q):
         token = token.strip(" .?!()[]{}\"'")
-        if len(token) < 2 or token.lower() in STOPWORDS:
+        if len(token) < 2 or token.lower() in STOPWORDS or _DILUTION_RE.fullmatch(token):
             continue
         if not _esc(token):
             continue

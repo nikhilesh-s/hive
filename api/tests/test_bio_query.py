@@ -40,9 +40,51 @@ def test_hash_catalog_without_vendor():
 
 
 def test_bare_number_without_vendor_is_not_catalog():
-    # A number with no vendor and no '#' is NOT trusted as a catalog number.
+    # A number with no vendor and no '#' is NOT a catalog filter of its own
+    # (it is only one of the OR'd columns of a plain term).
     sql = generate_bio_sql("9145")
-    assert "antibody_catalog_number" not in sql
+    assert "WHERE antibody_catalog_number" not in sql and " AND antibody_catalog_number" not in sql
+    for q in ("HEK 293 CST", "CST 1:1000"):   # a cell line or a dilution next to a vendor is not a catalog
+        sql = generate_bio_sql(q)
+        assert "AND antibody_catalog_number" not in sql and "%1000%" not in sql, q
+        _guarded(q)
+
+
+def test_row_cap_drops_the_partial_last_experiment(monkeypatch):
+    import asyncio
+
+    from app import search_service
+    rows = [{"id": i, "paper_id": "10.1/x", "doi": "10.1/x", "target": "STAT3", "stable_row_key": f"e{i // 5}:{i}"}
+            for i in range(12)]                     # experiments e0, e1 (5 lanes) and e2 (2 of its lanes)
+
+    async def fake_query(sql):
+        return rows
+    monkeypatch.setattr(search_service, "run_readonly_query", fake_query)
+    monkeypatch.setattr(search_service.settings, "openai_key", "")   # deterministic parser, never a model call
+    out = asyncio.run(search_service.execute_search("STAT3", 12))
+    assert out.truncated and out.count == 10 and {r.stable_row_key.split(":")[0] for r in out.results} == {"e0", "e1"}
+    out = asyncio.run(search_service.execute_search("STAT3", 100))
+    assert not out.truncated and out.count == 12
+
+
+def test_non_numeric_catalog_numbers():
+    # Regression: only digit catalogs parsed, so these found 0 of 50/31/53/31 corpus rows.
+    for q, cat in (("Sigma A1978", "A1978"), ("abcam ab108629", "ab108629"),
+                   ("Santa Cruz sc-398486", "sc-398486"), ("CST #5174s", "5174s"), ("CST 9145", "9145")):
+        sql = generate_bio_sql(q)
+        assert f"antibody_catalog_number ILIKE '%{cat}%'" in sql, q
+        assert "%sc-%" not in sql, q          # no stray fragment AND'd in
+        _guarded(q)
+    assert "antibody_catalog_number ILIKE '%sc-398486%'" in generate_bio_sql("sc-398486")   # term column
+
+
+def test_cell_line_is_not_a_site_and_greek_letters_survive():
+    assert "residue" not in generate_bio_sql("T24 STAT3") and "%T24%" in generate_bio_sql("T24 STAT3")
+    assert "residue ILIKE 'Thr' AND residue_position = 389" in generate_bio_sql("S6K T389")
+    sql = generate_bio_sql("IκBα")
+    assert "iκbα" in sql.lower() and "'%ib%'" not in sql and "%ib(" not in sql   # was the term "ib"
+    _guarded("IκBα")
+    assert "%expression%" not in generate_bio_sql("STAT3 expression")
 
 
 def test_coip():
