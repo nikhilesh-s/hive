@@ -123,7 +123,7 @@ def main() -> int:
         if len(review) > 25:
             lines.append(f"- ... {len(review) - 25} more below score {sorted(review, key=lambda c: -c['cv_score'])[25]['cv_score']:.2f}")
         lines.append("")
-    OUT.write_text("\n".join(lines) + "\n")
+    OUT.write_text("\n".join(lines).rstrip("\n") + "\n")
     print("\n".join(l for l in lines if l.startswith("## ") or "sent to the model" in l or "blocked" in l or "proxies" in l))
     return 0
 

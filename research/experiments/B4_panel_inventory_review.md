@@ -143,4 +143,3 @@ Review list: 43 candidates on western-mentioning pages that were not sent to the
 - page 5 · score 0.51 · `page_005_cand_0027.png`
 - page 2 · score 0.51 · `page_002_cand_0008.png`
 - ... 18 more below score 0.51
-
