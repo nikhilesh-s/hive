@@ -387,8 +387,11 @@ def _treatment_info(mc, caption: str = "", methods: str = "") -> TreatmentInfo:
     # "for the indicated times/doses" says the panel varies THAT quantity per
     # lane even when only one value is parseable -> never settle that scalar.
     # Kind-specific: a time course's single stimulus concentration stays settled.
-    src = [_claim_source(ctx, caption, methods)[0]] if ctx else []
-    det = [Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if ctx else []
+    claim_src, verbatim = _claim_source(ctx, caption, methods) if ctx else (None, False)
+    src = [claim_src] if ctx else []
+    # A regex over verbatim paper text is deterministic evidence; over the
+    # model's own treatment wording it is still the model's reading.
+    det = ([Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if verbatim else src) if ctx else []
     dose_f, dose_unit_f = _series_fields(
         doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)))
     dur_f, dur_unit_f = _series_fields(
