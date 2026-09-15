@@ -328,6 +328,21 @@ check("pixel cap refuses > MAX_PIXELS", raises(lambda: D.decode_image(_cv2.imenc
 check("reversed band_row message says reversed", (lambda: (lambda e: "reversed" in e)(
       next(iter([str(x) for x in [_try(lambda: D.analyze(img, lane_bounds=equal_bounds(2), band_row=(80, 40)))]]))))())
 
+# 15. a geometry caveat can never sit under a "valid" card: diagnostic lanes,
+#     a box with no membrane margin, and a text-like measured row all downgrade
+#     an otherwise-clean strip to warning; an explicit tall band_row is not "text"
+clean = synthetic([1.0, 0.5, 0.25, 0.1], noise=1.0)
+r_eqw = D.analyze(clean, lanes=4)
+check("diagnostic equal-width lanes -> warning state", r_eqw["quality"]["state"] == "warning"
+      and any("diagnostic" in x for x in r_eqw["quality"]["reasons"]))
+r_nomargin = D.analyze(clean, region=(0, 45, 400, 75), lane_bounds=equal_bounds(4), band_row=(45, 75))
+check("no flank rows -> warning state with the reason", r_nomargin["quality"]["state"] == "warning"
+      and any("no membrane rows" in x for x in r_nomargin["quality"]["reasons"]))
+r_tall = D.analyze(clean, region=(0, 5, 400, 115), lane_bounds=equal_bounds(4), band_row=(10, 110))
+check("explicit tall band_row is not called printed text", not any("printed text" in x for x in r_tall["warnings"]))
+r_explicit = D.analyze(clean, region=(0, 20, 400, 100), lane_bounds=equal_bounds(4))
+check("explicit clean strip with margin stays ok", r_explicit["quality"]["state"] == "ok" and r_explicit["quality"]["reasons"] == [])
+
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
 for n in failed:
