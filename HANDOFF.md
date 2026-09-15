@@ -99,13 +99,25 @@ adversarial pass (strips closer than a band height on small images); `next
 build` clean with the dev server stopped; `scripts/demo_check.py` green
 (see session log for the count).
 
+**Loading-control pairing (2026-09-15, browser-verified):** analyzer
+`pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
+record 4455, P-STAT3 strip ÷ β-actin strip gave normalized 0.6–0.8 / 1.0–1.1 /
+0.3 / 0.0 / 0.0–0.1 (wide-range warning) / 0.3–0.4, overall warning
+(inherited from the β-actin near tie), same-membrane caveat shown first, no
+console errors. Quality card no longer uses a side-tab border.
+
+**Tests (latest):** densitometry 94/94 · api 167 passed / 11 skipped · miner
+pytest 56 · biology / reconcile 21 / extract 10 / pipeline 13 /
+stable-row-key 34 green · tsc and lint clean.
+
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) one last run-of-show step-9 rehearsal in the browser
-before the founder hard stop (records 4455 valid, 4686 refused, export);
-(2) B-4 panel inventory if budget remains; (3) a Tally form built from the
-reviewed spec; (4) any P0/P1 the founder raises after the Tuesday review.
-D-5's author-value comparison is closed as "n too small"
-(`research/experiments/D5_author_values.md`).
+in priority order: (1) one last run-of-show step-9 rehearsal including 9e
+(pairing) before the founder hard stop; (2) B-4 panel inventory if budget
+remains; (3) a Tally form built from the reviewed spec; (4) any P0/P1 the
+founder raises after the Tuesday review. D-5's author-value comparison is
+closed as "n too small" (`research/experiments/D5_author_values.md`).
+Checkpoint rule from Nik (2026-09-15): commit and push after every coherent
+block and say so; sub-agents must report before they could hit a limit.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 
