@@ -181,3 +181,11 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   lanes touching image edges behave.
 - Post-fix hostile fuzz (250): confident-wrong valid strips 22 -> 11, remaining are the documented
   adjacent-strip merge limit plus one 9-DN JPEG noise-limited case (not gated: one point, error 0.16).
+- `079124d` real-corpus provenance sweep (child, read-only): today's backstop truncated catalog numbers
+  (20200728 -> 2020072, 5174s -> 5174), cut dilutions at the comma (1:100,000 -> 1:100) and offered a
+  second anti-PIK3CA antibody's catalog/vendor as candidates; fixed and verified on the sweep.
+- `4c98e6e` page error line visible before an image loads (corrupt TIFF on a fresh page), readable
+  FastAPI validation errors, lead copy no longer says "not loading-control normalized" above the pairing.
+- In progress: provenance child on pre-existing source typing (418 antibody "methods" sources not in
+  methods, 75 treatment "caption" sources not in the caption, 113 sample/organism caption snippets that
+  never name the value).
