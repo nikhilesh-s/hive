@@ -391,6 +391,24 @@ def _treatment_info(mc) -> TreatmentInfo:
     )
 
 
+# A methods sentence often lists several antibodies ("anti-p-STAT3 (CST #9145)
+# and anti-actin (Santa Cruz sc-47778)"). Splitting on antibody mentions and
+# keeping only the fragment that names THIS antibody's target stops the
+# backstop from attaching the first catalog number to the wrong antibody.
+_AB_SPLIT = re.compile(r"(?=\banti-)|(?=\bantibod(?:y|ies)\b)|;", re.IGNORECASE)
+
+
+def _target_scoped_antibody(text: str, target: str) -> dict:
+    """extract_antibody over the fragment of `text` that names `target`;
+    {} when the target is not found in exactly one fragment (abstain)."""
+    frags = [f for f in _AB_SPLIT.split(text) if f and f.strip()]
+    if len(frags) <= 1:
+        return extract_antibody(text)
+    keys = {k.lower() for k in (target, biology.core_symbol(target or "")) if k}
+    hits = [f for f in frags if any(k in f.lower() for k in keys)]
+    return extract_antibody(hits[0]) if len(hits) == 1 else {}
+
+
 def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
     text = ab.get("source", {}).get("text", "")
     vendor = ab.get("vendor")
@@ -414,7 +432,7 @@ def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
     # a regex hit is weaker than a read of the sentence. It only fills a field
     # the model left empty; a disagreeing model value stays the claim and the
     # regex value is kept as a Candidate so reviewers can see the disagreement.
-    det = extract_antibody(text) if text else {}
+    det = _target_scoped_antibody(text, ab.get("target", "")) if text else {}
     det_src = [Source(type="deterministic", rank=RANK_MODEL_TARGET, text=text)]
     _same = lambda a, b: re.sub(r"[\s#,]", "", str(a)).lower() == re.sub(r"[\s#,]", "", str(b)).lower()
 

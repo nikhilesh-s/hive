@@ -51,3 +51,21 @@ def test_deterministic_confidence_never_above_model_default():
     for name in ("vendor", "catalog_number", "dilution"):
         assert getattr(det, name).confidence <= getattr(model, name).confidence
         assert getattr(det, name).confidence <= 0.9
+
+
+MULTI = ("Membranes were probed with anti-p-STAT3 (Tyr705) (Cell Signaling, #9145, 1:1000) "
+         "and anti-\u03b2-actin (Santa Cruz, sc-47778, 1:5000).")
+
+
+def test_multi_antibody_sentence_is_scoped_to_this_target():
+    ab = _record({}, text=MULTI).antibodies[0]
+    assert ab.catalog_number.value == "sc-47778"
+    assert ab.vendor.value == "Santa Cruz Biotechnology"
+    assert ab.dilution.value == "1:5000"
+
+
+def test_multi_antibody_sentence_without_this_target_abstains():
+    text = "anti-p-STAT3 (Cell Signaling, #9145, 1:1000) and anti-GAPDH (Abcam, ab8245, 1:2000)."
+    ab = _record({}, text=text).antibodies[0]      # record target is beta-actin: not in the sentence
+    for f in (ab.vendor, ab.catalog_number, ab.dilution):
+        assert f.status == MISSING

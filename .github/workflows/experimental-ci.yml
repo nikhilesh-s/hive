@@ -111,7 +111,8 @@ jobs:
         run: |
           set -e
           ! git ls-files | grep -E '(^|/)\.env(\.|$)' | grep -v '\.env\.example$'
-          ! git grep -n -E 'sk-ant-[A-Za-z0-9_-]{20,}|postgresql://[^<@ ]+:[^<@ ]+@' -- ':!*.md' ':!.github/**' || (echo "credential-shaped string found" && exit 1)
+          # dummy DSNs in test fixtures point at localhost and are not credentials
+          ! git grep -n -E 'sk-ant-[A-Za-z0-9_-]{20,}|postgresql://[^<@ ]+:[^<@ ]+@' -- ':!*.md' ':!.github/**' | grep -v '@localhost' || (echo "credential-shaped string found" && exit 1)
 
   live-valency:
     name: Live Valency contract smoke (manual)
