@@ -368,6 +368,27 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   rejected as 400/422. Note for anyone re-running this: `api/.env`'s INTERNAL_API_KEY is NOT the key the
   demo launcher uses (it takes it from `.env.cloud`, same as the web proxy), so direct API calls with the
   former return 401.
+- Track C (browser state machine, lead): densitometry driven through record load, box drag, lane count,
+  row index, band-row mode (detect vs full box), divider move, target set, beta-actin pairing, lane-count
+  mismatch while a target is set, diagnostic mode with a target, record switch WHILE a measurement was in
+  flight, PNG upload, hand-built TIFF upload, corrupt TIFF, refusal after a valid result, and all three
+  exports. No stale number, quality card, target, geometry or export survived any transition: every change
+  cleared the card first, the mid-flight record switch dropped the result, the target and the region, a
+  5-lane control against a 6-lane target refused with "target has 6 lanes, control has 5", diagnostic mode
+  disabled pairing, and a failed upload kept the previous image with its own result (re-measure identical).
+  Console on that surface: only the two deliberate 400s from the corrupt-TIFF probes.
+  Paper QA UI: empty and 2-character questions are blocked client-side; a prose-only question returns "No
+  matching evidence" (no terms to filter on, by design); the DOI question renders 8 blocks, 12 citation
+  links, no bad citations. Main search UI: catalog 53 rows, MYC 8, organism 124, zero-result shows the
+  explicit "no matching evidence in the beta dataset" copy, and a second search cannot start while one is
+  in flight (the guard is belt-and-braces). Research page: 3 pre-warmed papers, 96 experiments / 384 rows
+  with 96 LIVE · UNREVIEWED badges and a working evidence panel. Feedback: one flag submitted through the
+  UI stored to the LOCAL feedback DB (`DB_FEEDBACK_URL` is the local socket, not a hosted DB) and was
+  deleted again; comment limits 4000 ok / 4001 rejected, session_id 65 rejected.
+- Final rehearsal on the frozen code (dev server rebuilt): 4455 valid 0.5-0.6 / 1.0 / 0.3 / 0.0 / 0.0-0.1 /
+  0.3 with ranking stable; pairing 0.6-0.8 / 1.0-1.1 / 0.3 / 0.0 / 0.0-0.1 / 0.3-0.4, same-membrane caveat
+  first; 4686 refused, no relative values anywhere in the table; JSON / CSV / overlay all export (JSON now
+  12.3 KB, up from 11.8 KB: it carries the request).
 - Track F (export / reproducibility, read-only child): rebuilding a request from the exported JSON alone and
   re-POSTing gives 0 diffs for the valid 4455 strip, the beta-actin warning, the 4686 refusal and the
   target/control pair (image sha256, region, lane bounds, band row, method + version, thresholds, per-lane
