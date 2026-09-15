@@ -365,7 +365,7 @@ export default function DensitometryPage() {
     }
   }
 
-  function useAsTarget() {
+  function setAsTarget() {
     if (!res?.image.region) return;
     const reg = res.image.region as Box;
     const anyLabel = res.lanes.some((l) => l.label);
@@ -497,12 +497,24 @@ export default function DensitometryPage() {
                     ))}
                   </>
                 )}
+                {target && (
+                  <g>
+                    <rect x={target.region[0]} y={target.region[1]} width={target.region[2] - target.region[0]} height={target.region[3] - target.region[1]} className="hb-dens-region-target" />
+                    <text x={target.region[0] + 3} y={target.region[1] - 3} fontSize={fs} className="hb-dens-label hb-dens-label-target">target</text>
+                  </g>
+                )}
+                {target && controlRegion && (
+                  <g>
+                    <rect x={controlRegion[0]} y={controlRegion[1]} width={controlRegion[2] - controlRegion[0]} height={controlRegion[3] - controlRegion[1]} className="hb-dens-region-target is-control" />
+                    <text x={controlRegion[0] + 3} y={controlRegion[1] - 3} fontSize={fs} className="hb-dens-label hb-dens-label-target">control</text>
+                  </g>
+                )}
               </svg>
             )}
           </div>
           <div style={{ fontFamily: MONO, fontSize: 11, color: 'var(--text-subtle)', marginTop: 6 }}>
             {region ? `region ${region.join(', ')} · ${bounds.length} lane(s)` : 'no region — drag a box on the image'}
-            {region && <button type="button" className="hb-search-clear" style={{ marginLeft: 8 }} onClick={resetGeometry} aria-label="Clear region">×</button>}
+            {region && <button type="button" className="hb-search-clear" style={{ marginLeft: 8 }} onClick={() => resetGeometry()} aria-label="Clear region">×</button>}
           </div>
 
           <div className="hb-dens-controls">
@@ -613,6 +625,92 @@ export default function DensitometryPage() {
             {' · '}nothing stored
           </p>
           <p className="hb-live-note" style={{ color: 'var(--warning)' }}>{res.disclaimer}</p>
+        </section>
+      )}
+
+      {imgSrc && (target || (res && !refused)) && (
+        <section className="hb-page-section">
+          <h2 className="hb-page-h2">4. Normalize to a loading control (optional)</h2>
+          <p className="hb-page-lead">
+            Divides the target strip&apos;s per-lane reading by the loading-control strip&apos;s. Both are uncalibrated within-image pixel
+            readings, so the ratio is comparable only between lanes of this image, is not a protein amount, and is only meaningful if
+            both strips come from the same membrane and exposure — which a figure cannot prove.
+          </p>
+          <div className="hb-live-form">
+            {res && !refused && <button type="button" onClick={setAsTarget} disabled={busy}>Use this measurement as the target</button>}
+            {target && <button type="button" onClick={analyzePair} disabled={busy || !region || diagnostic}>{busy ? 'Measuring…' : 'Measure as loading control'}</button>}
+          </div>
+          {target && (
+            <>
+              <div style={{ fontFamily: MONO, fontSize: 11, color: 'var(--text-subtle)', marginTop: 6 }}>
+                Target set: region {target.region.join(', ')} · {target.lane_bounds.length} lanes
+                <button type="button" className="hb-search-clear" style={{ marginLeft: 8 }} onClick={() => { setTarget(null); setPair(null); }} aria-label="Clear target">×</button>
+              </div>
+              <p className="hb-live-note">
+                Now drag a box around the loading-control strip of the SAME image (e.g. β-actin). The lane dividers are kept; adjust
+                them only if the control strip is offset.{diagnostic ? ' Turn off diagnostic mode to pair.' : ''}
+              </p>
+            </>
+          )}
+          {pair && (
+            <>
+              <div className={`hb-dens-quality ${QUALITY_CLASS[pair.quality.state]}`}>
+                <h3>{PAIR_LABEL[pair.quality.state]}</h3>
+                {pair.quality.reasons.length > 0 && <ul className="hb-page-list">{pair.quality.reasons.map((r) => <li key={r}>{r}</li>)}</ul>}
+                <p className="hb-live-note">
+                  {pair.method.name} v{pair.method.version} · target region {pair.target.image.region?.join(', ')} ({pair.target.quality.state}) · control region {pair.control.image.region?.join(', ')} ({pair.control.quality.state})
+                </p>
+                {pair.warnings.length > 0 && (
+                  <ul className="hb-page-list" style={{ color: 'var(--warning)', fontWeight: 600 }}>
+                    {pair.warnings.map((w) => <li key={w}>{w}</li>)}
+                  </ul>
+                )}
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="hb-dens-table">
+                  <thead>
+                    <tr>
+                      <th>lane</th><th>label</th><th>target rel</th><th>control rel</th>
+                      {!pairRefused && <><th>ratio</th><th>normalized</th></>}<th>quality</th>{!pairRefused && <th></th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pair.lanes.map((l) => {
+                      const lo = l.normalized_min ?? l.normalized, hi = l.normalized_max ?? l.normalized;
+                      return (
+                        <tr key={l.index}>
+                          <td style={{ fontFamily: MONO }}>{l.index}</td>
+                          <td style={{ fontFamily: MONO }}>{l.label ?? ''}</td>
+                          <td style={{ fontFamily: MONO }}>{l.target_relative == null ? '—' : l.target_relative.toFixed(2)}</td>
+                          <td style={{ fontFamily: MONO }}>{l.control_relative == null ? '—' : l.control_relative.toFixed(2)}</td>
+                          {!pairRefused && <td style={{ fontFamily: MONO, whiteSpace: 'nowrap' }}>{rangeText(l.ratio, l.ratio_min, l.ratio_max, 2)}</td>}
+                          {!pairRefused && <td style={{ fontFamily: MONO, whiteSpace: 'nowrap' }}>{rangeText(l.normalized, l.normalized_min, l.normalized_max, 1)}</td>}
+                          <td>
+                            <span className={`hb-dens-q ${QUALITY_CLASS[l.quality]}`}>{l.quality === 'quantification_refused' ? 'refused' : l.quality}</span>
+                            {l.reasons.length > 0 && <span className="hb-dens-reasons"> {l.reasons.join('; ')}</span>}
+                          </td>
+                          {!pairRefused && (
+                            <td style={{ width: '30%' }}>
+                              {lo != null && hi != null && <div className="hb-dens-bar" style={{ marginLeft: `${pct(lo)}%`, width: `${Math.max(2, pct(hi) - pct(lo))}%` }} />}
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="hb-live-note">
+                Target rel / control rel = each strip&apos;s corrected ÷ its own strongest lane. Ratio = target ÷ control; normalized = ratio ÷ the largest median ratio in this image.
+                A range means min–max across geometry perturbations; the bar spans that range.
+              </p>
+              <div className="hb-live-form" style={{ marginTop: 12 }}>
+                <button type="button" onClick={exportPairJson}>Export pair JSON</button>
+                <button type="button" onClick={exportPairCsv}>Export pair CSV</button>
+              </div>
+              <p className="hb-live-note" style={{ color: 'var(--warning)' }}>{pair.disclaimer}</p>
+            </>
+          )}
         </section>
       )}
     </div>
