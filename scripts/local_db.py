@@ -123,7 +123,13 @@ def cmd_up() -> None:
     for mig in migrations:
         if mig.name.endswith(".down.sql"):
             continue
-        run_sql(uri, mig.read_text())
+        try:
+            run_sql(uri, mig.read_text())
+        except Exception as e:  # CREATE POLICY has no IF NOT EXISTS: a re-run is fine
+            if type(e).__name__ != "DuplicateObjectError":
+                raise
+            print(f"already applied {mig.name} ({str(e).splitlines()[0]})")
+            continue
         print(f"applied {mig.name}")
     run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_feedback')
     run_sql(uri, f'GRANT CONNECT ON DATABASE "{DB_NAME}" TO hive_ingest')  # migration 005 (experimental)

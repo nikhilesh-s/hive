@@ -582,3 +582,101 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         "warnings": warnings,
         "disclaimer": DISCLAIMER,
     }
+
+
+# --------------------------------------------------------------------------- #
+# Loading-control pairing (target strip ÷ control strip, same image)
+# --------------------------------------------------------------------------- #
+PAIR_METHOD_NAME = "hiveblot.densitometry.pair"
+PAIR_METHOD_VERSION = "0.1.0"
+PAIR_CAVEAT = (
+    "Target ÷ loading control divides two uncalibrated within-image readings. The ratio is comparable "
+    "only between lanes of this image, is not a protein amount, and is only meaningful if both strips "
+    "come from the same membrane and exposure - which a published figure cannot prove."
+)
+
+
+def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any]:
+    """Per-lane target ÷ control from two `analyze` results of the SAME image
+    with the same number of lanes. Uses each strip's own relative values, so
+    the per-lane ratio carries a constant factor (control top ÷ target top);
+    `normalized` divides by the largest median ratio so that factor cancels.
+    Envelopes come from the two strips' perturbation envelopes (conservative:
+    target min ÷ control max ... target max ÷ control min). Refuses a lane
+    when either strip refused it or the control lane is weak; refuses the
+    pairing when either strip is refused as a whole."""
+    tl, cl = target["lanes"], control["lanes"]
+    if len(tl) != len(cl):
+        raise ValueError(f"target has {len(tl)} lanes, control has {len(cl)}; use the same lane boundaries")
+    overall = OK
+    reasons: list[str] = []
+    for name, r in (("target", target), ("control", control)):
+        if r["quality"]["state"] == REFUSED:
+            overall = REFUSED
+            reasons.append(f"{name} strip refused: " + "; ".join(r["quality"]["reasons"]))
+        elif r["quality"]["state"] == WARNING and overall == OK:
+            overall = WARNING
+    lanes: list[dict[str, Any]] = []
+    for t, c in zip(tl, cl):
+        lr: list[str] = []
+        q = OK
+        if t["quality"] == REFUSED or t["relative"] is None:
+            q, lr = REFUSED, lr + ["target lane refused"]
+        if c["quality"] == REFUSED or c["relative"] is None:
+            q, lr = REFUSED, lr + ["control lane refused"]
+        elif c["snr"] is not None and c["snr"] < SNR_MIN:
+            q, lr = REFUSED, lr + [f"control lane has no reliable signal (SNR {c['snr']}); a ratio over it is undefined"]
+        elif c["relative"] is not None and c["relative"] <= 0:
+            q, lr = REFUSED, lr + ["control lane reads zero"]
+        if q != REFUSED and (t["quality"] == WARNING or c["quality"] == WARNING):
+            q = WARNING
+            lr += [x for x in t["reasons"] + c["reasons"] if x.startswith("unstable") or x.startswith("some clipped")]
+        ratio = env = None
+        if q != REFUSED and overall != REFUSED:
+            ratio = t["relative"] / c["relative"]
+            te, ce = t.get("stability"), c.get("stability")
+            if te and ce and ce["relative_min"] > 0:
+                env = (te["relative_min"] / ce["relative_max"], te["relative_median"] / ce["relative_median"],
+                       te["relative_max"] / ce["relative_min"])
+        lanes.append({"index": t["index"], "label": t.get("label"),
+                      "target_relative": t["relative"], "control_relative": c["relative"],
+                      "ratio": ratio, "env": env, "quality": q, "reasons": lr})
+    valid = [l for l in lanes if l["ratio"] is not None]
+    top = max((l["env"][1] if l["env"] else l["ratio"]) for l in valid) if valid else 0.0
+    for l in lanes:
+        e = l.pop("env")
+        if l["ratio"] is None or top <= 0:
+            l.update({"ratio": None, "ratio_min": None, "ratio_median": None, "ratio_max": None,
+                      "normalized": None, "normalized_min": None, "normalized_max": None})
+            continue
+        med = e[1] if e else l["ratio"]
+        l.update({"ratio": round(l["ratio"], 4),
+                  "ratio_min": round(e[0], 4) if e else None, "ratio_median": round(med, 4) if e else None,
+                  "ratio_max": round(e[2], 4) if e else None,
+                  "normalized": round(med / top, 4),
+                  "normalized_min": round(e[0] / top, 4) if e else None,
+                  "normalized_max": round(e[2] / top, 4) if e else None})
+        if e and (e[2] - e[0]) / max(med, 1e-9) > 2 * STABILITY_WARN_WIDTH and l["quality"] == OK:
+            l["quality"] = WARNING
+            l["reasons"].append(f"ratio range {e[0]:.2f}-{e[2]:.2f} is wide under geometry perturbation")
+    if overall != REFUSED and not valid:
+        overall = REFUSED
+        reasons.append("no lane has a defined target ÷ control ratio")
+    if overall == OK and any(l["quality"] != OK for l in lanes):
+        overall = WARNING
+        reasons.append("one or more lanes carry a warning or are refused; read the per-lane reasons")
+    if overall == WARNING and not reasons:
+        reasons.append("one of the strips carries a warning; read its card")
+    return {
+        "method": {"name": PAIR_METHOD_NAME, "version": PAIR_METHOD_VERSION,
+                   "steps": "analyze target strip -> analyze control strip (same image, same lane bounds) -> "
+                            "per-lane target_relative / control_relative -> envelope from both perturbation "
+                            "envelopes -> normalized to the largest median ratio -> refusal when either strip "
+                            "or lane is refused or the control lane has no signal",
+                   "params": {"snr_min": SNR_MIN, "ratio_width_warn": 2 * STABILITY_WARN_WIDTH,
+                              "single_strip_method": f"{METHOD_NAME} {METHOD_VERSION}"}},
+        "target": target, "control": control, "lanes": lanes,
+        "quality": {"state": overall, "reasons": reasons},
+        "warnings": [PAIR_CAVEAT] + [w for w in target["warnings"] + control["warnings"] if "diagnostic" in w or "band rows" in w],
+        "disclaimer": DISCLAIMER,
+    }
