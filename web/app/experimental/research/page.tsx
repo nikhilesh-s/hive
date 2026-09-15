@@ -7,7 +7,7 @@
 //   scoped to that paper → cited answer + numbered evidence.
 // Nothing here touches the reviewed corpus; every live row is badged.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
@@ -73,8 +73,21 @@ export default function ResearchPage() {
   const [asking, setAsking] = useState(false);
   const [ask, setAsk] = useState<AskResponse | null>(null);
   const [askErr, setAskErr] = useState<string | null>(null);
+  const [rowsErr, setRowsErr] = useState<string | null>(null);
+  const [liveErr, setLiveErr] = useState<string | null>(null);
+  // Every paper-scoped request (rows, extraction start, job poll, ask) records the
+  // sequence number it started with; choosing a paper or starting an extraction
+  // bumps it, so a late response never lands on a newer selection.
+  const seq = useRef(0);
+  const pollFails = useRef(0);
 
-  const refreshLive = () => fetch('/api/experimental/live-papers').then((r) => r.json()).then((d) => setLivePapers(d.papers || [])).catch(() => {});
+  const refreshLive = () => fetch('/api/experimental/live-papers')
+    .then(async (r) => {
+      const d = await r.json();
+      setLivePapers(d.papers || []);
+      setLiveErr(d.error || d.detail || (r.ok ? null : `Backend returned ${r.status}`));
+    })
+    .catch(() => setLiveErr('request failed'));
 
   useEffect(() => {
     fetch('/api/experimental/status').then((r) => r.json()).then(setStatus).catch(() => setStatus(null));
@@ -82,14 +95,28 @@ export default function ResearchPage() {
   }, []);
 
   // Poll a running job every 2 s; on done, load its rows and refresh the ingested list.
+  // A job that can no longer be read (404 after an API restart, backend down) stops the poll with an error.
   useEffect(() => {
     if (!job || job.status === 'done' || job.status === 'failed') return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
+      const my = seq.current;
       setElapsed(Math.round((Date.now() - started) / 1000));
-      const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
-      if (!r.ok) return;
-      const j: Job = await r.json();
+      let j: Job | null = null;
+      let fail = 'backend unreachable';
+      try {
+        const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
+        if (r.ok) j = await r.json();
+        else fail = r.status === 404 ? 'the job no longer exists (the API may have restarted)' : `backend returned ${r.status}`;
+      } catch { /* fail stays 'backend unreachable' */ }
+      if (my !== seq.current) return; // another paper was chosen meanwhile
+      if (!j) {
+        // a 404 is final; ride out a transient 502 / network blip for ~10 s before giving up
+        if (fail.startsWith('backend') && ++pollFails.current < 5) return;
+        setJob((cur) => cur && { ...cur, status: 'failed', error: `Lost track of this job: ${fail}.` });
+        return;
+      }
+      pollFails.current = 0;
       setJob(j);
       if (j.status === 'done') { loadRows(j.doi); refreshLive(); }
     }, 2000);
@@ -106,62 +133,84 @@ export default function ResearchPage() {
     setTopic(qq);
     setSearching(true);
     setPapers([]);
+    setSources([]);
     try {
       const r = await post('/api/experimental/papers', { query: qq, limit: 8 });
       const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
       setPapers(d.results || []);
       setSources(d.sources_used || []);
       setSearchErr(d.errors || {});
+    } catch (e2) {
+      setSearchErr({ search: e2 instanceof Error ? e2.message : 'request failed' });
     } finally {
       setSearching(false);
     }
   }
 
+  // Drop every pending paper-scoped response and clear what it would have filled.
+  function invalidate() {
+    setRows([]); setRowsLoading(false); setRowsErr(null);
+    setAsk(null); setAskErr(null); setAsking(false);
+    setStartErr(null);
+    return ++seq.current;
+  }
+
   async function loadRows(doi: string) {
+    const my = seq.current;
     setRowsLoading(true);
+    setRowsErr(null);
     try {
       const r = await post('/api/experimental/search', { query: doi, limit: 500 });
-      const d = r.ok ? await r.json() : { results: [] };
+      const d = await r.json();
+      if (my !== seq.current) return; // another paper was chosen meanwhile
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
       setRows(d.results || []);
+    } catch (e2) {
+      if (my === seq.current) setRowsErr(`Could not load the live records: ${e2 instanceof Error ? e2.message : 'request failed'}`);
     } finally {
-      setRowsLoading(false);
+      if (my === seq.current) setRowsLoading(false);
     }
   }
 
   function choose(p: Paper) {
     setSelected(p);
-    setRows([]);
-    setAsk(null);
+    invalidate();
     setJob(null);
-    setStartErr(null);
     if (p.doi && ingested(p.doi)) loadRows(p.doi);
   }
 
   async function extract(doi: string) {
-    setStartErr(null);
-    setRows([]);
-    const r = await post('/api/experimental/ingest', { doi });
-    const d = await r.json();
-    if (!r.ok) { setStartErr(d.detail || d.error || `Backend returned ${r.status}`); return; }
-    setElapsed(0);
-    setJob(d);
+    const my = invalidate();
+    try {
+      const r = await post('/api/experimental/ingest', { doi });
+      const d = await r.json();
+      if (my !== seq.current) return; // another paper was chosen meanwhile
+      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
+      setElapsed(0);
+      setJob(d);
+    } catch (e2) {
+      if (my === seq.current) setStartErr(e2 instanceof Error ? e2.message : 'Request failed');
+    }
   }
 
   async function askQuestion(e?: React.FormEvent) {
     e?.preventDefault();
     if (!selected?.doi || question.trim().length < 3) return;
+    const my = seq.current;
     setAsking(true);
     setAskErr(null);
     setAsk(null);
     try {
       const r = await post('/api/experimental/ask', { question: question.trim(), doi: selected.doi, include_live: true });
       const d = await r.json();
+      if (my !== seq.current) return; // another paper was chosen meanwhile
       if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
       setAsk(d);
     } catch (e2) {
-      setAskErr(e2 instanceof Error ? e2.message : 'Request failed');
+      if (my === seq.current) setAskErr(e2 instanceof Error ? e2.message : 'Request failed');
     } finally {
-      setAsking(false);
+      if (my === seq.current) setAsking(false);
     }
   }
 
@@ -197,7 +246,7 @@ export default function ResearchPage() {
         </form>
         <div className="hb-search-examples" style={{ marginTop: 8 }}>
           <span>Try:</span>
-          {TOPICS.map((t) => <button key={t} type="button" onClick={() => findPapers(undefined, t)}>{t}</button>)}
+          {TOPICS.map((t) => <button key={t} type="button" disabled={searching} onClick={() => findPapers(undefined, t)}>{t}</button>)}
         </div>
         {sources.length > 0 && (
           <p className="hb-live-note">
@@ -205,6 +254,10 @@ export default function ResearchPage() {
             {Object.keys(searchErr).length ? ` · ${Object.entries(searchErr).map(([k, v]) => `${k}: ${v}`).join('; ')}` : ''}
           </p>
         )}
+        {!searching && sources.length === 0 && Object.keys(searchErr).length > 0 && (
+          <p className="hb-live-error" role="alert">Paper search failed · {Object.entries(searchErr).map(([k, v]) => `${k}: ${v}`).join('; ')}</p>
+        )}
+        {liveErr && <p className="hb-live-error" role="alert">Could not list already-extracted papers: {liveErr}</p>}
         <ul className="hb-live-papers">
           {papers.map((p, i) => {
             const have = ingested(p.doi);
@@ -281,6 +334,7 @@ export default function ResearchPage() {
             </div>
           )}
           {startErr && <p className="hb-live-error">{startErr}</p>}
+          {rowsErr && <p className="hb-live-error" role="alert">{rowsErr}</p>}
           {job && (
             <div className="hb-live-job" style={{ marginTop: 12 }}>
               <div style={{ fontFamily: MONO, fontSize: 12 }}>
