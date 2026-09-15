@@ -107,6 +107,10 @@ def _term_clause(term: str) -> str:
         # MYCN, IL-6R, metformin do not). SIMILAR TO keeps this inside the
         # guard's allowlist, no regex functions. ponytail: right boundary only,
         # so PERK still matches ERK; longer words (actin/actinin) stay substring.
+        # A left-boundary rule was measured on both local tiers on 2026-09-15:
+        # 0 off-target rows removed, 0 lost -- every off-target row is a symbol
+        # named in treatment / context / sample / catalog text (by design), and
+        # lower() cannot separate pERK (phospho-ERK) from PERK (EIF2AK3).
         pat = f"%{t.lower()}([^a-z]%)?"
         ors = " OR ".join(f"{c} ILIKE '%{t}%'" if c == "doi" else f"lower({c}) SIMILAR TO '{pat}'"
                           for c in TERM_COLUMNS)
