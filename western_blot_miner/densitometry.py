@@ -350,7 +350,8 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         reasons: list[str] = []
         state = OK
         if l["snr"] is not None and l["snr"] < SNR_MIN:
-            reasons.append(f"no signal above background (SNR {l['snr']} < {SNR_MIN})")
+            reasons.append(f"weak: mean corrected signal is within {SNR_MIN:g} sigma of the off-band residual "
+                           f"(SNR {l['snr']}); treat the value as at or near zero")
         if l["clipped_fraction"] >= CLIP_FRACTION_REFUSE:
             state = REFUSED
             reasons.append(f"band core clipped ({l['clipped_fraction']:.0%} of core pixels at the signal extreme; "
