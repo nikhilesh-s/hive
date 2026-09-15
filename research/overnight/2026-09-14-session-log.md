@@ -143,3 +143,31 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - B-4 scaffold: `scripts/experiments/panel_inventory_review.py`, blank inventory templates for the
   three reviewed papers, review report; recall/precision blocked on the human inventory; crop-gate
   visibility limit stated in the report.
+
+## Window 4 (2026-09-15 afternoon, Opus 5) — hardening / adversarial QA
+
+- `8c6ba44` CI hygiene: trailing Markdown spaces + B-4 report EOF blank line (the only failing CI step).
+- Property harness (`scratchpad/fuzz/fuzz_dens.py`, 300 random fixtures: refusal invariant, JSON safety,
+  determinism, envelope bracketing, confident-wrong, padding / polarity / mirror metamorphic, self-pair):
+  all held once the harness's own ground truth accounted for unequal band widths.
+- Read-only attack children (API boundaries; biology/provenance) + hostile fuzz found and we fixed:
+  - `7ccf754` refused strips still exposed per-lane stability ranges; refused pair lanes still exposed
+    target/control relatives; empty / undecodable base64 and int16/float64 colour TIFFs were HTTP 500;
+    transparent PNGs read as dark background; no decoded-pixel cap; control-only labels dropped;
+    labels silently cut at 40 chars; pair errors did not name the strip.
+  - `01719c0` antibody backstop stole neighbours' catalog/dilution (unprefixed lists, `;` inside
+    parentheses, substring target match ERK/ERK5, single fragment naming another protein); catalog regex
+    matched "indicated 1000"; pVHL / pRB / P-glycoprotein / P-gp read as phospho, p-p38 missed;
+    core_symbol stripped P-cadherin / t-PA; two-site captions assigned the first site; reported MW always
+    labelled caption with synthesized text; caption/methods split fooled by quoted/repeated headers; IP
+    lane markers labelled caption.
+  - `684b27f` geometry caveats (no membrane margin, diagnostic lanes, text-like row) sat under a "valid"
+    card; now they downgrade to warning.
+  - `e594c7c` pairing warns on offset control lanes / differing labels; lane-count mismatch rejected early.
+- Known limit (not gated, documented): strips closer than ~3 band sigmas merge into one row; centroid
+  spread and profile-shape distance both overlap real single strips, so a gate would warn on valid demo
+  strips. The per-lane profile sparkline shows the merged shape.
+- Frontend stale-state (this block): request sequence numbers so a late Measure / pair / TIFF-preview
+  response cannot paint onto a new image or geometry; row-index change invalidates; target uses the row
+  the result was measured with; errors clear on geometry change; CSV labels neutralised against formula
+  injection.
