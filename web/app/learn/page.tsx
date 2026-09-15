@@ -124,10 +124,11 @@ export default function Learn() {
         <p className="hb-page-p">
           The evidence panel tags each field with its source: <span style={{ fontFamily: MONO }}>caption</span>,{' '}
           <span style={{ fontFamily: MONO }}>methods</span>, <span style={{ fontFamily: MONO }}>antibody</span> (the reagent
-          entry), <span style={{ fontFamily: MONO }}>row label</span> (the printed target),{' '}
+          entry), <span style={{ fontFamily: MONO }}>model reading</span> (the extractor's own wording or its reading of the
+          printed row label, used when the words are not found verbatim in the caption or methods),{' '}
           <span style={{ fontFamily: MONO }}>image</span> (the panel itself, for lane conditions and band presence) or{' '}
           <span style={{ fontFamily: MONO }}>UniProt</span> (canonical name, accession, expected mass). Where the source is
-          a sentence, the sentence is quoted. Every panel links to the DOI so the paper
+          a sentence from the paper, the sentence is quoted; a model reading is labelled as one and is never shown as a quote. Every panel links to the DOI so the paper
           is one click away. Corrections you submit are stored beside the extraction as
           an auditable pair and are never applied over it.
         </p>
