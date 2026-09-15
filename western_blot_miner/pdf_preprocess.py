@@ -207,26 +207,49 @@ def retrieve_relevant_text_snippets(
     return "\n\n".join(f"- {snippet}" for snippet in deduped[:max_snippets])
 
 
+# Antibody reagent sentences ("primary antibodies against p-STAT3 (Tyr705;
+# 1:1,000; CST #9145) ..."): the deterministic antibody backstop can only
+# recover a catalog number / dilution the retrieved methods text contains.
+REAGENT_KEYWORDS = ["primary antibod", "antibodies against", "antibody against", "dilution"]
+
+# Per-section budgets. The blob used to be cut once at the end, and the methods
+# snippets come last, so long nearby-page and figure text truncated the methods
+# section away (39% of stored contexts had no methods snippets at all).
+NEARBY_CHARS = 4500
+FIGURE_CHARS = 4500
+METHODS_CHARS = 4000
+
+
 def build_text_context_for_candidate(
     candidate: dict[str, Any],
     page_records: list[dict[str, Any]],
     paper_text: str,
-    max_chars: int = 12000,
+    max_chars: int = 14000,
 ) -> str:
-    """Build the text block sent with a candidate image to an LLM."""
+    """Build the text block sent with a candidate image to an LLM.
+
+    Each section is truncated to its own budget so every section survives;
+    reagent sentences lead the methods snippets."""
     nearby = nearby_page_text(
         page_records,
         candidate["page"],
         radius=1,
-        max_chars_per_page=2500,
+        max_chars_per_page=1500,
+    )[:NEARBY_CHARS]
+    figure_context = extract_figure_context(paper_text, max_chars=FIGURE_CHARS)
+    reagents = retrieve_relevant_text_snippets(
+        paper_text,
+        REAGENT_KEYWORDS,
+        max_snippets=3,
+        window=450,
     )
-    figure_context = extract_figure_context(paper_text, max_chars=5000)
-    sample_methods_context = retrieve_relevant_text_snippets(
+    samples = retrieve_relevant_text_snippets(
         paper_text,
         BIO_SAMPLE_KEYWORDS,
         max_snippets=16,
         window=350,
     )
+    sample_methods_context = "\n\n".join(x for x in (reagents, samples) if x)[:METHODS_CHARS]
 
     context = f"""
 PAPER_ID: {candidate["paper_id"]}
