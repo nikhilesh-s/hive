@@ -419,7 +419,8 @@ def _treatment_info(mc, caption: str = "", methods: str = "") -> TreatmentInfo:
 # A "candidate protein name" is a token after `anti-`, or a token immediately
 # followed by "(" or "antibod…" ("GAPDH (1:5000) and ACTB (Abcam ab8227)
 # antibodies"). Generic words that take the same shape are not proteins.
-_AB_TOKEN = r"[^\W_](?:[\w\-/.]*\w)?"
+# dash variants (U+2010-2015, U+2212) stay inside a token: "β‑actin", "p‑STAT3"
+_AB_TOKEN = r"[^\W_](?:[\w\-\u2010-\u2015\u2212/.]*\w)?"
 _AB_CANDIDATE = re.compile(
     rf"\banti-\s*({_AB_TOKEN})|({_AB_TOKEN})(?=\s*\(|\s+antibod)", re.IGNORECASE)
 _AB_GENERIC = {"antibody", "antibodies", "primary", "secondary", "monoclonal", "polyclonal",
@@ -447,11 +448,12 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
     end. Parenthesised content never splits a scope. The target must be named;
     otherwise abstain ({}). Within scope, a field with more than one distinct
     value abstains (None) rather than picking the first regex hit."""
-    keys = {k.lower() for k in (target, biology.core_symbol(target or "")) if k}
+    fold = lambda s: _DASHES.sub("-", s or "").lower()   # "β‑actin" (U+2011) == "β-actin"
+    keys = {fold(k) for k in (target, biology.core_symbol(target or "")) if k}
     if not text or not keys:
         return {}
-    low, depth = text.lower(), _paren_depths(text)
-    is_target = lambda s: any(re.search(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", s.lower())
+    low, depth = fold(text), _paren_depths(text)            # same length: positions align
+    is_target = lambda s: any(re.search(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", fold(s))
                               for k in keys)
     mentions = sorted({m.start() for k in keys
                        for m in re.finditer(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", low)
@@ -476,6 +478,7 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
     if sum(1 for sc in scopes if "(" in sc) >= 2:
         return {}
     scope = " | ".join(scopes)
+    quote = next((sc for sc in scopes if "(" in sc), scopes[0]).strip()   # verbatim slice of `text`
 
     def one(vals):
         uniq = {re.sub(r"[\s#,]", "", v).lower() for v in vals}
@@ -490,6 +493,7 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
         "catalog_number": one(cats),
         "clone": one([m.group(1) for m in re.finditer(r"\bclone\s+([A-Za-z0-9\-]+)", scope, re.IGNORECASE)]),
         "dilution": one([f"1:{m.group(1).replace(',', '')}" for m in biology._DILUTION.finditer(scope)]),
+        "_quote": quote,
     }
 
 
@@ -519,8 +523,13 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
     # a regex hit is weaker than a read of the sentence. It only fills a field
     # the model left empty; a disagreeing model value stays the claim and the
     # regex value is kept as a Candidate so reviewers can see the disagreement.
-    det = _target_scoped_antibody(text, ab.get("target", "")) if verbatim else {}
-    det_src = [Source(type="deterministic", rank=RANK_MODEL_TARGET, text=text)]
+    # When the model's antibody text is its own paraphrase, scan the verbatim
+    # methods instead (target-scoped, same abstention rules); the deterministic
+    # source then quotes the matched methods window, never the paraphrase.
+    det_text = text if verbatim else methods
+    det = _target_scoped_antibody(det_text, ab.get("target", "")) if det_text else {}
+    det_src = [Source(type="deterministic", rank=RANK_MODEL_TARGET,
+                      text=text if verbatim else det.get("_quote", ""))]
     _same = lambda a, b: re.sub(r"[\s#,]", "", str(a)).lower() == re.sub(r"[\s#,]", "", str(b)).lower()
 
     def mk(v, c=0.9, det_v=None):

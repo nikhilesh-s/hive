@@ -270,18 +270,22 @@ def _split_text_context(text_context: str) -> tuple[str, str]:
     -> caption "" and the whole blob stays methods, untouched.
     """
     caption: list[str] = []
-    methods: list[str] = []
-    current, seen_caption = methods, False
+    preamble: list[str] = []
+    snippets: list[str] = []
+    current, seen_caption = preamble, False
     for line in text_context.splitlines(keepends=True):
         head = line.lstrip()
         if head.startswith(_CAPTION_HDR):
             current, seen_caption, line = caption, True, head[len(_CAPTION_HDR):]
         elif head.startswith(_METHODS_HDR):
-            current, line = methods, head[len(_METHODS_HDR):]
+            current, line = snippets, head[len(_METHODS_HDR):]
         current.append(line)
     if not seen_caption:
         return "", text_context
-    return "".join(caption).strip(), "".join(methods).strip()
+    # Methods snippets first, then the nearby-page preamble: the extraction
+    # prompt truncates methods, and the snippets carry the reagent sentences.
+    methods = "\n\n".join(x for x in ("".join(snippets).strip(), "".join(preamble).strip()) if x)
+    return "".join(caption).strip(), methods
 
 
 def _panel_context(summary: dict, candidate: dict, text_context: str) -> dict:

@@ -84,7 +84,7 @@ def test_split_strips_headers_and_concatenates_caption_sections():
 
 def test_split_ignores_header_quoted_mid_line_and_methods_first_order():
     cap, meth = _split_text_context(f'PRE says "{H1}" here\n{H1}\nCap.\n{H2}\nMeth.')
-    assert cap == "Cap." and meth.startswith('PRE says "') and "Meth." in meth
+    assert cap == "Cap." and 'PRE says "' in meth and meth.startswith("Meth.")   # snippets lead the preamble
     cap, meth = _split_text_context(f"{H2}\nMeth.\n{H1}\nCap.\n")
     assert cap == "Cap." and meth == "Meth."
 
