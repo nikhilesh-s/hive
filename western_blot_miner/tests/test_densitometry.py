@@ -129,6 +129,11 @@ check("band_row outside region rejected", raises(lambda: D.analyze(img, region=(
 check("reversed band_row rejected", raises(lambda: D.analyze(img, lane_bounds=equal_bounds(2), band_row=(80, 40))))
 r_br = D.analyze(img, region=(0, 20, 400, 100), lane_bounds=equal_bounds(2), band_row=(30, 90))
 check("explicit band_row honoured in full-image coords", r_br["band_row"] == [30, 90] and r_br["lanes"][0]["y0"] == 30)
+two_in_box = np.minimum(synthetic([1.0, 0.5], band_y=40), synthetic([0.5, 0.5], band_y=80))
+r_two = D.analyze(two_in_box, region=(0, 25, 400, 95), lane_bounds=equal_bounds(2), band_row=(25, 95))
+check("full-box band_row over two strips warns", any("spans 2 detected band rows" in w for w in r_two["warnings"]))
+r_one = D.analyze(two_in_box, region=(0, 25, 400, 95), lane_bounds=equal_bounds(2))
+check("detection inside the same box picks one strip", r_one["band_row"][1] - r_one["band_row"][0] < 30 and not any("spans" in w for w in r_one["warnings"]))
 
 # 8. two stacked band rows: row_index selects the second
 two = synthetic([1.0, 0.2], band_y=30)

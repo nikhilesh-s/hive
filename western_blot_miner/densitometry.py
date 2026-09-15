@@ -310,6 +310,10 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         if y0 < 0 or y1 > h or y1 - y0 < 2:
             raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is outside the selected region "
                              f"[{oy}, {oy + h}] or too thin")
+        inside = [(a, b) for a, b in rows if a >= y0 and b <= y1 and not row_text_like(gray, a, b, H)]
+        if len(inside) >= 2:
+            warnings.append(f"the chosen band row spans {len(inside)} detected band rows; their signals are summed "
+                            "per lane - draw the box around one strip or use row detection")
     elif rows:
         if row_index >= len(rows):
             warnings.append(f"row_index {row_index} out of range; {len(rows)} band row(s) detected, using the strongest")
