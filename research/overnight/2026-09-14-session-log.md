@@ -79,3 +79,17 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   reference instability). Auto geometry is diagnostic; ~0.5 s per analysis on the largest crop.
 - D1 report retired with a header; architecture doc experiment table updated; HANDOFF top block added.
 - Adversarial reviewer (Lead Q) running on densitometry + B-1/B-2; findings land in the next block.
+
+## Window 2 (2026-09-15, after the usage reset)
+
+- Lead Q sub-agent died on the rate limit; the orchestrator ran the probes itself
+  (`scratchpad/adv*.py`, not committed). Findings: P1 B-2 multi-antibody attribution (fixed,
+  `6e7911d`); everything else held (0 invariant violations / 30 fixtures, deterministic JSON,
+  clamped region echo, 400/422 at the API boundary, no protein-amount copy).
+- `6e7911d` — B-2 target scoping + CI hygiene `@localhost` exclusion.
+- Browser check of the record path on the local DB (record 4455) exposed the polarity bug
+  (region mean) and a false "printed text" warning on a tightly boxed strip; both fixed in
+  `5ccac69` together with the near-tie warning (values kept) vs severe-flip refusal split.
+- Real-crop gate checks (73 checks total) + `research/overnight/2026-09-14-summary.md`
+  (densitometry state, limitations, branch audit, Nik's manual steps) — this commit.
+- Lead P (Tally / distribution review) running as a sub-agent; result folded in when it returns.

@@ -49,23 +49,37 @@ beta; `main` is stale). Launcher: `CLAUDE_RUN_2026-09-14.md`. Plan:
   `deterministic`, rank below methods, confidence 0.6); disagreement is kept
   as a candidate, never overwrites.
 
-**Tests (2026-09-14):** densitometry 61/61 · api 164 passed / 11 skipped (DB
-matrix needs `HIVE_DB_TEST_URL`) · miner pytest 54 · biology / reconcile 21 /
+**Window 2 (2026-09-15 early):** adversarial probes run by the orchestrator
+(30 random fixtures: no refused lane ever carries a number, deterministic
+output, clamped region echo, 400/422 at the trust boundary); B-2 scoped to the
+sentence fragment naming this target (multi-antibody sentence bug); CI hygiene
+grep ignores `@localhost`; polarity decided on the whole image (a tight box
+around dense bands flipped it on record 4455); near-tie reference change is a
+warning with values kept, a clearly-weaker winner refuses; `rows_text_like` +
+printed-text warning; record-crop path verified in the browser on the local DB
+(record 4455: P-STAT3 strip valid + stable, T-Stat3 strip near-tie warning);
+real-crop gate checks added to the test script. Full state, limitations,
+branch audit and Nik's manual steps: **`research/overnight/2026-09-14-summary.md`**.
+
+**Tests (2026-09-15):** densitometry 73/73 · api 164 passed / 11 skipped (DB
+matrix needs `HIVE_DB_TEST_URL`) · miner pytest 56 · biology / reconcile 21 /
 loader / extract 10 / pipeline 13 / stable-row-key 34 all green · benchmark
 34/34 · `tsc` clean · lint 0/0 · `next build` clean · `git diff --check` clean.
 
-**Not done / known:** record-crop path of the densitometry page not re-verified
-in the browser this window (needs the local DB; upload path verified); no
-loading-control pairing, no cross-image comparison, nothing stored (reserved
-intensity columns stay NULL); `experimental-ci.yml` hygiene job still trips on
-the dummy localhost DSNs (one-line fix pending); Valency token not on this
-laptop (PMC fallback works); nothing experimental is hosted.
+**Not done / known:** no loading-control pairing, no cross-image comparison,
+nothing stored (reserved intensity columns stay NULL); thresholds are v0.2
+synthetic-justified defaults (D-7 real dilution series pending); Valency token
+not on this laptop (PMC fallback works); nothing experimental is hosted;
+`scripts/local_db.py up` prints a harmless "policy already exists" error on
+re-run.
 
-**EXACT NEXT TASK:** apply the adversarial (Lead Q) P0/P1 findings on
-densitometry + B-1/B-2 if any remain in the session log, then continue the
-recursive grind per the launcher (candidates in priority order: CI hygiene
-one-liner; `rows_detected` text-row flag + UI hint; record-crop path browser
-check with the local DB; overnight summary `research/overnight/2026-09-14-summary.md`).
+**EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
+in priority order: (1) fold the Lead P Tally/distribution review into
+`tickets/` if it is still uncommitted; (2) UI row picker (click a detected
+row from `rows_detected` instead of typing `row_index`); (3) author-value
+comparison ticket D-5 second half (LC3B-II:ACTB bar charts as an offset with
+n, "n too small" allowed); (4) overlay PNG in the export; (5) B-6 stale L1
+report cleanup.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 

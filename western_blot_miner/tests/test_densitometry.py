@@ -198,6 +198,32 @@ check("encode/decode round trip", D.decode_image(
 res16 = D.analyze((img.astype(np.uint16) * 257), lane_bounds=equal_bounds(4))
 check("16-bit input gives same ordering", [l["relative"] for l in res16["lanes"]][0] == 1.0)
 
+# 12. reviewed real crops (present in the repo under api/crops): one strip
+#     that yields a valid, ranking-stable within-image reading and one that
+#     refuses for a clipped reference. Regions are hand-drawn full-image
+#     pixel boxes around a single strip; these are gate checks, not accuracy.
+CROPS = Path(__file__).resolve().parents[2] / "api" / "crops"
+stat3 = CROPS / "10.3892_br.2026.2108" / "panel_candidates" / "page_005_cand_0034.png"
+bex2 = CROPS / "10.1186_s12964-025-02385-8" / "panel_candidates" / "page_005_cand_0032.png"
+if stat3.is_file() and bex2.is_file():
+    img_s = D.decode_image(stat3.read_bytes())
+    e = np.linspace(793, 1402, 7).round().astype(int)
+    six = [[int(e[i]), int(e[i + 1])] for i in range(6)]
+    r_p = D.analyze(img_s, region=(793, 120, 1402, 185), lane_bounds=six)      # P-STAT3 (Ser727), panel C
+    check("real P-STAT3 strip: valid reading", r_p["quality"]["state"] == "ok" and r_p["stability"]["ranking_stable"]
+          and r_p["image"]["inverted_for_analysis"] is True and 120 <= r_p["band_row"][0] < r_p["band_row"][1] <= 185)
+    check("real P-STAT3 strip: no clipping, all lanes have signal", all(l["clipped_fraction"] < D.CLIP_FRACTION_WARN for l in r_p["lanes"])
+          and all(l["relative"] is not None for l in r_p["lanes"]))
+    r_t = D.analyze(img_s, region=(793, 227, 1402, 292), lane_bounds=six)      # T-Stat3, panel C: lanes 1-2 near tie
+    check("real T-Stat3 strip: near tie is a warning with values", r_t["quality"]["state"] == "warning"
+          and r_t["stability"]["reference_tie_lanes"] == [1, 2] and all(l["relative"] is not None for l in r_t["lanes"]))
+    img_b = D.decode_image(bex2.read_bytes())
+    r_c = D.analyze(img_b, region=(0, 530, img_b.shape[1], 582), lanes=6)       # clipped strip (diagnostic lanes)
+    check("real clipped strip refuses", r_c["quality"]["state"] == "quantification_refused"
+          and all(l["relative"] is None for l in r_c["lanes"]) and max(l["clipped_fraction"] for l in r_c["lanes"]) >= D.CLIP_FRACTION_REFUSE)
+else:
+    print("  (real-crop checks skipped: api/crops not present)")
+
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
 for n in failed:
