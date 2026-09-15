@@ -144,15 +144,17 @@ for r in clip_rows:
               f"{r['reference_clipped_fraction']:.1%} | {r['reference_quality']} | {r['state']} |")
 first_refused = next((r for r in clip_rows if r["state"] == "quantification_refused"), None)
 worst_ok = max((abs(r["ratio_error_pct"]) for r in clip_rows if r["state"] == "ok"), default=0.0)
+big_err = next((r for r in clip_rows if abs(r["ratio_error_pct"]) > 5), clip_rows[-1])
 md += ["", f"Gates: warn at {D.CLIP_FRACTION_WARN:.0%} of band-core pixels within {D.CLIP_THRESHOLD_DN} DN of the floor, "
        f"refuse at {D.CLIP_FRACTION_REFUSE:.0%}. On this fixture the first refused row has a clipped core of "
        f"{first_refused['reference_clipped_fraction']:.0%} and a ratio error of {first_refused['ratio_error_pct']}%; "
        f"the largest error on any row still reported as ok is {worst_ok}% (the unclipped floor of this method: "
        "Gaussian tails and background estimation, not clipping). The refuse gate is therefore conservative: it "
-       "fires while the error is still single-digit and before the region (>=300 peak) where the ratio is off by "
-       "13-95%. A Gaussian band clips a large core fraction almost as soon as its peak crosses the floor, which is why "
+       f"fires while the error is still small and before peak {big_err['reference_peak_darkness']} where the ratio "
+       f"error reaches {big_err['ratio_error_pct']}% and keeps growing to {clip_rows[-1]['ratio_error_pct']}%. "
+       "A Gaussian band clips a large core fraction almost as soon as its peak crosses the floor, which is why "
        "the table has no gentle 2-10% regime; real bands with flatter tops clip more gradually, which the warn gate "
-       "is for. These are v0.2 defaults to be re-derived on a real dilution series (ticket D-7).", "",
+       "is for. These are first-generation defaults to be re-derived on a real dilution series (ticket D-7).", "",
        "## 2. JPEG re-encoding of a clipped core still trips the gate", "",
        "| JPEG q | ref peak | darkest core pixel | ref clipped core | strip state |", "|---|---|---|---|---|"]
 for r in jpeg_rows:

@@ -101,3 +101,10 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   text-row test, run-of-show step 9 rewritten with concrete records (4455 valid / near tie, 4686 refused).
   Browser-verified on record 4455 after an API restart.
 - Weak-lane flag reworded (a lane showing 0.4 was labelled "no signal"); summary updated — this commit.
+- `8d2a1aa` multi-strip full-box warning; About/Learn name the experimental route.
+- `19afe21` row buttons re-box the chosen strip; multi-strip box = warning.
+- Browser check of the re-box path showed the 3-strip box compressing ratios (0.6 → 0.8) because the
+  opening's background hits white space inside the box and membrane grey becomes signal. Method
+  **v0.3.0**: per-lane flank baseline (median of membrane rows one band-height above/below the band,
+  lower of the two) + flank MAD noise. Synthetic unclipped error 7.4% → ≤1.8%; tight vs re-boxed real
+  strip agree within 0.04; adversarial set all within 0.01. Box with no flank rows warns. — this commit.
