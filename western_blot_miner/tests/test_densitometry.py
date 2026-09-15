@@ -153,7 +153,12 @@ check("rows give opposite strongest lanes", r0["lanes"][0]["relative"] == 1.0 an
 # 9. region + explicit lanes: coordinates come back in full-image pixels and
 #    the printed-label row under the blot is excluded by the box
 labelled = synthetic([1.0, 0.5], band_y=40, h=120)
-labelled[95:110, 60:340] = 0  # a black "lane label" text row under the blot
+glyphs = (np.arange(60, 340) // 3) % 2 == 0          # 3 px strokes, 3 px gaps: printed text
+labelled[95:110, 60:340][:, glyphs] = 0              # a "lane label" text row under the blot
+solid_band = synthetic([1.0, 0.5], band_y=40, h=120)
+solid_band[34:46, 30:170] = 0                         # a clipped, solid-black BAND (long runs) is not text
+check("clipped solid band is not called text", D.row_text_like(solid_band, 34, 46, 120) is False
+      and D.row_text_like(labelled, 95, 110, 120) is True)
 r_lab = D.analyze(labelled, lanes=2)
 check("text row not chosen as band row", r_lab["band_row"][0] <= 40 <= r_lab["band_row"][1])
 check("text row flagged in rows_text_like", r_lab["rows_text_like"][0] is False and True in r_lab["rows_text_like"])
