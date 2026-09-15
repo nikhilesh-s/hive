@@ -38,6 +38,8 @@ const QUALITY_LABEL: Record<Quality, string> = {
   quantification_refused: 'Quantification refused',
 };
 const QUALITY_CLASS: Record<Quality, string> = { ok: 'is-ok', warning: 'is-warning', quantification_refused: 'is-refused' };
+// Fixed colours for the exported PNG (light footer, theme-independent): light-theme accent / warning / error.
+const PNG_COLOR: Record<Quality, string> = { ok: '#087f6d', warning: '#b8761e', quantification_refused: '#d64545' };
 
 function laneBounds(region: Box, dividers: number[]): [number, number][] {
   const xs = [region[0], ...dividers, region[2]];
@@ -51,9 +53,9 @@ function csvCell(v: unknown): string {
   const s = v == null ? '' : String(v);
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
-function download(name: string, type: string, text: string) {
+function download(name: string, type: string, part: BlobPart) {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.href = URL.createObjectURL(new Blob([part], { type }));
   a.download = name;
   a.click();
   URL.revokeObjectURL(a.href);
@@ -66,6 +68,8 @@ export default function DensitometryPage() {
   const [recordId, setRecordId] = useState('');
   const [live, setLive] = useState(false);
   const [rowIndex, setRowIndex] = useState(0);
+  const [fullRow, setFullRow] = useState(false); // band row = full box height instead of detecting inside it
+  const [usedFullRow, setUsedFullRow] = useState(false); // mode the current result was measured with
   const [stability, setStability] = useState(true);
   const [diagnostic, setDiagnostic] = useState(false);
   const [laneCount, setLaneCount] = useState('');
@@ -199,6 +203,7 @@ export default function DensitometryPage() {
     setRes(null);
     try {
       const anyLabel = labels.some((l) => l.trim());
+      const useFullRow = fullRow && !!region;
       const body: Record<string, unknown> = {
         region,
         lane_bounds: diagnostic ? null : bounds,
@@ -207,6 +212,7 @@ export default function DensitometryPage() {
         row_index: rowIndex,
         stability,
       };
+      if (useFullRow) body.band_row = [region![1], region![3]];
       if (upload) body.image_base64 = upload;
       else { body.record_id = Number(recordId); body.live = live; }
       const r = await fetch('/api/experimental/densitometry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -216,6 +222,7 @@ export default function DensitometryPage() {
         throw new Error(typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : `Backend returned ${r.status}`);
       }
       captureDims();
+      setUsedFullRow(useFullRow);
       setRes(d);
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : 'Request failed');
@@ -237,6 +244,47 @@ export default function DensitometryPage() {
       l.stability?.relative_min, l.stability?.relative_median, l.stability?.relative_max, l.clipped_fraction, l.quality, l.reasons.join('; '),
     ].map(csvCell).join(','));
     download(`hiveblot-densitometry-${stamp()}.csv`, 'text/csv', [head, cols, ...rows].join('\n') + '\n');
+  }
+  function exportPng() {
+    const img = imgRef.current;
+    if (!res || !img?.naturalWidth) return;
+    try {
+      const W = img.naturalWidth, H = img.naturalHeight;
+      const s = Math.max(1, W / 800); // stroke/font scale so large crops stay legible
+      const foot = Math.round(60 * s);
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H + foot;
+      const g = c.getContext('2d');
+      if (!g) throw new Error('Canvas unavailable');
+      g.drawImage(img, 0, 0, W, H);
+      const reg = res.image.region;
+      g.lineWidth = 1.5 * s; g.strokeStyle = PNG_COLOR.ok;
+      if (reg) g.strokeRect(reg[0], reg[1], reg[2] - reg[0], reg[3] - reg[1]);
+      const bx = reg ? [reg[0], reg[2]] : [0, W];
+      g.setLineDash([4 * s, 3 * s]); g.lineWidth = s; g.fillStyle = 'rgba(74, 214, 176, 0.08)';
+      g.fillRect(bx[0], res.band_row[0], bx[1] - bx[0], res.band_row[1] - res.band_row[0]);
+      g.strokeRect(bx[0], res.band_row[0], bx[1] - bx[0], res.band_row[1] - res.band_row[0]);
+      g.font = `600 ${11 * s}px ui-monospace, Menlo, monospace`; g.textAlign = 'center';
+      for (const l of res.lanes) {
+        const col = PNG_COLOR[l.quality];
+        g.setLineDash(l.quality === 'quantification_refused' ? [3 * s, 2 * s] : []);
+        g.strokeStyle = col; g.lineWidth = s;
+        g.strokeRect(l.x0, l.y0, l.x1 - l.x0, l.y1 - l.y0);
+        const text = String(l.label || l.index), tx = (l.x0 + l.x1) / 2, ty = l.y0 - 3 * s < 11 * s ? l.y0 + 12 * s : l.y0 - 3 * s;
+        g.setLineDash([]); g.lineWidth = 3 * s; g.strokeStyle = '#ffffff'; g.strokeText(text, tx, ty);
+        g.fillStyle = col; g.fillText(text, tx, ty);
+      }
+      g.fillStyle = '#f5f5f2'; g.fillRect(0, H, W, foot);
+      g.fillStyle = '#222222'; g.textAlign = 'left'; g.font = `${11 * s}px ui-monospace, Menlo, monospace`;
+      g.fillText(`${res.method.name} v${res.method.version} · quality=${res.quality.state} · region=[${reg?.join(', ') ?? ''}] · band_row=[${res.band_row.join(', ')}] · ${new Date().toISOString()}`, 8 * s, H + 22 * s);
+      g.fillText(res.disclaimer.split(/\.\s/)[0].replace(/\.?$/, '.'), 8 * s, H + 42 * s);
+      c.toBlob((b) => {
+        if (b) download(`hiveblot-densitometry-overlay-${stamp()}.png`, 'image/png', b);
+        else setErr('Overlay PNG export failed');
+      }, 'image/png');
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : 'Overlay PNG export failed');
+    }
   }
 
   const refused = res?.quality.state === 'quantification_refused';
@@ -322,6 +370,12 @@ export default function DensitometryPage() {
           <div className="hb-dens-controls">
             <label className="hb-ask-check">Lane count <input value={laneCount} onChange={(e) => onLaneCount(e.target.value)} placeholder="e.g. 6" aria-label="Lane count" inputMode="numeric" /></label>
             <label className="hb-ask-check">Row index <input value={rowIndex} onChange={(e) => setRowIndex(Number(e.target.value.replace(/\D/g, '') || 0))} aria-label="Row index" inputMode="numeric" /></label>
+            <label className="hb-ask-check">Band row{' '}
+              <select value={fullRow ? 'full' : 'detect'} onChange={(e) => { setFullRow(e.target.value === 'full'); setRes(null); }} aria-label="Band row mode" className="hb-dens-select">
+                <option value="detect">detect inside the box</option>
+                <option value="full">use the full box height</option>
+              </select>
+            </label>
             <label className="hb-ask-check"><input type="checkbox" checked={stability} onChange={(e) => setStability(e.target.checked)} /> stability study</label>
             <label className="hb-ask-check"><input type="checkbox" checked={diagnostic} onChange={(e) => setDiagnostic(e.target.checked)} /> auto / equal-width lanes (diagnostic only)</label>
           </div>
@@ -347,7 +401,7 @@ export default function DensitometryPage() {
             <h3>{QUALITY_LABEL[res.quality.state]}</h3>
             {res.quality.reasons.length > 0 && <ul className="hb-page-list">{res.quality.reasons.map((r) => <li key={r}>{r}</li>)}</ul>}
             <p className="hb-live-note">
-              {res.method.name} v{res.method.version} · lanes: {res.lane_mode} · band row y {res.band_row[0]}–{res.band_row[1]} · {res.rows_detected.length} row(s) detected{res.rows_text_like?.filter(Boolean).length ? ` (${res.rows_text_like.filter(Boolean).length} look like printed text)` : ''} ·{' '}
+              {res.method.name} v{res.method.version} · lanes: {res.lane_mode} · band row y {res.band_row[0]}–{res.band_row[1]} ({usedFullRow ? 'full box height' : 'detected'}) · {res.rows_detected.length} row(s) detected{res.rows_text_like?.filter(Boolean).length ? ` (${res.rows_text_like.filter(Boolean).length} look like printed text)` : ''} ·{' '}
               {res.image.inverted_for_analysis ? 'dark bands on light background' : 'light bands on dark background'}
               {res.stability && ` · stability: ±${res.stability.perturbation_px.x}px lanes / ±${res.stability.perturbation_px.y}px row × ${res.stability.runs} runs, ranking ${res.stability.ranking_stable ? 'stable' : res.stability.reference_tie_lanes?.length ? `near tie between lanes ${res.stability.reference_tie_lanes.join('/')}` : 'UNSTABLE'}`}
             </p>
@@ -393,6 +447,7 @@ export default function DensitometryPage() {
           <div className="hb-live-form" style={{ marginTop: 12 }}>
             <button type="button" onClick={exportJson}>Export JSON</button>
             <button type="button" onClick={exportCsv}>Export CSV</button>
+            <button type="button" onClick={exportPng}>Export overlay PNG</button>
           </div>
           <p className="hb-live-note">
             {res.source.record_id != null ? `record ${res.source.record_id} (${res.source.tier}) · ${res.source.target ?? ''} · ${res.source.crop ?? ''} · printed lanes ${res.source.printed_lanes ?? 'unknown'}` : 'uploaded image'}
