@@ -282,7 +282,10 @@ def _noise_stats(corrected: np.ndarray, y0: int, y1: int) -> tuple[float, float]
     if rest.size < 50:
         rest = corrected.ravel()
     med = float(np.median(rest))
-    mad = float(np.median(np.abs(rest - med)))
+    # lower-side MAD: other strips inside the box sit ABOVE the median and
+    # would inflate a two-sided scale until every lane looked like noise
+    low = rest[rest < med]
+    mad = float(np.median(med - low)) if low.size >= 25 else float(np.median(np.abs(rest - med)))
     return med, max(1.4826 * mad, 0.5)
 
 
@@ -328,6 +331,11 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     if row_text_like(gray, y0, y1, H):
         warnings.append("the selected band row looks like printed text (solid black glyphs or a tall block), "
                         "not a blot strip; draw the region around the membrane only")
+    n_blot_rows = sum(1 for a, b in rows if not row_text_like(gray, a, b, H))
+    multi_row_note = (f"the box contains {n_blot_rows} band rows; background and noise are estimated across all "
+                      "of them - box one strip for a measurement") if n_blot_rows >= 2 else None
+    if multi_row_note:
+        warnings.append(multi_row_note)
 
     if lane_bounds is not None:
         bounds = validate_lane_bounds(lane_bounds, ox, ox + w)
@@ -369,7 +377,8 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     overall_reasons: list[str] = []
     if top <= 0 or all(l["snr"] is not None and l["snr"] < SNR_MIN for l in base):
         overall = REFUSED
-        overall_reasons.append("no lane has signal above background in the selected row")
+        overall_reasons.append("no lane has signal above background in the selected row"
+                               + (f" ({multi_row_note})" if multi_row_note else ""))
     elif base[top_idx]["quality"] == REFUSED:
         overall = REFUSED
         overall_reasons.append(f"the strongest lane ({top_idx + 1}) is clipped, so nothing can be expressed relative to it")
@@ -460,6 +469,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
             l["relative"] = round(r, 4) if r is not None else None
         if overall != REFUSED and l["quality"] == WARNING:
             overall = WARNING if overall == OK else overall
+    if multi_row_note and overall == OK:
+        overall = WARNING
+        overall_reasons.append(multi_row_note)
     if overall == WARNING and not overall_reasons:
         overall_reasons.append("one or more lanes carry a warning; read the per-lane reasons")
     if overall == OK and any(l["quality"] == REFUSED for l in base):
