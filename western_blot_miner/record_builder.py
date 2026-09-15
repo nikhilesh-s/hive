@@ -300,8 +300,13 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
             # best-effort bait from the panel-scoped text only (same scoping
             # rule as the classification itself).
             bait = _first_gene_after(panel_scoped, panel_co_ip.end())
-            bait_src = Source(type="figure_caption", rank=RANK_CAPTION,
-                              text=_around(panel_scoped, panel_co_ip.start()))
+            # same channel rule as the classification: caption only when the
+            # co-IP wording is in the caption, otherwise the printed lane labels
+            bait_src = (Source(type="figure_caption", rank=RANK_CAPTION,
+                               text=_around(caption, panel_co_ip.start()))
+                        if panel_co_ip.start() < len(caption) else
+                        Source(type="image", rank=RANK_IMAGE,
+                               text=_around(panel_scoped, panel_co_ip.start())))
         if bait:
             ip_bait = EvidenceField.supported(bait, 0.75, [bait_src])
     return ExperimentInfo(experiment_type=exp_type, experiment_flags=exp_flags, ip_bait_protein=ip_bait)
