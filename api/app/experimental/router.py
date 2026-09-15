@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
@@ -148,14 +148,29 @@ async def live_papers():
 @router.get("/ingest/{job_id}")
 async def ingest_status(job_id: str):
     job = ingest.JOBS.get(job_id)
-    if job is None:
-        raise HTTPException(404, "Unknown job")
-    return job.to_dict()
+    if job is not None:
+        return job.to_dict()
+    if settings.db_ingest_url:  # a job persisted before an API restart is listed by GET /ingest too
+        try:
+            # ponytail: scans the 200 newest jobs; add a by-id query if the job table grows
+            stored = next((j for j in await list_ingest_jobs(200) if j["job_id"] == job_id), None)
+        except Exception as e:
+            logger.warning("ingest job lookup failed: %s", e)
+            raise HTTPException(503, "Live tier unavailable") from e
+        if stored:
+            return stored
+    raise HTTPException(404, "Unknown job")
 
 
 @router.delete("/ingest/{job_id}")
 async def ingest_delete(job_id: str):
     """Wipe one live extraction (rows + crops). Demo reset; never touches the reviewed corpus."""
+    if not settings.db_ingest_url:
+        raise HTTPException(503, "Live tier writes are not configured (DB_INGEST_URL)")
+    job = ingest.JOBS.get(job_id)
+    if job is not None and job.status not in ("done", "failed"):
+        # the running job would re-insert its rows after the delete
+        raise HTTPException(409, "This extraction is still running; delete it after it finishes")
     n = await delete_live_job(job_id)
     ingest.JOBS.pop(job_id, None)
     return {"job_id": job_id, "rows_deleted": n}
@@ -169,8 +184,11 @@ async def live_search(request: Request, body: SearchRequest):
     return await execute_search(body.query, body.limit, table_name=settings.live_table_name)
 
 
+_RECORD_ID = Path(ge=1, le=2**63 - 1)  # Postgres bigint; larger ids were a 500 from asyncpg
+
+
 @router.get("/records/{record_id}", response_model=RecordDetail)
-async def live_record(record_id: int):
+async def live_record(record_id: int = _RECORD_ID):
     row = await fetch_live_record(record_id)
     if row is None:
         raise HTTPException(404, "Record not found")
@@ -178,7 +196,7 @@ async def live_record(record_id: int):
 
 
 @router.get("/records/{record_id}/crop")
-async def live_crop(record_id: int):
+async def live_crop(record_id: int = _RECORD_ID):
     row = await fetch_live_record(record_id)
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")

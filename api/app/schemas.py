@@ -286,7 +286,7 @@ class FeedbackSubmission(BaseModel):
     002) beside — never over — the AI extraction. suggested_value is a human
     CORRECTION CLAIM for audit + future eval; it is never auto-applied."""
     feedback_scope: str
-    record_id: int | None = None
+    record_id: int | None = Field(default=None, ge=1, le=2**63 - 1)  # Postgres bigint
     # Reseed-proof identity (migration 003): survives DB reloads where the
     # serial record_id does not. Sent by the evidence panel when available.
     stable_row_key: str | None = Field(default=None, max_length=100)
