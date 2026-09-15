@@ -125,3 +125,16 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Loading-control pairing: `pair_ratio` + `POST /experimental-densitometry/pair` (`e0d1239`), nine
   synthetic checks, real record 4455 P-STAT3 ÷ β-actin normalized 0.69/1.0/0.31/0.04/0.04/0.33; UI
   section 4 built by the UI sub-agent (verified below when it lands). `local_db.py up` re-run is clean.
+
+## Window 3 (2026-09-15, Opus 5 after the Fable limit)
+
+- The pairing UI sub-agent hit the usage limit mid-edit. Its first half had already been swept into
+  `e0d1239`; the remaining section-4 edit typechecked and linted clean, so it was kept and pushed as
+  `1017a11` together with the side-tab fix on the quality card (design hook finding).
+- Browser-verified the full pairing flow on record 4455 (P-STAT3 target, β-actin control): table
+  matches the analyzer, caveat first, target/control overlay labels, both pair exports, no console
+  errors. All suites green (densitometry 94, api 167/11 skipped, miner 56).
+- Design hook: two other side-tab borders (globals.css ~1454, ~1638) are pre-existing beta styles
+  from 2026-09-01 / 09-05; left standing, not suppressed.
+- New rule from Nik: checkpoint commit + push after every coherent block and tell him; sub-agent
+  prompts must require an early progress report.
