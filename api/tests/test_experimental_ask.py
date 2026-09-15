@@ -175,10 +175,10 @@ def test_query_terms_drop_capitalised_prose_and_back_off_keeps_biology(monkeypat
 
     async def fake_query(sql):
         seen.append(sql)
-        return ROWS if "%Akt%" not in sql else []
+        return ROWS if "%akt(" not in sql.lower() else []
     monkeypatch.setattr(ask, "run_readonly_query", fake_query)
     assert _run(ask.retrieve("Compare Akt with STAT3", None, include_live=False))
-    assert "%STAT3%" in seen[-1] and "%Akt%" not in seen[-1]   # the weak word was dropped, not the protein
+    assert "%STAT3%" in seen[-1] and "%akt(" not in seen[-1].lower()   # the weak word was dropped, not the protein
 
 
 def test_no_filterable_terms_never_reads_the_whole_table(monkeypatch):
