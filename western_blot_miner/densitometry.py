@@ -39,6 +39,7 @@ real dilution-series benchmark exists (ticket D-7).
 """
 from __future__ import annotations
 
+import os
 import statistics
 from typing import Any
 
@@ -78,6 +79,12 @@ STABILITY_WARN_WIDTH = 0.25
 
 OK, WARNING, REFUSED = "ok", "warning", "quantification_refused"
 
+# Decoded-pixel cap: an 8 MB PNG of a blank canvas can decode to gigabytes and
+# the float32 morphology multiplies that. OpenCV's own decoder limit is set
+# before its first use, and the decoded size is checked again after decoding.
+MAX_PIXELS = 40_000_000
+os.environ.setdefault("OPENCV_IO_MAX_IMAGE_PIXELS", str(MAX_PIXELS))
+
 DISCLAIMER = (
     "EXPERIMENTAL and uncalibrated. Intensities are integrated pixel darkness "
     "of a published figure crop after background subtraction, relative within "
@@ -88,27 +95,59 @@ DISCLAIMER = (
 )
 
 
+def _to_8bit(img: np.ndarray) -> np.ndarray:
+    """Any supported sample type -> uint8 without stretching contrast."""
+    if img.dtype == np.uint8:
+        return img
+    if img.dtype == np.uint16:
+        return (img // 257).astype(np.uint8)          # 16-bit -> 8-bit, no stretch
+    if img.dtype in (np.float32, np.float64):
+        if not np.isfinite(img).all():
+            raise ValueError("the image contains NaN or infinite pixel values")
+        # floating-point exports are either 0-1 or 0-255 scaled
+        scaled = img * 255.0 if float(img.max()) <= 1.0 else img
+        return np.clip(np.rint(scaled), 0, 255).astype(np.uint8)
+    raise ValueError(f"unsupported pixel type {img.dtype}; export the blot as an 8-bit or 16-bit image")
+
+
 def _to_gray(img: np.ndarray) -> np.ndarray:
+    """Grayscale uint8. Transparent pixels are composited onto WHITE, the way
+    a browser shows them on the page, so polarity matches what the researcher
+    sees instead of treating transparent black as a dark background."""
     import cv2
 
+    img = _to_8bit(img)
+    if img.ndim == 3 and img.shape[2] in (2, 4):
+        color = img[..., :-1].astype(np.float32)
+        alpha = img[..., -1:].astype(np.float32) / 255.0
+        img = np.clip(np.rint(color * alpha + 255.0 * (1.0 - alpha)), 0, 255).astype(np.uint8)
+        if img.shape[2] == 1:
+            img = img[..., 0]
     if img.ndim == 3:
-        if img.shape[2] == 4:
-            img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    if img.dtype == np.uint16:
-        img = (img // 257).astype(np.uint8)   # 16-bit -> 8-bit, no stretch
-    elif img.dtype != np.uint8:
-        img = np.clip(img, 0, 255).astype(np.uint8)
+        if img.shape[2] == 1:
+            img = img[..., 0]
+        elif img.shape[2] == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            raise ValueError(f"unsupported channel count {img.shape[2]}")
     return img
 
 
 def decode_image(data: bytes) -> np.ndarray:
     import cv2
 
+    if not data:
+        raise ValueError("the image is empty (the upload decoded to zero bytes)")
     arr = np.frombuffer(data, dtype=np.uint8)
-    img = cv2.imdecode(arr, cv2.IMREAD_UNCHANGED)
+    try:
+        img = cv2.imdecode(arr, cv2.IMREAD_UNCHANGED)
+    except cv2.error:
+        img = None
     if img is None:
-        raise ValueError("not a decodable image")
+        raise ValueError("not a decodable image (expected PNG, JPEG, TIFF, BMP, WebP or GIF, "
+                         f"at most {MAX_PIXELS // 1_000_000} megapixels)")
+    if img.shape[0] * img.shape[1] > MAX_PIXELS:
+        raise ValueError(f"image is {img.shape[1]}x{img.shape[0]} px; the limit is {MAX_PIXELS // 1_000_000} megapixels")
     return img
 
 
@@ -376,9 +415,13 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     warnings: list[str] = []
     if band_row is not None:
         y0, y1 = int(band_row[0]) - oy, int(band_row[1]) - oy
-        if y0 < 0 or y1 > h or y1 - y0 < 2:
-            raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is outside the selected region "
-                             f"[{oy}, {oy + h}] or too thin")
+        if y1 <= y0:
+            raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is reversed or empty; give [top, bottom]")
+        if y0 < 0 or y1 > h:
+            raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is outside the selected region's rows "
+                             f"[{oy}, {oy + h}]")
+        if y1 - y0 < 2:
+            raise ValueError(f"band_row [{band_row[0]}, {band_row[1]}] is thinner than 2 px")
         inside = [(a, b) for a, b in rows if a >= y0 and b <= y1 and not row_text_like(gray, a, b, H)]
         if len(inside) >= 2:
             warnings.append(f"the chosen band row spans {len(inside)} detected band rows; their signals are summed "
@@ -532,9 +575,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     for i, (l, r) in enumerate(zip(base, rel)):
         l["label"] = labels[i] if labels else None
         if overall == REFUSED or l["quality"] == REFUSED:
+            # refusal invariant: no quantitative relative or relative range survives
             l["relative"] = None
-            if l["stability"] is not None and l["quality"] == REFUSED:
-                l["stability"] = None
+            l["stability"] = None
         else:
             l["relative"] = round(r, 4) if r is not None else None
         if overall != REFUSED and l["quality"] == WARNING:
@@ -645,7 +688,7 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
             if te and ce and ce["relative_min"] > 0:
                 env = (te["relative_min"] / ce["relative_max"], te["relative_median"] / ce["relative_median"],
                        te["relative_max"] / ce["relative_min"])
-        lanes.append({"index": t["index"], "label": t.get("label"),
+        lanes.append({"index": t["index"], "label": t.get("label") or c.get("label"),
                       "target_relative": t["relative"], "control_relative": c["relative"],
                       "ratio": ratio, "env": env, "quality": q, "reasons": lr})
     valid = [l for l in lanes if l["ratio"] is not None]
@@ -674,6 +717,11 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
         reasons.append("one or more lanes carry a warning or are refused; read the per-lane reasons")
     if overall == WARNING and not reasons:
         reasons.append("one of the strips carries a warning; read its card")
+    for l in lanes:
+        # refusal invariant: a refused lane or pairing exposes no per-lane relative either
+        if l["quality"] == REFUSED or overall == REFUSED:
+            l["target_relative"] = None
+            l["control_relative"] = None
     return {
         "method": {"name": PAIR_METHOD_NAME, "version": PAIR_METHOD_VERSION,
                    "steps": "analyze target strip -> analyze control strip (same image, same lane bounds) -> "
