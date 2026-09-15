@@ -171,3 +171,13 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   response cannot paint onto a new image or geometry; row-index change invalidates; target uses the row
   the result was measured with; errors clear on geometry change; CSV labels neutralised against formula
   injection.
+- `ec8218d` lane conditions / lane doses-durations / lane-text band patterns are image evidence, not
+  figure_caption (unfixed remainder of the IP-marker fix).
+- `68f1c7c` single lane downgraded to warning (relative 1 by definition); thin explicit band-row
+  refusal names the cause.
+- Verified without defects: export JSON -> rebuilt request reproduces identical lanes/state; record vs
+  upload path identical (same sha256); top/left padding shifts coordinates and profiles exactly
+  (120 fixtures); random pairings never expose numbers on refused lanes; 24 three-pixel lanes and
+  lanes touching image edges behave.
+- Post-fix hostile fuzz (250): confident-wrong valid strips 22 -> 11, remaining are the documented
+  adjacent-strip merge limit plus one 9-DN JPEG noise-limited case (not gated: one point, error 0.16).
