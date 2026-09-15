@@ -48,6 +48,8 @@ def test_cli_text_request_shape_and_result():
     assert args[args.index("--system-prompt") + 1] == "SYS"
     assert args[args.index("--tools") + 1] == ""                      # no tools for text
     assert "--no-session-persistence" in args and "--disable-slash-commands" in args
+    # the operator's user plugins / hooks / output styles must not shape answers
+    assert args[args.index("--setting-sources") + 1] == "project"
     assert "--bare" not in args and "--dangerously-skip-permissions" not in args
     assert os.path.isdir(cwd) and not os.listdir(cwd)                   # private empty cwd
 

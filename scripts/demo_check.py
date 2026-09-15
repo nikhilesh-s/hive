@@ -90,7 +90,8 @@ def main() -> int:
             try:
                 p = subprocess.run([exe, "-p", 'Reply with JSON {"ok": true}', "--output-format", "json",
                                     "--system-prompt", "Reply with the requested JSON only.", "--tools", "",
-                                    "--no-session-persistence", "--disable-slash-commands", "--model",
+                                    "--no-session-persistence", "--disable-slash-commands",
+                                    "--setting-sources", "project", "--model",
                                     os.environ.get("WBM_MODEL", "sonnet")],
                                    capture_output=True, text=True, timeout=180, stdin=subprocess.DEVNULL,
                                    env={k: v for k, v in os.environ.items() if k != "CLAUDECODE"})
