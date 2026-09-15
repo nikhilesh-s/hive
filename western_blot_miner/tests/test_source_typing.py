@@ -78,3 +78,28 @@ def test_treatment_dose_from_model_wording_is_not_deterministic():
     verb = build_evidence_record({**base, "texts": {"caption": "Hep3B cells treated with IL-6 (10 ng/ml) for 30 min", "methods": ""}})
     assert [x.type for x in verb.treatment.dose.sources] == ["deterministic"]
     assert verb.treatment.dose.value == para.treatment.dose.value
+
+
+
+def _coip_record(caption, lane_condition):
+    from western_blot_miner.record_builder import build_evidence_record
+    return build_evidence_record({
+        "raw_target": "p85", "texts": {"caption": caption, "methods": ""},
+        "model_claims": {"antibodies": [], "bands": [{"lane_index": 1, "lane_condition": lane_condition, "band_state": "present"}]},
+    })
+
+
+def test_coip_bait_from_lane_labels_is_image_evidence():
+    rec = _coip_record("Figure 4. Interaction analysis in H1299 cells.", "Co-IP anti-PIK3CA")
+    bait = rec.experiment.ip_bait_protein
+    assert bait.value == "PIK3CA"
+    assert [x.type for x in bait.sources] == ["image"]
+
+
+def test_coip_bait_from_caption_is_caption_evidence_with_caption_text():
+    caption = "Figure 4. Co-IP with anti-PIK3CA pulled down p85 in H1299 cells."
+    rec = _coip_record(caption, "IgG")
+    bait = rec.experiment.ip_bait_protein
+    assert bait.value is not None
+    assert [x.type for x in bait.sources] == ["figure_caption"]
+    assert bait.sources[0].text in caption
