@@ -70,8 +70,10 @@ function seedDividers(region: Box, n: number): number[] {
   return Array.from({ length: Math.max(0, n - 1) }, (_, i) => Math.round(region[0] + (w * (i + 1)) / n));
 }
 function csvCell(v: unknown): string {
-  const s = v == null ? '' : String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  let s = v == null ? '' : String(v);
+  // researcher text (labels, reasons) must not run as a spreadsheet formula
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 function download(name: string, type: string, part: BlobPart) {
   const a = document.createElement('a');
@@ -117,6 +119,7 @@ export default function DensitometryPage() {
   const [rowIndex, setRowIndex] = useState(0);
   const [fullRow, setFullRow] = useState(false); // band row = full box height instead of detecting inside it
   const [usedFullRow, setUsedFullRow] = useState(false); // mode the current result was measured with
+  const [usedRowIndex, setUsedRowIndex] = useState(0); // row index the current result was measured with
   const [stability, setStability] = useState(true);
   const [diagnostic, setDiagnostic] = useState(false);
   const [laneCount, setLaneCount] = useState('');
@@ -134,6 +137,10 @@ export default function DensitometryPage() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  // Every request records the sequence number it started with; any geometry,
+  // image or control change bumps it, so a late response can never paint a
+  // result onto a different image or geometry.
+  const seq = useRef(0);
   const ptr = useRef<{ kind: 'box' | 'divider'; idx: number; start: Pt; client: Pt; moved: boolean } | null>(null);
 
   function captureDims() {
@@ -147,7 +154,12 @@ export default function DensitometryPage() {
 
   // Dividers survive a region change while a target is set (the control strip
   // shares the target's lanes); a new image drops the target with everything else.
+  function invalidate() {
+    seq.current++;
+    setRes(null); setPair(null); setErr(null);
+  }
   function resetGeometry(newImage = false) {
+    seq.current++;
     setRegion(null); setDraft(null); setLabels([]); setRes(null); setPair(null); setErr(null);
     if (newImage || !target) setDividers([]);
     if (newImage) setTarget(null);
@@ -175,11 +187,13 @@ export default function DensitometryPage() {
       }
       // TIFF and other imager exports: ask the backend for an 8-bit PNG preview
       // and measure that PNG (identical to what the analyzer derives itself).
+      const my = ++seq.current;
       setBusy(true);
       setErr(null);
       try {
         const r = await fetch('/api/experimental/densitometry/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_base64: url }) });
         const d = await r.json();
+        if (my !== seq.current) return; // another image was loaded meanwhile
         if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : d.error || `Backend returned ${r.status}`);
         setUpload(d.png_base64);
         setImgSrc(d.png_base64);
@@ -210,13 +224,13 @@ export default function DensitometryPage() {
     // ponytail: with a target set, keep the dividers that fall inside the new box (drop, not clamp — clamping stacks them on an edge)
     setDividers(target ? dividers.filter((d) => d > box[0] && d < box[2]) : n > 1 ? seedDividers(box, n) : []);
     setLabels([]);
-    setRes(null); setPair(null);
+    invalidate();
   }
 
   function onLaneCount(v: string) {
     const digits = v.replace(/\D/g, '');
     setLaneCount(digits);
-    if (region) { setDividers(Number(digits) > 1 ? seedDividers(region, Number(digits)) : []); setRes(null); setPair(null); }
+    if (region) { setDividers(Number(digits) > 1 ? seedDividers(region, Number(digits)) : []); invalidate(); }
   }
 
   const inRegion = (p: Pt) => !!region && p[0] > region[0] && p[0] < region[2] && p[1] >= region[1] && p[1] <= region[3];
@@ -249,7 +263,7 @@ export default function DensitometryPage() {
       const hi = (s.idx < dividers.length - 1 ? dividers[s.idx + 1] : region[2]) - 1;
       const x = Math.min(hi, Math.max(lo, p[0]));
       setDividers((d) => d.map((v, i) => (i === s.idx ? x : v)));
-      setRes(null); setPair(null);
+      invalidate();
     }
   }
   function onPointerUp(e: React.PointerEvent<HTMLImageElement>) {
@@ -260,11 +274,11 @@ export default function DensitometryPage() {
     const p = toImage(e.clientX, e.clientY);
     if (s.kind === 'box') {
       if (s.moved) applyRegion(s.start, p);
-      else if (inRegion(p)) { setDividers((d) => [...d, p[0]].sort((a, b) => a - b)); setRes(null); setPair(null); }
+      else if (inRegion(p)) { setDividers((d) => [...d, p[0]].sort((a, b) => a - b)); invalidate(); }
     } else if (!s.moved) {
       setDividers((d) => d.filter((_, i) => i !== s.idx));
       setLabels((l) => l.filter((_, i) => i !== s.idx + 1));
-      setRes(null); setPair(null);
+      invalidate();
     }
   }
 
@@ -279,9 +293,11 @@ export default function DensitometryPage() {
   async function analyze(rowOverride?: number, regionOverride?: Box) {
     const rowIdx = rowOverride ?? rowIndex;
     const reg = regionOverride ?? region;
+    const my = ++seq.current;
     setBusy(true);
     setErr(null);
     setRes(null);
+    setPair(null);
     try {
       const anyLabel = labels.some((l) => l.trim());
       const useFullRow = fullRow && !!reg;
@@ -298,9 +314,11 @@ export default function DensitometryPage() {
       Object.assign(body, sourceBody());
       const r = await fetch('/api/experimental/densitometry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
+      if (my !== seq.current) return; // geometry or image changed while measuring
       if (!r.ok) throwDetail(d, r.status);
       captureDims();
       setUsedFullRow(useFullRow);
+      setUsedRowIndex(rowIdx);
       setRes(d);
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : 'Request failed');
@@ -374,7 +392,7 @@ export default function DensitometryPage() {
       lane_bounds: res.lanes.map((l) => [l.x0, l.x1] as [number, number]),
       lane_labels: anyLabel ? res.lanes.map((l) => l.label ?? '') : null,
       band_row: usedFullRow ? [reg[1], reg[3]] : null,
-      row_index: rowIndex,
+      row_index: usedRowIndex,
       res,
     });
     setPair(null);
@@ -382,6 +400,7 @@ export default function DensitometryPage() {
 
   async function analyzePair() {
     if (!target || !region) return;
+    const my = ++seq.current;
     setBusy(true);
     setErr(null);
     setPair(null);
@@ -395,6 +414,7 @@ export default function DensitometryPage() {
       };
       const r = await fetch('/api/experimental/densitometry/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
+      if (my !== seq.current) return; // geometry, target or image changed while pairing
       if (!r.ok) throwDetail(d, r.status);
       captureDims();
       setPair(d);
@@ -519,9 +539,9 @@ export default function DensitometryPage() {
 
           <div className="hb-dens-controls">
             <label className="hb-ask-check">Lane count <input value={laneCount} onChange={(e) => onLaneCount(e.target.value)} placeholder="e.g. 6" aria-label="Lane count" inputMode="numeric" /></label>
-            <label className="hb-ask-check">Row index <input value={rowIndex} onChange={(e) => setRowIndex(Number(e.target.value.replace(/\D/g, '') || 0))} aria-label="Row index" inputMode="numeric" /></label>
+            <label className="hb-ask-check">Row index <input value={rowIndex} onChange={(e) => { setRowIndex(Number(e.target.value.replace(/\D/g, '') || 0)); invalidate(); }} aria-label="Row index" inputMode="numeric" /></label>
             <label className="hb-ask-check">Band row{' '}
-              <select value={fullRow ? 'full' : 'detect'} onChange={(e) => { setFullRow(e.target.value === 'full'); setRes(null); }} aria-label="Band row mode" className="hb-dens-select">
+              <select value={fullRow ? 'full' : 'detect'} onChange={(e) => { setFullRow(e.target.value === 'full'); invalidate(); }} aria-label="Band row mode" className="hb-dens-select">
                 <option value="detect">detect inside the box</option>
                 <option value="full">use the full box height</option>
               </select>
@@ -644,7 +664,7 @@ export default function DensitometryPage() {
             <>
               <div style={{ fontFamily: MONO, fontSize: 11, color: 'var(--text-subtle)', marginTop: 6 }}>
                 Target set: region {target.region.join(', ')} · {target.lane_bounds.length} lanes
-                <button type="button" className="hb-search-clear" style={{ marginLeft: 8 }} onClick={() => { setTarget(null); setPair(null); }} aria-label="Clear target">×</button>
+                <button type="button" className="hb-search-clear" style={{ marginLeft: 8 }} onClick={() => { seq.current++; setTarget(null); setPair(null); }} aria-label="Clear target">×</button>
               </div>
               <p className="hb-live-note">
                 Now drag a box around the loading-control strip of the SAME image (e.g. β-actin). The lane dividers are kept; adjust

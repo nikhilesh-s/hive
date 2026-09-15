@@ -99,6 +99,13 @@ adversarial pass (strips closer than a band height on small images); `next
 build` clean with the dev server stopped; `scripts/demo_check.py` green
 (see session log for the count).
 
+**Hardening pass (2026-09-15 afternoon):** adversarial QA fixed refusal-invariant leaks (stability
+ranges and pair relatives on refused lanes), five HTTP 500 input classes, alpha polarity, antibody
+attribution theft in the B-2 backstop, p-prefix non-phospho names (pVHL/pRB/P-gp), two-site captions,
+MW source provenance, the caption/methods header split, caveats hidden under a "valid" card, pairing
+lane-offset warnings and frontend response races. Details and commits: session log "Window 4".
+Known limit: adjacent strips < ~3 band sigmas apart merge into one row without a warning.
+
 **Loading-control pairing (2026-09-15, browser-verified):** analyzer
 `pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
 record 4455, P-STAT3 strip ÷ β-actin strip gave normalized 0.6–0.8 / 1.0–1.1 /
