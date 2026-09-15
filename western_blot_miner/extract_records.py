@@ -130,7 +130,7 @@ def extract_panel(
     texts = panel_context.get("texts", {})
     user = (
         f"{OUTPUT_CONTRACT}\n\n--- FIGURE CAPTION ---\n{texts.get('caption','')}\n\n"
-        f"--- METHODS (excerpt) ---\n{texts.get('methods','')[:4000]}"
+        f"--- METHODS (excerpt) ---\n{texts.get('methods','')[:8000]}"
     )
     model_output = client.complete_json(SYSTEM_PROMPT, user, image_data_url=image_data_url)
     meta = ExtractionMeta(stage="deterministic+llm", backend=client.name, model=client.model, escalated=False)
