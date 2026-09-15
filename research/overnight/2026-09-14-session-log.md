@@ -198,3 +198,12 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Checked clean: 128 stored context blobs have line-start headers (no split leaks); 81 MP bomb PNG is a
   400 in 0.1 s; overlay PNG strokes land on returned lane/region coordinates; property harnesses rerun
   after the caveat changes (150 + 80 fixtures) hold; first fully green CI run on `7d92dfa`.
+- `9080341` treatment dose/duration parsed from the model's own wording are model readings, not
+  deterministic evidence.
+- `8f766fe` + `1d6c431` co-IP bait from printed lane labels typed image (not caption), and image quotes
+  windowed on the lane-label text only. Real-corpus sweep after all source-typing fixes: caption classes
+  0; only 40 U+2011 hyphen variants flagged by the sweep's stricter normaliser.
+- Browser state machine (pairing): new record clears the target and section 4; lane-count change after
+  setting a target gives "target has 6 lanes, control has 5"; diagnostic mode disables pairing with a hint.
+- `29bf167` CI lint failure on 9080341 (unescaped apostrophes from 0396aee). Cause of the miss: local lint
+  was piped through `tail`, hiding the exit code. Lint is now always run with pipefail.
