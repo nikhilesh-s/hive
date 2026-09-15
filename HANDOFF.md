@@ -162,11 +162,13 @@ like "Santa Cruz sc-398486" / "abcam ab108629" are found; "T24", "HEK 293 CST", 
 record_id paired with another record's stable_row_key. Known, not fixed (would need synonym expansion):
 pSTAT3 / beta-actin / SQSTM1 / ERK1/2 / 4E-BP1 spellings return nothing.
 
-**Tests (latest):** densitometry 116 checks · api 186 passed / 11 skipped · miner
+**Tests (latest):** densitometry 116 checks · api 192 passed / 11 skipped · miner
 pytest 133 · demo_check 19 PASS / 2 WARN / 0 FAIL · biology / reconcile 21 / extract 10 / pipeline 13 /
-stable-row-key 34 green · tsc and lint clean.
+stable-row-key 34 green · benchmark 34/34 · DB access matrix 11 · tsc, lint and next build clean.
 
-**EXACT NEXT TASK:** the Wednesday package is feature-complete and hardened. Before the demo:
+**EXACT NEXT TASK (after the 2026-09-15 final hardening window):** the package is frozen and green. Before
+the demo, run the stack per `research/UCSF_DEMO_2026-09-09.md`, run `scripts/demo_check.py` (expect 0 FAIL)
+and rehearse step 9 (4455 valid, beta-actin pairing warning, 4686 refused). Everything below still holds:
 (1) pull `experimental/ucsf-demo-2026-09-09`, start the stack per
 `research/UCSF_DEMO_2026-09-09.md`, run `scripts/demo_check.py` (expect 0 FAIL) and rehearse step 9
 (4455 valid, beta-actin pairing warning, 4686 refused); restart the API after any Python change (no
