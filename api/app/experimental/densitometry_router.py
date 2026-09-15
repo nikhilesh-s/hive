@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import hashlib
 import sys
 from pathlib import Path
 
@@ -32,11 +33,19 @@ class DensitometryRequest(BaseModel):
     record_id: int | None = None
     live: bool = False                       # record_id refers to the live tier
     image_base64: str | None = Field(default=None, max_length=12_000_000)
+    # DIAGNOSTIC: equal-width slicing of the region into this many lanes.
     lanes: int | None = Field(default=None, ge=1, le=24)
     row_index: int = Field(default=0, ge=0, le=15)
     # Box around one blot strip, full-image pixels [x0, y0, x1, y1]; the UI
     # lets the researcher draw it so printed labels are excluded.
     region: list[int] | None = Field(default=None, min_length=4, max_length=4)
+    # Researcher-defined lanes, full-image pixels [[x0, x1], ...] inside the
+    # region, ordered left to right. The product path; `lanes` is the fallback.
+    lane_bounds: list[list[int]] | None = Field(default=None, min_length=1, max_length=24)
+    lane_labels: list[str] | None = Field(default=None, max_length=24)
+    # Re-run the integration over small geometry perturbations and report an
+    # envelope per lane (see densitometry.py).
+    stability: bool = True
 
 
 async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, dict]:
@@ -84,15 +93,19 @@ async def experimental_densitometry(request: Request, body: DensitometryRequest)
         if len(png) > MAX_IMAGE_BYTES:
             raise HTTPException(413, "image too large")
         source = {"upload": True}
-    lanes = body.lanes or default_lanes
+    lanes = None if body.lane_bounds else (body.lanes or default_lanes)
+    labels = [str(x)[:40] for x in body.lane_labels] if body.lane_labels else None
     loop = asyncio.get_running_loop()
     try:
         result = await loop.run_in_executor(
             None, lambda: densitometry.analyze(densitometry.decode_image(png), lanes=lanes,
                                                row_index=body.row_index,
-                                               region=tuple(body.region) if body.region else None))
+                                               region=tuple(body.region) if body.region else None,
+                                               lane_bounds=body.lane_bounds, lane_labels=labels,
+                                               stability=body.stability))
     except ValueError as e:
         raise HTTPException(400, str(e))
+    source["image_sha256"] = hashlib.sha256(png).hexdigest()
     result["source"] = source
     result["lanes_requested"] = lanes
     result["stored"] = False

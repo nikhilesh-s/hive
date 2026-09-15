@@ -15,6 +15,7 @@ and it runs offline, which is how the benchmark exercises the biology.
 from __future__ import annotations
 
 import hashlib
+import re
 from typing import Any, Optional
 
 from . import biology
@@ -50,6 +51,7 @@ from .evidence_record import (
 from .reconcile import Claim, ModClaim, reconcile_field, reconcile_modification
 from .resolve import ProteinResolver, LocalMapResolver
 from .supabase_loader import (
+    extract_antibody,
     extract_dose,
     extract_dose_series,
     extract_duration,
@@ -407,7 +409,25 @@ def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
 
     assoc = _association_confidence(ab, row_core, mod_fields)
     src = [Source(type="methods", rank=RANK_METHODS, text=text)] if text else []
-    mk = lambda v, c=0.9: EvidenceField.supported(v, c, src) if v else EvidenceField.missing()
+    # Deterministic backstop over the antibody's own (target-scoped) snippet.
+    # Ranked below the model's methods evidence and never above 0.6 confidence:
+    # a regex hit is weaker than a read of the sentence. It only fills a field
+    # the model left empty; a disagreeing model value stays the claim and the
+    # regex value is kept as a Candidate so reviewers can see the disagreement.
+    det = extract_antibody(text) if text else {}
+    det_src = [Source(type="deterministic", rank=RANK_MODEL_TARGET, text=text)]
+    _same = lambda a, b: re.sub(r"[\s#,]", "", str(a)).lower() == re.sub(r"[\s#,]", "", str(b)).lower()
+
+    def mk(v, c=0.9, det_v=None):
+        if v:
+            field = EvidenceField.supported(v, c, src)
+            if det_v and not _same(v, det_v):
+                field.candidates.append(Candidate(value=det_v, source_type="deterministic",
+                                                  rank=RANK_MODEL_TARGET, confidence=0.6, evidence=det_src))
+            return field
+        if det_v:
+            return EvidenceField.supported(det_v, 0.6, det_src)
+        return EvidenceField.missing()
     ab_mod = biology.antibody_modification(ab.get("target", ""))
     phospho_specific = ab.get("phospho_specific")
     if phospho_specific is None:
@@ -415,10 +435,10 @@ def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
     return AntibodyInfo(
         role=ab.get("role", "detection"),
         antibody_target=mk(ab.get("target")),
-        vendor=mk(vendor),
-        catalog_number=mk(catalog, detection_conf),
-        clone=mk(ab.get("clone")),
-        dilution=mk(ab.get("dilution")),
+        vendor=mk(vendor, det_v=det.get("vendor")),
+        catalog_number=mk(catalog, detection_conf, det_v=det.get("catalog_number")),
+        clone=mk(ab.get("clone"), det_v=det.get("clone")),
+        dilution=mk(ab.get("dilution"), det_v=det.get("dilution")),
         phospho_specific=EvidenceField.supported(bool(phospho_specific), 0.85, src)
         if ab.get("target") else EvidenceField.missing(),
         detection_confidence=round(detection_conf, 2),

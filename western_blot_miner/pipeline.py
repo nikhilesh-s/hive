@@ -255,8 +255,31 @@ def run_records_stage(summary: dict, use_cache: bool = True, client=None, resolv
     }
 
 
+# Headers written by pdf_preprocess.build_text_context; split on them verbatim.
+_CAPTION_HDR = "LIKELY_FIGURE_OR_CAPTION_CONTEXT:"
+_METHODS_HDR = "PAPER_SAMPLE_OR_METHODS_SNIPPETS:"
+
+
+def _split_text_context(text_context: str) -> tuple[str, str]:
+    """(caption, methods) from the retrieval blob, source text untouched.
+
+    Caption = the section under the caption header (up to the methods header).
+    Methods = everything else (preamble + methods snippets), so nothing is
+    dropped. No caption header -> caption "" and the whole blob stays methods.
+    """
+    start = text_context.find(_CAPTION_HDR)
+    if start == -1:
+        return "", text_context
+    body = start + len(_CAPTION_HDR)
+    end = text_context.find(_METHODS_HDR, body)
+    if end == -1:
+        end = len(text_context)
+    return text_context[body:end].strip(), (text_context[:start] + text_context[end:]).strip()
+
+
 def _panel_context(summary: dict, candidate: dict, text_context: str) -> dict:
     """Map an OpenCV candidate + its retrieved text into an extract_panel context."""
+    caption, methods = _split_text_context(text_context or "")
     return {
         "paper": {
             "paper_id": summary.get("paper_id"),
@@ -266,10 +289,9 @@ def _panel_context(summary: dict, candidate: dict, text_context: str) -> dict:
             "page": candidate.get("page"),
             "image_crop_ref": candidate.get("candidate_path"),
         },
-        # The PDF retrieval blob mixes caption + methods context; give it to the
-        # model as `methods`. Per-source modification claims still come from the
-        # antibody strings the model reports (rank-1 evidence).
-        "texts": {"caption": "", "methods": text_context},
+        # Caption and methods are routed separately so `figure_caption` source
+        # snippets are real caption text (rank 2), not relabelled methods.
+        "texts": {"caption": caption, "methods": methods},
     }
 
 
