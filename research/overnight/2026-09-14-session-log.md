@@ -239,3 +239,6 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   requests 200 (the only 4xx in the tab were the deliberate probes); /experimental/research opens an
   already-extracted paper with 17 LIVE · UNREVIEWED cards and a working evidence panel. CI green on adfcf81.
 - In progress: read-only paper-QA grounding/citation attack child.
+- Live-ingestion row conversion on today's code: rebuilt records for the three reviewed papers convert to
+  475 rows (the reviewed corpus count), all JSON-safe, carrying model_target / deterministic /
+  figure_caption / methods / image source types through the provenance JSON. CI green on 06cb4ff.
