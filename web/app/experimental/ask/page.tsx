@@ -20,12 +20,12 @@ const EXAMPLES = [
 ];
 
 function renderAnswer(text: string, cited: string[]) {
-  // Turn [E3] into an anchor to the evidence block.
-  return text.split(/(\[E\d+\])/g).map((part, i) => {
-    const m = /^\[(E\d+)\]$/.exec(part);
-    if (!m) return <span key={i}>{part}</span>;
-    const ok = cited.includes(m[1]);
-    return <a key={i} href={`#${m[1]}`} className={`hb-ask-cite${ok ? '' : ' is-bad'}`}>{part}</a>;
+  // Turn [E3] and [E1, E3] into anchors to the evidence blocks.
+  return text.split(/(\[E\d+(?:\s*,\s*E\d+)*\])/g).map((part, i) => {
+    if (!/^\[E\d+(?:\s*,\s*E\d+)*\]$/.test(part)) return <span key={i}>{part}</span>;
+    return part.slice(1, -1).split(',').map((s) => s.trim()).map((ref) => (
+      <a key={`${i}-${ref}`} href={`#${ref}`} className={`hb-ask-cite${cited.includes(ref) ? '' : ' is-bad'}`}>[{ref}]</a>
+    ));
   });
 }
 
