@@ -142,10 +142,10 @@ def build_evidence_record(
     sample = _sample_info(mc, caption)
 
     # ---- treatment (deterministic dose/duration; never invented) -----------
-    treatment = _treatment_info(mc)
+    treatment = _treatment_info(mc, caption, methods)
 
     # ---- antibodies with detection vs association confidence ---------------
-    antibodies = [_antibody_info(ab, core, mod_fields) for ab in antibodies_in]
+    antibodies = [_antibody_info(ab, core, mod_fields, caption, methods) for ab in antibodies_in]
 
     # ---- molecular weight: reported (text) vs expected (UniProt) -----------
     molecular_weight = _mw_info(caption, methods, res, core=core)
@@ -311,9 +311,14 @@ def _sample_info(mc, caption) -> SampleInfo:
     sample_val = mc.get("sample") or mc.get("cell_line")
     cell_line = mc.get("cell_line") or mc.get("sample")
     org = mc.get("organism")
-    src_sample = [Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, str(sample_val or "")))]
-    sample_f = EvidenceField.supported(sample_val, 0.9, src_sample) if sample_val else EvidenceField.missing()
-    cell_f = EvidenceField.supported(cell_line, 0.9, src_sample) if cell_line else EvidenceField.missing()
+
+    def src_for(v):
+        # A caption source must name the value; otherwise it is the model's claim.
+        if caption and str(v).lower() in caption.lower():
+            return [Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, str(v)))]
+        return [Source(type="model_target", rank=RANK_MODEL_TARGET, text=str(v))]
+    sample_f = EvidenceField.supported(sample_val, 0.9, src_for(sample_val)) if sample_val else EvidenceField.missing()
+    cell_f = EvidenceField.supported(cell_line, 0.9, src_for(cell_line)) if cell_line else EvidenceField.missing()
     if not org and cell_line:
         org = CELL_LINE_ORGANISM.get(str(cell_line).lower())
         if org:
@@ -323,7 +328,7 @@ def _sample_info(mc, caption) -> SampleInfo:
         else:
             organism_f = EvidenceField.missing()
     elif org:
-        organism_f = EvidenceField.supported(org, 0.85, src_sample)
+        organism_f = EvidenceField.supported(org, 0.85, src_for(org))
     else:
         organism_f = EvidenceField.missing()
     return SampleInfo(sample=sample_f, cell_line=cell_f, organism=organism_f,
@@ -372,7 +377,7 @@ def _series_fields(values: list[dict], ctx: str, det: list[Source],
     return value_f, unit_f
 
 
-def _treatment_info(mc) -> TreatmentInfo:
+def _treatment_info(mc, caption: str = "", methods: str = "") -> TreatmentInfo:
     ctx = mc.get("treatment_context") or ""
     name = mc.get("treatment_name")
     # Series-aware: enumerations ("10, 30 and 60 ug/ml", "0, 5, 10, 30, 60 min")
@@ -382,7 +387,7 @@ def _treatment_info(mc) -> TreatmentInfo:
     # "for the indicated times/doses" says the panel varies THAT quantity per
     # lane even when only one value is parseable -> never settle that scalar.
     # Kind-specific: a time course's single stimulus concentration stays settled.
-    src = [Source(type="figure_caption", rank=RANK_CAPTION, text=ctx)] if ctx else []
+    src = [_claim_source(ctx, caption, methods)[0]] if ctx else []
     det = [Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if ctx else []
     dose_f, dose_unit_f = _series_fields(
         doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)))
@@ -479,7 +484,7 @@ def _target_scoped_antibody(text: str, target: str) -> dict:
     }
 
 
-def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
+def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "") -> AntibodyInfo:
     text = ab.get("source", {}).get("text", "")
     vendor = ab.get("vendor")
     if vendor:
@@ -496,13 +501,16 @@ def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
     detection_conf = min(detection_conf, 0.98)
 
     assoc = _association_confidence(ab, row_core, mod_fields)
-    src = [Source(type="methods", rank=RANK_METHODS, text=text)] if text else []
+    claim_src, verbatim = _claim_source(text, caption, methods, methods_first=True)
+    src = [claim_src] if text else []
     # Deterministic backstop over the antibody's own (target-scoped) snippet.
+    # Only over text verified verbatim in the paper: a regex over the model's
+    # own paraphrase is not deterministic source evidence.
     # Ranked below the model's methods evidence and never above 0.6 confidence:
     # a regex hit is weaker than a read of the sentence. It only fills a field
     # the model left empty; a disagreeing model value stays the claim and the
     # regex value is kept as a Candidate so reviewers can see the disagreement.
-    det = _target_scoped_antibody(text, ab.get("target", "")) if text else {}
+    det = _target_scoped_antibody(text, ab.get("target", "")) if verbatim else {}
     det_src = [Source(type="deterministic", rank=RANK_MODEL_TARGET, text=text)]
     _same = lambda a, b: re.sub(r"[\s#,]", "", str(a)).lower() == re.sub(r"[\s#,]", "", str(b)).lower()
 
@@ -804,6 +812,27 @@ def _band_conf(c) -> float:
     if isinstance(c, (int, float)):
         return float(c)
     return {"high": 0.9, "medium": 0.6, "low": 0.3}.get(str(c).lower(), 0.6)
+
+
+_DASHES = re.compile("[\u2010-\u2015\u2212]")
+
+
+def _verbatim_in(snippet: str, text: str) -> bool:
+    """`snippet` occurs in `text` modulo whitespace runs, soft hyphens and dash variants."""
+    norm = lambda t: re.sub(r"\s+", " ", _DASHES.sub("-", (t or "").replace("\u00ad", ""))).strip()
+    snip = norm(snippet)
+    return bool(snip) and snip in norm(text)
+
+
+def _claim_source(text: str, caption: str, methods: str,
+                  methods_first: bool = False) -> tuple[Source, bool]:
+    """(Source typed by where `text` actually occurs, verbatim?). Text found in
+    neither caption nor methods is the model's own wording -> model_target."""
+    chans = [("figure_caption", RANK_CAPTION, caption), ("methods", RANK_METHODS, methods)]
+    for typ, rank, body in (chans[::-1] if methods_first else chans):
+        if _verbatim_in(text, body):
+            return Source(type=typ, rank=rank, text=text), True
+    return Source(type="model_target", rank=RANK_MODEL_TARGET, text=text), False
 
 
 def _snippet(text: str, needle: str, width: int = 70) -> str:
