@@ -54,3 +54,28 @@ Start execution, not another broad planning pass:
 5. after each coherent block, test, commit, push, update this log and `HANDOFF.md`, then recursively choose the next highest-value task.
 
 The next Claude window should not spend time re-deriving this plan unless repository state materially contradicts it.
+
+## Window 1 execution log (2026-09-14 night)
+
+Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 skipped, tsc clean.
+
+### Block 1 — commit `7238a8f` (pushed)
+- Densitometry v0.2: region propagation fixed (proxy dropped it); `lane_bounds`/`lane_labels`
+  first-class; equal-width/auto = diagnostics; explicit contract; clip / SNR / geometry gates;
+  refusal states with `relative: null`; deterministic perturbation envelope; method + threshold
+  metadata; sha256 of the image; UI rebuilt (drag region, dividers, labels, overlay, quality
+  card, ranges, JSON/CSV export). Tests 61/61 + API 10 (164 total).
+- B-1 caption/methods split (`_split_text_context`, 2 tests). B-2 antibody backstop (4 tests).
+- Browser-verified on the local stack (API :8010 upload path, web :3000): clipped reference lane
+  → "Quantification refused" card, no relative column; 4 clean lanes → ranges 1.0 / 0.5 / 0.2–0.3 / 0.0,
+  ranking stable, overlay matches returned geometry.
+- Sub-agents used: Biology lead (B-1/B-2), Densitometry UI lead (page/proxy/css); orchestrator
+  owned analyzer/router/tests/git.
+
+### Block 2 — validation docs (this commit)
+- `scripts/experiments/densitometry_clip_study.py` → `research/experiments/D2_clip_threshold_study.md`
+- `scripts/experiments/densitometry_real_crops.py` → `research/experiments/D5_real_crops_refusal.md`
+  (21/21 crops have a clipped row past the gate; 78/112 rows refused, 15 ok, 19 warning; 1 refused for
+  reference instability). Auto geometry is diagnostic; ~0.5 s per analysis on the largest crop.
+- D1 report retired with a header; architecture doc experiment table updated; HANDOFF top block added.
+- Adversarial reviewer (Lead Q) running on densitometry + B-1/B-2; findings land in the next block.

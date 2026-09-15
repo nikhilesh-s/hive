@@ -1,5 +1,17 @@
 # D1 — densitometry vs reviewed band states
 
+> **RETIRED 2026-09-14 — not a densitometry quality metric.** This run compared
+> an automatic-placement prototype (whole-crop auto rows, equal-width lanes,
+> no region, thresholds 0.35 / 0.20 chosen by hand) against the model's own
+> categorical band read of the same crop, paired by index. 404 of the 424
+> scored lanes are `present`, so answering "present" for every lane scores
+> 95.3%; the prototype scored 59.7% and recovered 6 of 20 absent lanes. It
+> predates region propagation (D-1) and researcher-defined lanes (D-2). Do not
+> quote 59.7% anywhere. The replacement checks are
+> `research/experiments/D2_clip_threshold_study.md` (synthetic, known ratios)
+> and `research/experiments/D5_real_crops_refusal.md` (what v0.2 refuses on the
+> reviewed crops). Kept for the record only.
+
 Records 93 · crops 21 · lanes scored 424 · agree 253 · disagree 171 · agreement **0.597** · uncertain lanes 30 · skipped 3
 
 present ⇒ relative ≥ 0.35; absent ⇒ relative < 0.2; band row = i-th detected row for the i-th record on the crop.

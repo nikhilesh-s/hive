@@ -43,7 +43,7 @@ makes the beta credible.
         │           deterministic retrieval over reviewed (+ live) → numbered evidence blocks         │
         │           → Claude answers ONLY from the blocks, cites [E#]; citations validated            │
         │                                                                                            │
-        │ MEASURE   POST /experimental-densitometry {record_id | image, lanes?, region?}              │
+        │ MEASURE   POST /experimental-densitometry {record_id | image, region, lane_bounds, labels}  │
         │           OpenCV: background opening → band row → lane boxes → relative intensity           │
         │           uncalibrated, never stored                                                        │
         └──────────────┬──────────────────────────────┬──────────────────────────────────────────────┘
@@ -75,7 +75,10 @@ Design rules that keep the beta honest while adding live ingestion:
 - **Densitometry is a reading aid, not data.** Relative within one image,
   disclaimer on every response, `stored: false`, FUTURE intensity columns
   stay NULL. The `/learn` statement "HiveBlot does not measure intensity"
-  remains true for Evidence Records.
+  remains true for Evidence Records. v0.2 (2026-09-14): researcher-drawn
+  region + lane bounds, per-lane quality state, clipped-core / no-signal /
+  unstable-reference refusals (`relative: null`), perturbation envelope,
+  method + threshold metadata in every response, JSON/CSV export.
 
 Files: `api/app/experimental/{ingest,router,ask,densitometry_router}.py`,
 `api/app/valency.py`, `western_blot_miner/{fulltext,densitometry}.py`,
@@ -132,7 +135,7 @@ down → PMC search fills the list automatically (`sources_used` shows which).
 ```bash
 cd api && ../.venv/bin/python -m pytest -q                       # 147 passed (+ RLS matrix below)
 HIVE_DB_TEST_URL=$(.venv/bin/python scripts/local_db.py test-url) .venv/bin/python -m pytest api/tests/test_db_access_matrix.py -v   # 10, incl. live tier
-.venv/bin/python western_blot_miner/tests/test_densitometry.py   # 20/20 synthetic-blot checks
+.venv/bin/python western_blot_miner/tests/test_densitometry.py   # 61/61 synthetic-blot checks (v0.2: lanes, gates, stability)
 cd web && npx tsc --noEmit && npm run lint                       # clean
 ```
 
@@ -149,7 +152,9 @@ ratios, inversion, saturation, stacked rows, text-row demotion, region boxes.
 | ID | Question | Script | Needs | Output |
 |---|---|---|---|---|
 | **L1** | On the 3 reviewed DOIs, how well does the live pipeline agree with the human-reviewed rows, lane by lane (target, modification, experiment type, sample, catalog #, band state)? | `scripts/experiments/live_ingest_eval.py` | model key + network | `research/experiments/L1_live_ingest_eval.{json,md}` |
-| **D1** | Does uncalibrated densitometry contradict the reviewed categorical band states? | `scripts/experiments/densitometry_vs_bands.py` | nothing | `research/experiments/D1_densitometry_vs_bands.{json,md}` |
+| **D1** (retired 2026-09-14) | Does uncalibrated densitometry contradict the reviewed categorical band states? | `scripts/experiments/densitometry_vs_bands.py` | nothing | `research/experiments/D1_densitometry_vs_bands.{json,md}` — not a quality metric, see its header |
+| **D2** | Where do the clip / stability gates sit relative to the ratio error on fixtures with known ratios? | `scripts/experiments/densitometry_clip_study.py` | nothing | `research/experiments/D2_clip_threshold_study.{json,md}` |
+| **D5** | On the 21 reviewed crops, does v0.2 refuse where the pixels are clipped / signal-free / unstable? | `scripts/experiments/densitometry_real_crops.py` | nothing | `research/experiments/D5_real_crops_refusal.{json,md}` |
 | **V1** | For 10 blot-heavy queries on UCSF's targets, does Valency return open-access, PMC-resolvable DOIs at better rank than PMC search alone? | manual via `/experimental/papers/search` with `source=valency` vs `pmc`, count PMC-resolvable DOIs in the top 5 | Valency token | table in this doc |
 | **Q1** | For 10 questions with known answers in the reviewed corpus, does /ask cite the right record and never contradict a status? | manual via `/experimental/ask`; record cited refs vs expected record ids | model key | table in this doc |
 
