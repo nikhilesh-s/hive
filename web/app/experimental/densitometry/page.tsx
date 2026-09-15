@@ -69,6 +69,18 @@ function seedDividers(region: Box, n: number): number[] {
   const w = region[2] - region[0];
   return Array.from({ length: Math.max(0, n - 1) }, (_, i) => Math.round(region[0] + (w * (i + 1)) / n));
 }
+// FastAPI validation errors arrive as [{loc, msg}, ...]; show "field: message" lines, not raw JSON.
+function readableDetail(detail: unknown, status: number): string {
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    return detail.map((e) => {
+      const loc = Array.isArray(e?.loc) ? e.loc.filter((x: unknown) => x !== 'body').join(' → ') : '';
+      return loc ? `${loc}: ${e?.msg ?? 'invalid'}` : String(e?.msg ?? e);
+    }).join('; ');
+  }
+  return detail ? JSON.stringify(detail) : `Backend returned ${status}`;
+}
+
 function csvCell(v: unknown): string {
   let s = v == null ? '' : String(v);
   // researcher text (labels, reasons) must not run as a spreadsheet formula
@@ -194,7 +206,7 @@ export default function DensitometryPage() {
         const r = await fetch('/api/experimental/densitometry/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_base64: url }) });
         const d = await r.json();
         if (my !== seq.current) return; // another image was loaded meanwhile
-        if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : d.error || `Backend returned ${r.status}`);
+        if (!r.ok) throw new Error(readableDetail(d.detail ?? d.error, r.status));
         setUpload(d.png_base64);
         setImgSrc(d.png_base64);
         resetGeometry(true);
@@ -286,8 +298,7 @@ export default function DensitometryPage() {
   const canMeasure = !!imgSrc && !busy && (diagnostic || !!region);
   const sourceBody = () => upload ? { image_base64: upload } : { record_id: Number(recordId), live };
   const throwDetail = (d: { detail?: unknown; error?: unknown }, status: number): never => {
-    const detail = d.detail ?? d.error;
-    throw new Error(typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : `Backend returned ${status}`);
+    throw new Error(readableDetail(d.detail ?? d.error, status));
   };
 
   async function analyze(rowOverride?: number, regionOverride?: Box) {
@@ -453,8 +464,9 @@ export default function DensitometryPage() {
         <h1 className="hb-page-h1">Experimental densitometry</h1>
         <p className="hb-page-lead">
           Pixel-derived, background-corrected band intensity per lane, relative to the strongest lane in the
-          <strong> same image</strong>. No units, not a protein amount, not comparable across images, not
-          loading-control normalized. A figure crop is not raw data: exposure, clipping and re-encoding are unknown,
+          <strong> same image</strong>. No units, not a protein amount, not comparable across images. The optional
+          loading-control ratio below divides two readings of the same image and is still not a protein amount.
+          A figure crop is not raw data: exposure, clipping and re-encoding are unknown,
           so treat this as a reading aid, never as a quantification. Nothing from this page is stored anywhere.
         </p>
         <ExperimentalNav />
@@ -469,6 +481,13 @@ export default function DensitometryPage() {
         </div>
         <p className="hb-live-note">…or upload a panel image: <input type="file" accept="image/png,image/jpeg,image/tiff,.tif,.tiff,image/bmp,image/webp" onChange={onFile} /> <span style={{ color: 'var(--text-subtle)' }}>(PNG, JPEG, or a TIFF straight from the imager — 16-bit is shown and measured as 8-bit, no stretch)</span></p>
       </section>
+
+      {!imgSrc && err && (
+        <section className="hb-page-section">
+          {/* a failed first upload or crop load has no image section to show its error in */}
+          <p className="hb-live-error" role="alert">{err}</p>
+        </section>
+      )}
 
       {imgSrc && (
         <section className="hb-page-section">
@@ -560,7 +579,7 @@ export default function DensitometryPage() {
           <div className="hb-live-form" style={{ marginTop: 12 }}>
             <button type="button" onClick={() => analyze()} disabled={!canMeasure}>{busy ? 'Measuring…' : 'Measure'}</button>
           </div>
-          {err && <p className="hb-live-error">{err}</p>}
+          {err && <p className="hb-live-error" role="alert">{err}</p>}
         </section>
       )}
 
