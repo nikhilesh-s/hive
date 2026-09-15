@@ -137,11 +137,31 @@ export default function DensitometryPage() {
     const f = e.target.files?.[0];
     if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const url = String(reader.result);
-      setUpload(url);
-      setImgSrc(url);
-      resetGeometry();
+      const browserShows = /^image\/(png|jpeg|gif|webp|bmp)$/.test(f.type);
+      if (browserShows) {
+        setUpload(url);
+        setImgSrc(url);
+        resetGeometry();
+        return;
+      }
+      // TIFF and other imager exports: ask the backend for an 8-bit PNG preview
+      // and measure that PNG (identical to what the analyzer derives itself).
+      setBusy(true);
+      setErr(null);
+      try {
+        const r = await fetch('/api/experimental/densitometry/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image_base64: url }) });
+        const d = await r.json();
+        if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : d.error || `Backend returned ${r.status}`);
+        setUpload(d.png_base64);
+        setImgSrc(d.png_base64);
+        resetGeometry();
+      } catch (e2) {
+        setErr(e2 instanceof Error ? e2.message : 'Could not decode that file');
+      } finally {
+        setBusy(false);
+      }
     };
     reader.readAsDataURL(f);
   }
@@ -341,7 +361,7 @@ export default function DensitometryPage() {
           <label className="hb-ask-check"><input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> live tier</label>
           <button type="button" onClick={loadRecord} disabled={!/^\d+$/.test(recordId.trim())}>Load crop</button>
         </div>
-        <p className="hb-live-note">…or upload a panel image: <input type="file" accept="image/png,image/jpeg" onChange={onFile} /></p>
+        <p className="hb-live-note">…or upload a panel image: <input type="file" accept="image/png,image/jpeg,image/tiff,.tif,.tiff,image/bmp,image/webp" onChange={onFile} /> <span style={{ color: 'var(--text-subtle)' }}>(PNG, JPEG, or a TIFF straight from the imager — 16-bit is shown and measured as 8-bit, no stretch)</span></p>
       </section>
 
       {imgSrc && (

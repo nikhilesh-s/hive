@@ -168,3 +168,30 @@ def test_explicit_band_row_is_used_and_validated(client):
     for bad in ([70, 20], [80, 81], [200, 300]):
         r = client.post("/experimental-densitometry", json={**body, "band_row": bad}, headers=AUTH)
         assert r.status_code == 400, bad
+
+
+def test_tiff_preview_returns_8bit_png_and_measures_the_same(client):
+    import cv2
+
+    img16 = (np.full((90, 300), 230, dtype=np.uint16) * 257)
+    img16[38:52, 20:130] = 120 * 257
+    img16[38:52, 170:280] = 180 * 257
+    ok, buf = cv2.imencode(".tiff", img16)
+    assert ok
+    b64 = base64.b64encode(buf.tobytes()).decode()
+    r = client.post("/experimental-densitometry/preview", json={"image_base64": b64}, headers=AUTH)
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["png_base64"].startswith("data:image/png;base64,") and d["width"] == 300 and d["height"] == 90
+    assert len(d["source_sha256"]) == 64 and d["stored"] is False
+    png = base64.b64decode(d["png_base64"].split(",", 1)[1])
+    gray = cv2.imdecode(np.frombuffer(png, np.uint8), cv2.IMREAD_UNCHANGED)
+    assert gray.dtype == np.uint8 and int(gray[45, 60]) == 120
+    # measuring the preview PNG equals measuring the TIFF directly
+    body = {"lane_bounds": [[0, 150], [150, 300]], "stability": False}
+    ra = client.post("/experimental-densitometry", json={"image_base64": d["png_base64"], **body}, headers=AUTH)
+    rb = client.post("/experimental-densitometry", json={"image_base64": b64, **body}, headers=AUTH)
+    assert ra.status_code == 200 and rb.status_code == 200, (ra.text, rb.text)
+    assert [l["corrected"] for l in ra.json()["lanes"]] == [l["corrected"] for l in rb.json()["lanes"]]
+    assert client.post("/experimental-densitometry/preview", json={"image_base64": "zz"}, headers=AUTH).status_code == 400
+    assert client.post("/experimental-densitometry/preview", json={"image_base64": b64}).status_code == 401
