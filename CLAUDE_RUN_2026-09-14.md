@@ -1,7 +1,7 @@
 # Claude run launcher — UCSF densitometry push
 
-**Active branch:** `experimental/ucsf-demo-2026-09-09`  
-**Founder hard stop:** Tuesday, 2026-09-15 at 7:00 PM America/Los_Angeles  
+**Active branch:** `experimental/ucsf-demo-2026-09-09`\
+**Founder hard stop:** Tuesday, 2026-09-15 at 7:00 PM America/Los_Angeles\
 **Primary execution plan:** `research/OVERNIGHT_ORCHESTRATOR_2026-09-14.md`
 
 This file is the short launcher for every Claude Code window used on this push. It exists so a fresh window can resume immediately instead of re-planning the repository.

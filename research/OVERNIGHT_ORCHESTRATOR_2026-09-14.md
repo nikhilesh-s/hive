@@ -1,7 +1,7 @@
 # HiveBlot overnight orchestrator — densitometry-first push — 2026-09-14 → 2026-09-15
 
-**Target ship:** Wednesday, 2026-09-16  
-**Single active working branch for this push:** `experimental/ucsf-demo-2026-09-09`  
+**Target ship:** Wednesday, 2026-09-16\
+**Single active working branch for this push:** `experimental/ucsf-demo-2026-09-09`\
 **Primary objective:** make the next UCSF package feel like a meaningful product step, led by a real first-generation experimental densitometry workflow, while fixing the two highest-leverage biology plumbing issues and simplifying the repository around one active integration branch.
 
 This brief is intentionally aggressive. It should use roughly 80% of one active five-hour Claude window on useful work and preserve ~20% for Nik's review/fixes. It is not permission to fabricate scientific confidence, silently mutate the reviewed corpus, or deploy irreversible production changes.
