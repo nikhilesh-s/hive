@@ -187,7 +187,7 @@ def retrieve_relevant_text_snippets(
     """Retrieve text snippets around biological sample and method keywords."""
     text = normalize_ws(full_text)
     low = text.lower()
-    snippets = []
+    windows: list[list[int]] = []
 
     for term in query_terms:
         term_low = term.lower()
@@ -196,15 +196,38 @@ def retrieve_relevant_text_snippets(
             idx = low.find(term_low, start)
             if idx == -1:
                 break
-            snippet_start = max(0, idx - window)
-            snippet_end = min(len(text), idx + len(term) + window)
-            snippets.append(text[snippet_start:snippet_end])
+            windows.append([max(0, idx - window), min(len(text), idx + len(term) + window)])
             start = idx + len(term_low)
-            if len(snippets) >= max_snippets * 3:
+            if len(windows) >= max_snippets * 3:
                 break
 
-    deduped = _dedupe_prefix(snippets)
-    return "\n\n".join(f"- {snippet}" for snippet in deduped[:max_snippets])
+    # Merge overlapping windows: two keywords in one sentence used to yield two
+    # near-identical snippets (prefix dedupe keys only the first 250 chars),
+    # spending the section budget twice on the same text. First-appearance
+    # order of the merged spans is kept.
+    merged: list[list[int]] = []
+    for w in windows:
+        for m in merged:
+            if w[0] <= m[1] and m[0] <= w[1]:
+                m[0], m[1] = min(m[0], w[0]), max(m[1], w[1])
+                break
+        else:
+            merged.append(list(w))
+    changed = True
+    while changed:                      # a widened span can now touch an earlier one
+        changed = False
+        for i in range(len(merged)):
+            for j in range(i + 1, len(merged)):
+                a, b = merged[i], merged[j]
+                if b[0] <= a[1] and a[0] <= b[1]:
+                    a[0], a[1] = min(a[0], b[0]), max(a[1], b[1])
+                    del merged[j]
+                    changed = True
+                    break
+            if changed:
+                break
+    snippets = _dedupe_prefix(text[a:b] for a, b in merged)
+    return "\n\n".join(f"- {snippet}" for snippet in snippets[:max_snippets])
 
 
 # Antibody reagent sentences ("primary antibodies against p-STAT3 (Tyr705;

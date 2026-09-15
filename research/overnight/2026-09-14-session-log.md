@@ -216,3 +216,16 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Soft-saturation probe (not a code defect, documented limit): a tanh exposure knee compresses ratios
   (0.5 / 0.25 / 0.1 -> 0.67 / 0.37 / 0.17) with 0% clipped pixels and a "valid" card; core flatness does
   not separate it from clean or real strips, so no gate. Only a dilution-series calibration (D-7) can bound it.
+- Live (non-replay) extraction of the demo panel (claude_cli / sonnet, one model call, cached): biology
+  correct (Ser727 / Tyr705 phospho, T-Stat3 total, beta-actin unmodified), 0 provenance violations, but
+  every antibody catalog empty. Root cause was retrieval, not the backstop: the context blob was cut once
+  at 12000 chars with methods last, so 50/128 stored contexts had no methods snippets; reagent sentences
+  were never targeted; extract_panel sent only 4000 methods chars.
+- `8dd8735` per-section context budgets, reagent snippets first, methods snippets ahead of the preamble,
+  8000-char methods prompt, backstop over verbatim methods with dash-variant folding.
+- Follow-up (this block): the reagent sentence was retrieved twice (overlapping keyword windows), so the
+  backstop abstained as if two antibodies; identical / prefix scopes now count once and overlapping
+  retrieval windows merge. Replaying the cached live output on the rebuilt context: beta-actin rows recover
+  CST #4967, 1:2000, Cell Signaling with a deterministic source quoting "beta‑actin (1:2,000; CST #4967)";
+  phospho and total STAT3 rows abstain (one sentence names both). Stored-corpus sweep: 0 value changes.
+  This is B-2's original acceptance case, now met on the live path.
