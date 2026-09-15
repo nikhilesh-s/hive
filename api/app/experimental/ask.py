@@ -25,6 +25,7 @@ from pathlib import Path as _Path
 from ..bio_query import STOPWORDS, generate_bio_sql
 from ..config import settings
 from ..db import run_readonly_query
+from ..search_service import _experiment_key
 from ..schemas import WesternBlotRecord, review_reasons_from_flags
 from ..sql_guard import guard_and_limit_sql
 
@@ -35,6 +36,7 @@ if str(_REPO) not in sys.path:  # western_blot_miner (provider plumbing) lives a
     sys.path.insert(0, str(_REPO))
 
 MAX_EXPERIMENTS = 12
+_ROW_CAP = 300
 # [E2] and the grouped form [E1, E3]; each ref is checked against the blocks shown.
 _CITE_RE = re.compile(r"\[(E\d+(?:\s*,\s*E\d+)*)\]")
 _DELIMS = str.maketrans("[]<>", "()()")
@@ -151,7 +153,13 @@ async def _rows_for(q: str, table: str) -> list[dict]:
     sql = generate_bio_sql(q, table)
     if " WHERE " not in sql:  # nothing to filter on: never return the whole table as "evidence"
         return []
-    return await run_readonly_query(guard_and_limit_sql(sql, 300, table))
+    rows = await run_readonly_query(guard_and_limit_sql(sql, _ROW_CAP, table))
+    if len(rows) >= _ROW_CAP:
+        # The cap cut the last experiment mid-lanes (a 384-row paper): a partial
+        # lane strip would misstate its design to the model, so drop it.
+        last = _experiment_key(rows[-1])
+        rows = [r for r in rows if _experiment_key(r) != last] or rows
+    return rows
 
 
 async def _table_rows(terms: list[str], doi: str | None, table: str) -> list[dict]:

@@ -194,6 +194,16 @@ def test_no_filterable_terms_never_reads_the_whole_table(monkeypatch):
     assert seen == []
 
 
+def test_row_cap_never_shows_a_partial_experiment(monkeypatch):
+    rows = [dict(ROWS[2], id=i, stable_row_key=f"e{i // 7}:{i}") for i in range(300)]   # e42 has 6 of 7 lanes
+
+    async def fake_query(sql):
+        return rows
+    monkeypatch.setattr(ask, "run_readonly_query", fake_query)
+    got = _run(ask._rows_for("GAPDH", "western_blot_records"))
+    assert len(got) == 294 and not any(r["stable_row_key"].startswith("e42:") for r in got)
+
+
 def test_retrieval_failure_is_an_error_not_no_evidence(monkeypatch):
     async def reviewed_down(sql):
         raise RuntimeError("connection refused")
