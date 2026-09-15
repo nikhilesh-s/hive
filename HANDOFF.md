@@ -115,6 +115,12 @@ text is verbatim there, otherwise "model reading" (UI label `0396aee`); caption 
 longer read as phospho (`e6e86ad`); treatment dose/duration from model wording are model readings
 (`9080341`); co-IP bait from lane labels is image evidence with lane-only quotes (`8f766fe`,
 `1d6c431`); CI lint fix for unescaped JSX apostrophes (`29bf167`) — run lint with pipefail.
+B-2 on the LIVE path (`8dd8735` + follow-up): a live claude_cli extraction of the demo panel showed
+every antibody catalog empty because the context blob truncated the methods snippets away (50/128
+stored contexts had none) and never targeted reagent sentences. Per-section budgets, reagent snippets
+first, a methods-scoped verbatim backstop with dash folding, and repeated-sentence dedupe now recover
+beta-actin CST #4967 / 1:2000 with a deterministic quote; phospho/total STAT3 abstain. Stored corpus
+values unchanged. Pre-warmed papers keep their stored contexts; a re-extraction would use the new ones.
 
 **Loading-control pairing (2026-09-15, browser-verified):** analyzer
 `pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
