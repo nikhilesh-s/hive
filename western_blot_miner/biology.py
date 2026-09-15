@@ -132,6 +132,14 @@ P_NUMBER_PROTEINS = {
     "p130", "p107", "p120", "p62", "p45", "p90", "p70", "p110",
 }
 
+# Proteins whose leading "P-"/"t-" is part of the NAME, not a phospho/total
+# prefix: P-cadherin (CDH3), P-selectin (SELP), P-glycoprotein / P-gp (ABCB1),
+# t-PA (PLAT). Matched case-insensitively on the first token.
+NAME_PREFIX_PROTEINS = {"p-cadherin", "p-selectin", "p-glycoprotein", "p-gp", "t-pa"}
+# p-names that are never phosphorylation by name: pVHL (von Hippel-Lindau),
+# pRB (retinoblastoma), Pgp (ABCB1), plus the hyphenated names above.
+NON_PHOSPHO_P_NAMES = NAME_PREFIX_PROTEINS | {"pvhl", "prb", "pgp"}
+
 # --------------------------------------------------------------------------- #
 # Regexes
 # --------------------------------------------------------------------------- #
@@ -179,7 +187,7 @@ _INPUT_BLOT = re.compile(r"\binput\b", re.IGNORECASE)
 
 # Catalog number: "#9145", "cat. no. 9145", "ab32157", "sc-482".
 _CATALOG = re.compile(
-    r"(?:cat(?:alog)?\.?\s*(?:no\.?|#|number)?\s*|#)\s*([A-Za-z]{0,3}[-\s]?\d{3,7})",
+    r"(?:\bcat(?:alog)?\.?\s*(?:no\.?|#|number)?\s*|#)\s*([A-Za-z]{0,3}[-\s]?\d{3,7})",
     re.IGNORECASE,
 )
 _CATALOG_VENDORCODE = re.compile(r"\b(ab\d{3,7}|sc[-\s]?\d{3,7})\b", re.IGNORECASE)
@@ -453,10 +461,11 @@ def _core_symbol(target: str) -> str:
     # Greek letters -> spelled-out forms so "β-actin" reaches the alias map /
     # UniProt as "beta-actin" (raw wording is preserved elsewhere).
     s = s.replace("β", "beta").replace("α", "alpha")
-    # phospho word, or a p-/t- prefix with a REQUIRED separator.
-    s = re.sub(r"^(phospho[-\s]?|[pt][-\s])", "", s, flags=re.IGNORECASE)
-    # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
-    s = re.sub(r"^p([A-Z]{2,})", r"\1", s)
+    if re.split(r"[\s(]+", s.strip())[0].lower() not in NAME_PREFIX_PROTEINS:  # P-cadherin, t-PA keep their prefix
+        # phospho word, or a p-/t- prefix with a REQUIRED separator.
+        s = re.sub(r"^(phospho[-\s]?|[pt][-\s])", "", s, flags=re.IGNORECASE)
+        # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
+        s = re.sub(r"^p([A-Z]{2,})", r"\1", s)
     tokens = re.split(r"[\s(]+", s.strip())
     core = tokens[0] if tokens else ""
     # Glue a trailing pure-isoform token (digits / slashes): "ERK 1/2" -> "ERK1/2".
@@ -473,9 +482,13 @@ def _target_has_phospho_marker(target: str) -> bool:
     comes from the per-row target label, not the shared caption.
     """
     low = target.lower()
-    token = _token(target)
-    if token in P_NUMBER_PROTEINS or re.fullmatch(r"p\d{1,3}[a-z/]*", token):
-        return False  # p53, p38, p21 ... never phospho by name alone
+    # Guard on the UN-stripped first token: bare p38/p53 are never phospho by
+    # name, but an explicit marker on them ("p-p38", "phospho-p38") still is.
+    first = re.split(r"[\s(]+", low.strip())[0]
+    if first in P_NUMBER_PROTEINS or re.fullmatch(r"p\d{1,3}[a-z/0-9]*", first):
+        return False  # p53, p38, p21, p27Kip1, p70S6K ... never phospho by name alone
+    if first in NON_PHOSPHO_P_NAMES:
+        return False  # pVHL, pRB, P-glycoprotein ... protein names, not phospho
     if "phospho" in low:
         return True
     if re.search(r"\bp-\s?[A-Za-z]", target):  # p-STAT3, p-AKT
@@ -500,13 +513,18 @@ def _scoped_site(core: str, *texts: str) -> Optional[dict]:
             continue
         low = text.lower()
         idx = low.find(core_low)
+        sites = {}
         while idx != -1:
             found_core = True
             window = text[max(0, idx - 10): idx + len(core) + 45]
             site = parse_phospho_site(window)
             if site:
-                return site
+                sites.setdefault((site["residue"], site["position"]), site)
             idx = low.find(core_low, idx + 1)
+        if len(sites) > 1:
+            return None  # "p-STAT3 Ser727 and p-STAT3 Tyr705": no single site
+        if sites:
+            return next(iter(sites.values()))
     if found_core:
         return None  # core present but no site next to it -> don't guess
     # core absent from all texts: text is likely about this one target -> allow
@@ -749,16 +767,19 @@ def caption_modification_for_core(core: str, text: str) -> Optional[dict]:
     core_low = core.lower()
     low = text.lower()
     states: set[str] = set()
-    site_found: Optional[dict] = None
+    sites: dict = {}
     idx = low.find(core_low)
     while idx != -1:
         pre = text[max(0, idx - 12): idx]
         post = text[idx + len(core): idx + len(core) + 14]
         st = _mention_state(pre, post)
         states.add(st["type"])
-        if st.get("site") and site_found is None:
-            site_found = st["site"]
+        if st.get("site"):
+            sites.setdefault((st["site"]["residue"], st["site"]["position"]), st["site"])
         idx = low.find(core_low, idx + 1)
+    # Two DISTINCT sites for this core ("p-STAT3 Ser727 and p-STAT3 Tyr705"):
+    # phosphorylation stands, but no single site is assigned.
+    site_found = next(iter(sites.values())) if len(sites) == 1 else None
 
     # A bare mention either asserts nothing (alone: "PI3K/AKT/mTOR signaling"
     # must not become a total-protein claim) or signals the text spans multiple
