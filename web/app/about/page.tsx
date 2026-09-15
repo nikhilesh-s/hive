@@ -88,7 +88,7 @@ export default function About() {
         <ul className="hb-page-list">
           <li><strong>It does not guess.</strong> When credible sources disagree, the field is marked <em>Conflicting</em>, keeps no value, and shows both claims.</li>
           <li><strong>It does not fill gaps.</strong> A value the paper never states is shown as <em>not reported</em>, never as a plausible number.</li>
-          <li><strong>It does not measure intensity.</strong> Band presence is categorical (present / absent / uncertain). There is no densitometry, and multiplicity such as a doublet is recorded descriptively only.</li>
+          <li><strong>It does not measure intensity.</strong> Band presence is categorical (present / absent / uncertain). Evidence Records carry no densitometry, and multiplicity such as a doublet is recorded descriptively only. (An experimental, uncalibrated densitometry page exists under <em>Experimental</em>; it measures within one image, refuses clipped or unstable readings, and stores nothing.)</li>
           <li><strong>It does not read mass off an image.</strong> Expected molecular weight comes from the UniProt sequence; reported weight comes only from what the paper printed. They are stored separately.</li>
           <li><strong>It does not overwrite itself.</strong> Researcher corrections are stored beside the extraction as an auditable pair, never applied over it.</li>
         </ul>
