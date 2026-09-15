@@ -30,14 +30,32 @@ interface Result {
   source: { record_id?: number; tier?: string; target?: string; crop?: string; printed_lanes?: number | null; upload?: boolean };
   lanes_requested: number | null; stored: boolean;
 }
+interface PairLane {
+  index: number; label: string | null;
+  target_relative: number | null; control_relative: number | null;
+  ratio: number | null; ratio_min: number | null; ratio_median: number | null; ratio_max: number | null;
+  normalized: number | null; normalized_min: number | null; normalized_max: number | null;
+  quality: Quality; reasons: string[];
+}
+interface PairResult {
+  method: Result['method']; target: Result; control: Result; lanes: PairLane[];
+  quality: { state: Quality; reasons: string[] }; warnings: string[]; disclaimer: string; source: Result['source']; stored: boolean;
+}
 type Box = [number, number, number, number];
 type Pt = [number, number];
+// Geometry of the strip a loading-control strip will be divided by (same image).
+interface Target { region: Box; lane_bounds: [number, number][]; lane_labels: string[] | null; band_row: [number, number] | null; row_index: number; res: Result }
 
 const MONO = 'var(--font-mono), monospace';
 const QUALITY_LABEL: Record<Quality, string> = {
   ok: 'Valid within-image relative measurement',
   warning: 'Warning — read the caveats',
   quantification_refused: 'Quantification refused',
+};
+const PAIR_LABEL: Record<Quality, string> = {
+  ok: 'Valid within-image target ÷ loading-control ratio',
+  warning: 'Warning — read the caveats',
+  quantification_refused: 'Normalization refused',
 };
 const QUALITY_CLASS: Record<Quality, string> = { ok: 'is-ok', warning: 'is-warning', quantification_refused: 'is-refused' };
 // Fixed colours for the exported PNG (light footer, theme-independent): light-theme accent / warning / error.
@@ -65,6 +83,9 @@ function download(name: string, type: string, part: BlobPart) {
 const stamp = () => new Date().toISOString().replace(/[:.]/g, '-');
 const relText = (l: Lane) => l.relative == null ? '—' : l.stability ? `${l.stability.relative_min.toFixed(1)}–${l.stability.relative_max.toFixed(1)}` : l.relative.toFixed(2);
 const relBar = (l: Lane) => l.relative == null ? null : l.stability ? l.stability.relative_median : l.relative;
+// Point value, or min–max range when the stability study produced one.
+const rangeText = (v: number | null, lo: number | null, hi: number | null, dp: number) => v == null ? '—' : lo != null && hi != null ? `${lo.toFixed(dp)}–${hi.toFixed(dp)}` : v.toFixed(dp);
+const pct = (v: number) => Math.max(0, Math.min(100, v * 100));
 
 // Vertical profile sparkline: opening-corrected row means over the band row
 // plus the flank rows the baseline came from; y runs top->bottom like the image.
@@ -108,6 +129,8 @@ export default function DensitometryPage() {
   const [dividers, setDividers] = useState<number[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
   const [res, setRes] = useState<Result | null>(null);
+  const [target, setTarget] = useState<Target | null>(null);
+  const [pair, setPair] = useState<PairResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -122,14 +145,18 @@ export default function DensitometryPage() {
     return () => window.removeEventListener('resize', captureDims);
   }, []);
 
-  function resetGeometry() {
-    setRegion(null); setDraft(null); setDividers([]); setLabels([]); setRes(null); setErr(null);
+  // Dividers survive a region change while a target is set (the control strip
+  // shares the target's lanes); a new image drops the target with everything else.
+  function resetGeometry(newImage = false) {
+    setRegion(null); setDraft(null); setLabels([]); setRes(null); setPair(null); setErr(null);
+    if (newImage || !target) setDividers([]);
+    if (newImage) setTarget(null);
   }
 
   function loadRecord() {
     if (!/^\d+$/.test(recordId.trim())) return;
     setUpload(null);
-    resetGeometry();
+    resetGeometry(true);
     setImgSrc(`${live ? '/api/experimental/record' : '/api/record'}/${recordId.trim()}/crop?t=${Date.now()}`);
   }
 
@@ -143,7 +170,7 @@ export default function DensitometryPage() {
       if (browserShows) {
         setUpload(url);
         setImgSrc(url);
-        resetGeometry();
+        resetGeometry(true);
         return;
       }
       // TIFF and other imager exports: ask the backend for an 8-bit PNG preview
@@ -156,7 +183,7 @@ export default function DensitometryPage() {
         if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : d.error || `Backend returned ${r.status}`);
         setUpload(d.png_base64);
         setImgSrc(d.png_base64);
-        resetGeometry();
+        resetGeometry(true);
       } catch (e2) {
         setErr(e2 instanceof Error ? e2.message : 'Could not decode that file');
       } finally {
@@ -180,15 +207,16 @@ export default function DensitometryPage() {
     if (box[2] - box[0] < 4 || box[3] - box[1] < 4) return;
     setRegion(box);
     const n = Number(laneCount) || 0;
-    setDividers(n > 1 ? seedDividers(box, n) : []);
+    // ponytail: with a target set, keep the dividers that fall inside the new box (drop, not clamp — clamping stacks them on an edge)
+    setDividers(target ? dividers.filter((d) => d > box[0] && d < box[2]) : n > 1 ? seedDividers(box, n) : []);
     setLabels([]);
-    setRes(null);
+    setRes(null); setPair(null);
   }
 
   function onLaneCount(v: string) {
     const digits = v.replace(/\D/g, '');
     setLaneCount(digits);
-    if (region) { setDividers(Number(digits) > 1 ? seedDividers(region, Number(digits)) : []); setRes(null); }
+    if (region) { setDividers(Number(digits) > 1 ? seedDividers(region, Number(digits)) : []); setRes(null); setPair(null); }
   }
 
   const inRegion = (p: Pt) => !!region && p[0] > region[0] && p[0] < region[2] && p[1] >= region[1] && p[1] <= region[3];
@@ -221,7 +249,7 @@ export default function DensitometryPage() {
       const hi = (s.idx < dividers.length - 1 ? dividers[s.idx + 1] : region[2]) - 1;
       const x = Math.min(hi, Math.max(lo, p[0]));
       setDividers((d) => d.map((v, i) => (i === s.idx ? x : v)));
-      setRes(null);
+      setRes(null); setPair(null);
     }
   }
   function onPointerUp(e: React.PointerEvent<HTMLImageElement>) {
@@ -232,16 +260,21 @@ export default function DensitometryPage() {
     const p = toImage(e.clientX, e.clientY);
     if (s.kind === 'box') {
       if (s.moved) applyRegion(s.start, p);
-      else if (inRegion(p)) { setDividers((d) => [...d, p[0]].sort((a, b) => a - b)); setRes(null); }
+      else if (inRegion(p)) { setDividers((d) => [...d, p[0]].sort((a, b) => a - b)); setRes(null); setPair(null); }
     } else if (!s.moved) {
       setDividers((d) => d.filter((_, i) => i !== s.idx));
       setLabels((l) => l.filter((_, i) => i !== s.idx + 1));
-      setRes(null);
+      setRes(null); setPair(null);
     }
   }
 
   const bounds = region ? laneBounds(region, dividers) : [];
   const canMeasure = !!imgSrc && !busy && (diagnostic || !!region);
+  const sourceBody = () => upload ? { image_base64: upload } : { record_id: Number(recordId), live };
+  const throwDetail = (d: { detail?: unknown; error?: unknown }, status: number): never => {
+    const detail = d.detail ?? d.error;
+    throw new Error(typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : `Backend returned ${status}`);
+  };
 
   async function analyze(rowOverride?: number, regionOverride?: Box) {
     const rowIdx = rowOverride ?? rowIndex;
@@ -262,14 +295,10 @@ export default function DensitometryPage() {
         stability,
       };
       if (useFullRow) body.band_row = [reg![1], reg![3]];
-      if (upload) body.image_base64 = upload;
-      else { body.record_id = Number(recordId); body.live = live; }
+      Object.assign(body, sourceBody());
       const r = await fetch('/api/experimental/densitometry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
-      if (!r.ok) {
-        const detail = d.detail ?? d.error;
-        throw new Error(typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : `Backend returned ${r.status}`);
-      }
+      if (!r.ok) throwDetail(d, r.status);
       captureDims();
       setUsedFullRow(useFullRow);
       setRes(d);
@@ -336,7 +365,64 @@ export default function DensitometryPage() {
     }
   }
 
+  function useAsTarget() {
+    if (!res?.image.region) return;
+    const reg = res.image.region as Box;
+    const anyLabel = res.lanes.some((l) => l.label);
+    setTarget({
+      region: reg,
+      lane_bounds: res.lanes.map((l) => [l.x0, l.x1] as [number, number]),
+      lane_labels: anyLabel ? res.lanes.map((l) => l.label ?? '') : null,
+      band_row: usedFullRow ? [reg[1], reg[3]] : null,
+      row_index: rowIndex,
+      res,
+    });
+    setPair(null);
+  }
+
+  async function analyzePair() {
+    if (!target || !region) return;
+    setBusy(true);
+    setErr(null);
+    setPair(null);
+    try {
+      const { region: tr, lane_bounds, lane_labels, band_row, row_index } = target;
+      const body = {
+        ...sourceBody(),
+        target: { region: tr, lane_bounds, lane_labels, band_row, row_index },
+        control: { region, lane_bounds: laneBounds(region, dividers), band_row: fullRow ? [region[1], region[3]] : null, row_index: rowIndex },
+        stability,
+      };
+      const r = await fetch('/api/experimental/densitometry/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json();
+      if (!r.ok) throwDetail(d, r.status);
+      captureDims();
+      setPair(d);
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : 'Request failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function exportPairJson() {
+    if (!pair) return;
+    download(`hiveblot-densitometry-pair-${stamp()}.json`, 'application/json', JSON.stringify({ ...pair, exported_at: new Date().toISOString(), page: '/experimental/densitometry' }, null, 2));
+  }
+  function exportPairCsv() {
+    if (!pair) return;
+    const head = `# ${pair.method.name} v${pair.method.version}; target_region=${pair.target.image.region?.join(' ') ?? 'none'}; control_region=${pair.control.image.region?.join(' ') ?? 'none'}; quality=${pair.quality.state}`;
+    const cols = 'index,label,target_relative,control_relative,ratio,ratio_min,ratio_median,ratio_max,normalized,normalized_min,normalized_max,quality,reasons';
+    const rows = pair.lanes.map((l) => [
+      l.index, l.label, l.target_relative, l.control_relative, l.ratio, l.ratio_min, l.ratio_median, l.ratio_max,
+      l.normalized, l.normalized_min, l.normalized_max, l.quality, l.reasons.join('; '),
+    ].map(csvCell).join(','));
+    download(`hiveblot-densitometry-pair-${stamp()}.csv`, 'text/csv', [head, cols, ...rows].join('\n') + '\n');
+  }
+
   const refused = res?.quality.state === 'quantification_refused';
+  const pairRefused = pair?.quality.state === 'quantification_refused';
+  const controlRegion = pair?.control.image.region;
   const fs = dims ? 11 / dims.sx : 11; // 11 displayed px, expressed in natural units for the viewBox overlay
   const band = res ? [res.image.region?.[0] ?? 0, res.image.region?.[2] ?? res.image.width] : null;
 
