@@ -105,6 +105,14 @@ attribution theft in the B-2 backstop, p-prefix non-phospho names (pVHL/pRB/P-gp
 MW source provenance, the caption/methods header split, caveats hidden under a "valid" card, pairing
 lane-offset warnings and frontend response races. Details and commits: session log "Window 4".
 Known limit: adjacent strips < ~3 band sigmas apart merge into one row without a warning.
+Later the same afternoon: lane-condition / lane dose / lane-text band patterns typed as image
+evidence (`ec8218d`); single lane = warning, thin band-row refusal explains itself (`68f1c7c`);
+antibody backstop regressions from the scoping rewrite fixed on the real corpus - full catalog
+numbers, comma-grouped dilutions, abstain on two antibodies against one target (`079124d`);
+page errors visible before an image loads, readable validation errors, lead copy consistent with
+the pairing (`4c98e6e`). A provenance child is fixing pre-existing source typing (antibody
+"methods" sources that are model paraphrase, treatment wording typed caption, sample/organism
+caption snippets that never name the value) — check the session log for its commit.
 
 **Loading-control pairing (2026-09-15, browser-verified):** analyzer
 `pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
