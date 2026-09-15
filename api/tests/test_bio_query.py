@@ -24,7 +24,7 @@ def test_phospho_site_query():
 def test_one_letter_site():
     sql = generate_bio_sql("phospho AKT S473")
     assert "residue ILIKE 'Ser' AND residue_position = 473" in sql
-    assert "%AKT%" in sql
+    assert "%akt([^a-z]%)?" in sql
 
 
 def test_vendor_catalog():
@@ -48,7 +48,7 @@ def test_bare_number_without_vendor_is_not_catalog():
 def test_coip():
     sql = generate_bio_sql("co-IP EGFR")
     assert "experiment_type ILIKE 'co_ip'" in sql
-    assert "%EGFR%" in sql
+    assert "%egfr([^a-z]%)?" in sql
     _guarded("co-IP EGFR")
 
 
@@ -115,3 +115,15 @@ def test_phospho_word_filter_includes_unsettled():
     assert "modification_type ILIKE '%phospho%'" in sql
     assert "CONFLICTING" in sql and "AMBIGUOUS" in sql
     _guarded("phospho ERK")
+
+
+def test_short_gene_symbol_does_not_match_inside_a_word():
+    # Regression: '%MYC%' matched Rapamycin / Bafilomycin treatments, so a MYC
+    # search on the local corpus returned 90 rows of which 4 were MYC.
+    sql = generate_bio_sql("MYC 10.3892/br.2026.2108")
+    assert "lower(treatment_name) SIMILAR TO '%myc([^a-z]%)?'" in sql
+    assert "treatment_name ILIKE '%MYC%'" not in sql
+    assert "doi ILIKE '%10.3892/br.2026.2108%'" in sql      # long terms and DOIs stay substring
+    assert "target ILIKE '%STAT3%'" in generate_bio_sql("STAT3")
+    guarded = _guarded("MYC")
+    assert "SIMILAR TO" in guarded and isinstance(sqlglot.parse_one(guarded, read="postgres"), exp.Select)

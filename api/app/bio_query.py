@@ -90,7 +90,18 @@ def _esc(term: str) -> str:
 
 def _term_clause(term: str) -> str:
     t = _esc(term)
-    ors = " OR ".join(f"{c} ILIKE '%{t}%'" for c in TERM_COLUMNS)
+    if len(t) <= 4 and t[-1:].isalpha() and "+" not in t:
+        # Short gene symbols (MYC, MET, KIT, ERK) must not match inside a word:
+        # '%myc%' returned 86 Rapamycin/Bafilomycin rows for 4 MYC rows. The
+        # symbol may not be followed by a letter (c-Myc, ERK1/2 still match;
+        # MYCN, IL-6R, metformin do not). SIMILAR TO keeps this inside the
+        # guard's allowlist, no regex functions. ponytail: right boundary only,
+        # so PERK still matches ERK; longer words (actin/actinin) stay substring.
+        pat = f"%{t.lower()}([^a-z]%)?"
+        ors = " OR ".join(f"{c} ILIKE '%{t}%'" if c == "doi" else f"lower({c}) SIMILAR TO '{pat}'"
+                          for c in TERM_COLUMNS)
+    else:
+        ors = " OR ".join(f"{c} ILIKE '%{t}%'" for c in TERM_COLUMNS)
     return f"({ors})"
 
 
