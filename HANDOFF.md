@@ -110,9 +110,9 @@ evidence (`ec8218d`); single lane = warning, thin band-row refusal explains itse
 antibody backstop regressions from the scoping rewrite fixed on the real corpus - full catalog
 numbers, comma-grouped dilutions, abstain on two antibodies against one target (`079124d`);
 page errors visible before an image loads, readable validation errors, lead copy consistent with
-the pairing (`4c98e6e`). A provenance child is fixing pre-existing source typing (antibody
-"methods" sources that are model paraphrase, treatment wording typed caption, sample/organism
-caption snippets that never name the value) — check the session log for its commit.
+the pairing (`4c98e6e`). Pre-existing source typing fixed (`c42f1ee`): a source is methods/caption only if its
+text is verbatim there, otherwise "model reading" (UI label `0396aee`); caption "pVHL"/"pRB" no
+longer read as phospho (`e6e86ad`).
 
 **Loading-control pairing (2026-09-15, browser-verified):** analyzer
 `pair_ratio` + `POST /experimental-densitometry/pair` + page section 4. On
