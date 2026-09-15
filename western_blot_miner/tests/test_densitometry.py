@@ -350,6 +350,14 @@ check("explicit tall band_row is not called printed text", not any("printed text
 r_explicit = D.analyze(clean, region=(0, 20, 400, 100), lane_bounds=equal_bounds(4))
 check("explicit clean strip with margin stays ok", r_explicit["quality"]["state"] == "ok" and r_explicit["quality"]["reasons"] == [])
 
+# 16. degenerate geometry is not presented as a clean comparison
+one = D.analyze(synthetic([1.0], noise=1.0), region=(0, 20, 400, 100), lane_bounds=[[100, 300]])
+check("single lane is a warning, not a valid comparison", one["quality"]["state"] == "warning"
+      and any("only one lane" in x for x in one["quality"]["reasons"]))
+thin = D.analyze(synthetic([1.0, 0.5], noise=1.5), region=(0, 20, 400, 100), lane_bounds=equal_bounds(2), band_row=(59, 61))
+check("thin explicit band row: refusal names the thin row", thin["quality"]["state"] != "ok"
+      and (thin["quality"]["state"] != "quantification_refused" or any("px tall" in x for x in thin["quality"]["reasons"])))
+
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
 for n in failed:
