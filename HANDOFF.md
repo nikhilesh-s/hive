@@ -129,7 +129,14 @@ record 4455, P-STAT3 strip ÷ β-actin strip gave normalized 0.6–0.8 / 1.0–1
 (inherited from the β-actin near tie), same-membrane caveat shown first, no
 console errors. Quality card no longer uses a side-tab border.
 
-**Tests (latest):** densitometry 94/94 · api 167 passed / 11 skipped · miner
+**Paper QA hardening (`d056c83`):** record text can no longer inject into the prompt (one-line,
+delimiter-neutralised `<record>` blocks); a reviewed-tier retrieval failure says "Retrieval failed", not
+"no evidence"; capitalised prose is not a search term; an unfilterable question never reads the whole
+table; `[E1, E2]` is a citation and phantom refs are reported in `invalid_cited`; MISSING modification
+renders "not stated". Open gap: citations are checked for existence, not for agreement with the cited
+record's status.
+
+**Tests (latest):** densitometry 116 checks · api 177 passed / 11 skipped · miner
 pytest 56 · biology / reconcile 21 / extract 10 / pipeline 13 /
 stable-row-key 34 green · tsc and lint clean.
 

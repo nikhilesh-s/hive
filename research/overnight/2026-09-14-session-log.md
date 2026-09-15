@@ -242,3 +242,20 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
 - Live-ingestion row conversion on today's code: rebuilt records for the three reviewed papers convert to
   475 rows (the reviewed corpus count), all JSON-safe, carrying model_target / deterministic /
   figure_caption / methods / image source types through the provenance JSON. CI green on 06cb4ff.
+- Paper-QA grounding attack (read-only child, mocked DB + model) confirmed five defects in
+  `api/app/experimental/ask.py`, all fixed in `d056c83` with 7 regression tests (each failed on the old
+  code): (D1) record fields were interpolated raw, so a newline + "[E1] ... QUESTION: ..." in a field
+  forged a record and a question; fields are now folded to one line with `[]<>` neutralised inside
+  `<record ref>` tags and the system prompt says record text is data. (D2) a reviewed-table or guard
+  failure was reported as "No matching evidence"; it is now "Retrieval failed" (live-table failure still
+  tolerated). (D3) capitalised prose ("Show", "Compare") became AND terms; dropped, and single-capital
+  words (Akt) go last so back-off drops them before proteins. (D4) a question with no filterable term
+  ran an unfiltered SELECT over the whole table; now no query. (D5) `[E1, E2]` was not a citation and
+  phantom refs (E0, E99) were silently ignored; grouped refs parse, phantom refs land in `invalid_cited`
+  and the note; both answer renderers link grouped refs. Also: a non-string model reply was a 500;
+  modification MISSING rendered "none stated" (reads as total protein), now "not stated"; rows without a
+  stable_row_key merged on the "doi:" prefix.
+- Open gap (not fixed, documented): citations are validated for existence only. A cited answer can still
+  contradict the cited record's status (e.g. assert phospho-Ser727 while citing a CONFLICTING record);
+  there is no per-claim status check. api 177 passed / 11 skipped; tsc and lint clean; the restarted local
+  stack answers the STAT3 question with 12 blocks and no note, "Show GAPDH" returns the 5 GAPDH blocks.
