@@ -232,3 +232,52 @@ def test_pair_endpoint_target_over_control(client):
     assert client.post("/experimental-densitometry/pair", json=bad, headers=AUTH).status_code == 400
     assert client.post("/experimental-densitometry/pair", json={**body, "image_base64": None}, headers=AUTH).status_code == 400
     assert client.post("/experimental-densitometry/pair", json=body).status_code == 401
+
+
+def test_empty_or_undecodable_upload_is_400_on_every_endpoint(client):
+    for path, extra in (("/experimental-densitometry", {"lanes": 2}), ("/experimental-densitometry/preview", {}),
+                        ("/experimental-densitometry/pair", {"target": {"region": [0, 0, 10, 10], "lane_bounds": [[0, 10]]},
+                                                             "control": {"region": [0, 0, 10, 10], "lane_bounds": [[0, 10]]}})):
+        for bad in ("!!!!", "data:image/png;base64,"):
+            r = client.post(path, json={"image_base64": bad, **extra}, headers=AUTH)
+            assert r.status_code == 400, (path, bad, r.status_code, r.text)
+
+
+def test_unsupported_pixel_type_is_400_not_500(client):
+    import cv2
+
+    ok, buf = cv2.imencode(".tiff", np.zeros((40, 60, 3), np.int16))
+    assert ok
+    b64 = base64.b64encode(buf.tobytes()).decode()
+    for path in ("/experimental-densitometry", "/experimental-densitometry/preview"):
+        r = client.post(path, json={"image_base64": b64, "lanes": 1}, headers=AUTH)
+        assert r.status_code == 400, (path, r.status_code, r.text)
+
+
+def test_pair_error_names_the_strip_and_labels_are_not_silently_cut(client):
+    b64 = base64.b64encode(_two_strip_png()).decode()
+    good = [[0, 100], [100, 200], [200, 300], [300, 400]]
+    body = {"image_base64": b64, "target": {"region": [0, 10, 400, 60], "lane_bounds": good},
+            "control": {"region": [0, 85, 400, 135], "lane_bounds": [[0, 150], [100, 250], [250, 350], [350, 400]]}}
+    r = client.post("/experimental-densitometry/pair", json=body, headers=AUTH)
+    assert r.status_code == 400 and r.json()["detail"].startswith("control strip:")
+    long = {"image_base64": b64, "lane_bounds": good, "lane_labels": ["x" * 41, "b", "c", "d"]}
+    r = client.post("/experimental-densitometry", json=long, headers=AUTH)
+    assert r.status_code == 400 and "40 characters" in r.json()["detail"]
+
+
+def test_refused_pair_exposes_no_per_lane_relatives(client):
+    b64 = base64.b64encode(_two_strip_png()).decode()
+    lanes = [[0, 100], [100, 200], [200, 300], [300, 400]]
+    body = {"image_base64": b64, "target": {"region": [0, 62, 400, 82], "lane_bounds": lanes},   # blank gap between strips
+            "control": {"region": [0, 85, 400, 135], "lane_bounds": lanes}}
+    r = client.post("/experimental-densitometry/pair", json=body, headers=AUTH)
+    assert r.status_code == 200, r.text
+    d = r.json()
+    assert d["quality"]["state"] == "quantification_refused"
+    for l in d["lanes"]:
+        assert all(l[k] is None for k in ("target_relative", "control_relative", "ratio", "ratio_min", "ratio_median",
+                                          "ratio_max", "normalized", "normalized_min", "normalized_max"))
+    for strip in ("target", "control"):
+        if d[strip]["quality"]["state"] == "quantification_refused":
+            assert all(l["relative"] is None and l["stability"] is None for l in d[strip]["lanes"])

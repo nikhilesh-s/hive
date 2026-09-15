@@ -77,6 +77,20 @@ async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, di
     return crop.read_bytes(), n_lanes, row
 
 
+MAX_LABEL_CHARS = 40
+
+
+def _labels(raw: list[str] | None) -> list[str] | None:
+    """Lane labels are researcher text shown in tables and exports: refuse
+    over-long ones instead of silently cutting them."""
+    if not raw:
+        return None
+    too_long = [i + 1 for i, x in enumerate(raw) if len(str(x)) > MAX_LABEL_CHARS]
+    if too_long:
+        raise HTTPException(400, f"lane label(s) {too_long} longer than {MAX_LABEL_CHARS} characters")
+    return [str(x) for x in raw]
+
+
 class StripSpec(BaseModel):
     """One strip of the image for the loading-control pairing."""
     region: list[int] = Field(min_length=4, max_length=4)
@@ -125,12 +139,14 @@ async def experimental_densitometry_pair(request: Request, body: PairRequest):
     def _run():
         img = densitometry.decode_image(png)
         out = []
-        for spec in (body.target, body.control):
-            labels = [str(x)[:40] for x in spec.lane_labels] if spec.lane_labels else None
-            out.append(densitometry.analyze(img, region=tuple(spec.region), lane_bounds=spec.lane_bounds,
-                                            lane_labels=labels, row_index=spec.row_index,
-                                            band_row=tuple(spec.band_row) if spec.band_row else None,
-                                            stability=body.stability))
+        for name, spec in (("target", body.target), ("control", body.control)):
+            try:
+                out.append(densitometry.analyze(img, region=tuple(spec.region), lane_bounds=spec.lane_bounds,
+                                                lane_labels=_labels(spec.lane_labels), row_index=spec.row_index,
+                                                band_row=tuple(spec.band_row) if spec.band_row else None,
+                                                stability=body.stability))
+            except ValueError as e:
+                raise ValueError(f"{name} strip: {e}")
         return densitometry.pair_ratio(out[0], out[1])
 
     try:
@@ -185,7 +201,7 @@ async def experimental_densitometry(request: Request, body: DensitometryRequest)
         raise HTTPException(400, "Provide record_id or image_base64")
     png, default_lanes, source = await _load_image(body)
     lanes = None if body.lane_bounds else (body.lanes or default_lanes)
-    labels = [str(x)[:40] for x in body.lane_labels] if body.lane_labels else None
+    labels = _labels(body.lane_labels)
     loop = asyncio.get_running_loop()
     try:
         result = await loop.run_in_executor(

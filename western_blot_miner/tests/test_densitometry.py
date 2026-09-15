@@ -115,6 +115,14 @@ check("blank strip refused", res_blank["quality"]["state"] == "quantification_re
 check("blank reason", any("no lane has signal" in r for r in res_blank["quality"]["reasons"]))
 
 # 7. geometry validation raises (never measures something else silently)
+def _try(fn):
+    try:
+        fn()
+    except ValueError as e:
+        return e
+    return None
+
+
 def raises(fn):
     try:
         fn()
@@ -210,6 +218,7 @@ res_sev = D.analyze(sev, lane_bounds=[[0, 200], [200, 400]])
 check("severe flip detected", res_sev["stability"] is not None and res_sev["stability"]["ranking_stable"] is False)
 check("severe flip refuses", res_sev["quality"]["state"] == "quantification_refused" and all(l["relative"] is None for l in res_sev["lanes"]))
 check("severe flip reason", any("clearly weaker" in r for r in res_sev["quality"]["reasons"]))
+check("refused strip exposes no stability range on any lane", all(l["stability"] is None for l in res_sev["lanes"]))
 # the same bands with lanes drawn over the whole of each band are stable
 res_tie_ok = D.analyze(tie, lane_bounds=[[30, 170], [230, 370]])
 check("full-band lanes on identical bands are stable", res_tie_ok["stability"]["ranking_stable"] and res_tie_ok["quality"]["state"] == "ok")
@@ -288,7 +297,36 @@ check("pair: weak control lane warned", pr_w["lanes"][3]["quality"] == "warning"
 ctl_clip = D.analyze(synthetic([1.0, 1.0, 1.0, 1.0], peak=400), lane_bounds=equal_bounds(4))
 pr_c = D.pair_ratio(tgt, ctl_clip)
 check("pair: refused control strip refuses the pairing", pr_c["quality"]["state"] == "quantification_refused" and all(l["normalized"] is None for l in pr_c["lanes"]))
+check("pair: refused lanes expose no per-lane relatives", all(l["target_relative"] is None and l["control_relative"] is None
+      for l in pr_c["lanes"]) and pr_e["lanes"][3]["target_relative"] is None and pr_e["lanes"][3]["control_relative"] is None)
+check("pair: non-refused lanes keep their relatives", pr_e["lanes"][0]["target_relative"] is not None)
+ctl_labelled = D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(4), lane_labels=["w", "x", "y", "z"])
+check("pair: control-only labels are carried", [l["label"] for l in D.pair_ratio(D.analyze(pair_img, region=(0, 10, 400, 60),
+      lane_bounds=equal_bounds(4)), ctl_labelled)["lanes"]] == ["w", "x", "y", "z"])
 check("pair: lane count mismatch raises", raises(lambda: D.pair_ratio(tgt, D.analyze(pair_img, region=(0, 85, 400, 135), lane_bounds=equal_bounds(2)))))
+
+# 14. decoding and pixel types: empty / corrupt data, unsupported depths, float
+#     scaling, alpha composited on white, pixel cap
+import cv2 as _cv2  # noqa: E402
+check("empty bytes -> ValueError", raises(lambda: D.decode_image(b"")))
+check("garbage bytes -> ValueError", raises(lambda: D.decode_image(b"\x00\x01garbage")))
+base8 = synthetic([1.0, 0.5, 0.25, 0.0], noise=2.0)
+ref_rel = [l["relative"] for l in D.analyze(base8, lane_bounds=equal_bounds(4), stability=False)["lanes"]]
+f01 = base8.astype(np.float32) / 255.0
+check("float 0-1 image is rescaled, not crushed to black", [l["relative"] for l in D.analyze(f01, lane_bounds=equal_bounds(4), stability=False)["lanes"]] == ref_rel)
+check("int16 colour image -> ValueError (no 500)", raises(lambda: D.analyze(np.zeros((60, 60, 3), np.int16))))
+check("NaN pixels -> ValueError", raises(lambda: D.analyze(np.full((60, 60), np.nan, np.float32))))
+bands_alpha = (255 - base8).astype(np.uint8)                      # darkness as alpha
+rgba = np.zeros((*base8.shape, 4), np.uint8)
+rgba[..., 3] = bands_alpha                                         # black ink, transparent background
+r_alpha = D.analyze(rgba, lane_bounds=equal_bounds(4), stability=False)
+check("transparent background composites onto white (dark bands on light)", r_alpha["image"]["inverted_for_analysis"] is True
+      and r_alpha["lanes"][0]["relative"] == 1.0 and abs(r_alpha["lanes"][1]["relative"] - 0.5) < 0.12)
+check("pixel cap not triggered by a small image", D.decode_image(_cv2.imencode(".png", base8)[1].tobytes()).shape == base8.shape)
+huge = np.full((8000, 5100), 255, np.uint8)
+check("pixel cap refuses > MAX_PIXELS", raises(lambda: D.decode_image(_cv2.imencode(".png", huge)[1].tobytes())))
+check("reversed band_row message says reversed", (lambda: (lambda e: "reversed" in e)(
+      next(iter([str(x) for x in [_try(lambda: D.analyze(img, lane_bounds=equal_bounds(2), band_row=(80, 40)))]]))))())
 
 failed = [n for n, ok in CHECKS if not ok]
 print(f"densitometry: {len(CHECKS) - len(failed)}/{len(CHECKS)} checks passed")
