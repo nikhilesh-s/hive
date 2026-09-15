@@ -45,6 +45,8 @@ jobs:
           for t in test_biology test_reconcile test_loader_enrichment test_extract_records test_pipeline_records test_stable_row_key test_densitometry; do
             echo "== $t"; python western_blot_miner/tests/$t.py
           done
+      - name: Western blot miner pytest suites (attack / provenance / source-typing regressions)
+        run: python -m pytest -q western_blot_miner/tests --ignore=western_blot_miner/tests/test_densitometry.py
       - name: Benchmark (seed self-consistency)
         run: python eval/score.py
       - name: Migration copies in sync
