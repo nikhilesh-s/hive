@@ -259,7 +259,9 @@ def _region_arrays(gray_full: np.ndarray, region):
     # around one strip would otherwise shrink the kernel below the band
     # height, the opening would absorb the band into "background", and the
     # ratios would collapse toward 1 while still looking valid.
-    k = max(5, (min(H, W) // 4) | 1)
+    # floor of 61 px: on small images a quarter of the size can be smaller than two
+    # adjacent strips together, and the opening would then eat part of a band
+    k = max(61, min(H, W) // 4) | 1
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
     background = cv2.morphologyEx(signal, cv2.MORPH_OPEN, kernel)
     corrected = np.clip(signal - background, 0, None)

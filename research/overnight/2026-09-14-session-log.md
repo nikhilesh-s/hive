@@ -112,3 +112,6 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   4686 box corrected and browser-rehearsed (refused, clipped cores 30–56%).
 - Per-lane vertical profile in the response + sparkline column in the table (band row shaded, flank
   rows faint, dashed baseline); browser-verified on record 4455 — this commit.
+- TIFF uploads (imager exports) via `POST /experimental-densitometry/preview` → 8-bit PNG data URL;
+  measurement on the preview equals the TIFF (test); rate limit 60/min; browser-verified with a 16-bit
+  synthetic TIFF.

@@ -76,7 +76,13 @@ with no membrane margin warns; a multi-strip box is at least a warning and the
 UI's row buttons re-box the chosen strip. About/Learn name the experimental
 route without changing the Evidence Record statement.
 
-**Tests (2026-09-15):** densitometry 81/81 · api 165 passed / 11 skipped (DB
+**Also landed 2026-09-15:** printed-text rows = short dark runs (clipped
+bands no longer called text); per-lane vertical profile + sparkline column;
+row buttons re-box a strip inside a multi-strip box; TIFF uploads through an
+8-bit PNG preview endpoint; densitometry rate limit 60/min; run-of-show step 9
+rehearsed in the browser for records 4455 (valid) and 4686 (clipped refusal).
+
+**Tests (2026-09-15):** densitometry 84/84 · api 166 passed / 11 skipped (DB
 matrix needs `HIVE_DB_TEST_URL`) · miner pytest 56 · biology / reconcile 21 /
 loader / extract 10 / pipeline 13 / stable-row-key 34 all green · benchmark
 34/34 · `tsc` clean · lint 0/0 · `next build` clean · `git diff --check` clean.
@@ -89,13 +95,13 @@ not on this laptop (PMC fallback works); nothing experimental is hosted;
 re-run.
 
 **EXACT NEXT TASK:** continue the recursive grind per the launcher. Candidates
-in priority order: (1) browser re-check of the v0.3.0 numbers on record 4455
-after restarting the API (`hiveblot-api-demo`), then a rehearsal of run-of-show
-step 9 end to end; (2) author-value comparison, ticket D-5 second half
-(LC3B-II:ACTB bar charts as an offset with n, "n too small" allowed);
-(3) TIFF upload preview for researchers' own imager files; (4) a per-lane
-vertical profile sparkline in the UI so a researcher can see the band and the
-flank rows the baseline came from; (5) B-4 panel inventory if budget remains.
+in priority order: (1) `npm run build` with the dev server stopped, then
+`scripts/demo_check.py` and one last run-of-show rehearsal before the founder
+hard stop; (2) author-value comparison, ticket D-5 second half (LC3B-II:ACTB
+bar charts as an offset with n, "n too small" allowed); (3) a third
+adversarial pass aimed at the flank baseline (bands touching the box edge,
+strips closer than one band height, smiling bands); (4) B-4 panel inventory
+if budget remains.
 
 ## CURRENT STATE (2026-09-01, UCSF beta-readiness pass — session 31)
 
