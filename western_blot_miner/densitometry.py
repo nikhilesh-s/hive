@@ -645,6 +645,8 @@ PAIR_METHOD_VERSION = "0.1.0"
 # A control lane below this fraction of the strongest control lane makes the
 # ratio amplify that lane's noise: warned, not refused (under-loading is real).
 CONTROL_MIN_RELATIVE = 0.25
+# Centre shift (fraction of lane width) beyond which paired lanes are warned as offset.
+PAIR_MAX_CENTRE_SHIFT = 0.5
 PAIR_CAVEAT = (
     "Target ÷ loading control divides two uncalibrated within-image readings. The ratio is comparable "
     "only between lanes of this image, is not a protein amount, and is only meaningful if both strips "
@@ -664,6 +666,26 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
     tl, cl = target["lanes"], control["lanes"]
     if len(tl) != len(cl):
         raise ValueError(f"target has {len(tl)} lanes, control has {len(cl)}; use the same lane boundaries")
+    # Lanes are paired by index. A control lane whose centre sits more than a
+    # fraction of its width away from the target lane's centre is probably a
+    # different physical lane (dividers moved, strip offset badly).
+    geometry_warnings: list[str] = []
+    offset_lanes = []
+    for t, c in zip(tl, cl):
+        width = min(t["x1"] - t["x0"], c["x1"] - c["x0"])
+        shift = abs((t["x0"] + t["x1"]) / 2 - (c["x0"] + c["x1"]) / 2)
+        if width > 0 and shift > PAIR_MAX_CENTRE_SHIFT * width:
+            offset_lanes.append((t["index"], round(shift)))
+    if offset_lanes:
+        geometry_warnings.append("control lane(s) offset from the target lane with the same number: "
+                                 + ", ".join(f"lane {i} by {s} px" for i, s in offset_lanes)
+                                 + f" (more than {PAIR_MAX_CENTRE_SHIFT:.0%} of the lane width); check that lane i "
+                                 "of the control is the same sample as lane i of the target")
+    tlab = [t.get("label") for t in tl]
+    clab = [c.get("label") for c in cl]
+    if any(tlab) and any(clab) and tlab != clab:
+        geometry_warnings.append("target and control lane labels differ; the pairing uses lane order, "
+                                 "labels shown are the target's")
     overall = OK
     reasons: list[str] = []
     for name, r in (("target", target), ("control", control)):
@@ -725,6 +747,9 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
     if overall == OK and any(l["quality"] != OK for l in lanes):
         overall = WARNING
         reasons.append("one or more lanes carry a warning or are refused; read the per-lane reasons")
+    if geometry_warnings and overall == OK:
+        overall = WARNING
+        reasons.extend(geometry_warnings)
     if overall == WARNING and not reasons:
         reasons.append("one of the strips carries a warning; read its card")
     for l in lanes:
@@ -740,9 +765,11 @@ def pair_ratio(target: dict[str, Any], control: dict[str, Any]) -> dict[str, Any
                             "or lane is refused or the control lane has no signal",
                    "params": {"snr_min": SNR_MIN, "ratio_width_warn": 2 * STABILITY_WARN_WIDTH,
                               "control_min_relative": CONTROL_MIN_RELATIVE,
+                              "pair_max_centre_shift": PAIR_MAX_CENTRE_SHIFT,
                               "single_strip_method": f"{METHOD_NAME} {METHOD_VERSION}"}},
         "target": target, "control": control, "lanes": lanes,
         "quality": {"state": overall, "reasons": reasons},
-        "warnings": [PAIR_CAVEAT] + [w for w in target["warnings"] + control["warnings"] if "diagnostic" in w or "band rows" in w],
+        "warnings": [PAIR_CAVEAT] + geometry_warnings
+                    + [w for w in target["warnings"] + control["warnings"] if "diagnostic" in w or "band rows" in w],
         "disclaimer": DISCLAIMER,
     }
