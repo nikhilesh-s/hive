@@ -108,3 +108,7 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   **v0.3.0**: per-lane flank baseline (median of membrane rows one band-height above/below the band,
   lower of the two) + flank MAD noise. Synthetic unclipped error 7.4% → ≤1.8%; tight vs re-boxed real
   strip agree within 0.04; adversarial set all within 0.01. Box with no flank rows warns. — this commit.
+- `f1022a4` printed-text test = short dark runs (a clipped ACTB strip was being called text); run-of-show
+  4686 box corrected and browser-rehearsed (refused, clipped cores 30–56%).
+- Per-lane vertical profile in the response + sparkline column in the table (band row shaded, flank
+  rows faint, dashed baseline); browser-verified on record 4455 — this commit.

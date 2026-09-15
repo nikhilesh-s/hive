@@ -1690,11 +1690,16 @@ body {
 .hb-dens-q.is-ok { color: var(--accent); }
 .hb-dens-q.is-warning { color: var(--warning); }
 .hb-dens-q.is-refused { color: var(--error); }
-.hb-dens-reasons { color: var(--text-subtle); font-size: 12px; }
+.hb-dens-reasons { color: var(--text-subtle); display: block; font-size: 11px; line-height: 1.35; max-width: 34ch; }
 .hb-dens-table { border-collapse: collapse; font-family: var(--font-sans), sans-serif; font-size: 13px; width: 100%; }
 .hb-dens-table th { color: var(--text-subtle); font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.4px; padding: 6px 8px; text-align: left; text-transform: uppercase; }
 .hb-dens-table td { border-top: 1px solid var(--border); color: var(--text-primary); padding: 6px 8px; }
 .hb-dens-bar { background: var(--accent); border-radius: 2px; height: 10px; }
+.hb-dens-spark { display: block; overflow: visible; }
+.hb-dens-spark-line { fill: none; stroke: var(--text-primary); stroke-width: 1.2; }
+.hb-dens-spark-band { fill: rgba(74, 214, 176, 0.18); }
+.hb-dens-spark-flank { fill: var(--text-subtle); opacity: 0.18; }
+.hb-dens-spark-base { stroke: var(--warning); stroke-dasharray: 3 2; stroke-width: 1; }
 
 /* EXPERIMENTAL: research page --------------------------------------------- */
 .hb-live-papers li.is-selected { background: var(--accent-faint); border-radius: 6px; padding-left: 10px; padding-right: 10px; }
