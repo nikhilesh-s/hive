@@ -317,4 +317,7 @@ Baseline verified at `b287b7b`: densitometry 20/20 (old contract), api 160/11 sk
   rows, record 42 with a different (reseeded) key gets only the legacy row, a caller without a key
   matches by id, a key follows its record to a new id. Browser: /search?q=loading control shows
   "Found 30 experiments (175 lane records)" (was 100 rows), no console errors; demo_check 19 PASS /
-  2 WARN / 0 FAIL.
+  2 WARN / 0 FAIL. (CI on 8cd3f88 was cancelled by the next push; ec395b9 and later carry it.)
+- Same cap defect in paper QA: `_rows_for` capped rows at 300, so a paper-scoped question on a 384-row
+  live paper handed the model a partial lane strip for the last experiment. The partial trailing
+  experiment is now dropped there too (shared `_experiment_key`); regression test; api 187 passed.
