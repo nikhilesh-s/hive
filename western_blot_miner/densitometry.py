@@ -208,7 +208,8 @@ def _long_run_fraction(block: np.ndarray, min_run: int = TEXT_MAX_RUN_PX) -> flo
     return float(runs[runs >= min_run].sum() / runs.sum()) if runs.size else 0.0
 
 
-def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None = None) -> bool:
+def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None = None,
+                  check_tall: bool = True) -> bool:
     """Printed labels: solid-black pixels in SHORT horizontal runs (glyph
     strokes), and/or a tall block (stacked label lines). A clipped band is
     also solid black but runs for tens of pixels, so it is not text.
@@ -219,7 +220,7 @@ def row_text_like(gray: np.ndarray | None, a: int, b: int, total_h: int | None =
     block = gray[a:b]
     solid = (block < 16).mean() > TEXT_SOLID_FRACTION and _long_run_fraction(block) < 0.5
     # stacked label lines are >= ~40 px at the 350 DPI the crops are rendered at
-    tall = (b - a) > max(40, 0.1 * (total_h or gray.shape[0]))
+    tall = check_tall and (b - a) > max(40, 0.1 * (total_h or gray.shape[0]))
     return bool(solid or tall)
 
 
@@ -437,9 +438,14 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     y0, y1 = max(0, y0), min(h, y1)
     if y1 - y0 < 2:
         raise ValueError("band row too thin")
-    if row_text_like(gray, y0, y1, H):
-        warnings.append("the selected band row looks like printed text (solid black glyphs or a tall block), "
-                        "not a blot strip; draw the region around the membrane only")
+    # Caveats that make a result less than a clean measurement. They are listed
+    # in `warnings` AND downgrade an otherwise-ok strip to 'warning', so the
+    # quality card never says "valid" while a geometry caveat is buried below.
+    caveats: list[str] = []
+    # an explicit band_row is the researcher's choice: its height is not a text cue
+    if row_text_like(gray, y0, y1, H, check_tall=band_row is None):
+        caveats.append("the selected band row looks like printed text (solid black glyphs or a tall block), "
+                       "not a blot strip; draw the region around the membrane only")
     n_blot_rows = sum(1 for a, b in rows if not row_text_like(gray, a, b, H))
     multi_row_note = (f"the box contains {n_blot_rows} band rows; only the chosen row is integrated and its "
                       "baseline comes from the rows next to it - box one strip to check the geometry") if n_blot_rows >= 2 else None
@@ -454,9 +460,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
         bounds = [(a + ox, b + ox) for a, b in detect_lanes(strip, lanes)]
         lane_mode = "equal_width" if lanes else "auto"
         if lane_mode == "auto" and len(bounds) > 1:
-            warnings.append("lane boundaries were auto-detected from the intensity profile (diagnostic); define lanes explicitly for a measurement")
+            caveats.append("lane boundaries were auto-detected from the intensity profile (diagnostic); define lanes explicitly for a measurement")
         elif lane_mode == "equal_width":
-            warnings.append("lanes are equal-width slices of the selected region (diagnostic); define lanes explicitly for a measurement")
+            caveats.append("lanes are equal-width slices of the selected region (diagnostic); define lanes explicitly for a measurement")
     labels = list(lane_labels) if lane_labels else []
     if labels and len(labels) != len(bounds):
         raise ValueError(f"{len(labels)} lane labels for {len(bounds)} lanes")
@@ -464,9 +470,10 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     noise = _noise_stats(corrected, y0, y1)
     base = _integrate(gray, signal, background, corrected, inverted, ox, oy, y0, y1, bounds, noise, with_profile=True)
     if any(l["flank_rows"] == 0 for l in base):
-        warnings.append("no membrane rows above/below the band inside the box for some lanes: the flank baseline "
-                        "and noise could not be estimated there (opening-only background); include a margin of "
-                        "at least the band height above and below the strip")
+        caveats.append("no membrane rows above/below the band inside the box for some lanes: the flank baseline "
+                       "and noise could not be estimated there (opening-only background); include a margin of "
+                       "at least the band height above and below the strip")
+    warnings.extend(caveats)
     top, rel = _relative(base)
     top_idx = int(np.argmax([l["corrected"] for l in base])) if top > 0 else None
 
@@ -585,6 +592,9 @@ def analyze(img: np.ndarray, lanes: int | None = None, row_index: int = 0,
     if multi_row_note and overall == OK:
         overall = WARNING
         overall_reasons.append(multi_row_note)
+    if caveats and overall == OK:
+        overall = WARNING
+        overall_reasons.extend(caveats)
     if overall == WARNING and not overall_reasons:
         overall_reasons.append("one or more lanes carry a warning; read the per-lane reasons")
     if overall == OK and any(l["quality"] == REFUSED for l in base):
