@@ -261,20 +261,27 @@ _METHODS_HDR = "PAPER_SAMPLE_OR_METHODS_SNIPPETS:"
 
 
 def _split_text_context(text_context: str) -> tuple[str, str]:
-    """(caption, methods) from the retrieval blob, source text untouched.
+    """(caption, methods) from the retrieval blob.
 
-    Caption = the section under the caption header (up to the methods header).
+    Headers count only at the START of a line (a header quoted mid-line is
+    text). Caption = every section under a caption header, concatenated.
     Methods = everything else (preamble + methods snippets), so nothing is
-    dropped. No caption header -> caption "" and the whole blob stays methods.
+    dropped. Header strings are removed from both outputs. No caption header
+    -> caption "" and the whole blob stays methods, untouched.
     """
-    start = text_context.find(_CAPTION_HDR)
-    if start == -1:
+    caption: list[str] = []
+    methods: list[str] = []
+    current, seen_caption = methods, False
+    for line in text_context.splitlines(keepends=True):
+        head = line.lstrip()
+        if head.startswith(_CAPTION_HDR):
+            current, seen_caption, line = caption, True, head[len(_CAPTION_HDR):]
+        elif head.startswith(_METHODS_HDR):
+            current, line = methods, head[len(_METHODS_HDR):]
+        current.append(line)
+    if not seen_caption:
         return "", text_context
-    body = start + len(_CAPTION_HDR)
-    end = text_context.find(_METHODS_HDR, body)
-    if end == -1:
-        end = len(text_context)
-    return text_context[body:end].strip(), (text_context[:start] + text_context[end:]).strip()
+    return "".join(caption).strip(), "".join(methods).strip()
 
 
 def _panel_context(summary: dict, candidate: dict, text_context: str) -> dict:

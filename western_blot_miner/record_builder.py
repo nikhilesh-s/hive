@@ -39,6 +39,7 @@ from .evidence_record import (
     RANK_ANTIBODY,
     RANK_CAPTION,
     RANK_DETERMINISTIC,
+    RANK_IMAGE,
     RANK_METHODS,
     RANK_MODEL_TARGET,
     RANK_REFERENCE,
@@ -237,12 +238,18 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
     elif biology._CO_IP.search(panel_scoped):
         m = biology._CO_IP.search(panel_scoped)
         flags.append("co_ip")
-        sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
-                              text=_around(panel_scoped, m.start())))
+        # lane_text is the model's reading of labels printed on the image, not
+        # caption text: type it as image evidence when the hit falls there.
+        if m.start() < len(caption):
+            sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
+                                  text=_around(caption, m.start())))
+        else:
+            sources.append(Source(type="image", rank=RANK_IMAGE,
+                                  text=_around(panel_scoped, m.start())))
     elif biology._IP_LANE.search(lane_text):
         m = biology._IP_LANE.search(lane_text)
         flags.append("co_ip")
-        sources.append(Source(type="figure_caption", rank=RANK_CAPTION,
+        sources.append(Source(type="image", rank=RANK_IMAGE,
                               text=_around(lane_text, m.start())))
     elif biology._CO_IP.search(methods):
         m = biology._CO_IP.search(methods)
@@ -395,18 +402,74 @@ def _treatment_info(mc) -> TreatmentInfo:
 # and anti-actin (Santa Cruz sc-47778)"). Splitting on antibody mentions and
 # keeping only the fragment that names THIS antibody's target stops the
 # backstop from attaching the first catalog number to the wrong antibody.
-_AB_SPLIT = re.compile(r"(?=\banti-)|(?=\bantibod(?:y|ies)\b)|;", re.IGNORECASE)
+# A "candidate protein name" is a token after `anti-`, or a token immediately
+# followed by "(" or "antibod…" ("GAPDH (1:5000) and ACTB (Abcam ab8227)
+# antibodies"). Generic words that take the same shape are not proteins.
+_AB_TOKEN = r"[^\W_](?:[\w\-/.]*\w)?"
+_AB_CANDIDATE = re.compile(
+    rf"\banti-\s*({_AB_TOKEN})|({_AB_TOKEN})(?=\s*\(|\s+antibod)", re.IGNORECASE)
+_AB_GENERIC = {"antibody", "antibodies", "primary", "secondary", "monoclonal", "polyclonal",
+               "and", "or", "against", "with", "the", "clone"}
+_AB_SENTENCE_END = re.compile(r"\.\s+(?=[A-Z])|;")
+
+
+def _paren_depths(text: str) -> list[int]:
+    d, out = 0, []
+    for ch in text:
+        if ch in ")]":
+            d = max(0, d - 1)
+        out.append(d)
+        if ch in "([":
+            d += 1
+    return out
 
 
 def _target_scoped_antibody(text: str, target: str) -> dict:
-    """extract_antibody over the fragment of `text` that names `target`;
-    {} when the target is not found in exactly one fragment (abstain)."""
-    frags = [f for f in _AB_SPLIT.split(text) if f and f.strip()]
-    if len(frags) <= 1:
-        return extract_antibody(text)
+    """Antibody metadata from the part of `text` that belongs to `target`.
+
+    Scope = from each top-level mention of the target (alphanumeric-bounded, so
+    ERK never matches ERK5 and actin never matches alpha-actinin) to the next
+    top-level mention of a DIFFERENT candidate protein, a `;`, or the sentence
+    end. Parenthesised content never splits a scope. The target must be named;
+    otherwise abstain ({}). Within scope, a field with more than one distinct
+    value abstains (None) rather than picking the first regex hit."""
     keys = {k.lower() for k in (target, biology.core_symbol(target or "")) if k}
-    hits = [f for f in frags if any(k in f.lower() for k in keys)]
-    return extract_antibody(hits[0]) if len(hits) == 1 else {}
+    if not text or not keys:
+        return {}
+    low, depth = text.lower(), _paren_depths(text)
+    is_target = lambda s: any(re.search(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", s.lower())
+                              for k in keys)
+    mentions = sorted({m.start() for k in keys
+                       for m in re.finditer(rf"(?<![a-z0-9]){re.escape(k)}(?![a-z0-9])", low)
+                       if depth[m.start()] == 0})
+    if not mentions:
+        return {}
+    bounds = [m.start() for m in _AB_SENTENCE_END.finditer(text) if depth[m.start()] == 0]
+    for m in _AB_CANDIDATE.finditer(text):
+        tok = m.group(1) or m.group(2)
+        start = m.start(1) if m.group(1) else m.start(2)
+        if depth[start] == 0 and tok.lower() not in _AB_GENERIC and not is_target(tok):
+            bounds.append(start)
+    scopes = []
+    for p in mentions:
+        end = min([b for b in bounds if b > p], default=len(text))
+        scopes.append(text[p:end])
+    scope = " | ".join(scopes)
+
+    def one(vals):
+        uniq = {re.sub(r"[\s#,]", "", v).lower() for v in vals}
+        return vals[0] if len(uniq) == 1 else None
+    s_low = scope.lower()
+    vendors = list(dict.fromkeys(label for key, label in biology.VENDORS.items() if key in s_low))
+    cats = ([m.group(1).strip() for m in biology._CATALOG.finditer(scope)]
+            or [m.group(1).strip() for m in biology._CATALOG_VENDORCODE.finditer(scope)])
+    return {
+        "target": None,
+        "vendor": one(vendors),
+        "catalog_number": one(cats),
+        "clone": one([m.group(1) for m in re.finditer(r"\bclone\s+([A-Za-z0-9\-]+)", scope, re.IGNORECASE)]),
+        "dilution": one([f"1:{m.group(1)}" for m in biology._DILUTION.finditer(scope)]),
+    }
 
 
 def _antibody_info(ab, row_core, mod_fields) -> AntibodyInfo:
@@ -480,7 +543,14 @@ def _association_confidence(ab, row_core, mod_fields) -> float:
     return 0.5                           # same protein, modification mismatch
 
 
-def _kda_near_core(core: str, text: str) -> float | None:
+def _kda_hit(text: str) -> tuple[float, str] | None:
+    """(kDa value, verbatim window around the match) or None."""
+    m = biology._KDA.search(text or "")
+    val = extract_kda(text)
+    return (val, _around(text, m.start())) if m and val is not None else None
+
+
+def _kda_near_core(core: str, text: str) -> tuple[float, str] | None:
     """A kDa figure counts as REPORTED for this target only when it appears
     near a mention of the target's core symbol. A page blob's first kDa number
     (ladder descriptions, other rows' masses) must never be attributed to every
@@ -492,25 +562,27 @@ def _kda_near_core(core: str, text: str) -> float | None:
     idx = low.find(core_low)
     while idx != -1:
         window = text[max(0, idx - 30): idx + len(core) + 60]
-        val = extract_kda(window)
-        if val is not None:
-            return val
+        hit = _kda_hit(window)
+        if hit is not None:
+            return hit
         idx = low.find(core_low, idx + 1)
     return None
 
 
 def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
-    reported = _kda_near_core(core, caption)
-    if reported is None:
-        reported = _kda_near_core(core, methods)
-    if reported is None and caption and core and core.lower() not in caption.lower():
+    hit, src_type, src_rank = _kda_near_core(core, caption), "figure_caption", RANK_CAPTION
+    if hit is None:
+        hit, src_type, src_rank = _kda_near_core(core, methods), "methods", RANK_METHODS
+    if hit is None and caption and core and core.lower() not in caption.lower():
         # Core absent from a short caption -> the caption is plausibly about
         # this single target row anyway (same fallback rule as _scoped_site).
         # Applies to the CAPTION only, never the page-level methods blob.
-        reported = extract_kda(caption)
+        hit, src_type, src_rank = _kda_hit(caption), "figure_caption", RANK_CAPTION
+    reported = hit[0] if hit else None
+    # Source text is the verbatim matched window, typed by the channel it came from.
     reported_f = EvidenceField.supported(
-        reported, 0.8, [Source(type="figure_caption", rank=RANK_CAPTION, text=f"{reported} kDa")]) \
-        if reported is not None else EvidenceField.missing()
+        reported, 0.8, [Source(type=src_type, rank=src_rank, text=hit[1])]) \
+        if hit else EvidenceField.missing()
     expected = res.expected_mass_kda
     expected_f = EvidenceField.supported(
         expected, 0.9, [Source(type="uniprot_reference", rank=RANK_REFERENCE,
