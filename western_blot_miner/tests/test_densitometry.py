@@ -61,6 +61,10 @@ check("overall ok", res["quality"]["state"] == "ok")
 y0, y1 = res["band_row"]
 check("band row brackets y=60", y0 <= 60 <= y1)
 check("lane y bounds = band row", all(l["y0"] == y0 and l["y1"] == y1 for l in res["lanes"]))
+pf = res["lanes"][0]["profile"]
+check("profile covers the band row plus flanks in full-image y", pf["y0"] <= y0 and pf["y0"] + len(pf["values"]) >= y1
+      and pf["flank"][0][1] <= y0 and pf["flank"][1][0] >= y1)
+check("profile peaks inside the band row", y0 <= pf["y0"] + int(np.argmax(pf["values"])) < y1)
 check("method metadata", res["method"]["name"] == D.METHOD_NAME and res["method"]["version"] == D.METHOD_VERSION
       and res["method"]["params"]["clip_fraction_refuse"] == D.CLIP_FRACTION_REFUSE)
 

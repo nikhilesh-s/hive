@@ -11,9 +11,11 @@ import ExperimentalNav from '@/components/ExperimentalNav';
 
 type Quality = 'ok' | 'warning' | 'quantification_refused';
 interface Stability { relative_min: number; relative_median: number; relative_max: number }
+interface Profile { y0: number; values: number[]; flank: [number, number][] }
 interface Lane {
   index: number; label: string | null; x0: number; x1: number; y0: number; y1: number;
   raw: number; background: number; corrected: number; relative: number | null; clipped_fraction: number;
+  flank_baseline?: number; flank_rows?: number; profile?: Profile;
   quality: Quality; reasons: string[]; stability: Stability | null;
 }
 interface Result {
@@ -63,6 +65,30 @@ function download(name: string, type: string, part: BlobPart) {
 const stamp = () => new Date().toISOString().replace(/[:.]/g, '-');
 const relText = (l: Lane) => l.relative == null ? '—' : l.stability ? `${l.stability.relative_min.toFixed(1)}–${l.stability.relative_max.toFixed(1)}` : l.relative.toFixed(2);
 const relBar = (l: Lane) => l.relative == null ? null : l.stability ? l.stability.relative_median : l.relative;
+
+// Vertical profile sparkline: opening-corrected row means over the band row
+// plus the flank rows the baseline came from; y runs top->bottom like the image.
+function Sparkline({ l, vmax }: { l: Lane; vmax: number }) {
+  const p = l.profile;
+  if (!p || p.values.length < 2 || vmax <= 0) return null;
+  const W = 120, H = 40, n = p.values.length;
+  const x = (i: number) => (i / (n - 1)) * W;
+  const y = (v: number) => H - 2 - (Math.max(0, v) / vmax) * (H - 4);
+  const pts = p.values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const span = (a: number, b: number, cls: string) => {
+    const i0 = Math.max(0, a - p.y0), i1 = Math.min(n - 1, b - p.y0);
+    return i1 > i0 ? <rect x={x(i0)} y={0} width={x(i1) - x(i0)} height={H} className={cls} /> : null;
+  };
+  const base = l.flank_baseline ?? 0;
+  return (
+    <svg className="hb-dens-spark" viewBox={`0 0 ${W} ${H}`} width={W} height={H} aria-label={`Vertical profile of lane ${l.index}`} role="img">
+      {p.flank.map(([a, b], i) => <g key={i}>{span(a, b, 'hb-dens-spark-flank')}</g>)}
+      {span(l.y0, l.y1, 'hb-dens-spark-band')}
+      {base > 0 && <line x1={0} x2={W} y1={y(base)} y2={y(base)} className="hb-dens-spark-base" />}
+      <polyline points={pts} className="hb-dens-spark-line" />
+    </svg>
+  );
+}
 
 export default function DensitometryPage() {
   const [recordId, setRecordId] = useState('');
@@ -434,12 +460,13 @@ export default function DensitometryPage() {
             <table className="hb-dens-table">
               <thead>
                 <tr>
-                  <th>lane</th><th>label</th>{!refused && <th>relative</th>}<th>corrected</th><th>background</th><th>clipped</th><th>quality</th>{!refused && <th></th>}
+                  <th>lane</th><th>label</th>{!refused && <th>relative</th>}<th>corrected</th><th>background</th><th>clipped</th><th>profile</th><th>quality</th>{!refused && <th></th>}
                 </tr>
               </thead>
               <tbody>
                 {res.lanes.map((l) => {
                   const bar = relBar(l);
+                  const vmax = Math.max(...res.lanes.map((k) => Math.max(...(k.profile?.values ?? [0]))));
                   return (
                     <tr key={l.index}>
                       <td style={{ fontFamily: MONO }}>{l.index}</td>
@@ -448,6 +475,7 @@ export default function DensitometryPage() {
                       <td style={{ fontFamily: MONO }}>{Math.round(l.corrected).toLocaleString()}</td>
                       <td style={{ fontFamily: MONO }}>{Math.round(l.background).toLocaleString()}</td>
                       <td style={{ fontFamily: MONO, color: l.clipped_fraction > 0.02 ? 'var(--error)' : undefined }}>{(l.clipped_fraction * 100).toFixed(1)}%</td>
+                      <td><Sparkline l={l} vmax={vmax} /></td>
                       <td>
                         <span className={`hb-dens-q ${QUALITY_CLASS[l.quality]}`}>{l.quality === 'quantification_refused' ? 'refused' : l.quality}</span>
                         {l.reasons.length > 0 && <span className="hb-dens-reasons"> {l.reasons.join('; ')}</span>}
@@ -460,6 +488,7 @@ export default function DensitometryPage() {
             </table>
           </div>
           <p className="hb-live-note">
+            {'Profile = row means of the background-corrected signal, top to bottom: shaded band row, faint flank rows (where the dashed per-lane baseline comes from). '}
             {!refused && 'Relative = corrected ÷ strongest lane. A range means min–max across geometry perturbations; the bar is the median. '}
             Clipped = fraction of pixels at the sensor/encoding limit (red above 2%).
           </p>
