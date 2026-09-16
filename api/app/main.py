@@ -42,3 +42,13 @@ if settings.experimental_enabled:
 
     app.include_router(experimental_router)
     app.include_router(densitometry_router)
+
+    # Local-runner bridge: hosted HiveBlot can ask the researcher's own machine
+    # to run model jobs, so no Claude credential ever lives in the cloud. These
+    # routes authenticate with HIVEBLOT_RUNNER_TOKEN, never the internal key,
+    # and are inert (503) until that token is set.
+    from .experimental import relay_client
+    from .experimental.runner import router as runner_router
+
+    app.include_router(runner_router)
+    relay_client.install()

@@ -37,6 +37,17 @@ def _extract_json(raw: str) -> dict[str, Any]:
     return {"error": "bad_json", "raw": raw[:1200]}
 
 
+# Backends a host application can add without touching this module — used by the
+# hosted API to register `relay`, which hands the prompt to the researcher's own
+# machine instead of holding any model credential. name -> (factory, status_fn).
+_EXTRA_BACKENDS: dict[str, tuple[Callable[..., "LLMClient"], Callable[[str], tuple[bool, str]]]] = {}
+
+
+def register_backend(name: str, factory: Callable[..., "LLMClient"],
+                     status_fn: Callable[[str], tuple[bool, str]]) -> None:
+    _EXTRA_BACKENDS[name.lower()] = (factory, status_fn)
+
+
 class LLMClient:
     """Interface: return parsed JSON for a (system, user, optional image) prompt."""
 
@@ -305,6 +316,8 @@ def backend_status(backend: Optional[str] = None) -> tuple[bool, str]:
     """Is the configured backend usable right now? (ok, backend name | reason)."""
     backend = (backend or os.environ.get("WBM_LLM_BACKEND", "")).lower()
     env = os.environ
+    if backend in _EXTRA_BACKENDS:
+        return _EXTRA_BACKENDS[backend][1](backend)
     if backend == "claude_cli":
         exe = ClaudeCLIClient.available()
         return (True, "claude_cli") if exe else (False, "WBM_LLM_BACKEND=claude_cli but no `claude` executable found")
@@ -324,6 +337,8 @@ def backend_status(backend: Optional[str] = None) -> tuple[bool, str]:
 
 def get_client(backend: Optional[str] = None, escalation: bool = False) -> LLMClient:
     backend = (backend or os.environ.get("WBM_LLM_BACKEND", "bedrock")).lower()
+    if backend in _EXTRA_BACKENDS:
+        return _EXTRA_BACKENDS[backend][0](escalation=escalation)
     if backend == "bedrock":
         return BedrockClient(model=DEFAULT_BEDROCK_ESCALATION_MODEL if escalation else None)
     if backend == "anthropic":

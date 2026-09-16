@@ -100,7 +100,10 @@ def test_answer_without_model_returns_evidence_only(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
     monkeypatch.delenv("WBM_LLM_BACKEND", raising=False)
     out = _run(ask.answer("Is ERK phosphorylated after IL-6?", include_live=False))
-    assert out["answer"] is None and "no model backend" in out["note"]
+    # the note repeats the backend's own reason, so a hosted deployment says
+    # "no HiveBlot Local Runner connected" instead of asking for an API key
+    assert out["answer"] is None and "Retrieval only" in out["note"] and "model" in out["note"].lower()
+    assert out["note"].endswith(".")
     assert [b["ref"] for b in out["evidence"]] == ["E1", "E2"]
 
 
