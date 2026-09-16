@@ -118,7 +118,10 @@ def test_relay_waits_for_the_local_answer_and_times_out_cleanly(client, monkeypa
 
 def test_the_runner_script_refuses_unknown_job_kinds():
     import importlib.util
-    spec = importlib.util.spec_from_file_location("hiveblot_runner", "/Users/niks/hive/scripts/hiveblot_runner.py")
+    from pathlib import Path
+
+    script = Path(__file__).resolve().parents[2] / "scripts" / "hiveblot_runner.py"
+    spec = importlib.util.spec_from_file_location("hiveblot_runner", script)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert mod.HANDLERS == ("extract_panel", "paper_qa")
