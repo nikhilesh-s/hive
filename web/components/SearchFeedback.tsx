@@ -21,6 +21,7 @@ export default function SearchFeedback({ query, zeroResults = false }:
   { query: string; zeroResults?: boolean }) {
   const [state, setState] = useState<'idle' | 'explain' | 'done'>(zeroResults ? 'explain' : 'idle');
   const [expected, setExpected] = useState('');
+  const [failed, setFailed] = useState(false);
 
   if (!query) return null;
   if (state === 'done') {
@@ -35,14 +36,19 @@ export default function SearchFeedback({ query, zeroResults = false }:
     type: 'understood_yes' | 'understood_partially' | 'understood_no' | 'no_results',
     comment?: string,
   ) => {
+    setFailed(false);
     submitFeedback({
       feedback_scope: 'search', search_query: query, feedback_type: type,
       comment: comment || null,
       // The location doubles as the result-count signal: zero vs non-zero.
       ui_location: zeroResults ? 'search_zero_results' : 'search_results',
+    }).then((ok) => {
+      // F-6: a dropped submission must not render a checkmark. On failure the
+      // prompt stays put so the same click can be retried.
+      setFailed(!ok);
+      if (ok && (type === 'understood_yes' || comment !== undefined)) setState('done');
     });
-    if (type === 'understood_yes' || comment !== undefined) setState('done');
-    else setState('explain');
+    if (type !== 'understood_yes' && comment === undefined) setState('explain');
   };
 
   const btn = {
@@ -53,6 +59,11 @@ export default function SearchFeedback({ query, zeroResults = false }:
 
   return (
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {failed && (
+        <div style={{ fontFamily: MONO, fontSize: '10px', color: 'var(--error)' }}>
+          couldn’t save that — try again
+        </div>
+      )}
       {state === 'idle' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <span style={{ fontFamily: SANS, fontSize: '12px', color: 'var(--text-subtle)' }}>

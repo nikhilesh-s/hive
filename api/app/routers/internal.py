@@ -157,7 +157,7 @@ async def record_feedback(record_id: int = PathParam(ge=1, le=2**63 - 1)):
 
 @router.post("/feedback", response_model=FeedbackResponse,
              dependencies=[Depends(require_internal_key)])
-@limiter.limit(settings.search_rate_limit)
+@limiter.limit(settings.feedback_rate_limit)
 async def submit_feedback(request: Request, body: FeedbackSubmission):
     """Store researcher feedback (migration 002). The AI extraction is never
     mutated here — corrections are stored beside it, keyed to the record and
