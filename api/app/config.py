@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -52,6 +53,12 @@ class Settings(BaseSettings):
     # slowapi rate-limit strings, e.g. "20/minute"
     search_rate_limit: str = "20/minute"
     agent_rate_limit: str = "10/minute"
+
+    # Stamped on every feedback row and returned by /health, so a demo laptop
+    # and a hosted deployment are distinguishable in the F-1 export (F-5,
+    # replacing the hardcoded "beta-local"). Set APP_VERSION explicitly, or
+    # let it fall back to the build SHA Render injects by itself.
+    app_version: str = os.environ.get("RENDER_GIT_COMMIT", "dev-local")[:12]
 
     table_name: str = "western_blot_records"
     max_search_limit: int = 500

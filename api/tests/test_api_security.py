@@ -116,7 +116,9 @@ def test_health_is_public(client):
     r = client.get("/health")
 
     assert r.status_code == 200
-    assert r.json() == {"status": "ok"}
+    # app_version (F-5) lets an operator confirm which build is live without
+    # writing a feedback row; it is a build id, never a secret.
+    assert r.json() == {"status": "ok", "app_version": settings.app_version}
 
 
 # --- request validation --------------------------------------------------

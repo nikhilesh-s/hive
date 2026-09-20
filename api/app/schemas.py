@@ -307,6 +307,10 @@ class FeedbackSubmission(BaseModel):
     comment: str | None = Field(default=None, max_length=4000)
     ui_location: str | None = Field(default=None, max_length=200)
     session_id: str | None = Field(default=None, max_length=64)
+    # F-5 (migration 006): optional, sent ONLY when the researcher ticked the
+    # explicit opt-in. Never returned by the rehydration path (FeedbackItem
+    # below has no contact field), so it cannot render in another browser.
+    contact: str | None = Field(default=None, max_length=200)
 
     def validate_scope(self) -> str | None:
         """Scope-specific requirements; returns an error string or None."""

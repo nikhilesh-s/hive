@@ -54,7 +54,12 @@ export default function BetaFeedback({ query }: { query?: string }) {
   const [state, setState] = useState<'idle' | 'open' | 'survey' | 'done'>('idle');
   const [text, setText] = useState('');
   const [answers, setAnswers] = useState(['', '', '']);
+  // F-5: contact is stored only when the (unchecked by default) box is ticked.
+  const [consent, setConsent] = useState(false);
+  const [email, setEmail] = useState('');
   const surveyDone = useSyncExternalStore(subscribeSurvey, surveyDoneSnapshot, () => true);
+
+  const contact = consent && email.trim() ? email.trim() : null;
 
   const closeSurvey = () => {
     try { window.localStorage.setItem(SURVEY_KEY, '1'); } catch { /* private mode */ }
@@ -75,6 +80,24 @@ export default function BetaFeedback({ query }: { query?: string }) {
     background: 'var(--input-background)', border: '1px solid var(--border-strong)',
     borderRadius: '8px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px',
   } as const;
+
+  const ContactOptIn = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <label style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', fontFamily: SANS, fontSize: '11px', color: 'var(--text-subtle)', lineHeight: 1.4 }}>
+        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+        <span>You may follow up with me about this comment (optional).</span>
+      </label>
+      {consent && (
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@lab.ucsf.edu"
+          style={{ ...input, resize: undefined, fontSize: '12px' }}
+        />
+      )}
+    </div>
+  );
 
   if (state === 'idle') {
     return (
@@ -124,6 +147,7 @@ export default function BetaFeedback({ query }: { query?: string }) {
             />
           </div>
         ))}
+        {ContactOptIn}
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => {
@@ -132,7 +156,7 @@ export default function BetaFeedback({ query }: { query?: string }) {
                 if (!a) return;  // an unanswered question writes no row
                 submitFeedback({
                   feedback_scope: 'ui', comment: a, feedback_type: s.type,
-                  search_query: query || null, ui_location: s.location,
+                  search_query: query || null, ui_location: s.location, contact,
                 });
               });
               closeSurvey();
@@ -173,13 +197,14 @@ export default function BetaFeedback({ query }: { query?: string }) {
             placeholder="e.g. keep the blot visible while I inspect the methods"
             style={input}
           />
+          {ContactOptIn}
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={() => {
                 if (!text.trim()) return;
                 submitFeedback({
                   feedback_scope: 'ui', comment: text.trim(),
-                  search_query: query || null, ui_location: 'search_page',
+                  search_query: query || null, ui_location: 'search_page', contact,
                 });
                 setState('done');
               }}
