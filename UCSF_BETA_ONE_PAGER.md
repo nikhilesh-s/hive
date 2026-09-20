@@ -26,19 +26,21 @@ For each field, ask: does the quoted source actually support this value? Does th
 
 ## What this beta is not
 
-This is not a literature search engine. It only covers 3 reviewed papers, not the wider literature. It does not measure band intensity (no densitometry, no fold-change, no up/down-regulation calls). It does not guess: when sources disagree, HiveBlot shows both claims instead of picking one.
+This link is not yet the live literature search. It covers 3 reviewed papers, chosen so we can check every field by hand. It does not guess: when sources disagree, HiveBlot shows both claims instead of picking one.
+
+Built and running on our side, coming in the next drop once hosted: live literature search (give a target or DOI, HiveBlot finds open-access papers through Valency and PMC and extracts the blots, shown as unreviewed), question answering over a paper with citations, and a first densitometry tool that measures relative band intensity from a crop and refuses when the image is clipped.
 
 ## Known limitations
 
-The corpus is intentionally small, so most searches outside these 3 papers will return nothing. Automated extraction accuracy on papers HiveBlot has not seen has not been measured yet. The free-tier hosting means the first search after a quiet period can take 30-60 seconds. For paper access, we are currently using Valencio and PaperQA2 to pull in papers; broader access to the literature may come later as the beta grows.
+The corpus is intentionally small, so most searches outside these 3 papers will return nothing. Automated extraction accuracy on papers HiveBlot has not seen has not been measured yet. The free-tier hosting means the first search after a quiet period can take 30-60 seconds. Paper access in the live search runs through Valency and PMC open access; paywalled papers are reported as such, not scraped. Broader access may be needed later.
 
 ## Feedback link
 
-Please tell us what worked and what did not: [TALLY_LINK]
+Please tell us what worked and what did not: https://tally.so/r/A7kzWB
 
 ## Contact / next steps
 
-Beta link: [BETA_LINK]
+Beta link: https://hiveblot-beta.vercel.app
 
 Questions or issues: [CONTACT_EMAIL]
 

@@ -152,14 +152,13 @@ demo-blocking runtime failure justifies a change before UCSF. No P2 polish.
   papers and rows re-counted live in Supabase: 3 / 475), `PAPER_ACCESS_AUDIT.md`
   (verdict: hosted runtime makes no literature call; only ingestion does),
   `UCSF_BETA_HANDOFF_MESSAGE.md`, `UCSF_BETA_ONE_PAGER.md`,
-  `BETA_EMAIL_WITH_TALLY_AND_BRIEF.md` (all with `[BETA_LINK]` /
-  `[TALLY_LINK]` / `[CONTACT_EMAIL]` placeholders) and `HOSTING_STATUS.md`
+  `BETA_EMAIL_WITH_TALLY_AND_BRIEF.md` (beta and Tally links filled in, `[CONTACT_EMAIL]` still a placeholder) and `HOSTING_STATUS.md`
   (live, both free plans, no blockers; API `/docs` is public). One smoke
   feedback row (feedback_id 42, record 1189) was created and then deleted.
   Prior 2026-09-16 "marked correct" feedback on record 1189 is still visible
-  in the evidence panel; Nik decides whether to keep it. Open naming
-  question: the prompts say "Valencio", the repo says "Valency"; the pack
-  uses "Valencio" as instructed. Hosted beta unchanged (Render autoDeploy
+  in the evidence panel; Nik decides whether to keep it. Links filled in:
+  beta https://hiveblot-beta.vercel.app, Tally https://tally.so/r/A7kzWB.
+  Hosted beta unchanged (Render autoDeploy
   off; Vercel not auto-deploying this branch).
 - **2026-09-01 (session 31)** — Claude Code (Fable 5.1). **UCSF BETA-READINESS
   PASS (security migration + P0 communication + consolidated QA/UX; deployed

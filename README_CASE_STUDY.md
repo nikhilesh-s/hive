@@ -67,7 +67,7 @@ Being explicit about uncertainty was better received than trying to make every f
 - There is no densitometry or quantitative band-intensity inference anywhere in the system.
 - The free-tier API spins down when idle, so the first search after a quiet period is slow.
 - Rate limiting runs per server instance, which would need rework if the API were scaled horizontally.
-- Getting evidence into the system currently depends on manual review rather than a general pipeline. Live paper discovery and reading exists on a separate, unmerged branch and has not been folded into this frozen beta. For now, we are using Valencio and PaperQA2 for paper access, but we may need broader paper access later, before the corpus can grow much past a handful of papers.
+- Getting evidence into the system currently depends on manual review rather than a general pipeline. Live paper discovery and reading exists on a separate, unmerged branch and has not been folded into this frozen beta. For now, we are using Valency and PaperQA2 for paper access, but we may need broader paper access later, before the corpus can grow much past a handful of papers.
 
 ## What comes next
 
