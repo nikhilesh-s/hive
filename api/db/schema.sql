@@ -57,7 +57,10 @@ grant connect on database postgres to hive_readonly;
 grant usage on schema public to hive_readonly;
 grant select on western_blot_records to hive_readonly;
 
--- Ensures any future column added to this table is still readable without
--- re-granting, but does NOT grant access to any other table created later.
-alter default privileges in schema public
-    grant select on tables to hive_readonly;
+-- NOTE (migration 004): an earlier version of this file also ran
+--   alter default privileges in schema public grant select on tables to hive_readonly;
+-- That grants SELECT on every FUTURE table (it is how hive_readonly silently
+-- gained access to hiveblot_feedback). Column additions never needed it --
+-- a table-level SELECT grant already covers new columns. Projects that applied
+-- the old version are repaired by migrations/004_secure_public_tables.sql,
+-- which also enables Row Level Security and revokes the Supabase client roles.
