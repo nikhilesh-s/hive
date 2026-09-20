@@ -382,6 +382,9 @@ export default function SearchPage() {
                   beta dataset (3 reviewed papers). This does not mean no such evidence
                   exists in the literature — the beta corpus is deliberately small.
                 </p>
+                <div className="hb-search-feedback-wrap">
+                  <SearchFeedback key={query} query={query} zeroResults />
+                </div>
               </div>
             )}
           </div>

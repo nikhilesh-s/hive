@@ -278,8 +278,14 @@ RECORD_FEEDBACK_TYPES = {
     "wrong_interpretation", "wrong_experiment_type", "wrong_target_modification",
     "wrong_phosphosite", "wrong_antibody_association", "wrong_figure_association",
     "missing_methods_context", "irrelevant_result", "other",
+    # F-3: usefulness of the whole result, not its wrongness. The instrument
+    # measured wrongness in detail and usefulness not at all.
+    "useful", "not_relevant",
 }
-SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no"}
+SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no",
+                         # F-2: the search returned nothing. The query itself is
+                         # the signal; ui_location says search_zero_results.
+                         "no_results"}
 
 
 class FeedbackSubmission(BaseModel):
@@ -301,6 +307,10 @@ class FeedbackSubmission(BaseModel):
     comment: str | None = Field(default=None, max_length=4000)
     ui_location: str | None = Field(default=None, max_length=200)
     session_id: str | None = Field(default=None, max_length=64)
+    # F-5 (migration 006): optional, sent ONLY when the researcher ticked the
+    # explicit opt-in. Never returned by the rehydration path (FeedbackItem
+    # below has no contact field), so it cannot render in another browser.
+    contact: str | None = Field(default=None, max_length=200)
 
     def validate_scope(self) -> str | None:
         """Scope-specific requirements; returns an error string or None."""

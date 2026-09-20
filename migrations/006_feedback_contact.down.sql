@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE hiveblot_feedback DROP COLUMN IF EXISTS contact;
+COMMIT;

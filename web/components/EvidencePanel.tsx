@@ -179,6 +179,12 @@ function Ack() {
   return <span style={{ fontFamily: MONO, fontSize: '10px', color: TEAL }}>✓ recorded — thank you</span>;
 }
 
+// F-6: a 429/503 used to render a checkmark. Say so instead; the controls
+// stay on screen so the researcher can retry.
+function FailNote() {
+  return <span style={{ fontFamily: MONO, fontSize: '10px', color: RED }}>couldn’t save that — try again</span>;
+}
+
 // --- one auditable field row --------------------------------------------------
 
 // Prior researcher feedback for one field — rendered as a clearly separated
@@ -223,6 +229,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
   prior?: PriorFeedback[]; stableRowKey?: string | null; readOnly?: boolean;
 }) {
   const [mode, setMode] = useState<'idle' | 'correcting' | 'done'>('idle');
+  const [failed, setFailed] = useState(false);
   const glyph = statusGlyph(fe.status);
   const value = fmtValue(name, fe, all);
   const snippet = fe.sources.find((s) => s.text)?.text || '';
@@ -231,13 +238,13 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
     : null;
 
   const send = (feedback_type: string, suggested?: string, comment?: string) => {
+    setFailed(false);
     submitFeedback({
       feedback_scope: 'field', record_id: recordId, stable_row_key: stableRowKey, paper_id: paperId,
       field_name: name, model_value: value || null, feedback_type,
       suggested_value: suggested || null, comment: comment || null,
       ui_location: 'evidence_panel',
-    });
-    setMode('done');
+    }).then((ok) => { setFailed(!ok); setMode(ok ? 'done' : 'idle'); });
   };
 
   // Lane-series fields (time course / dose response): the per-lane values are
@@ -281,7 +288,8 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
         {srcName && (
           <span style={{ fontFamily: MONO, fontSize: '9px', color: LABEL }}>via {srcName}</span>
         )}
-        <span style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+        <span style={{ marginLeft: 'auto', display: 'flex', gap: '4px', alignItems: 'center' }}>
+          {failed && <FailNote />}
           {readOnly ? null : mode === 'done' ? <Ack /> : mode === 'idle' && (
             <>
               <Btn color={TEAL} title="Correct / useful" onClick={() => send('correct')}>✓</Btn>
@@ -346,6 +354,9 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
   const [missingMode, setMissingMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagMode, setFlagMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagType, setFlagType] = useState('wrong_interpretation');
+  // F-3: usefulness of the result as a whole, separate from its correctness.
+  const [usefulMode, setUsefulMode] = useState<'idle' | 'why' | 'done'>('idle');
+  const [recordFailed, setRecordFailed] = useState(false);
   const [cropFailed, setCropFailed] = useState(false);
 
   const [priorFeedback, setPriorFeedback] = useState<PriorFeedback[]>([]);
@@ -548,12 +559,25 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
             live extraction — unreviewed; feedback is collected on the reviewed corpus only
           </span>
         )}
+        {!readOnly && (usefulMode === 'done' ? <Ack /> : usefulMode === 'idle' ? (
+          <>
+            <Btn color={TEAL} onClick={() => {
+              setRecordFailed(false);
+              submitFeedback({
+                feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key,
+                paper_id: detail.paper_id, feedback_type: 'useful', ui_location: 'evidence_panel',
+              }).then((ok) => { setRecordFailed(!ok); if (ok) setUsefulMode('done'); });
+            }}>This was useful</Btn>
+            <Btn color={RED} onClick={() => setUsefulMode('why')}>Not what I needed</Btn>
+          </>
+        ) : null)}
         {!readOnly && (missingMode === 'done' ? <Ack /> : missingMode === 'idle' ? (
           <Btn color={TEAL} onClick={() => setMissingMode('open')}>+ Missing information?</Btn>
         ) : null)}
         {!readOnly && (flagMode === 'done' ? <Ack /> : flagMode === 'idle' ? (
           <Btn color={GOLD} onClick={() => setFlagMode('open')}>⚑ Flag this result</Btn>
         ) : null)}
+        {recordFailed && <FailNote />}
         {priorRecordScope.length > 0 && (
           <span style={{ fontFamily: MONO, fontSize: '9px', color: GOLD }}>
             {priorRecordScope.length} prior record-level feedback item{priorRecordScope.length > 1 ? 's' : ''} on file
@@ -566,6 +590,22 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
           </a>
         )}
       </div>
+      {usefulMode === 'why' && (
+        <div style={{ marginTop: '8px' }}>
+          <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIM }}>
+            In one line — what were you actually looking for?
+          </div>
+          <CorrectionForm placeholder="" askValue={false}
+            onSubmit={(_v, c) => {
+              submitFeedback({
+                feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key,
+                paper_id: detail.paper_id, feedback_type: 'not_relevant', comment: c || null,
+                ui_location: 'evidence_panel',
+              }).then((ok) => { setRecordFailed(!ok); if (ok) setUsefulMode('done'); });
+            }}
+            onCancel={() => setUsefulMode('idle')} />
+        </div>
+      )}
       {missingMode === 'open' && (
         <div style={{ marginTop: '8px' }}>
           <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIM }}>
@@ -577,8 +617,7 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
               submitFeedback({
                 feedback_scope: 'missing_field', record_id: detail.id, stable_row_key: detail.stable_row_key, paper_id: detail.paper_id,
                 field_name: v || 'unspecified', comment: c || null, ui_location: 'evidence_panel',
-              });
-              setMissingMode('done');
+              }).then((ok) => { setRecordFailed(!ok); if (ok) setMissingMode('done'); });
             }}
             onCancel={() => setMissingMode('idle')} />
         </div>
@@ -595,8 +634,7 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
               submitFeedback({
                 feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key, paper_id: detail.paper_id,
                 feedback_type: flagType, comment: c || null, ui_location: 'evidence_panel',
-              });
-              setFlagMode('done');
+              }).then((ok) => { setRecordFailed(!ok); if (ok) setFlagMode('done'); });
             }}
             onCancel={() => setFlagMode('idle')} />
         </div>
