@@ -3,7 +3,7 @@
 # Free tier on purpose. Read DEPLOYMENT.md §2 before changing anything here.
 #
 # Deploy: Render dashboard -> New -> Blueprint -> pick nikhilesh-s/hive ->
-# branch feature/bio-context-beta. Render reads this file, creates the service
+# branch main. Render reads this file, creates the service
 # on the FREE plan, and then prompts for the four secret values below
 # (sync: false = "never store this in git, ask me in the dashboard").
 #
@@ -17,8 +17,8 @@ services:
     runtime: docker
     plan: free                  # do NOT change: starter/standard/pro all bill
     region: oregon
-    branch: feature/bio-context-beta
-    dockerfilePath: ./api/Dockerfile
+    branch: main
+    dockerfilePath: ./api/Dockerfile.experimental
     dockerContext: .            # repo root — the Dockerfile COPYs api/crops/
     healthCheckPath: /health
     autoDeploy: false           # deploys are deliberate, not every push
@@ -41,3 +41,14 @@ services:
         value: ""
       - key: ALLOWED_ORIGINS    # the deployed Vercel origin (+ local dev)
         value: https://hiveblot-beta.vercel.app,http://localhost:3000
+      # --- experimental stack (set in the dashboard 2026-09-20; secrets never here) ---
+      - key: EXPERIMENTAL_ENABLED
+        value: "true"
+      - key: WBM_LLM_BACKEND
+        value: anthropic
+      - key: ANTHROPIC_API_KEY   # model calls for live extraction and paper QA
+        sync: false
+      - key: DB_INGEST_URL       # hive_ingest, Supavisor SESSION mode (5432)
+        sync: false
+      - key: VALENCY_API_TOKEN   # optional; PMC discovery works without it
+        sync: false
