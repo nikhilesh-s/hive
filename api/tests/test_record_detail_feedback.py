@@ -279,6 +279,10 @@ def test_feedback_scope_rules_direct():
     s = FeedbackSubmission(feedback_scope="search", search_query="x",
                            feedback_type="understood_partially")
     assert s.validate_scope() is None
+    # F-2: a zero-result search is a first-class search signal.
+    z = FeedbackSubmission(feedback_scope="search", search_query="nonsense protein",
+                           feedback_type="no_results", ui_location="search_zero_results")
+    assert z.validate_scope() is None
 
 
 # --- figure-crop endpoint ----------------------------------------------------

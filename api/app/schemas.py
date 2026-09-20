@@ -279,7 +279,10 @@ RECORD_FEEDBACK_TYPES = {
     "wrong_phosphosite", "wrong_antibody_association", "wrong_figure_association",
     "missing_methods_context", "irrelevant_result", "other",
 }
-SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no"}
+SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no",
+                         # F-2: the search returned nothing. The query itself is
+                         # the signal; ui_location says search_zero_results.
+                         "no_results"}
 
 
 class FeedbackSubmission(BaseModel):
