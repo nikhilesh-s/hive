@@ -3,6 +3,10 @@
 // Subtle post-search prompt: "Did HiveBlot understand what you were looking
 // for?" Persisted with the query so misunderstood searches become training
 // signal for the search layer.
+//
+// On a zero-result search (zeroResults) the prompt asks what was being looked
+// for instead: on a small reviewed corpus "my protein is not here" is the most
+// common and most informative event, and it used to leave no trace (F-2).
 
 import { useState } from 'react';
 
@@ -13,8 +17,9 @@ const SANS = 'var(--font-sans), sans-serif';
 
 // A new query resets the prompt: the parent renders this with key={query},
 // so React remounts it instead of an effect calling setState.
-export default function SearchFeedback({ query }: { query: string }) {
-  const [state, setState] = useState<'idle' | 'explain' | 'done'>('idle');
+export default function SearchFeedback({ query, zeroResults = false }:
+  { query: string; zeroResults?: boolean }) {
+  const [state, setState] = useState<'idle' | 'explain' | 'done'>(zeroResults ? 'explain' : 'idle');
   const [expected, setExpected] = useState('');
 
   if (!query) return null;
@@ -26,10 +31,15 @@ export default function SearchFeedback({ query }: { query: string }) {
     );
   }
 
-  const send = (type: 'understood_yes' | 'understood_partially' | 'understood_no', comment?: string) => {
+  const send = (
+    type: 'understood_yes' | 'understood_partially' | 'understood_no' | 'no_results',
+    comment?: string,
+  ) => {
     submitFeedback({
       feedback_scope: 'search', search_query: query, feedback_type: type,
-      comment: comment || null, ui_location: 'search_results',
+      comment: comment || null,
+      // The location doubles as the result-count signal: zero vs non-zero.
+      ui_location: zeroResults ? 'search_zero_results' : 'search_results',
     });
     if (type === 'understood_yes' || comment !== undefined) setState('done');
     else setState('explain');
@@ -54,18 +64,26 @@ export default function SearchFeedback({ query }: { query: string }) {
         </div>
       )}
       {state === 'explain' && (
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{
+          display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap',
+          justifyContent: zeroResults ? 'center' : undefined,
+        }}>
+          {zeroResults && (
+            <span style={{ fontFamily: SANS, fontSize: '12px', color: 'var(--text-subtle)' }}>
+              Nothing found. What were you looking for?
+            </span>
+          )}
           <input
             value={expected}
             onChange={(e) => setExpected(e.target.value)}
-            placeholder="What did you expect instead?"
+            placeholder={zeroResults ? 'e.g. phospho-ERK in primary hepatocytes' : 'What did you expect instead?'}
             style={{
               background: 'var(--input-background)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)',
               borderRadius: '4px', padding: '4px 10px', fontFamily: SANS, fontSize: '11px', width: '320px',
             }}
           />
           <button style={{ ...btn, color: 'var(--accent)', borderColor: 'var(--accent)' }}
-                  onClick={() => send('understood_partially', expected)}>
+                  onClick={() => send(zeroResults ? 'no_results' : 'understood_partially', expected)}>
             Send
           </button>
         </div>
