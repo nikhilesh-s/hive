@@ -123,6 +123,8 @@ def test_fetch_pdf_prefers_europepmc_listing_then_unpaywall(monkeypatch, tmp_pat
             return R(200, content=b"<html>bot check</html>")        # publisher blocks scripts -> not a PDF
         if url.endswith("PMC10/fullTextPDF"):
             return R(404)
+        if "openalex" in url:
+            return R(200, js={"best_oa_location": None, "locations": []})
         if "unpaywall" in url:
             return R(200, js={"best_oa_location": {"url_for_pdf": "https://pub.example/p.pdf", "host_type": "publisher"},
                               "oa_locations": [{"url_for_pdf": "https://repo.example/p.pdf", "host_type": "repository"}]})
@@ -135,7 +137,7 @@ def test_fetch_pdf_prefers_europepmc_listing_then_unpaywall(monkeypatch, tmp_pat
     monkeypatch.setattr(fulltext.requests, "get", fake_get2)
     got = fulltext.fetch_pdf("10.1000/xyz", tmp_path)
     assert got["source"] == "unpaywall:repository" and got["pdf_path"].endswith("10.1000_xyz.pdf")
-    assert got["tried"] == ["europepmc_render", "europepmc_listed_pdf", "europepmc_legacy", "unpaywall"]
+    assert got["tried"] == ["europepmc_render", "europepmc_listed_pdf", "europepmc_legacy", "openalex", "unpaywall"]
 
     # Placeholder contact email => Unpaywall is skipped, never called with a fake address
     monkeypatch.setenv("UNPAYWALL_EMAIL", "western-blot-miner@example.com")
@@ -144,6 +146,41 @@ def test_fetch_pdf_prefers_europepmc_listing_then_unpaywall(monkeypatch, tmp_pat
                         else R(404))
     got = fulltext.fetch_pdf("10.1000/none", tmp_path)
     assert got["pdf_path"] is None and "unpaywall_skipped_no_contact_email" in got["tried"]
+
+
+def test_fetch_pdf_falls_back_to_openalex_when_pmc_blocks_scripts(monkeypatch, tmp_path):
+    """Europe PMC answers 403 to scripted PDF requests (observed 2026-09-20);
+    the publisher's own OA PDF, found through OpenAlex, still works and needs
+    no contact email."""
+    class R:
+        def __init__(self, status, content=b"", js=None):
+            self.status_code, self.content, self._js, self.headers = status, content, js, {}
+        def json(self):
+            return self._js
+
+    monkeypatch.delenv("UNPAYWALL_EMAIL", raising=False)
+
+    def fake_get(url, params=None, timeout=None, allow_redirects=True, headers=None):
+        if "idconv" in url:
+            return R(200, js={"records": [{"requested-id": "10.1000/oa", "doi": "10.1000/oa", "pmcid": "PMC11"}]})
+        if url.endswith("PMC11?pdf=render") or url.endswith("PMC11/fullTextPDF"):
+            return R(403, content=b"<!DOCTYPE html>blocked")
+        if "europepmc/webservices/rest/search" in url:
+            return R(200, js={"resultList": {"result": []}})
+        if "openalex" in url:
+            return R(200, js={"best_oa_location": {"pdf_url": "https://pub.example/blocked.pdf"},
+                              "locations": [{"pdf_url": "https://pub.example/blocked.pdf"},
+                                            {"pdf_url": "https://pub.example/real.pdf"}]})
+        if url == "https://pub.example/blocked.pdf":
+            return R(200, content=b"<html>bot check</html>")
+        if url == "https://pub.example/real.pdf":
+            return R(200, content=b"%PDF-1.7 real")
+        raise AssertionError(url)
+
+    monkeypatch.setattr(fulltext.requests, "get", fake_get)
+    got = fulltext.fetch_pdf("10.1000/oa", tmp_path)
+    assert got["source"] == "openalex" and got["pdf_path"].endswith("10.1000_oa.pdf")
+    assert got["tried"] == ["europepmc_render", "europepmc_legacy", "openalex"]
 
 
 def test_download_retries_rate_limits_then_gives_up(monkeypatch, tmp_path):
