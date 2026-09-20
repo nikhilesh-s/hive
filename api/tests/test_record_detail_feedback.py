@@ -177,6 +177,13 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
     assert inserted["suggested_value"] == "HepG2"
     assert inserted["model_value"] == "Hep3B"
     assert "target" not in inserted and "canonical_target" not in inserted
+    # F-5: a real app_version, not the old hardcoded "beta-local"; contact is
+    # None unless the researcher opted in.
+    assert inserted["app_version"] == settings.app_version != "beta-local"
+    assert inserted["contact"] is None
+    r = client.post("/feedback", headers=AUTH,
+                    json={"feedback_scope": "ui", "comment": "call me", "contact": "a@lab.edu"})
+    assert r.status_code == 200 and inserted["contact"] == "a@lab.edu"
 
     # scope validation failures -> 400
     bad = [
@@ -214,6 +221,21 @@ def test_feedback_rejects_nul_and_mismatched_record_keys(client, monkeypatch):
     assert r.status_code == 400 and "different records" in r.json()["detail"]
     assert inserted == []
     assert client.post("/feedback", json={**base, "stable_row_key": "abc:1"}, headers=AUTH).status_code == 200
+
+
+def test_feedback_has_its_own_generous_rate_limit(client, monkeypatch):
+    """F-6: every hosted researcher shares one Vercel proxy IP, so feedback on
+    the 20/minute search bucket was silently dropped. 25 submissions in a
+    minute from one client must all land."""
+    import app.routers.internal as internal
+
+    async def fake_insert(fields):
+        return 1
+    monkeypatch.setattr(internal, "insert_feedback", fake_insert)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+    body = {"feedback_scope": "ui", "comment": "hi"}
+    codes = {client.post("/feedback", json=body, headers=AUTH).status_code for _ in range(25)}
+    assert codes == {200}
 
 
 def test_feedback_503_when_unconfigured(client, monkeypatch):
@@ -266,6 +288,8 @@ def test_feedback_rehydration_endpoint(client, monkeypatch):
     assert item["model_value"] is None
     assert item["suggested_value"] == "phosphorylation"
     assert item["field_name"] == "modification_type"
+    # F-5: an opt-in contact address is never rehydrated into another browser.
+    assert "contact" not in item
     # auth required; unconfigured -> 503
     assert client.get("/records/673/feedback").status_code in (401, 403)
     monkeypatch.setattr(settings, "db_feedback_url", "")
@@ -279,6 +303,17 @@ def test_feedback_scope_rules_direct():
     s = FeedbackSubmission(feedback_scope="search", search_query="x",
                            feedback_type="understood_partially")
     assert s.validate_scope() is None
+    # F-3: usefulness of a whole result, with an optional one-line why.
+    for t in ("useful", "not_relevant"):
+        r = FeedbackSubmission(feedback_scope="record", record_id=42, feedback_type=t,
+                               comment="wanted a phospho-site" if t == "not_relevant" else None)
+        assert r.validate_scope() is None
+    assert FeedbackSubmission(feedback_scope="record", record_id=42,
+                              feedback_type="not_a_type").validate_scope()
+    # F-2: a zero-result search is a first-class search signal.
+    z = FeedbackSubmission(feedback_scope="search", search_query="nonsense protein",
+                           feedback_type="no_results", ui_location="search_zero_results")
+    assert z.validate_scope() is None
 
 
 # --- figure-crop endpoint ----------------------------------------------------

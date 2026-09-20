@@ -34,7 +34,9 @@ router = APIRouter()
 @router.get("/health")
 def health():
     """Public liveness check - use this for uptime pings, not `/`."""
-    return {"status": "ok"}
+    # app_version is also stamped on every feedback row (F-5), so a deploy can
+    # be told apart from a demo laptop when reading the export.
+    return {"status": "ok", "app_version": settings.app_version}
 
 
 @router.get("/")
@@ -155,7 +157,7 @@ async def record_feedback(record_id: int = PathParam(ge=1, le=2**63 - 1)):
 
 @router.post("/feedback", response_model=FeedbackResponse,
              dependencies=[Depends(require_internal_key)])
-@limiter.limit(settings.search_rate_limit)
+@limiter.limit(settings.feedback_rate_limit)
 async def submit_feedback(request: Request, body: FeedbackSubmission):
     """Store researcher feedback (migration 002). The AI extraction is never
     mutated here — corrections are stored beside it, keyed to the record and
@@ -177,7 +179,7 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
             raise HTTPException(400, "record_id and stable_row_key refer to different records")
     # Column names come from this fixed dict — never from client-supplied keys.
     fields = {
-        "app_version": "beta-local",
+        "app_version": settings.app_version,
         "feedback_scope": body.feedback_scope,
         "record_id": body.record_id,
         "stable_row_key": body.stable_row_key,
@@ -191,6 +193,7 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         "comment": body.comment,
         "ui_location": body.ui_location,
         "session_id": body.session_id,
+        "contact": body.contact,
     }
     try:
         feedback_id = await insert_feedback(fields)
