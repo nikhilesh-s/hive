@@ -1,0 +1,137 @@
+# Experimental-track CI. Push/PR gates are deterministic and credential-free.
+# The live Valency contract check runs only on manual dispatch and needs the
+# VALENCY_API_TOKEN repository secret (never echoed; absent => skipped).
+name: experimental-ci
+
+on:
+  push:
+    branches: ["experimental/**"]
+  pull_request:
+    branches: ["experimental/**", "feature/bio-context-beta"]
+  workflow_dispatch:
+    inputs:
+      run_live_valency:
+        description: "Run the live Valency contract smoke (needs VALENCY_API_TOKEN secret)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: experimental-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: API + miner (unit, no network)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            api/requirements.txt
+            western_blot_miner/requirements.txt
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements.txt -r western_blot_miner/requirements.txt pytest
+      - name: API unit tests (RLS matrix skips without a DB)
+        working-directory: api
+        run: python -m pytest -q
+      - name: Western blot miner suites
+        run: |
+          set -e
+          for t in test_biology test_reconcile test_loader_enrichment test_extract_records test_pipeline_records test_stable_row_key test_densitometry; do
+            echo "== $t"; python western_blot_miner/tests/$t.py
+          done
+      - name: Western blot miner pytest suites (attack / provenance / source-typing regressions)
+        run: python -m pytest -q western_blot_miner/tests --ignore=western_blot_miner/tests/test_densitometry.py
+      - name: Benchmark (seed self-consistency)
+        run: python eval/score.py
+      - name: Migration copies in sync
+        working-directory: api
+        run: python -m pytest -q tests/test_supabase_migrations_sync.py
+
+  rls:
+    name: RLS access matrix (Postgres service)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hiveblot_rlstest
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r api/requirements.txt pytest
+      - name: Access matrix (migrations 001-005, every role)
+        working-directory: api
+        env:
+          HIVE_DB_TEST_URL: postgresql://postgres:postgres@localhost:5432/hiveblot_rlstest
+        run: python -m pytest -q tests/test_db_access_matrix.py -v
+
+  web:
+    name: Web typecheck, lint, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+        env:
+          API_BASE_URL: http://localhost:8000
+          INTERNAL_API_KEY: ci-placeholder
+
+  hygiene:
+    name: Whitespace and secret-shape scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: git diff --check against the merge base
+        run: |
+          base=$(git merge-base origin/${{ github.base_ref || 'feature/bio-context-beta' }} HEAD 2>/dev/null || git rev-parse HEAD~1)
+          git diff --check "$base" HEAD
+      - name: No committed env files or key-shaped strings
+        run: |
+          set -e
+          ! git ls-files | grep -E '(^|/)\.env(\.|$)' | grep -v '\.env\.example$'
+          # dummy DSNs in test fixtures point at localhost and are not credentials
+          ! git grep -n -E 'sk-ant-[A-Za-z0-9_-]{20,}|postgresql://[^<@ ]+:[^<@ ]+@' -- ':!*.md' ':!.github/**' | grep -v '@localhost' || (echo "credential-shaped string found" && exit 1)
+
+  live-valency:
+    name: Live Valency contract smoke (manual)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_valency }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r api/requirements.txt -r western_blot_miner/requirements.txt
+      - name: Contract smoke (skips cleanly when the secret is absent)
+        env:
+          VALENCY_API_TOKEN: ${{ secrets.VALENCY_API_TOKEN }}
+        run: |
+          if [ -z "$VALENCY_API_TOKEN" ]; then
+            echo "::warning::VALENCY_API_TOKEN secret is not set; live smoke skipped"
+            exit 0
+          fi
+          python scripts/experiments/valency_smoke.py

@@ -1,103 +1,135 @@
 'use client';
 
+// Every number and capability claim on this page must be traceable to
+// HANDOFF.md / research/TEAM_BETA_HANDOFF.md. Nothing here may imply
+// literature-wide coverage, automated ingestion accuracy, or densitometry.
+
+const MONO = 'var(--font-mono), monospace';
+
+const PAPERS: [string, string][] = [
+  ['10.3892/br.2026.2108', 'phospho-STAT3 / IL-6 time course and inhibitor matrix in Hep3B cells (human)'],
+  ['10.3892/ijmm.2022.5188', 'loading-control validation across mouse submandibular gland development and duct ligation'],
+  ['10.1186/s12964-025-02385-8', 'BEX2 / PIK3CA co-immunoprecipitation in H1792, H1299 and A549 cells (human)'],
+];
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="hb-page-section">
+      <h2 className="hb-page-h2">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 export default function About() {
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Manrope', sans-serif" }}>
-      {/* Hero */}
-      <section style={{ textAlign: 'center', padding: '88px 56px 60px' }}>
-        <h1 style={{ fontSize: '64px', fontWeight: 600, marginBottom: '24px' }}>
-          About HiveBlot
-        </h1>
-        <p style={{ fontSize: '18px', color: '#a9bdb5', maxWidth: '700px', margin: '0 auto', lineHeight: 1.7 }}>
-          Western blotting is one of the most fundamental techniques in molecular biology, used in nearly 8-9% of all protein-related publications. But this data is trapped in millions of PDF figures, locked behind paywalls, scattered across the literature.
+    <div className="hb-page">
+      <section className="hb-page-hero">
+        <h1 className="hb-page-h1">About HiveBlot</h1>
+        <p className="hb-page-lead">
+          HiveBlot turns published Western blot figures, captions and methods into
+          structured, searchable, auditable <em>experiment-level</em> evidence: which
+          protein, modified where, in which cells, under what treatment, detected with
+          which antibody, and what the blot showed lane by lane.
         </p>
       </section>
 
-      {/* The Problem */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,.07)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>The Problem</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px' }}>
-          <div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px', color: '#e0a458' }}>
-              Lost Knowledge
-            </h3>
-            <p style={{ color: '#a9bdb5', lineHeight: 1.7 }}>
-              Every western blot tells a story about which proteins are expressed in which cell lines under what conditions. That story is locked in a figure caption.
-            </p>
-          </div>
-          <div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px', color: '#8fb6ff' }}>
-              Wasted Time
-            </h3>
-            <p style={{ color: '#a9bdb5', lineHeight: 1.7 }}>
-              A researcher wanting to know if protein X is expressed in cell line Y must manually search PubMed, open dozens of papers, scan figures, and read captions. This takes hours or days.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* The Solution */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,.07)', maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px' }}>The Solution</h2>
-        <p style={{ color: '#a9bdb5', lineHeight: 1.7, marginBottom: '32px' }}>
-          HiveBlot uses computer vision and language models to automatically:
+      <Section title="Who it is for">
+        <p className="hb-page-p">
+          Wet-lab researchers who need to locate and compare experiment-level Western
+          blot evidence. The sharpest questions it is built for: has this antibody or
+          catalog number already appeared in published work, and what did the blot look
+          like? Has this protein been blotted in this cell line under this treatment?
+          Can I trust this row, and where exactly did each value come from?
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '40px' }}>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>🔬</div>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Identify</h3>
-            <p style={{ color: '#a9bdb5', fontSize: '14px', lineHeight: 1.6 }}>
-              Detect western blot images in published papers
-            </p>
-          </div>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>📖</div>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Extract</h3>
-            <p style={{ color: '#a9bdb5', fontSize: '14px', lineHeight: 1.6 }}>
-              Parse protein names, cell lines, conditions, and results from captions
-            </p>
-          </div>
-          <div>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>🔍</div>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>Aggregate</h3>
-            <p style={{ color: '#a9bdb5', fontSize: '14px', lineHeight: 1.6 }}>
-              Build a searchable database linking proteins to cell lines
-            </p>
-          </div>
-        </div>
-      </section>
+      </Section>
 
-      {/* Stats */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,.07)', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '60px' }}>By the Numbers</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '80px', maxWidth: '1000px', margin: '0 auto' }}>
-          <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#4ad6b0', marginBottom: '12px' }}>2.8K+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>PAPERS PROCESSED</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#e0a458', marginBottom: '12px' }}>12.4K+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>BLOTS INDEXED</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '52px', fontWeight: 700, color: '#8fb6ff', marginBottom: '12px' }}>520+</div>
-            <div style={{ color: '#a9bdb5', fontFamily: '"IBM Plex Mono", monospace', fontSize: '12px', letterSpacing: '1px' }}>PROTEINS TRACKED</div>
-          </div>
+      <Section title="What the beta contains today">
+        <div className="hb-stat-row" aria-label="Current corpus size">
+          <div className="hb-stat"><div className="hb-stat-n">3</div><div className="hb-stat-l">REVIEWED PAPERS</div></div>
+          <div className="hb-stat"><div className="hb-stat-n">93</div><div className="hb-stat-l">EXPERIMENT GROUPS</div></div>
+          <div className="hb-stat"><div className="hb-stat-n">475</div><div className="hb-stat-l">EVIDENCE ROWS</div></div>
         </div>
-      </section>
+        <p className="hb-page-p">
+          The corpus is intentionally small and reviewed. Every row was checked
+          field-by-field by a human and then by an independent scientific QA pass. One
+          row is one lane of one blot panel; rows group into experiments. The three
+          papers:
+        </p>
+        <ul className="hb-page-list">
+          {PAPERS.map(([doi, what]) => (
+            <li key={doi}>
+              <a href={`https://doi.org/${doi}`} target="_blank" rel="noreferrer" style={{ fontFamily: MONO, color: 'var(--accent)' }}>
+                {doi}
+              </a>
+              <span style={{ color: 'var(--text-secondary)' }}> — {what}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="hb-page-p">
+          A search that returns nothing usually means the topic is not in these three
+          papers. It does not mean no such evidence exists in the literature, and the
+          search page says so.
+        </p>
+      </Section>
 
-      {/* Why It Matters */}
-      <section style={{ padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,.07)', backgroundColor: 'rgba(74,214,176,.04)' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '42px', fontWeight: 600, marginBottom: '32px', textAlign: 'center' }}>Why It Matters</h2>
-          <p style={{ color: '#a9bdb5', lineHeight: 1.8, fontSize: '16px' }}>
-            HiveBlot democratizes access to western blot data. Instead of taking hours to discover that a protein is expressed in a cell line, researchers can answer that question in seconds. This accelerates experimental design, reduces redundant work, and makes protein expression knowledge immediately actionable.
-          </p>
-          <p style={{ color: '#a9bdb5', lineHeight: 1.8, fontSize: '16px', marginTop: '20px' }}>
-            The database grows with every new publication, creating a living resource that bridges the gap between published results and active research.
-          </p>
+      <Section title="What an Evidence Record is">
+        <p className="hb-page-p">
+          Not a single answer, but a container. Each important field (protein identity,
+          phosphosite, cell line, organism, treatment, dose, duration, antibody,
+          molecular weight) carries its own value, a status, the source it came from
+          (caption, methods, antibody entry, the model&apos;s own reading, UniProt) and the wording
+          that supports it. The normalized value and the wording as printed in the
+          paper are both kept, so every normalization is auditable and reversible.
+        </p>
+      </Section>
+
+      <Section title="What HiveBlot refuses to do">
+        <ul className="hb-page-list">
+          <li><strong>It does not guess.</strong> When credible sources disagree, the field is marked <em>Conflicting</em>, keeps no value, and shows both claims.</li>
+          <li><strong>It does not fill gaps.</strong> A value the paper never states is shown as <em>not reported</em>, never as a plausible number.</li>
+          <li><strong>It does not measure intensity.</strong> Band presence is categorical (present / absent / uncertain). Evidence Records carry no densitometry, and multiplicity such as a doublet is recorded descriptively only. (An experimental, uncalibrated densitometry page exists under <em>Experimental</em>; it measures within one image, refuses clipped or unstable readings, and stores nothing.)</li>
+          <li><strong>It does not read mass off an image.</strong> Expected molecular weight comes from the UniProt sequence; reported weight comes only from what the paper printed. They are stored separately.</li>
+          <li><strong>It does not overwrite itself.</strong> Researcher corrections are stored beside the extraction as an auditable pair, never applied over it.</li>
+        </ul>
+      </Section>
+
+      <Section title="What this beta proves, and what it does not">
+        <div className="hb-two-col">
+          <div>
+            <h3 className="hb-page-h3" style={{ color: 'var(--accent)' }}>Demonstrated on the reviewed corpus</h3>
+            <ul className="hb-page-list">
+              <li>Structured Evidence Records with field-level provenance</li>
+              <li>Experiment-level search (protein, phosphosite, antibody, cell line, co-IP, loading control)</li>
+              <li>Explicit uncertainty and abstention</li>
+              <li>Conflicts preserved rather than silently resolved</li>
+              <li>Researcher feedback stored beside model output and surviving reloads</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="hb-page-h3" style={{ color: 'var(--warning)' }}>Not demonstrated yet</h3>
+            <ul className="hb-page-list">
+              <li>Coverage of the wider literature (the corpus is three papers)</li>
+              <li>Automated extraction accuracy on papers HiveBlot has not been shown; the model-reading step for these three papers ran with a human in the loop</li>
+              <li>Precision, recall or F1 on unseen papers: no such number exists yet</li>
+              <li>Densitometry or any quantitative band-intensity inference</li>
+            </ul>
+          </div>
         </div>
-      </section>
+        <p className="hb-page-p">
+          The reviewed corpus is the baseline that automated extraction will be measured
+          against. Until that evaluation runs, no accuracy claim about new papers is made
+          anywhere on this site.
+        </p>
+      </Section>
+
+      <Section title="Beta hosting note">
+        <p className="hb-page-p">
+          The beta runs on free-tier hosting. The first search after a quiet spell can
+          take 30–60 seconds while the API wakes up; everything after that is fast.
+          A slow first search is the hosting plan, not the product.
+        </p>
+      </Section>
     </div>
   );
 }

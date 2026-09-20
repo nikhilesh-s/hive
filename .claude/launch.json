@@ -1,0 +1,52 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hiveblot-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "web",
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "hiveblot-api-local",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd api && ../.venv/bin/python -m uvicorn app.main:app --port 8000"
+      ],
+      "port": 8000
+    },
+    {
+      "name": "hiveblot-api-cloud",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd api && set -a && . ./.env.cloud && set +a && ../.venv/bin/python -m uvicorn app.main:app --port 8010"
+      ],
+      "port": 8010
+    },
+    {
+      "name": "hiveblot-api-local-8010",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd api && INTERNAL_API_KEY=$(grep '^INTERNAL_API_KEY' .env.cloud | cut -d= -f2-) ../.venv/bin/python -m uvicorn app.main:app --port 8010"
+      ],
+      "port": 8010
+    },
+    {
+      "name": "hiveblot-api-demo",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd api && set -a && . ./.env && set +a && INTERNAL_API_KEY=$(grep '^INTERNAL_API_KEY' .env.cloud | cut -d= -f2-) WBM_LLM_BACKEND=${WBM_LLM_BACKEND:-claude_cli} WBM_MODEL=${WBM_MODEL:-sonnet} ../.venv/bin/python -m uvicorn app.main:app --port 8010"
+      ],
+      "port": 8010
+    }
+  ]
+}

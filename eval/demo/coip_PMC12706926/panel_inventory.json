@@ -1,0 +1,28 @@
+{
+ "paper_id": "10.1186/s12964-025-02385-8",
+ "status": "unfilled",
+ "filled_by": null,
+ "instructions": "For every page, count the western blot panels a biologist would extract (one entry per panel). Do not copy anything from HiveBlot output. Leave pages without westerns as an empty list. Set status to 'filled' when done.",
+ "pages": {
+  "1": [],
+  "2": [],
+  "3": [],
+  "4": [],
+  "5": [],
+  "6": [],
+  "7": [],
+  "8": [],
+  "9": [],
+  "10": [],
+  "11": [],
+  "12": []
+ },
+ "panel_entry_example": {
+  "figure": "Fig 2C",
+  "targets": [
+   "LC3B",
+   "ACTB"
+  ],
+  "lanes": 6
+ }
+}

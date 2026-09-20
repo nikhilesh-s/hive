@@ -1,0 +1,236 @@
+{
+  "10.3892/br.2026.2108": {
+    "comparison": {
+      "live_rows": 113,
+      "reviewed_rows": 113,
+      "matched_lanes": 29,
+      "only_live": 84,
+      "only_reviewed": 78,
+      "per_field": {
+        "canonical_target": {
+          "agree": 29,
+          "total": 29,
+          "agreement": 1.0
+        },
+        "modification_label": {
+          "agree": 24,
+          "total": 29,
+          "agreement": 0.828
+        },
+        "experiment_type": {
+          "agree": 24,
+          "total": 29,
+          "agreement": 0.828
+        },
+        "cell_line": {
+          "agree": 29,
+          "total": 29,
+          "agreement": 1.0
+        },
+        "antibody_catalog_number": {
+          "agree": 24,
+          "total": 29,
+          "agreement": 0.828
+        },
+        "band_state": {
+          "agree": 25,
+          "total": 29,
+          "agreement": 0.862
+        }
+      },
+      "mismatches": [
+        {
+          "key": [
+            "perk12",
+            "0",
+            "5"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "0",
+            "5"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "0",
+            "5"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "0",
+            "5"
+          ],
+          "field": "band_state",
+          "live": "present",
+          "reviewed": "uncertain"
+        },
+        {
+          "key": [
+            "perk12",
+            "10",
+            "5"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "10",
+            "5"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "10",
+            "5"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "30",
+            "5"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "30",
+            "5"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "30",
+            "5"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "5",
+            "5"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "5",
+            "5"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "5",
+            "5"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "perk12",
+            "60",
+            "5"
+          ],
+          "field": "modification_label",
+          "live": "total",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "60",
+            "5"
+          ],
+          "field": "experiment_type",
+          "live": "standard_western",
+          "reviewed": null
+        },
+        {
+          "key": [
+            "perk12",
+            "60",
+            "5"
+          ],
+          "field": "antibody_catalog_number",
+          "live": null,
+          "reviewed": "4370"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "0",
+            "4"
+          ],
+          "field": "band_state",
+          "live": "absent",
+          "reviewed": "uncertain"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "10",
+            "4"
+          ],
+          "field": "band_state",
+          "live": "uncertain",
+          "reviewed": "present"
+        },
+        {
+          "key": [
+            "pstat3ser727",
+            "5",
+            "4"
+          ],
+          "field": "band_state",
+          "live": "uncertain",
+          "reviewed": "present"
+        }
+      ]
+    },
+    "records": 20
+  }
+}
