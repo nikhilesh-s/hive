@@ -7,6 +7,27 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## HOSTED STATE (2026-09-20 evening) — READ FIRST
+
+- **One branch: `main`** (PR #3 merged at `7c7a7c5`; `feature/bio-context-beta` and the
+  `experimental/*` branches are history). New work lands on `main`.
+- **Hosted, one link:** https://hiveblot-beta.vercel.app (Vercel prod, deployed from `main`) and
+  https://hiveblot-api.onrender.com (Render free service `srv-da1rbvs9v7es738635ug`, now built from
+  `main` with `api/Dockerfile.experimental`; `autoDeploy` off, deploy via the Render API).
+- **Live paths:** `/search` (reviewed corpus) · `/experimental/research` (Valency + PMC discovery,
+  live extraction, paper QA, densitometry tabs) · `/experimental/ask` · `/experimental/live` ·
+  `/experimental/densitometry`. Status endpoint (via web proxy) reports model backend `anthropic`
+  ready, `valency_configured: true`, `ingest_db_configured: true`.
+- **Supabase:** migration 005 applied 2026-09-20 (`western_blot_records_live`, `ingest_jobs`,
+  `ingest_crops`, role `hive_ingest` with a SCRAM password). Live tier starts at 0 rows.
+- **Render env var names** (values in the dashboard only): `ANTHROPIC_API_KEY`, `WBM_LLM_BACKEND`,
+  `EXPERIMENTAL_ENABLED`, `DB_INGEST_URL`, `VALENCY_API_TOKEN` plus the beta set. Operator secrets
+  on Nik's laptop: `~/.hive-secrets/render.env`, `~/.hive-secrets/valency.env`, `~/hive_ingest_dsn.txt`.
+- **Verified hosted 2026-09-20:** densitometry on record 1189 (v0.3.0, near-tie warning, no leak);
+  Valency semantic search returns DOIs with `sources_used: ["valency"]`; PMC fallback works.
+  Live ingestion + paper QA end-to-end: see the session log entry below for the result.
+- The share-pack docs at the repo root are on hold by Nik's request; do not spend time on them.
+
 ## UCSF PUSH STATE (2026-09-14 → founder hard stop Tue 2026-09-15 19:00 PT) — READ FIRST
 
 **Active integration branch: `experimental/ucsf-demo-2026-09-09`** (the only
