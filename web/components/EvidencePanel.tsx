@@ -346,6 +346,8 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
   const [missingMode, setMissingMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagMode, setFlagMode] = useState<'idle' | 'open' | 'done'>('idle');
   const [flagType, setFlagType] = useState('wrong_interpretation');
+  // F-3: usefulness of the result as a whole, separate from its correctness.
+  const [usefulMode, setUsefulMode] = useState<'idle' | 'why' | 'done'>('idle');
   const [cropFailed, setCropFailed] = useState(false);
 
   const [priorFeedback, setPriorFeedback] = useState<PriorFeedback[]>([]);
@@ -548,6 +550,18 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
             live extraction — unreviewed; feedback is collected on the reviewed corpus only
           </span>
         )}
+        {!readOnly && (usefulMode === 'done' ? <Ack /> : usefulMode === 'idle' ? (
+          <>
+            <Btn color={TEAL} onClick={() => {
+              submitFeedback({
+                feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key,
+                paper_id: detail.paper_id, feedback_type: 'useful', ui_location: 'evidence_panel',
+              });
+              setUsefulMode('done');
+            }}>This was useful</Btn>
+            <Btn color={RED} onClick={() => setUsefulMode('why')}>Not what I needed</Btn>
+          </>
+        ) : null)}
         {!readOnly && (missingMode === 'done' ? <Ack /> : missingMode === 'idle' ? (
           <Btn color={TEAL} onClick={() => setMissingMode('open')}>+ Missing information?</Btn>
         ) : null)}
@@ -566,6 +580,23 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
           </a>
         )}
       </div>
+      {usefulMode === 'why' && (
+        <div style={{ marginTop: '8px' }}>
+          <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIM }}>
+            In one line — what were you actually looking for?
+          </div>
+          <CorrectionForm placeholder="" askValue={false}
+            onSubmit={(_v, c) => {
+              submitFeedback({
+                feedback_scope: 'record', record_id: detail.id, stable_row_key: detail.stable_row_key,
+                paper_id: detail.paper_id, feedback_type: 'not_relevant', comment: c || null,
+                ui_location: 'evidence_panel',
+              });
+              setUsefulMode('done');
+            }}
+            onCancel={() => setUsefulMode('idle')} />
+        </div>
+      )}
       {missingMode === 'open' && (
         <div style={{ marginTop: '8px' }}>
           <div style={{ fontFamily: SERIF, fontSize: '12px', color: DIM }}>
