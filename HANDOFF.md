@@ -7,26 +7,75 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
-## HOSTED STATE (2026-09-20 evening) — READ FIRST
+## PAUSED 2026-09-20 22:00 PT — READ FIRST (state, flaws, exact resume steps)
 
-- **One branch: `main`** (PR #3 merged at `7c7a7c5`; `feature/bio-context-beta` and the
-  `experimental/*` branches are history). New work lands on `main`.
-- **Hosted, one link:** https://hiveblot-beta.vercel.app (Vercel prod, deployed from `main`) and
-  https://hiveblot-api.onrender.com (Render free service `srv-da1rbvs9v7es738635ug`, now built from
-  `main` with `api/Dockerfile.experimental`; `autoDeploy` off, deploy via the Render API).
-- **Live paths:** `/search` (reviewed corpus) · `/experimental/research` (Valency + PMC discovery,
-  live extraction, paper QA, densitometry tabs) · `/experimental/ask` · `/experimental/live` ·
-  `/experimental/densitometry`. Status endpoint (via web proxy) reports model backend `anthropic`
-  ready, `valency_configured: true`, `ingest_db_configured: true`.
-- **Supabase:** migration 005 applied 2026-09-20 (`western_blot_records_live`, `ingest_jobs`,
-  `ingest_crops`, role `hive_ingest` with a SCRAM password). Live tier starts at 0 rows.
-- **Render env var names** (values in the dashboard only): `ANTHROPIC_API_KEY`, `WBM_LLM_BACKEND`,
-  `EXPERIMENTAL_ENABLED`, `DB_INGEST_URL`, `VALENCY_API_TOKEN` plus the beta set. Operator secrets
-  on Nik's laptop: `~/.hive-secrets/render.env`, `~/.hive-secrets/valency.env`, `~/hive_ingest_dsn.txt`.
-- **Verified hosted 2026-09-20:** densitometry on record 1189 (v0.3.0, near-tie warning, no leak);
-  Valency semantic search returns DOIs with `sources_used: ["valency"]`; PMC fallback works.
-  Live ingestion + paper QA end-to-end: see the session log entry below for the result.
-- The share-pack docs at the repo root are on hold by Nik's request; do not spend time on them.
+Nik paused all HiveBlot work. `main` is the only branch; everything below is on it and pushed.
+Older sections of this file are history and may contradict this block; this block wins.
+
+### What is hosted and verified (2026-09-20)
+- One link: https://hiveblot-beta.vercel.app (Vercel prod from `main` @ `7c7a7c5`) and
+  https://hiveblot-api.onrender.com (Render free `srv-da1rbvs9v7es738635ug`, built from `main`
+  @ `0aa5fdf` with `api/Dockerfile.experimental`; `autoDeploy` off).
+- `/search`: reviewed corpus (3 papers / 475 rows, recounted live), evidence panel, crops, field
+  feedback. Smoke report: `SMOKE_TEST_REPORT.md` (11 pass / 0 fail / 1 not verified).
+- `/experimental/research`: Valency semantic search (`sources_used: ["valency"]`), PMC fallback,
+  **live extraction proven hosted** (job `a8263b4d520f`, DOI 10.3892/br.2026.2108: 9 candidate
+  panels, 20 experiment records, 113 lane rows, ~4.5 min, backend `anthropic`). Live tier now
+  holds those 113 unreviewed rows.
+- `/experimental/ask`: paper QA with citations verified on the reviewed corpus.
+- `/experimental/densitometry`: v0.3.0 verified hosted on record 1189 (near-tie warning, no leak).
+- Supabase: migration 005 applied (live tables + `hive_ingest` role). Render env var names:
+  `ANTHROPIC_API_KEY`, `WBM_LLM_BACKEND=anthropic`, `EXPERIMENTAL_ENABLED=true`, `DB_INGEST_URL`,
+  `VALENCY_API_TOKEN` plus the beta set. Operator files on Nik's laptop only:
+  `~/.hive-secrets/render.env` (Render API key), `~/.hive-secrets/valency.env`, `~/hive_ingest_dsn.txt`.
+
+### Merged to main but NOT deployed (commit `4911bc0`, feedback tickets F-1..F-6)
+Export script, zero-result search capture, result-level useful / not relevant, 3-question session
+survey, opt-in contact column (**migration 006**), real `app_version`, separate feedback rate limit,
+failed submits now visible. api 201 passed / 12 skipped, tsc clean, lint clean, build clean.
+**Deploying the API without migration 006 will 500 every feedback submit** (it inserts `contact`).
+
+### Exact resume steps, in order
+1. `supabase db push --dry-run` must list only `20260920000007_feedback_contact.sql`; then `supabase db push`.
+2. Deploy API: `K=$(sed -n 's/^RENDER_API_KEY=//p' ~/.hive-secrets/render.env)`;
+   `POST https://api.render.com/v1/services/srv-da1rbvs9v7es738635ug/deploys` with
+   `{"clearCache":"do_not_clear"}` (env-var edits do not auto-deploy). Poll `.../deploys/<id>`.
+3. Deploy web: `cd web && vercel deploy --prod --yes`.
+4. F-8 hosted smoke: submit one row through each new control, read back with
+   `scripts/export_feedback.py --json`, delete the test rows (`supabase db query --linked`).
+5. Send the email (draft in chat 2026-09-20 and `BETA_EMAIL_WITH_TALLY_AND_BRIEF.md`; add the
+   research-page paragraph). Tally: https://tally.so/r/A7kzWB, add hidden-field params per lab.
+
+### Known flaws and risks (pick up here)
+- **Paper access is fragile.** Europe PMC (403) and PMC (proof-of-work page) block scripted PDF
+  downloads since 2026-08; NCBI retired the OA web service. Live ingestion now depends on OpenAlex
+  resolving a publisher PDF URL and the publisher answering a plain client (Spandidos and Springer
+  do; a browser user agent gets blocked). Unpaywall is skipped because no real contact email is
+  configured (`UNPAYWALL_EMAIL`); decide which mailbox to use. Papers without a publisher PDF fail
+  honestly ("No open-access PDF"). No retry queue, no caching of PDFs across Render restarts.
+- **Live extraction is slow and costly:** ~4.5 min and one Anthropic call per panel; jobs run in the
+  API process on a free Render instance with no worker, no concurrency guard beyond the app's own,
+  and a 15-minute idle spin-down that kills in-flight jobs. Two testers extracting at once is untested.
+- **Live tier feedback is read-only by design**; testers cannot correct unreviewed rows.
+- **Corpus stats are hardcoded copy** (`web/app/about/page.tsx`, `web/app/search/page.tsx`); they will
+  drift as the live tier grows. Live rows are not counted there.
+- **Record 1189** carries 2026-09-16 internal "marked correct" feedback visible to testers; decide
+  whether to delete (`hiveblot_feedback`, ids from `export_feedback.py`).
+- **API `/docs` is public** (route names only). `docs_url=None` in `api/app/main.py` if unwanted.
+- **Rate limits are per proxy IP**: all Vercel traffic shares one bucket on Render (search 20/min,
+  feedback 120/min, densitometry 60/min). A lab session could hit 429 on search.
+- **Crops are baked into the image at an absolute laptop path**; `api/crops/` must be re-staged by
+  hand when the reviewed corpus changes. Live crops go to `ingest_crops` in Postgres instead.
+- **No auth on the experimental pages**: anyone with the link can start paid model jobs. Acceptable
+  for a private beta; add a shared beta key before wider sharing.
+- **Cold start** 30–60 s on the first request; the UI says so, but extraction plus cold start is slow.
+- **Docs pack at repo root** (`README_CASE_STUDY.md`, `UCSF_BETA_*.md`, `BETA_EMAIL_*.md`,
+  `PAPER_ACCESS_AUDIT.md`, `HOSTING_STATUS.md`, `SMOKE_TEST_REPORT.md`) was written before the
+  experimental stack was hosted; several sentences still say live search is "not yet in this link".
+  Nik paused this work; update or delete before sharing.
+- **Old branches** (`feature/bio-context-beta`, `experimental/*`, `execute-plan-verification`) are
+  fully contained in `main`; safe to delete after Nik's review. `render.yaml` now says `main`.
+- Untested hosted: per-field ✓/✗ after the F-6 change, mobile layout, other browsers, `/v1/search`.
 
 ## UCSF PUSH STATE (2026-09-14 → founder hard stop Tue 2026-09-15 19:00 PT) — READ FIRST
 
