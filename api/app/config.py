@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -7,9 +9,14 @@ class Settings(BaseSettings):
     instead of failing deep inside a request handler.
     """
 
-    supabase_url: str
-    supabase_key: str
-    openai_key: str
+    # Kept only so existing env files keep loading; the API no longer opens a
+    # PostgREST client (migration 004 revoked the anon key's table access and
+    # every endpoint now runs on the scoped Postgres roles below).
+    supabase_url: str = ""
+    supabase_key: str = ""
+    # Optional: when set, /search uses the legacy OpenAI NL->SQL generator
+    # (still behind sql_guard). Empty => the deterministic bio_query parser.
+    openai_key: str = ""
 
     # Connection string for a Postgres role that only has SELECT on
     # western_blot_records. Used exclusively to execute the LLM-generated
@@ -17,6 +24,14 @@ class Settings(BaseSettings):
     # a full-database compromise the way it could with the Supabase
     # service-role key.
     db_readonly_url: str
+
+    # Connection string for the hive_feedback role (migration 002): INSERT +
+    # SELECT on hiveblot_feedback ONLY. Separate from db_readonly_url so the
+    # feedback write path physically cannot touch western_blot_records —
+    # researcher corrections are stored beside, never over, the AI extraction.
+    # Optional: when empty, the feedback endpoints return 503 instead of the
+    # whole API failing to boot.
+    db_feedback_url: str = ""
 
     # Shared secret the web/ frontend's server-side API route uses to call
     # the internal endpoints (/search, /proteins). Only ever sent server-to-
@@ -40,6 +55,24 @@ class Settings(BaseSettings):
 
     table_name: str = "western_blot_records"
     max_search_limit: int = 500
+
+    # --- EXPERIMENTAL (live ingestion / discovery / paper QA / densitometry) --
+    experimental_enabled: bool = True
+    # Unreviewed tier written by live DOI ingestion (migration 005).
+    live_table_name: str = "western_blot_records_live"
+    # hive_ingest role DSN (INSERT/DELETE on the live tables only). Empty =>
+    # ingestion endpoints return 503; search over the live table still works.
+    db_ingest_url: str = ""
+    # Valency Bond bearer token (Settings page in app.valency.io). Server-only.
+    valency_api_token: str = ""
+    valency_mcp_url: str = "https://mcp.valency.io/"
+
+    # Base directory the figure-crop endpoint may serve PNGs from. Records
+    # store absolute crop paths (image_crop_ref); only paths resolving inside
+    # this directory are ever served. Default = the local pipeline's run dir.
+    crop_base_dir: str = str(
+        Path(__file__).resolve().parents[2] / "western_blot_miner" / "data" / "pdf_runs"
+    )
 
     openai_model: str = "gpt-4.1-mini"
 

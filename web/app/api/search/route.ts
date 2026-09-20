@@ -14,9 +14,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { query } = await request.json();
+    const raw = await request.json().catch(() => null);
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { query } = raw as { query?: unknown };
 
-    if (!query || query.trim() === '') {
+    if (typeof query !== 'string' || query.trim() === '') {
       return NextResponse.json(
         { error: 'Query is required' },
         { status: 400 }
@@ -29,7 +33,9 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         ...(BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {}),
       },
-      body: JSON.stringify({ query }),
+      // 500 = backend maximum; above it the backend drops the trailing partial
+      // experiment and sets `truncated`, which the search page surfaces.
+      body: JSON.stringify({ query, limit: 500 }),
     });
 
     if (!backendResponse.ok) {

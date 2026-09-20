@@ -42,6 +42,32 @@ def test_schema_qualified_table_is_allowed():
     assert limit_of(out) == 10
 
 
+def test_multi_condition_and_or_passes():
+    # Regression: sqlglot >= 30 models AND/OR as exp.Func subclasses
+    # (exp.Connector); the function allowlist must not reject boolean
+    # connectors, or every multi-concept query (which nlp.py's prompt rules
+    # 5/6/8 explicitly instruct the model to produce) 400s.
+    out = guard_and_limit_sql(
+        f"SELECT * FROM {TABLE} WHERE (target ILIKE '%stat3%' OR canonical_target "
+        f"ILIKE '%stat3%') AND (treatment_context ILIKE '%il-6%' OR condition "
+        f"ILIKE '%il-6%')",
+        50,
+    )
+    assert limit_of(out) == 50
+    assert " AND " in out.upper()
+    assert " OR " in out.upper()
+
+
+def test_connector_skip_does_not_reopen_function_hole():
+    # The Connector exemption must not exempt real functions nested inside
+    # AND/OR expressions.
+    with pytest.raises(SQLGuardError, match="not allowed"):
+        guard_and_limit_sql(
+            f"SELECT * FROM {TABLE} WHERE target ILIKE '%x%' AND pg_sleep(5) IS NULL",
+            10,
+        )
+
+
 def test_trailing_semicolon_and_whitespace_are_tolerated():
     out = guard_and_limit_sql(f"  SELECT * FROM {TABLE};  ", 10)
 

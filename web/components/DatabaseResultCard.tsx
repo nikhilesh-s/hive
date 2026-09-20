@@ -1,305 +1,419 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
+import EvidencePanel from '@/components/EvidencePanel';
+import { formatLaneLabel } from '@/lib/lanes';
+
+// NOTE: every Evidence Record field below is OPTIONAL. Legacy rows (pre-migration
+// 001) simply omit them and the card falls back to the original base fields, so
+// existing search never breaks. New fields render only when present -- a missing
+// value shows as "not reported", never as fabricated data.
 interface DatabaseResult {
   id: number;
   paper_id: string;
   page: number | null;
-  western_blot_type: string;
-  sample: string;
+  western_blot_type: string | null;
+  sample: string | null;
   organism: string | null;
   treatment_context: string | null;
   figure_label: string | null;
   target: string;
-  condition: string;
-  band_detected: boolean;
+  condition: string | null;
+  band_detected: boolean | null;
   confidence: number | null;
+  // --- Evidence Record additions (all optional) ---
+  canonical_target?: string | null;
+  uniprot_id?: string | null;
+  protein_status?: string | null;
+  modification_label?: string | null;
+  modification_status?: string | null;
+  experiment_type?: string | null;
+  cell_line?: string | null;
+  treatment_name?: string | null;
+  dose?: number | null;
+  dose_unit?: string | null;
+  duration?: number | null;
+  duration_unit?: string | null;
+  antibody_vendor?: string | null;
+  antibody_catalog_number?: string | null;
+  antibody_dilution?: string | null;
+  band_state?: string | null;
+  reported_molecular_weight_kda?: number | null;
+  expected_molecular_weight_kda?: number | null;
+  figure_caption?: string | null;
+  image_crop_ref?: string | null;
+  needs_review?: boolean | null;
+  anomaly_flags?: Array<{ code?: string; message?: string; detail?: string }> | null;
+  // Plain-language reasons the row needs review (API-derived from the
+  // stored validation flags; older API builds send only anomaly_flags).
+  review_reasons?: string[] | null;
+  doi?: string | null;
+  pmcid?: string | null;
+  title?: string | null;
+}
+
+export interface LaneSummary {
+  condition: string | null;
+  band_state: string | null;
 }
 
 interface DatabaseResultCardProps {
   data: DatabaseResult;
+  // EXPERIMENTAL: row comes from the live, unreviewed tier. Badged, read
+  // from the live endpoints, and feedback controls are hidden (live ids are
+  // a different id space from the reviewed corpus).
+  live?: boolean;
+  // When search results are grouped into one card per experiment (paper +
+  // panel + target), `lanes` carries every lane of the group so a researcher
+  // reads ONE experiment instead of N near-identical rows. Optional: a card
+  // without it renders the single row exactly as before.
+  lanes?: LaneSummary[];
 }
 
-export default function DatabaseResultCard({ data }: DatabaseResultCardProps) {
-  const [expanded, setExpanded] = useState(false);
+const MONO = 'var(--font-mono), monospace';
+const SERIF = 'var(--font-serif), serif';
+const SANS = 'var(--font-sans), sans-serif';
+const LABEL = 'var(--text-subtle)';
+const TEXT = 'var(--text-primary)';
+const TEAL = 'var(--accent)';
+const GOLD = 'var(--warning)';
+const RED = 'var(--error)';
+
+function titleCase(s?: string | null): string {
+  if (!s) return '';
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatMeasurement(value: number, unit?: string | null): string {
+  return unit ? `${value} ${unit}` : String(value);
+}
+
+export { formatLaneLabel } from '@/lib/lanes';
+
+// Why a row needs review, in the engine's own plain-language flag text.
+// Never invented: an empty list means the flags carried no detail.
+function reviewReasons(d: DatabaseResult): string[] {
+  if (d.review_reasons?.length) return d.review_reasons;
+  const out: string[] = [];
+  for (const f of d.anomaly_flags || []) {
+    const t = f.detail || f.message;
+    if (t && !out.includes(t)) out.push(t);
+  }
+  return out;
+}
+
+// Deterministic experiment-design tag derived ONLY from the group's own lane
+// labels + the reviewed treatment context (data-backed, never invented).
+// Abstention is the default: no supported semantics -> no tag.
+const DOSE_UNIT_RE = /(\d+(\.\d+)?)\s*(ng\/ml|[uµμ]g\/ml|mg\/ml|[nuµμ]M\b|mmol|nmol|[uµμ]mol|mg\/kg|%)/i;
+// Embryonic/postnatal developmental-stage nomenclature: E14.5, P0, P7,
+// P28M/P25F (optional sex suffix). These are SAMPLE STAGES, never doses.
+const DEV_STAGE_RE = /^[EP]\d+(\.\d+)?[FM]?$/;
+
+export function deriveDesignTag(lanes?: LaneSummary[], treatmentContext?: string | null): string | null {
+  if (!lanes || lanes.length < 3) return null;
+  const conds = lanes.map((l) => (l.condition || '').trim()).filter(Boolean);
+  if (conds.length < 3) return null;
+  // Developmental series takes precedence: E/P-day labels also end in digits
+  // and previously false-fired the dose heuristic (GAPDH mouse, "P0..P28M").
+  const dev = conds.filter((c) => DEV_STAGE_RE.test(c));
+  if (dev.length >= 3) return 'developmental series';
+  const timepoints = conds.filter((c) => /^\d+(\.\d+)?\s*(min|mins|h|hr|hrs)$/i.test(c));
+  if (timepoints.length >= 3) return 'time course';
+  // DOSE SERIES needs explicit dose semantics, not just trailing numbers:
+  // either the lane labels carry a unit, or the reviewed treatment context
+  // states a concentration series the lane numbers correspond to.
+  const trailing = conds
+    .map((c) => /^(.*?)(\d+(?:\.\d+)?)$/.exec(c))
+    .filter((m): m is RegExpExecArray => !!m && m[1].trim().length > 0 && !DEV_STAGE_RE.test(m.input));
+  if (trailing.length >= 3) {
+    const prefixes = new Set(trailing.map((m) => m[1].trim()));
+    const numbers = new Set(trailing.map((m) => m[2]));
+    const doseSemantics =
+      conds.some((c) => DOSE_UNIT_RE.test(c)) ||
+      (treatmentContext ? DOSE_UNIT_RE.test(treatmentContext) : false);
+    if (prefixes.size === 1 && numbers.size >= 3 && doseSemantics) return 'dose series';
+  }
+  return null;
+}
+
+// Supported / Needs review / Conflicting -- derived, never asserted beyond evidence.
+function reviewState(d: DatabaseResult): { label: string; color: string } | null {
+  const statuses = [d.protein_status, d.modification_status];
+  if (statuses.includes('CONFLICTING')) return { label: 'Conflicting', color: RED };
+  if (d.needs_review === true || statuses.includes('AMBIGUOUS')) return { label: 'Needs review', color: GOLD };
+  if (d.needs_review === false) return { label: 'Supported', color: TEAL };
+  return null;
+}
+
+function Field({ label, value, mono, color }: { label: string; value: ReactNode; mono?: boolean; color?: string }) {
+  return (
+    <div className="hb-result-field">
+      <div style={{ fontFamily: MONO, fontSize: '10px', fontWeight: 600, color: LABEL, marginBottom: '4px' }}>
+        {label}
+      </div>
+      <div style={{ fontFamily: mono ? MONO : SANS, fontSize: mono ? '13px' : '14px', color: color || TEXT, lineHeight: 1.3 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Metadata({ label, value, mono }: { label: string; value: ReactNode; mono?: boolean }) {
+  return (
+    <div className="hb-result-metadata-row">
+      <div className="hb-result-metadata-label">{label}</div>
+      <div className={mono ? 'hb-result-metadata-value hb-result-metadata-value-mono' : 'hb-result-metadata-value'}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function EmptyFieldValue() {
+  return <span className="hb-result-empty-value">not reported</span>;
+}
+
+function Chip({ children }: { children: ReactNode }) {
+  return <span className="hb-result-chip">{children}</span>;
+}
+
+function experimentLabel(blotType?: string | null): string | null {
+  if (!blotType) return null;
+  if (blotType === 'co_ip') return 'co-IP';
+  if (blotType.includes('western')) return 'WB';
+  return titleCase(blotType);
+}
+
+export default function DatabaseResultCard({ data, lanes, live = false }: DatabaseResultCardProps) {
+  const apiBase = live ? '/api/experimental/record' : '/api/record';
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [cropFailed, setCropFailed] = useState(false);
+  const headline = data.canonical_target || data.target;
+  const headlineMod = data.modification_label ? ` · ${data.modification_label}` : '';
+  const review = reviewState(data);
+  const blotType = data.experiment_type || data.western_blot_type;
+  const sampleText = data.cell_line || data.sample;
+  const bandText = data.band_state || (data.band_detected == null ? null : data.band_detected ? 'present' : 'absent');
+  const antibody = [data.antibody_vendor, data.antibody_catalog_number ? `#${data.antibody_catalog_number}` : null]
+    .filter(Boolean)
+    .join(' · ');
+  // Structured name·dose·duration only. The verbatim treatment_context now has
+  // its own identity line under the headline — falling back to it here printed
+  // the same sentence twice on cards with no parsed treatment name.
+  const treatment =
+    data.treatment_name || data.dose != null
+      ? [
+          data.treatment_name,
+          data.dose != null ? formatMeasurement(data.dose, data.dose_unit) : null,
+          data.duration != null ? formatMeasurement(data.duration, data.duration_unit) : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      : null;
+  // Multi-condition experiments (P0-4): surface co-conditions that are
+  // literally named on this group's lane labels (CL-E, Bis II, U0126 …) so the
+  // summary doesn't understate the design. "±" = the lanes carry both with-
+  // and without- states; nothing is asserted beyond the printed labels.
+  const extraAgents = (() => {
+    if (!treatment || !lanes || lanes.length < 2) return [] as string[];
+    const seen = new Set<string>();
+    for (const l of lanes) {
+      for (const tok of (l.condition || '').split(/[+/·,]/)) {
+        const t = tok.trim().replace(/[+−-]+$/, '').trim();
+        if (!t || /^\d/.test(t)) continue;
+        if (/^(ctrl|control|input|igg|ip:.*)$/i.test(t)) continue;
+        if (DEV_STAGE_RE.test(t)) continue;
+        const base = t.replace(/\s+\d+(\.\d+)?$/, '').trim();
+        if (!base) continue;
+        if (data.treatment_name && base.toLowerCase() === data.treatment_name.toLowerCase()) continue;
+        seen.add(base);
+      }
+    }
+    return [...seen];
+  })();
+  const treatmentDisplay = treatment
+    ? `${treatment}${extraAgents.length ? ` (± ${extraAgents.join(', ')})` : ''}`
+    : null;
+  // co-IP context from this group's own lane labels (P1): "IP:PIK3CA" printed
+  // on a lane IS the bait statement for the panel.
+  const ipBait = (() => {
+    if (blotType !== 'co_ip' || !lanes) return null;
+    for (const l of lanes) {
+      const m = /\bIP:\s*([A-Za-z0-9-]+)/.exec(l.condition || '');
+      if (m) return m[1];
+    }
+    return null;
+  })();
+  const mw =
+    data.reported_molecular_weight_kda != null || data.expected_molecular_weight_kda != null
+      ? [
+          data.reported_molecular_weight_kda != null ? `reported ${data.reported_molecular_weight_kda} kDa` : null,
+          data.expected_molecular_weight_kda != null ? `expected ${data.expected_molecular_weight_kda} kDa` : null,
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      : null;
+
+  const bandColor = bandText === 'present' ? TEAL : bandText === 'absent' ? RED : GOLD;
+  // The record's OWN panel crop, served by the API from the reviewed crop
+  // archive (never a stand-in image). Absent crop => honest placeholder.
+  const previewSrc = data.image_crop_ref && !cropFailed ? `${apiBase}/${data.id}/crop` : null;
+  const reasons = review && review.label !== 'Supported' ? reviewReasons(data) : [];
+  const designTag = deriveDesignTag(lanes, data.treatment_context);
+  const sourceId = data.doi || data.paper_id;
+  const indicatorChips = [
+    experimentLabel(blotType),
+    data.modification_label?.toLowerCase().includes('phospho') ? 'Phospho' : null,
+    designTag ? titleCase(designTag) : null,
+    lanes && lanes.length > 1 ? `${lanes.length} lanes` : null,
+  ].filter((chip): chip is string => Boolean(chip));
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: expanded ? '1fr 240px' : '1fr 56px',
-        gap: '0',
-        backgroundColor: 'rgba(255,255,255,.07)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-        transition: 'grid-template-columns 0.25s ease',
-        border: '1px solid rgba(255,255,255,.06)',
-      }}
-    >
-      {/* Main Content Area */}
-      <div
-        style={{
-          backgroundColor: '#06090c',
-          padding: '24px 28px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
-        {/* Content */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
-          {/* Left Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Target */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                TARGET
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: '14px',
-                  color: '#4ad6b0',
-                  lineHeight: 1.3,
-                }}
-              >
-                {data.target}
-              </div>
+    <div className="hb-result-card">
+      <div className="hb-result-card-main">
+        <section className="hb-result-card-primary">
+          <div className="hb-result-title-row">
+            <div className="hb-result-title" style={{ fontFamily: SERIF }}>
+              {headline}
+              <span>{headlineMod}</span>
             </div>
-
-            {/* Sample */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                SAMPLE
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: '14px',
-                  color: '#e7f0ee',
-                  lineHeight: 1.3,
-                }}
-              >
-                {data.sample}
-              </div>
-            </div>
-
-            {/* Western Blot Type */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                BLOT TYPE
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: '14px',
-                  color: '#e7f0ee',
-                  lineHeight: 1.3,
-                }}
-              >
-                {data.western_blot_type.replace('_', ' / ')}
-              </div>
-            </div>
+            {review && (
+              <span className="hb-status-badge" style={{ color: review.color, borderColor: review.color }}>
+                {review.label}
+              </span>
+            )}
           </div>
-
-          {/* Right Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Condition */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                CONDITION
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: '14px',
-                  color: '#e7f0ee',
-                  lineHeight: 1.3,
-                }}
-              >
-                {data.condition}
-              </div>
+          {live && (
+            <div className="hb-live-badge" title="Extracted live by the model + deterministic engine; no human review">
+              LIVE · UNREVIEWED
             </div>
+          )}
 
-            {/* Band Detected */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                BAND DETECTED
-              </div>
-              <div
-                style={{
-                  fontFamily: '"Newsreader", serif',
-                  fontSize: '14px',
-                  color: data.band_detected ? '#4ad6b0' : '#ff6b6b',
-                  lineHeight: 1.3,
-                  fontWeight: 600,
-                }}
-              >
-                {data.band_detected ? '✓ Yes' : '✗ No'}
-              </div>
+          {data.canonical_target && data.target && data.canonical_target !== data.target && (
+            <div className="hb-printed-target">as printed: {data.target}</div>
+          )}
+
+          {reasons.length > 0 && (
+            <div className="hb-review-reasons" style={{ color: review?.color }}>
+              <span className="hb-review-reasons-label">{review?.label === 'Conflicting' ? 'Why conflicting' : 'Why it needs review'}</span>
+              <ul>
+                {reasons.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
             </div>
+          )}
 
-            {/* Paper ID */}
-            <div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  color: '#6f857d',
-                  marginBottom: '4px',
-                  letterSpacing: '0.4px',
-                }}
-              >
-                PAPER ID
-              </div>
-              <div
-                style={{
-                  fontFamily: '"IBM Plex Mono", monospace',
-                  fontSize: '13px',
-                  color: '#a9bdb5',
-                  lineHeight: 1.3,
-                }}
-              >
-                {data.paper_id}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Metadata */}
-        {(data.organism || data.treatment_context || data.figure_label || data.page) && (
-          <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,.08)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-              {data.organism && (
-                <div>
-                  <span style={{ color: '#6f857d', fontSize: '10px', fontWeight: 600 }}>Organism: </span>
-                  <span style={{ color: '#e7f0ee', fontSize: '12px' }}>{data.organism}</span>
-                </div>
-              )}
+          {(designTag || data.treatment_context) && (
+            <div className="hb-result-context" style={{ fontFamily: SERIF }}>
+              {designTag && <span className="hb-result-context-tag">{designTag.toUpperCase()}</span>}
               {data.treatment_context && (
-                <div>
-                  <span style={{ color: '#6f857d', fontSize: '10px', fontWeight: 600 }}>Treatment: </span>
-                  <span style={{ color: '#e7f0ee', fontSize: '12px' }}>{data.treatment_context}</span>
-                </div>
-              )}
-              {data.figure_label && (
-                <div>
-                  <span style={{ color: '#6f857d', fontSize: '10px', fontWeight: 600 }}>Figure: </span>
-                  <span style={{ color: '#e7f0ee', fontSize: '12px' }}>{data.figure_label}</span>
-                </div>
-              )}
-              {data.page && (
-                <div>
-                  <span style={{ color: '#6f857d', fontSize: '10px', fontWeight: 600 }}>Page: </span>
-                  <span style={{ color: '#e7f0ee', fontSize: '12px' }}>{data.page}</span>
-                </div>
+                data.treatment_context.length > 130
+                  ? `${data.treatment_context.slice(0, 130)}...`
+                  : data.treatment_context
               )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </section>
 
-      {/* Citation Tab / Expanded Section */}
-      <div
-        style={{
-          backgroundColor: '#0a0d0f',
-          display: 'flex',
-          flexDirection: 'column',
-          borderLeft: '1px solid rgba(255,255,255,.06)',
-          cursor: 'pointer',
-          overflow: 'hidden',
-        }}
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? (
-          // Expanded view - placeholder for future figure data
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-            <div
-              style={{
-                fontFamily: '"Newsreader", serif',
-                fontSize: '12px',
-                color: '#a9bdb5',
-                textAlign: 'center',
-                padding: '20px',
-              }}
-            >
-              Figure data coming soon
+        <section className="hb-result-card-sample">
+          {sampleText && <Field label="SAMPLE" value={sampleText} />}
+          {blotType && <Field label="EXPERIMENT" value={blotType === 'co_ip' ? 'co-IP' : titleCase(blotType)} />}
+          {data.organism && !data.cell_line && <Field label="ORGANISM" value={data.organism} />}
+          {ipBait && <Field label="IP BAIT" value={ipBait} mono />}
+        </section>
+
+        <section className="hb-result-card-treatment">
+          <Field label="TREATMENT" value={treatmentDisplay || <EmptyFieldValue />} />
+          {lanes && lanes.length > 1 ? (
+            <div className="hb-treatment-lanes">
+              <Field
+                label={`LANES (${lanes.length})`}
+                value={
+                  <span className="hb-lane-strip">
+                    {lanes.map((l, i) => (
+                      <span
+                        key={i}
+                        className="hb-lane-pill"
+                        style={{ color: l.band_state === 'present' ? TEAL : l.band_state === 'absent' ? RED : GOLD }}
+                      >
+                        {formatLaneLabel(l.condition) || `lane ${i + 1}`}
+                      </span>
+                    ))}
+                  </span>
+                }
+              />
             </div>
+          ) : (
+            bandText && <Field label="BAND" value={titleCase(bandText)} color={bandColor} />
+          )}
+        </section>
+
+        <section className="hb-result-card-figure">
+          {previewSrc ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewSrc}
+                alt={`Published blot panel for ${headline}`}
+                className="hb-result-preview-image"
+                loading="lazy"
+                onError={() => setCropFailed(true)}
+              />
+              <div className="hb-result-preview-caption">Panel crop from the published figure</div>
+            </>
+          ) : (
+            <div className="hb-result-preview-placeholder">No figure crop available for this record</div>
+          )}
+        </section>
+
+        <section className="hb-result-card-metadata">
+          <div className="hb-result-chip-group" aria-label="Experiment indicators">
+            {indicatorChips.map((chip) => (
+              <Chip key={chip}>{chip}</Chip>
+            ))}
           </div>
-        ) : (
-          // Collapsed view - Citation tab
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
-              padding: '8px',
-            }}
+          {antibody && <Metadata label="Antibody" value={antibody} mono />}
+          {mw && <Metadata label="Molecular weight" value={mw} mono />}
+          {data.uniprot_id && <Metadata label="UniProt" value={data.uniprot_id} mono />}
+          {(data.figure_label || data.page || sourceId) && (
+            <Metadata
+              label="Source"
+              mono
+              value={
+                <>
+                  {data.figure_label && <span>{data.figure_label}</span>}
+                  {data.page && <span>Page {data.page}</span>}
+                  {data.doi ? (
+                    <a href={`https://doi.org/${data.doi}`} target="_blank" rel="noreferrer" className="hb-result-doi">
+                      DOI: {data.doi} ↗
+                    </a>
+                  ) : (
+                    sourceId && <span>DOI: {sourceId}</span>
+                  )}
+                </>
+              }
+            />
+          )}
+          <button
+            type="button"
+            className="hb-evidence-toggle"
+            onClick={() => setEvidenceOpen((o) => !o)}
+            aria-expanded={evidenceOpen}
+            aria-controls={`hb-evidence-${data.id}`}
           >
-            <div
-              style={{
-                fontFamily: '"IBM Plex Mono", monospace',
-                fontSize: '9px',
-                fontWeight: 600,
-                color: '#4ad6b0',
-                writingMode: 'vertical-rl',
-                textOrientation: 'mixed',
-                letterSpacing: '0.8px',
-              }}
-            >
-              CITATION
-            </div>
-          </div>
-        )}
+            {evidenceOpen ? 'Hide evidence' : 'Evidence & sources'}
+            <span aria-hidden="true">{evidenceOpen ? ' ▴' : ' ▾'}</span>
+          </button>
+        </section>
       </div>
+      {evidenceOpen && (
+        <div id={`hb-evidence-${data.id}`} className="hb-result-card-evidence">
+          <EvidencePanel recordId={data.id} apiBase={apiBase} readOnly={live} />
+        </div>
+      )}
     </div>
   );
 }
