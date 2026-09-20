@@ -1,19 +1,18 @@
 # HiveBlot beta: a heads up before you look
 
-HiveBlot is a search tool for Western blot evidence in published papers. You search for a protein, antibody, or condition, and it shows you structured Evidence Records: what cell line, what treatment, what antibody, what the blot showed lane by lane, with each field traced back to the exact wording in the paper it came from.
+Hi all,
 
-This is an early beta, and we want to be upfront about that. The corpus right now is intentionally small: three papers, reviewed by hand field by field, not a broad literature sweep. If you search for something outside those three papers, you won't find it, and that's expected, not a bug.
+HiveBlot is a search tool for Western blot evidence in published papers. You search a protein, antibody, cell line or condition, and it returns the experiments that match, lane by lane, with every field traced back to the sentence or figure it came from. Where the paper is unclear, it says so instead of guessing.
 
-What we're really testing with this beta:
+Beta link: https://hiveblot-beta.vercel.app
+Feedback form (about 5 minutes): https://tally.so/r/A7kzWB
 
-- Do you trust what it shows you?
-- Is the evidence (where a value came from, why it's marked uncertain or conflicting) clear enough to be useful?
-- Do the results actually feel useful for your work?
+What is live right now: search over a small, hand-reviewed set of three papers, the evidence panel with sources and figure crops, and feedback on any field. The corpus is small on purpose. We want to know whether the evidence presentation is trustworthy and clear before we grow it, so a search outside those papers will come back empty and that is expected.
 
-Some parts of getting a paper into the system right now depend on Valencio and PaperQA2 for paper access, and we expect we'll need broader paper access as this grows past the initial corpus.
+What is built but not yet in this link: live literature search (you give a target or DOI, HiveBlot finds open-access papers through Valency and PMC, extracts the blots and shows them unreviewed), question answering over a paper with citations, and a first densitometry tool that measures relative band intensity from a crop and refuses when the image is clipped. These run on our side today and will come to you in the next drop once they are hosted.
 
-Beta link: [BETA_LINK]
+What we most want from you: does the evidence make you trust a result more or less, is anything confusing, and would this fit into how you actually work.
 
-If you have five minutes after trying it, this short form helps a lot: [TALLY_LINK]
+The first search after a quiet spell can take up to a minute while the free-tier server wakes up.
 
-Thanks for taking a look this early. Honest feedback, especially the critical kind, is exactly what we need right now.
+Thanks for looking this early. Critical feedback is the most useful kind.

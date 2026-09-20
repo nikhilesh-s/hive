@@ -7,7 +7,7 @@ creation of this file.
 Question asked: everywhere HiveBlot accesses, expects, references, downloads,
 parses, or depends on papers, PDFs, PMC/PMCID content, PubMed/PMID, DOI
 metadata, paper text, paper images, figure crops, paper metadata, PaperQA2,
-Valencio/Valency, or any external literature retrieval.
+Valency/Valency, or any external literature retrieval.
 
 ---
 
@@ -30,7 +30,7 @@ service, the PMC Open Access figure packages, PyMuPDF PDF rendering, OpenCV
 panel cropping, UniProt resolution) lives in `western_blot_miner/` and
 `scripts/`, which run only on a developer's machine during ingestion and
 reseeding. Nothing in `api/` imports that package.
-For now, we are using Valencio and PaperQA2, but we may need broader paper access later.
+For now, we are using Valency and PaperQA2, but we may need broader paper access later.
 
 ---
 
@@ -172,7 +172,7 @@ stated.
    section names three DOIs and says a search returning nothing means "the
    topic is not in these three papers." This is the single most visible place
    where the frozen-corpus fact is stated. It does not currently say how
-   papers get in. Candidate location for: "For now, we are using Valencio and PaperQA2, but we may need broader paper access later."
+   papers get in. Candidate location for: "For now, we are using Valency and PaperQA2, but we may need broader paper access later."
 2. `web/app/about/page.tsx:26-33`. The lead claims
    HiveBlot "turns published Western blot figures, captions and methods into
    structured evidence." True of the pipeline; a reader may hear it as a live
@@ -204,12 +204,12 @@ stated.
 10. `HANDOFF.md:111-114`. Points at live DOI ingestion,
     Valency/PMC discovery and grounded paper QA on the experimental stack.
     This is the one in-repo place that already names the future direction, and
-    it should say plainly that none of it is hosted on this branch. For now, we are using Valencio and PaperQA2,
+    it should say plainly that none of it is hosted on this branch. For now, we are using Valency and PaperQA2,
     but we may need broader paper access later.
 
 11. `UCSF_BETA_HANDOFF_MESSAGE.md:13` (untracked draft).
     Already carries the intended framing: "Some parts of getting a paper
-    into the system right now depend on Valencio and PaperQA2 for paper
+    into the system right now depend on Valency and PaperQA2 for paper
     access, and we expect we'll need broader paper access as this grows past
     the initial corpus." Flagged so the wording stays consistent with whatever
     lands in the tracked docs.
@@ -269,7 +269,7 @@ Plain statements that match what the code does. Use as-is or trim.
 - "Getting a paper into HiveBlot is a separate, offline step: we retrieve the
   open-access full text and figures, extract candidate blot panels, and review
   every field by hand before it is loaded."
-- "For now, we are using Valencio and PaperQA2, but we may need broader paper
+- "For now, we are using Valency and PaperQA2, but we may need broader paper
   access later."
 - "A search that returns nothing means the topic is not in the current corpus.
   It does not mean no such evidence exists in the literature."
@@ -286,7 +286,7 @@ Plain statements that match what the code does. Use as-is or trim.
 The sister branch `experimental/ucsf-demo-2026-09-09`, adds live ingestion, grounded paper QA and Valency-based
 paper discovery. **None of it is hosted**, and none of it exists on
 `feature/bio-context-beta`. Noted here only so the boundary is explicit.
-For now, we are using Valencio and PaperQA2, but we may need broader paper access later.
+For now, we are using Valency and PaperQA2, but we may need broader paper access later.
 
 Relevant paths on that branch:
 
