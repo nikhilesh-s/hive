@@ -279,6 +279,13 @@ def test_feedback_scope_rules_direct():
     s = FeedbackSubmission(feedback_scope="search", search_query="x",
                            feedback_type="understood_partially")
     assert s.validate_scope() is None
+    # F-3: usefulness of a whole result, with an optional one-line why.
+    for t in ("useful", "not_relevant"):
+        r = FeedbackSubmission(feedback_scope="record", record_id=42, feedback_type=t,
+                               comment="wanted a phospho-site" if t == "not_relevant" else None)
+        assert r.validate_scope() is None
+    assert FeedbackSubmission(feedback_scope="record", record_id=42,
+                              feedback_type="not_a_type").validate_scope()
     # F-2: a zero-result search is a first-class search signal.
     z = FeedbackSubmission(feedback_scope="search", search_query="nonsense protein",
                            feedback_type="no_results", ui_location="search_zero_results")
