@@ -14,6 +14,8 @@ export interface FeedbackPayload {
   suggested_value?: string | null;
   comment?: string | null;
   ui_location?: string | null;
+  // F-5: set ONLY when the researcher ticked the "you may follow up" box.
+  contact?: string | null;
 }
 
 export function sessionId(): string {
