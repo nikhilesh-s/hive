@@ -30,6 +30,7 @@ EUROPEPMC_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 EUROPEPMC_RENDER = "https://europepmc.org/articles/{pmcid}?pdf=render"  # Europe PMC's own PDF render
 EUROPEPMC_PDF = "https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/fullTextPDF"  # legacy; often 404 now
 UNPAYWALL = "https://api.unpaywall.org/v2/{doi}"
+OPENALEX = "https://api.openalex.org/works/https://doi.org/{doi}"  # keyless OA resolver
 DEFAULT_TIMEOUT = 60
 RETRIES = 3
 _DOI_RE = re.compile(r"10\.\d{4,9}/\S+", re.IGNORECASE)
@@ -138,6 +139,24 @@ def resolve_ids(identifier: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
     return resolve_ids_batch([identifier], timeout).get(identifier.lower(), {})
 
 
+def openalex_pdf_urls(doi: str, timeout: int = DEFAULT_TIMEOUT) -> list[str]:
+    """OpenAlex: every open-access location that lists a direct PDF URL for
+    this DOI, best location first. No key or contact email required."""
+    try:
+        resp = requests.get(OPENALEX.format(doi=doi), timeout=timeout, headers=_headers(),
+                            params={"select": "best_oa_location,locations"})
+        data = resp.json() if resp.status_code == 200 else {}
+    except (requests.RequestException, ValueError) as error:
+        logger.debug("openalex failed for %s: %s", doi, error)
+        return []
+    urls: list[str] = []
+    for loc in [data.get("best_oa_location") or {}] + list(data.get("locations") or []):
+        url = (loc or {}).get("pdf_url")
+        if url and url not in urls:
+            urls.append(url)
+    return urls
+
+
 def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
     """DOI -> open-access PDF on disk. Returns {pdf_path|None, pmcid, pmid, doi, source}."""
     doi = normalize_doi(doi)
@@ -168,8 +187,17 @@ def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> 
         if path:
             result.update(pdf_path=path, source="europepmc")
             return result
+    if doi:
+        # 4. OpenAlex (Europe PMC and PMC block scripted PDF downloads since
+        #    2026-08; publishers' own OA PDFs still answer a plain client)
+        result["tried"].append("openalex")
+        for pdf_url in openalex_pdf_urls(doi, timeout):
+            path = _download(pdf_url, out_dir / f"{doi.replace('/', '_')}.pdf", timeout)
+            if path:
+                result.update(pdf_path=path, source="openalex")
+                return result
     if doi and _has_real_email():
-        # 4. Unpaywall: every open-access location that offers a PDF
+        # 5. Unpaywall: every open-access location that offers a PDF
         result["tried"].append("unpaywall")
         try:
             resp = requests.get(UNPAYWALL.format(doi=doi), params={"email": _email()}, timeout=timeout)
