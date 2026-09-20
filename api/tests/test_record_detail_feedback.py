@@ -177,6 +177,13 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
     assert inserted["suggested_value"] == "HepG2"
     assert inserted["model_value"] == "Hep3B"
     assert "target" not in inserted and "canonical_target" not in inserted
+    # F-5: a real app_version, not the old hardcoded "beta-local"; contact is
+    # None unless the researcher opted in.
+    assert inserted["app_version"] == settings.app_version != "beta-local"
+    assert inserted["contact"] is None
+    r = client.post("/feedback", headers=AUTH,
+                    json={"feedback_scope": "ui", "comment": "call me", "contact": "a@lab.edu"})
+    assert r.status_code == 200 and inserted["contact"] == "a@lab.edu"
 
     # scope validation failures -> 400
     bad = [
@@ -266,6 +273,8 @@ def test_feedback_rehydration_endpoint(client, monkeypatch):
     assert item["model_value"] is None
     assert item["suggested_value"] == "phosphorylation"
     assert item["field_name"] == "modification_type"
+    # F-5: an opt-in contact address is never rehydrated into another browser.
+    assert "contact" not in item
     # auth required; unconfigured -> 503
     assert client.get("/records/673/feedback").status_code in (401, 403)
     monkeypatch.setattr(settings, "db_feedback_url", "")

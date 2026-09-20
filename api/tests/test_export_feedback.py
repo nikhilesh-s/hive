@@ -26,6 +26,7 @@ pytestmark = pytest.mark.skipif(not DB_URL, reason="HIVE_DB_TEST_URL not set")
 
 FEEDBACK_MIGRATIONS = [  # only the ones that touch hiveblot_feedback
     "migrations/002_feedback.sql",
+    "migrations/006_feedback_contact.sql",
 ]
 
 

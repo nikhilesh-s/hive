@@ -36,6 +36,7 @@ CHAIN = [
     "migrations/003_stable_row_key.sql",
     "migrations/004_secure_public_tables.sql",
     "migrations/005_experimental_live_tables.sql",   # EXPERIMENTAL live tier
+    "migrations/006_feedback_contact.sql",           # F-5 opt-in contact column
 ]
 LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
             "VALUES ('live-paper', 'STAT3', 'job1')")
