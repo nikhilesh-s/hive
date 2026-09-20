@@ -278,6 +278,9 @@ RECORD_FEEDBACK_TYPES = {
     "wrong_interpretation", "wrong_experiment_type", "wrong_target_modification",
     "wrong_phosphosite", "wrong_antibody_association", "wrong_figure_association",
     "missing_methods_context", "irrelevant_result", "other",
+    # F-3: usefulness of the whole result, not its wrongness. The instrument
+    # measured wrongness in detail and usefulness not at all.
+    "useful", "not_relevant",
 }
 SEARCH_FEEDBACK_TYPES = {"understood_yes", "understood_partially", "understood_no",
                          # F-2: the search returned nothing. The query itself is
