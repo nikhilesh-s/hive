@@ -438,6 +438,31 @@ demo-blocking runtime failure justifies a change before UCSF. No P2 polish.
 ---
 
 ## Historical session log
+- **2026-09-20 (session 33)** — Claude Code (Opus 5), worktree branch
+  `worktree-agent-a6deafad371bd895c` off `main`, committed there and not
+  pushed. **TRACK F: RESEARCHER FEEDBACK WE CAN ANALYZE (F-1..F-6).** New
+  `scripts/export_feedback.py` (CSV or JSON, ordered by `created_at`,
+  `--json` / `--since` / `--dsn`, DSN read from the feedback env var and never
+  printed) with a pytest that skips unless the DB test-url env var is set.
+  Zero-result searches now render the search prompt and write a
+  `no_results` row carrying the query, with the zero-count signal in
+  `ui_location` so no column was added. The evidence panel's record-level row
+  gained "This was useful" / "Not what I needed" (new free-TEXT feedback types,
+  no migration), hidden on read-only live cards. The beta widget gained the
+  three DEMO.md §7 questions as one row per answered question, offered once per
+  browser session and dismissible, plus an unchecked opt-in that stores a
+  contact address only when ticked — migration 006 adds that one nullable
+  column (with a down file, mirrored into the Supabase CLI layout, green under
+  the sync and access-matrix tests) and it is excluded from the rehydration
+  path, so it can never render in another browser. `app_version` is now read
+  from settings (env var, else the build SHA the host injects) instead of the
+  hardcoded literal, and `/health` reports it. Feedback got its own generous
+  rate limit instead of sharing the search bucket that every hosted researcher
+  hits through one proxy IP, and every client call now checks the response:
+  a dropped submission says so and keeps the controls on screen instead of
+  showing a checkmark. Tests: api 201 passed / 12 skipped (212 passed with the
+  DB test url set), web typecheck, lint and build clean. Not done: F-7 and F-8
+  — nothing is deployed, so no hosted feedback row was written or read back.
 - **2026-09-20 (session 32)** — Claude Code (Fable 5.1). **UCSF BETA SHARE
   PACK (docs only; no code, no deploy, no schema change).** Seven markdown
   files at the repo root, written from the "Nik tasks prompts" orchestration
