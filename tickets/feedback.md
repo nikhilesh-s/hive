@@ -71,7 +71,7 @@ Project active, RLS on, 1 row readable via `supabase db query --linked`.
 Remaining: insert one row through the **hosted** UI after the next deploy
 and read it back (part of F-8).
 
-### F-1 · `scripts/export_feedback.py` — one command, CSV or JSON
+### F-1 · `scripts/export_feedback.py` — one command, CSV or JSON — DONE 2026-09-20 (`5c01566`)
 - Why: the founder's literal question. Today there is no path from
   "researchers gave feedback" to "we looked at it".
 - Acceptance: reads `DB_FEEDBACK_URL` from the environment (never
@@ -82,7 +82,7 @@ and read it back (part of F-8).
   researchers: never commit an export.
 - Estimate: 0.5 half-day. Depends on: nothing. Owner: Nik.
 
-### F-2 · Capture zero-result searches
+### F-2 · Capture zero-result searches — DONE 2026-09-20 (`ec843c6`)
 - Why: gap 2.
 - Acceptance: `SearchFeedback` also renders on the empty-results branch with
   prompt "We found nothing for that — what were you hoping to find?";
@@ -91,7 +91,7 @@ and read it back (part of F-8).
   query on local produces a row.
 - Estimate: 0.5. Depends on: nothing. Owner: Srushti.
 
-### F-3 · Result-level "This was useful" / "Not what I needed" (+ one-line why)
+### F-3 · Result-level "This was useful" / "Not what I needed" (+ one-line why) — DONE 2026-09-20 (`172f22d`)
 - Why: gap 1.
 - Acceptance: two buttons in the evidence panel's record-level action row;
   `useful` and `not_useful_result` added to `RECORD_FEEDBACK_TYPES`; "Not
@@ -101,7 +101,7 @@ and read it back (part of F-8).
 - Estimate: 1 (0.5 web, 0.5 api). Depends on: nothing. Owner: Srushti (web)
   + Nik (api).
 
-### F-4 · Three-question end-of-session survey (DEMO.md §7 as rows)
+### F-4 · Three-question end-of-session survey (DEMO.md §7 as rows) — DONE 2026-09-20 (`f493056`)
 - Why: gap 6. Turns Yashvi's spoken close into queryable data.
 - Acceptance: Yashvi supplies final wording for three questions (fields that
   matter most / what is missing / what it would take to trust an unreviewed
@@ -112,7 +112,7 @@ and read it back (part of F-8).
 - Estimate: 1. Depends on: Yashvi copy first. Owner: Yashvi (content) +
   Srushti (build).
 
-### F-5 · Optional contact with explicit consent, and a real `app_version`
+### F-5 · Optional contact with explicit consent, and a real `app_version` — DONE 2026-09-20 (`94b8e96`)
 - Why: gap 5, plus demo-laptop clicks and UCSF clicks are indistinguishable.
 - Acceptance: `migrations/006_feedback_contact.sql` adds nullable `contact
   TEXT` (idempotent, with `.down.sql`, mirrored by
@@ -127,13 +127,25 @@ and read it back (part of F-8).
 - Estimate: 1. Depends on: F-4. Owner: Nik (migration + api), Srushti (the
   checkbox).
 
-### F-6 · Separate feedback rate limit; stop faking success
+### F-6 · Separate feedback rate limit; stop faking success — DONE 2026-09-20 (`8aeb64a`)
 - Why: gap 4.
 - Acceptance: feedback gets its own, higher limit or a key that
   distinguishes users behind the proxy; `submitFeedback()` returning false
   shows "couldn't save that — try again" instead of a checkmark; verified by
   25 submissions in a minute from one client.
 - Estimate: 0.5. Depends on: nothing. Owner: Nik (limit) + Srushti (UI).
+
+**As built (2026-09-20), where it differs from the acceptance text above:**
+F-2 stores the zero-result signal as `ui_location=search_zero_results` rather
+than a result-count column (no schema change); the prompt reads "Nothing found.
+What were you looking for?". F-3 named the negative type `not_relevant`, not
+`not_useful_result`. F-4's three questions are the DEMO.md §7 fields /
+missing / trust questions, one `scope=ui` row each with its own
+`feedback_type` **and** `ui_location=survey_q1..q3`, offered once per browser
+session and dismissible. F-5's `app_version` falls back to the build SHA Render
+injects when `APP_VERSION` is unset, and `/health` now reports it. F-6 defaults
+`FEEDBACK_RATE_LIMIT` to `120/minute`. Still open for F-8: nothing is deployed,
+so no hosted row has been written or read back.
 
 ### F-7 · Weekly feedback triage
 - Why: an export nobody reads is a file. Corrections are labels for the
