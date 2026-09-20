@@ -57,6 +57,8 @@ export default function BetaFeedback({ query }: { query?: string }) {
   // F-5: contact is stored only when the (unchecked by default) box is ticked.
   const [consent, setConsent] = useState(false);
   const [email, setEmail] = useState('');
+  const [failed, setFailed] = useState(false);
+  const [sent, setSent] = useState([false, false, false]);
   const surveyDone = useSyncExternalStore(subscribeSurvey, surveyDoneSnapshot, () => true);
 
   const contact = consent && email.trim() ? email.trim() : null;
@@ -80,6 +82,12 @@ export default function BetaFeedback({ query }: { query?: string }) {
     background: 'var(--input-background)', border: '1px solid var(--border-strong)',
     borderRadius: '8px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px',
   } as const;
+
+  const FailNote = failed ? (
+    <div style={{ fontFamily: MONO, fontSize: '10px', color: 'var(--error)' }}>
+      couldn’t save that — try again
+    </div>
+  ) : null;
 
   const ContactOptIn = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -148,19 +156,24 @@ export default function BetaFeedback({ query }: { query?: string }) {
           </div>
         ))}
         {ContactOptIn}
+        {FailNote}
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => {
-              SURVEY.forEach((s, i) => {
-                const a = answers[i].trim();
-                if (!a) return;  // an unanswered question writes no row
-                submitFeedback({
-                  feedback_scope: 'ui', comment: a, feedback_type: s.type,
+              setFailed(false);
+              // An unanswered question writes no row; a question that already
+              // landed is not re-sent when the researcher retries a failure.
+              Promise.all(SURVEY.map((s, i) => (
+                !answers[i].trim() || sent[i] ? Promise.resolve(true) : submitFeedback({
+                  feedback_scope: 'ui', comment: answers[i].trim(), feedback_type: s.type,
                   search_query: query || null, ui_location: s.location, contact,
-                });
+                })
+              ))).then((oks) => {
+                setSent(oks.map((ok, i) => sent[i] || (ok && !!answers[i].trim())));
+                if (oks.some((ok) => !ok)) { setFailed(true); return; }  // F-6: never fake success
+                closeSurvey();
+                setState('done');
               });
-              closeSurvey();
-              setState('done');
             }}
             style={primary}
           >
@@ -198,15 +211,16 @@ export default function BetaFeedback({ query }: { query?: string }) {
             style={input}
           />
           {ContactOptIn}
+          {FailNote}
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={() => {
                 if (!text.trim()) return;
+                setFailed(false);
                 submitFeedback({
                   feedback_scope: 'ui', comment: text.trim(),
                   search_query: query || null, ui_location: 'search_page', contact,
-                });
-                setState('done');
+                }).then((ok) => (ok ? setState('done') : setFailed(true)));  // F-6
               }}
               style={primary}
             >

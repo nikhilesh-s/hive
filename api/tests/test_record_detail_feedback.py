@@ -223,6 +223,21 @@ def test_feedback_rejects_nul_and_mismatched_record_keys(client, monkeypatch):
     assert client.post("/feedback", json={**base, "stable_row_key": "abc:1"}, headers=AUTH).status_code == 200
 
 
+def test_feedback_has_its_own_generous_rate_limit(client, monkeypatch):
+    """F-6: every hosted researcher shares one Vercel proxy IP, so feedback on
+    the 20/minute search bucket was silently dropped. 25 submissions in a
+    minute from one client must all land."""
+    import app.routers.internal as internal
+
+    async def fake_insert(fields):
+        return 1
+    monkeypatch.setattr(internal, "insert_feedback", fake_insert)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+    body = {"feedback_scope": "ui", "comment": "hi"}
+    codes = {client.post("/feedback", json=body, headers=AUTH).status_code for _ in range(25)}
+    assert codes == {200}
+
+
 def test_feedback_503_when_unconfigured(client, monkeypatch):
     monkeypatch.setattr(settings, "db_feedback_url", "")
     good = {"feedback_scope": "ui", "comment": "hi"}

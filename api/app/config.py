@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     # slowapi rate-limit strings, e.g. "20/minute"
     search_rate_limit: str = "20/minute"
     agent_rate_limit: str = "10/minute"
+    # Feedback gets its own, generous bucket (F-6): every hosted researcher
+    # arrives from the same Vercel proxy IP, so the key is effectively "all of
+    # UCSF" — sharing the search limit silently dropped real feedback.
+    feedback_rate_limit: str = "120/minute"
 
     # Stamped on every feedback row and returned by /health, so a demo laptop
     # and a hosted deployment are distinguishable in the F-1 export (F-5,
