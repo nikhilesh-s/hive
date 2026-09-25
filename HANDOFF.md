@@ -7,6 +7,10 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+**2026-09-24:** team summary lives in [`TEAM_HANDOFF.md`](TEAM_HANDOFF.md).
+Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
+Outreach plan is on branch `outreach/oct20`.
+
 ## PAUSED 2026-09-20 22:00 PT — READ FIRST (state, flaws, exact resume steps)
 
 Nik paused all HiveBlot work. `main` is the only branch; everything below is on it and pushed.
