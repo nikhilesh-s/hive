@@ -50,10 +50,8 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
   `HOSTING_STATUS.md` and others) still says live search is "not yet in this link". Corpus counts
   are hardcoded in `web/app/about/page.tsx` and `web/app/search/page.tsx`.
 - **B-9:** `api/app/nlp.py` describes an old schema. Setting `OPENAI_KEY` silently makes search worse.
-- Record 1189 shows internal "marked correct" feedback to testers.
-- API `/docs` is public (route names only).
-- Reviewed crops are baked into the Docker image and must be re-staged by hand.
-- Not tested hosted: per-field ✓/✗ after F-6, mobile layout, other browsers.
+- Smaller: record 1189 shows internal feedback to testers; API `/docs` is public; reviewed crops
+  are baked into the Docker image. Not tested hosted: per-field ✓/✗ after F-6, mobile, other browsers.
 
 ## 4. Tickets left
 
@@ -80,8 +78,7 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 - Search-driven growth: extract and add papers automatically when someone searches (UCSF meeting).
 - UCSF network access for journals the institution licenses (the "green flag" idea).
 - Organism threading into UniProt, so mouse blots resolve correctly.
-- Antibody validation and controls fields; record-detail endpoint for full provenance.
-- Ladder-based MW estimation, then doublet / smear / saturation QC flags. Densitometry last.
+- Antibody validation and controls fields; ladder-based MW estimation, then QC flags. Densitometry last.
 - Reseed the hosted 475 rows once B-5 has measured the new pipeline (founder decision D-2).
 - Escalating ambiguous panels to a stronger model, only if B-5 shows it helps (D-3).
 
@@ -99,8 +96,8 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
   (10-06 to 10-08); 3 = the rest, ~30 (10-13 to 10-15); readout 10-19 to 10-20.
 - Targets: 80 sent, 20 replies, 12 users, 8 papers corrected by authors, 150 field labels,
   3 design partners, 1 dilution-series commitment.
-- Rules: max ~20 new emails a day, three touches then stop, opt-outs removed the same day.
-- **Nothing has been sent. Every email is sent by hand, one at a time, from Nik's mailbox.**
+- Max ~20 new emails a day, three touches then stop, opt-outs removed the same day.
+  **Nothing has been sent. Every email is sent by hand, one at a time, from Nik's mailbox.**
 
 Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 `git show outreach/oct20:outreach/prospects.csv`.
@@ -120,25 +117,13 @@ Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 
 ## 7. Who does what this week
 
-**Nik**
-- Deploy: migration 006, Render, Vercel, F-8 smoke test.
-- Daily cap on ingest and ask; move Render to Starter; set `UNPAYWALL_EMAIL`.
-- Run the pre-extractions (Mon-Tue), then all sending and replies.
-
-**Srushti**
-- `?doi=` deep link on the research page.
-- Journal-access flag.
-- Any bug a tester reports that week.
-
-**Tanvi**
-- Fix stale copy in the docs pack and hardcoded corpus counts.
-- Spot-check every extracted paper before it goes in an email.
-- Weekly F-7 triage (valid / invalid / unclear; extraction bugs become B tickets).
-
-**Yashvi**
-- Send the overdue UCSF follow-up (Tally form + research page).
-- Own the prospect sheet: status per row.
-- Handle concierge requests.
+- **Nik:** deploy (migration 006, Render, Vercel, F-8 smoke test). Daily cap on ingest and ask.
+  Move Render to Starter. Set `UNPAYWALL_EMAIL`. Pre-extract papers Mon-Tue, then all sending and replies.
+- **Srushti:** `?doi=` deep link on the research page. Journal-access flag. Any bug a tester reports.
+- **Tanvi:** fix stale copy in the docs pack and hardcoded corpus counts. Spot-check every extracted
+  paper before it goes in an email. Weekly F-7 triage (extraction bugs become B tickets).
+- **Yashvi:** send the overdue UCSF follow-up (Tally form + research page). Own the prospect sheet
+  (status per row). Handle concierge requests.
 
 ## 8. Branches
 
@@ -146,7 +131,6 @@ Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 - `release/hosted` (`0aa5fdf`): exactly what Vercel and Render run today.
 - `outreach/oct20`: outreach plan and prospect sheet.
 - `archive/*` tags: 7 old branches, fully merged into `main`, then deleted (2026-09-24).
-- Copilot PR #2 is stale. Main fixed that CI issue another way.
 
 ## 9. Nik's decisions needed
 
