@@ -178,6 +178,24 @@ class SearchResponse(BaseModel):
     truncated: bool = False  # the row cap was hit; the last partial experiment was dropped
 
 
+class SearchHistorySubmission(BaseModel):
+    session_id: str = Field(min_length=1, max_length=128)
+    query: str = Field(min_length=1, max_length=500)
+    filters: dict = Field(default_factory=dict)
+
+
+class SearchHistoryItem(BaseModel):
+    id: int
+    query: str
+    filters: dict = Field(default_factory=dict)
+    created_at: str
+    last_searched_at: str
+
+
+class SearchHistoryResponse(BaseModel):
+    items: list[SearchHistoryItem]
+
+
 # --- record detail ("Why does HiveBlot say this?") --------------------------
 
 class FieldEvidence(BaseModel):
