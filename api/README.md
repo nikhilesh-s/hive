@@ -6,7 +6,8 @@ scientific papers, stored in Supabase.
 ## Two API surfaces, one search pipeline
 
 - **Internal** (`app/routers/internal.py`): `/health`, `/`, `/proteins`,
-  `/search`. Called only by `web/`'s server-side `/api/search` route
+  `/search`, and browser-session-scoped `/history` routes. Called only by
+  `web/`'s server-side `/api/*` routes
   (Next.js BFF) using `INTERNAL_API_KEY`. Free to change shape as the
   frontend's needs change - not a contract anyone else depends on.
 - **External** (`app/routers/external.py`): `POST /v1/search`. The one
@@ -75,4 +76,5 @@ check entirely.
 | GET    | `/`          | none | Supabase connectivity check, returns 5 sample rows |
 | GET    | `/proteins`  | `INTERNAL_API_KEY` | web/ frontend only |
 | POST   | `/search`    | `INTERNAL_API_KEY`, rate-limited | web/ frontend only |
+| GET/POST/DELETE | `/history` and `/history/{id}` | `INTERNAL_API_KEY` | web/ frontend only; anonymous browser session until auth exists |
 | POST   | `/v1/search` | one of `AGENT_API_KEYS`, rate-limited | external agents/integrations |

@@ -1,4 +1,4 @@
-"""Database access matrix for the two application tables (migration 004).
+"""Database access matrix for the application tables (migration 007).
 
 Runs the canonical SQL chain (base schema -> 001 -> 002 -> 003 -> 004) on a
 scratch Postgres and then checks, role by role, what each one can do. This is
@@ -37,6 +37,7 @@ CHAIN = [
     "migrations/004_secure_public_tables.sql",
     "migrations/005_experimental_live_tables.sql",   # EXPERIMENTAL live tier
     "migrations/006_feedback_contact.sql",           # F-5 opt-in contact column
+    "migrations/007_search_history.sql",
 ]
 LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
             "VALUES ('live-paper', 'STAT3', 'job1')")
@@ -61,6 +62,7 @@ async def _apply_chain(conn):
     for t in ("ingest_crops", "ingest_jobs", "western_blot_records_live"):
         await conn.execute(f"DROP TABLE IF EXISTS {t} CASCADE")
     await conn.execute("DROP TABLE IF EXISTS hiveblot_feedback CASCADE")
+    await conn.execute("DROP TABLE IF EXISTS search_history CASCADE")
     await conn.execute("DROP TABLE IF EXISTS western_blot_records CASCADE")
     for rel in CHAIN:
         sql = (REPO / rel).read_text()
@@ -127,9 +129,9 @@ def run(conn, coro):
 def test_rls_enabled_on_both_tables(conn):
     rows = run(conn, conn.fetch(
         "SELECT relname, relrowsecurity FROM pg_class WHERE relname IN "
-        "('western_blot_records', 'hiveblot_feedback')"))
+        "('western_blot_records', 'hiveblot_feedback', 'search_history')"))
     assert {r["relname"]: r["relrowsecurity"] for r in rows} == {
-        "western_blot_records": True, "hiveblot_feedback": True}
+        "western_blot_records": True, "hiveblot_feedback": True, "search_history": True}
 
 
 def test_policies_target_explicit_roles(conn):
@@ -155,6 +157,8 @@ def test_public_client_roles_have_no_access(conn, role):
     assert run(conn, _as_role(conn, role, FEEDBACK_SQL)) == denied
     assert run(conn, _as_role(conn, role, "UPDATE hiveblot_feedback SET comment='x'")) == denied
     assert run(conn, _as_role(conn, role, "DELETE FROM hiveblot_feedback")) == denied
+    assert run(conn, _as_role(conn, role, "SELECT * FROM search_history")) == denied
+    assert run(conn, _as_role(conn, role, "DELETE FROM search_history")) == denied
 
 
 def test_public_client_roles_get_no_future_tables(conn):
@@ -191,6 +195,19 @@ def test_hive_feedback_is_insert_and_read_only_on_feedback(conn):
     assert run(conn, _as_role(conn, "hive_feedback", RECORD_SQL)) == "42501"
     assert run(conn, _as_role(conn, "hive_feedback", "UPDATE western_blot_records SET target='x'")) == "42501"
     assert run(conn, _as_role(conn, "hive_feedback", "DELETE FROM western_blot_records")) == "42501"
+
+
+def test_hive_feedback_owns_search_history_access(conn):
+    assert run(conn, _as_role(conn, "hive_feedback",
+               "INSERT INTO search_history (session_id, query, normalized_query) "
+               "VALUES ('session-a', 'STAT3', 'STAT3')")) == "ok"
+    assert run(conn, _rows_as_role(conn, "hive_feedback",
+               "SELECT * FROM search_history WHERE session_id='session-a'")) == 1
+    assert run(conn, _as_role(conn, "hive_feedback",
+               "UPDATE search_history SET query='pSTAT3' WHERE session_id='session-a'")) == "ok"
+    assert run(conn, _as_role(conn, "hive_feedback",
+               "DELETE FROM search_history WHERE session_id='session-a'")) == "ok"
+    assert run(conn, _as_role(conn, "hive_feedback", "SELECT * FROM western_blot_records")) == "42501"
 
 
 def test_live_tier_matrix(conn):
