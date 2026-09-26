@@ -133,6 +133,59 @@ async def insert_feedback(fields: dict) -> int:
         return await conn.fetchval(sql, *[fields[c] for c in cols])
 
 
+async def upsert_search_history(session_id: str, query: str,
+                                normalized_query: str, filters: dict) -> dict:
+    """Record a successfully executed search for one anonymous session.
+
+    The unique key makes repeated searches useful history rather than a list
+    of identical events; the original query and most recent timestamp remain
+    available for display and re-running.
+    """
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "INSERT INTO search_history "
+            "(session_id, query, normalized_query, filters, last_searched_at) "
+            "VALUES ($1, $2, $3, $4::jsonb, now()) "
+            "ON CONFLICT (session_id, normalized_query, filters) DO UPDATE SET "
+            "query = EXCLUDED.query, last_searched_at = now() "
+            "RETURNING id, query, filters, created_at, last_searched_at",
+            session_id, query, normalized_query, filters,
+        )
+        return dict(row)
+
+
+async def list_search_history(session_id: str, limit: int = 50) -> list[dict]:
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT id, query, filters, created_at, last_searched_at "
+            "FROM search_history WHERE session_id = $1 "
+            "ORDER BY last_searched_at DESC LIMIT $2",
+            session_id, limit,
+        )
+        return [dict(row) for row in rows]
+
+
+async def delete_search_history(session_id: str, history_id: int) -> bool:
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM search_history WHERE id = $1 AND session_id = $2",
+            history_id, session_id,
+        )
+        return result.endswith("1")
+
+
+async def clear_search_history(session_id: str) -> int:
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM search_history WHERE session_id = $1", session_id,
+        )
+        return int(result.split()[-1])
+
+
 # --- EXPERIMENTAL: live (unreviewed) tier ----------------------------------
 _ingest_pool: asyncpg.Pool | None = None
 
