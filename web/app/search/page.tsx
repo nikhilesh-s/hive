@@ -14,6 +14,7 @@ import FiltersBar, {
 } from '@/components/FiltersBar';
 import SearchFeedback from '@/components/SearchFeedback';
 import BetaFeedback from '@/components/BetaFeedback';
+import { recordSearchHistory } from '@/lib/history';
 
 interface DatabaseResult {
   id: number;
@@ -138,7 +139,7 @@ export default function SearchPage() {
     clearSearchUrl();
   };
 
-  async function handleSearch(searchQuery: string) {
+  async function handleSearch(searchQuery: string, submittedFilters: SearchFilters = emptySearchFilters()) {
     setQuery(searchQuery);
     if (!searchQuery.trim()) {
       clearResults();
@@ -171,6 +172,7 @@ export default function SearchPage() {
       }
 
       const data: SearchResponse = await response.json();
+      void recordSearchHistory(searchQuery, submittedFilters).catch(() => undefined);
       if (my !== seq.current) return; // a newer search started meanwhile
       setResults(data.results || []);
       setTruncated(data.truncated === true);
@@ -201,7 +203,7 @@ export default function SearchPage() {
   const handlePrimarySearch = (searchQuery: string) => {
     setDraftFilters(emptySearchFilters());
     setAppliedFilters(emptySearchFilters());
-    handleSearch(searchQuery);
+    handleSearch(searchQuery, emptySearchFilters());
   };
 
   const handleApplyFilters = () => {
@@ -209,7 +211,7 @@ export default function SearchPage() {
     if (!filterQuery) return;
     setAppliedFilters({ ...draftFilters });
     setFiltersOpen(false);
-    handleSearch(filterQuery);
+    handleSearch(filterQuery, draftFilters);
   };
 
   const handleClearDraftFilter = (key: SearchFilterKey) => {
@@ -221,7 +223,7 @@ export default function SearchPage() {
     setDraftFilters(next);
     setAppliedFilters(next);
     const filterQuery = buildFilterQuery(next);
-    if (filterQuery) handleSearch(filterQuery);
+    if (filterQuery) handleSearch(filterQuery, next);
     else clearResults();
   };
 

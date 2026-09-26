@@ -7,6 +7,16 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Search History (2026-09-25)
+
+Search History is implemented on `main` via the existing Next.js -> FastAPI ->
+Supabase architecture. It includes migration 007, session-scoped persistence,
+normalized deduplication, `/history`, rerun links through `/search?q=...`,
+individual deletion, clear-all confirmation, and loading/error/empty states.
+Authentication is not implemented, so ownership is browser-session scoped via
+the existing anonymous localStorage session ID; Saved Results remains a
+separate, unimplemented feature specified in Ticket C.
+
 **2026-09-24:** team summary lives in [`TEAM_HANDOFF.md`](TEAM_HANDOFF.md).
 Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
 Outreach plan is on branch `outreach/oct20`.
