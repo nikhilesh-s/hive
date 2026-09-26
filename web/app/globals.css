@@ -134,6 +134,178 @@ body {
   margin-right: 24px;
 }
 
+.hb-history-page {
+  min-height: calc(100vh - 86px);
+  background: var(--background);
+  padding: 64px 56px 96px;
+}
+
+.hb-history-shell {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.hb-history-header {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border-strong);
+  display: flex;
+  gap: 32px;
+  justify-content: space-between;
+  padding-bottom: 28px;
+}
+
+.hb-history-kicker,
+.hb-history-section-heading,
+.hb-history-empty-label {
+  color: var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+}
+
+.hb-history-header h1 {
+  color: var(--text-primary);
+  font-family: var(--font-serif), serif;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 10px 0 8px;
+}
+
+.hb-history-header p,
+.hb-history-empty p {
+  color: var(--text-secondary);
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hb-history-clear,
+.hb-history-delete,
+.hb-history-search-link {
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: .7px;
+  text-decoration: none;
+  transition: border-color .18s, color .18s, background-color .18s;
+}
+
+.hb-history-clear,
+.hb-history-delete {
+  background: transparent;
+  cursor: pointer;
+}
+
+.hb-history-clear {
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+
+.hb-history-clear:hover,
+.hb-history-delete:hover,
+.hb-history-search-link:hover {
+  background: var(--surface-secondary);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.hb-history-clear:disabled,
+.hb-history-delete:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.hb-history-section-heading {
+  color: var(--text-subtle);
+  margin: 34px 0 12px;
+}
+
+.hb-history-list {
+  border-top: 1px solid var(--border);
+}
+
+.hb-history-row {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  min-height: 84px;
+  padding: 16px 0;
+}
+
+.hb-history-entry {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.hb-history-query {
+  color: var(--text-primary);
+  font-family: var(--font-serif), serif;
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hb-history-entry:hover .hb-history-query {
+  color: var(--accent);
+}
+
+.hb-history-meta {
+  color: var(--text-subtle);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.hb-history-delete {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+}
+
+.hb-history-empty {
+  border: 1px solid var(--border);
+  margin-top: 34px;
+  padding: 56px 32px;
+  text-align: center;
+}
+
+.hb-history-empty p {
+  margin: 12px 0 22px;
+}
+
+.hb-history-search-link {
+  display: inline-block;
+  padding: 10px 14px;
+}
+
+.hb-history-state,
+.hb-history-error {
+  font-family: var(--font-serif), serif;
+  margin-top: 34px;
+  padding: 24px;
+}
+
+.hb-history-state {
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.hb-history-error {
+  background: var(--error-soft);
+  border: 1px solid var(--error-border);
+  color: var(--error);
+}
+
 .hb-theme-toggle {
   align-items: center;
   background: var(--surface-secondary);
@@ -1708,3 +1880,11 @@ body {
 .hb-live-papers li.is-selected { background: var(--accent-faint); border-radius: 6px; padding-left: 10px; padding-right: 10px; }
 .hb-research-prewarmed { margin-top: 18px; }
 .hb-research-prewarmed summary { color: var(--accent); cursor: pointer; font-family: var(--font-sans), sans-serif; font-size: 13px; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .hb-history-page { padding: 40px 20px 64px; }
+  .hb-history-header { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .hb-history-header h1 { font-size: 30px; }
+  .hb-history-row { align-items: flex-start; }
+  .hb-history-delete { margin-top: 2px; }
+}

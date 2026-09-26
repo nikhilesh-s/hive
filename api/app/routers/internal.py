@@ -11,7 +11,16 @@ from fastapi import Path as PathParam
 
 from ..auth import require_internal_key
 from ..config import settings
-from ..db import fetch_feedback_for_record, fetch_record_by_id, insert_feedback, search_targets
+from ..db import (
+    clear_search_history,
+    delete_search_history,
+    fetch_feedback_for_record,
+    fetch_record_by_id,
+    insert_feedback,
+    list_search_history,
+    search_targets,
+    upsert_search_history,
+)
 from ..limiter import limiter
 from ..record_detail import build_record_detail
 from ..schemas import (
@@ -23,6 +32,9 @@ from ..schemas import (
     RecordFeedbackResponse,
     SearchRequest,
     SearchResponse,
+    SearchHistoryItem,
+    SearchHistoryResponse,
+    SearchHistorySubmission,
 )
 from ..search_service import execute_search
 
@@ -201,3 +213,79 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         logger.exception("feedback insert failed")
         raise HTTPException(500, "Failed to store feedback") from e
     return FeedbackResponse(feedback_id=feedback_id)
+
+
+def _history_session_id(session_id: str) -> str:
+    value = session_id.strip()
+    if not value or value == "ssr":
+        raise HTTPException(400, "A browser session id is required")
+    return value
+
+
+def _history_item(row: dict) -> SearchHistoryItem:
+    return SearchHistoryItem(
+        id=row["id"],
+        query=row["query"],
+        filters=row.get("filters") or {},
+        created_at=row["created_at"].isoformat(),
+        last_searched_at=row["last_searched_at"].isoformat(),
+    )
+
+
+@router.get("/history", response_model=SearchHistoryResponse,
+            dependencies=[Depends(require_internal_key)])
+async def get_search_history(
+    session_id: str = Query(..., min_length=1, max_length=128),
+    limit: int = Query(50, ge=1, le=100),
+):
+    try:
+        rows = await list_search_history(_history_session_id(session_id), limit)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("history lookup failed")
+        raise HTTPException(500, "History lookup failed") from e
+    return SearchHistoryResponse(items=[_history_item(row) for row in rows])
+
+
+@router.post("/history", response_model=SearchHistoryItem,
+             dependencies=[Depends(require_internal_key)])
+async def record_search_history(request: Request, body: SearchHistorySubmission):
+    session_id = _history_session_id(body.session_id)
+    query = body.query.strip()
+    normalized_query = " ".join(query.split())
+    try:
+        row = await upsert_search_history(session_id, query, normalized_query, body.filters)
+    except Exception as e:
+        logger.exception("history insert failed")
+        raise HTTPException(500, "Failed to store search history") from e
+    return _history_item(row)
+
+
+@router.delete("/history/{history_id}", dependencies=[Depends(require_internal_key)])
+async def remove_search_history(
+    history_id: int = PathParam(ge=1, le=2**63 - 1),
+    session_id: str = Query(..., min_length=1, max_length=128),
+):
+    try:
+        await delete_search_history(_history_session_id(session_id), history_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("history delete failed")
+        raise HTTPException(500, "Failed to delete history item") from e
+    return {"deleted": True}
+
+
+@router.delete("/history", dependencies=[Depends(require_internal_key)])
+async def remove_all_search_history(
+    session_id: str = Query(..., min_length=1, max_length=128),
+):
+    try:
+        deleted = await clear_search_history(_history_session_id(session_id))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("history clear failed")
+        raise HTTPException(500, "Failed to clear history") from e
+    return {"deleted": deleted}

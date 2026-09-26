@@ -12,6 +12,7 @@ PAIRS = [
     ("migrations/004_secure_public_tables.sql", "supabase/migrations/20260901000005_secure_hiveblot_public_tables.sql"),
     ("migrations/005_experimental_live_tables.sql", "supabase/migrations/20260905000006_experimental_live_tables.sql"),
     ("migrations/006_feedback_contact.sql", "supabase/migrations/20260920000007_feedback_contact.sql"),
+    ("migrations/007_search_history.sql", "supabase/migrations/20260925000007_search_history.sql"),
 ]
 
 

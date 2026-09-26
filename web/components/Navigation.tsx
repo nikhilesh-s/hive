@@ -42,6 +42,11 @@ export function Navigation() {
             SEARCH
           </span>
         </Link>
+        <Link href="/history">
+          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+            HISTORY
+          </span>
+        </Link>
         <Link href="/about">
           <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             ABOUT
