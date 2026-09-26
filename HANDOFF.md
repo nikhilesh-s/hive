@@ -7,6 +7,29 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Ticket C Handoff to Nikhilesh (2026-09-25)
+
+Documentation and implementation work on `experimental/ucsf-demo-2026-09-09`:
+**[Ticket C: Save Experiments and Saved Results](research/team_delegation/NIKHILESH_TICKET_C_SAVED_RESULTS.md)**.
+The ticket remains the product and execution specification for Claude/Nikhilesh:
+Save/Saved on Search experiment cards, persistent experiment-level bookmarks,
+and `/saved` with grouped lanes, removal, counts, and appropriate page states.
+The separate Search History feature is now implemented at `/history` and is
+documented in Ticket C without changing the Saved Results scope.
+
+Inspection baseline: `511d7b6`. Researcher-account authentication is not present
+in the inspected application; Search History therefore uses the existing
+anonymous browser session ID and is not account-level or cross-device. Saved
+Results still needs Nik's ownership and live/unreviewed-result decisions.
+Search History changes are committed in `ad61693` on `feature/search-history`;
+the configured upstream for the former experimental branch is locally marked
+`[gone]`. Validation completed: Python syntax, migration parity, frontend
+`tsc`, lint, and production build all pass; the Python environment does not
+contain `pytest`. Next task: Nik reviews Ticket C,
+confirms the two Saved Results scope decisions, then assigns implementation.
+The dated demo state below remains historical context and is not a claim that
+Ticket C shipped.
+
 ## UCSF PUSH STATE (2026-09-14 → founder hard stop Tue 2026-09-15 19:00 PT) — READ FIRST
 
 **Active integration branch: `experimental/ucsf-demo-2026-09-09`** (the only
