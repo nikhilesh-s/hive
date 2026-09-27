@@ -25,3 +25,9 @@ def test_no_headers_keeps_everything_under_methods():
     texts = _panel_context({}, {}, blob)["texts"]
     assert texts["caption"] == ""
     assert texts["methods"] == blob
+
+
+def test_doi_falls_back_to_the_job_doi_only_when_it_is_a_doi():
+    assert _panel_context({"paper_id": "10.17912/x", "extracted_doi": None}, {}, "")["paper"]["doi"] == "10.17912/x"
+    assert _panel_context({"paper_id": "10.1/a", "extracted_doi": "10.2/b"}, {}, "")["paper"]["doi"] == "10.2/b"
+    assert _panel_context({"paper_id": "some_pdf_stem", "extracted_doi": None}, {}, "")["paper"]["doi"] is None
