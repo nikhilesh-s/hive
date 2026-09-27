@@ -56,3 +56,45 @@ def test_api_schema_and_docs_are_not_public():
     with TestClient(app) as c:
         for path in ("/docs", "/redoc", "/openapi.json"):
             assert c.get(path).status_code == 404, path
+
+
+def test_extractions_run_one_at_a_time(monkeypatch):
+    """Two concurrent extractions starved Render's health check and both died."""
+    import asyncio
+    import threading
+    import time
+
+    active, peak, lock = [0], [0], threading.Lock()
+
+    def slow_fetch(doi, out_dir):
+        with lock:
+            active[0] += 1
+            peak[0] = max(peak[0], active[0])
+        time.sleep(0.2)
+        with lock:
+            active[0] -= 1
+        return {"pdf_path": None}
+
+    monkeypatch.setattr(settings, "db_ingest_url", "")
+    monkeypatch.setattr(ingest, "backend_ready", lambda: (True, "stub"))
+    monkeypatch.setattr(ingest.fulltext, "fetch_pdf", slow_fetch)
+    a, b = ingest.start_job("10.1000/a"), ingest.start_job("10.1000/b")
+
+    async def both():
+        await asyncio.gather(ingest.run_job(a.job_id), ingest.run_job(b.job_id))
+    asyncio.run(both())
+    assert peak[0] == 1 and a.status == b.status == "failed"
+
+
+def test_job_orphaned_by_a_restart_reads_as_failed(monkeypatch):
+    async def stored(limit=20):
+        return [{"job_id": "zombie1", "status": "preprocessing", "error": None, "created_at": "2026-09-27"},
+                {"job_id": "old1", "status": "done", "error": None, "created_at": "2026-09-26"}]
+    monkeypatch.setattr(settings, "db_ingest_url", "postgresql://hive_ingest:x@localhost/x")
+    monkeypatch.setattr(exp_router, "list_ingest_jobs", stored)
+    with TestClient(app) as c:
+        z = c.get("/experimental/ingest/zombie1", headers=AUTH).json()
+        assert z["status"] == "failed" and "restart" in z["error"]
+        assert c.get("/experimental/ingest/old1", headers=AUTH).json()["status"] == "done"
+        listed = {j["job_id"]: j["status"] for j in c.get("/experimental/ingest", headers=AUTH).json()["jobs"]}
+        assert listed["zombie1"] == "failed" and listed["old1"] == "done"

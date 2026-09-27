@@ -67,6 +67,19 @@ class Job:
 
 
 JOBS: dict[str, Job] = {}
+# Extractions run inside the API process. On a small instance two at once
+# starved the health check and the platform restarted the process, killing
+# both (2026-09-27), so jobs past this many wait their turn as "queued".
+_SLOTS = asyncio.Semaphore(max(1, settings.ingest_concurrency))
+
+
+def interrupted(stored: dict) -> dict:
+    """A persisted job missing from this process's JOBS that never finished was
+    killed by a restart (jobs only run in-process): report it as failed."""
+    if stored.get("status") in ("done", "failed"):
+        return stored
+    return {**stored, "status": "failed",
+            "error": "Interrupted by a server restart. Start the extraction again."}
 
 
 def backend_ready() -> tuple[bool, str]:
@@ -121,29 +134,32 @@ async def run_job(job_id: str) -> Job:
             await load_rows(job, rows, prior.parent)
             await _set(job, status="done", message=f"{job.records} experiment record(s), {len(rows)} lane row(s) re-loaded. Unreviewed.")
             return job
-        ok, why = backend_ready()
-        if not ok:
-            raise RuntimeError(why)
-        job.backend = why
-        await _set(job, status="fetching", message="Locating open-access full text (Europe PMC / Unpaywall)…")
-        got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
-        if not got.get("pdf_path"):
-            raise RuntimeError("No open-access PDF is available for this DOI (PMC / Unpaywall); "
-                               "HiveBlot only reads papers it is allowed to download.")
-        await _set(job, pmcid=got.get("pmcid"), status="preprocessing",
-                   message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
-        summary = await loop.run_in_executor(
-            None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
-        n = summary.get("llm_candidate_count", 0)
-        await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
-                   message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
-        rec = await loop.run_in_executor(None, lambda: pipeline.run_records_stage(summary, use_cache=False))
-        rows = json.loads(Path(rec["rows_path"]).read_text(encoding="utf-8"))
-        await _set(job, records=rec.get("records"), rows=len(rows), status="loading",
-                   message="Storing live rows and crops…")
-        await load_rows(job, rows, Path(summary["out_dir"]))
-        await _set(job, status="done",
-                   message=f"{rec.get('records', 0)} experiment record(s), {len(rows)} lane row(s). Unreviewed.")
+        if _SLOTS.locked():
+            await _set(job, message="Waiting for another extraction to finish (one runs at a time)…")
+        async with _SLOTS:
+            ok, why = backend_ready()
+            if not ok:
+                raise RuntimeError(why)
+            job.backend = why
+            await _set(job, status="fetching", message="Locating open-access full text (Europe PMC / Unpaywall)…")
+            got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
+            if not got.get("pdf_path"):
+                raise RuntimeError("No open-access PDF is available for this DOI (PMC / Unpaywall); "
+                                   "HiveBlot only reads papers it is allowed to download.")
+            await _set(job, pmcid=got.get("pmcid"), status="preprocessing",
+                       message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
+            summary = await loop.run_in_executor(
+                None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
+            n = summary.get("llm_candidate_count", 0)
+            await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
+                       message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
+            rec = await loop.run_in_executor(None, lambda: pipeline.run_records_stage(summary, use_cache=False))
+            rows = json.loads(Path(rec["rows_path"]).read_text(encoding="utf-8"))
+            await _set(job, records=rec.get("records"), rows=len(rows), status="loading",
+                       message="Storing live rows and crops…")
+            await load_rows(job, rows, Path(summary["out_dir"]))
+            await _set(job, status="done",
+                       message=f"{rec.get('records', 0)} experiment record(s), {len(rows)} lane row(s). Unreviewed.")
     except Exception as exc:
         logger.exception("ingest job %s failed", job_id)
         await _set(job, status="failed", error=str(exc)[:500], message="Extraction failed")
