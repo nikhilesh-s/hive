@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientIpHeader } from '@/lib/clientIp';
 
 // Server-only env vars: never exposed to the client bundle since this file
 // only runs in the Next.js API route handler (Node runtime), not in the browser.
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         ...(BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {}),
+        ...(await clientIpHeader()),
       },
       // 500 = backend maximum; above it the backend drops the trailing partial
       // experiment and sets `truncated`, which the search page surfaces.
