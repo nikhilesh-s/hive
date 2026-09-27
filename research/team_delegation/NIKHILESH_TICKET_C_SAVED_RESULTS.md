@@ -22,7 +22,7 @@ Search for evidence
   -> Remove it from Saved when no longer needed
 ```
 
-## Related Feature: Search History
+## Related Feature: Search History — Implemented
 
 Search History is a separate companion feature, not another form of Saved
 Results:
@@ -52,6 +52,49 @@ normalized deduplication, `/history`, rerun links through `/search?q=...`,
 individual deletion, clear-all confirmation, empty/loading/error states, and
 database/API test coverage. TypeScript, lint, production build, Python syntax,
 and migration parity checks pass. Saved Results remains unimplemented.
+
+### Search History behavior and acceptance
+
+History contains submitted searches, not saved evidence. It must remain a
+separate table and UI from the `saved_results` feature specified below.
+
+```text
+Submit a search
+  -> existing Search flow runs
+  -> record only after a successful response
+  -> open HISTORY
+  -> choose an entry
+  -> return to /search?q=<encoded query>
+  -> existing Search page executes it
+```
+
+Implemented behavior:
+
+- Typing does not create history; submission/execution is required.
+- Repeated searches are upserted by browser session, whitespace-normalized
+  query, and structured filters; the most recent timestamp is updated.
+- The page lists the latest 50 entries with query and last-searched time.
+- Each entry can be rerun or removed. Clear-all requires confirmation.
+- Loading, empty, and error states are shown; the search-results flow remains
+  the existing `/search?q=...` behavior.
+- History uses the existing Next.js -> FastAPI -> PostgreSQL/Supabase path and
+  existing scoped database role; it does not create a second database.
+
+Implementation references:
+
+- Search submission integration: `web/app/search/page.tsx`
+- History page: `web/app/history/page.tsx`
+- Typed frontend data access: `web/lib/history.ts`
+- Next.js API proxy: `web/app/api/history/`
+- FastAPI endpoints and database data access: `api/app/routers/internal.py`,
+  `api/app/db.py`, and `api/app/schemas.py`
+- Database migration: `migrations/007_search_history.sql` and
+  `supabase/migrations/20260925000007_search_history.sql`
+
+Deployment note: application code is on `main`; migration 007 must be applied
+to the existing Supabase project before the hosted History endpoints can use
+the table. Authentication is not implemented, so History is browser-session
+scoped and is not account-level or cross-device.
 
 This is a bookmarking feature. Saving or removing a bookmark must never modify or delete the underlying scientific evidence.
 

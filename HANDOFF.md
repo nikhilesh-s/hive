@@ -15,7 +15,9 @@ normalized deduplication, `/history`, rerun links through `/search?q=...`,
 individual deletion, clear-all confirmation, and loading/error/empty states.
 Authentication is not implemented, so ownership is browser-session scoped via
 the existing anonymous localStorage session ID; Saved Results remains a
-separate, unimplemented feature specified in Ticket C.
+separate, unimplemented feature specified in Ticket C. Ticket C now documents
+the History workflow, acceptance behavior, implementation locations, and the
+need to apply migration 007 before the hosted History endpoints can use it.
 
 **2026-09-24:** team summary lives in [`TEAM_HANDOFF.md`](TEAM_HANDOFF.md).
 Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
