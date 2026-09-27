@@ -61,6 +61,8 @@ class Settings(BaseSettings):
     # extractions (one model call per panel) and paper-QA answers.
     daily_ingest_cap: int = 30
     daily_ask_cap: int = 200
+    # Live extractions running at once in the API process (others queue).
+    ingest_concurrency: int = 1
 
     # Stamped on every feedback row and returned by /health, so a demo laptop
     # and a hosted deployment are distinguishable in the F-1 export (F-5,
