@@ -35,7 +35,17 @@ release now needs migrations `20260920000007` and `20260925000007` before the AP
   Daily caps: 30 extractions / 200 answers per UTC day. Rate limits keyed per researcher via
   `X-Hive-Client-IP` (trusted only with the internal key). `/docs` and `/openapi.json` are 404.
 - PR #5: publisher `citation_pdf_url` fallback for OA papers (PLOS, Nature family, microPublication).
-- PR #6: records use the job's DOI when the PDF text has none (paper_id NOT NULL failure). Render at `a339c57`.
+- PR #6: records use the job's DOI when the PDF text has none (paper_id NOT NULL failure).
+- PR #9: one extraction at a time (`INGEST_CONCURRENCY`, default 1). Two at once on the free
+  instance timed out Render's health check and the restart killed both; jobs orphaned by a
+  restart now read as failed. Re-test: two submitted together, second queued, both done in
+  7 min, no restart. **Render and `release/hosted` at `e5e332d`**; Vercel web code unchanged
+  since `f105813`.
+- Wave-1 pre-extraction: 9 of 17 candidate papers are in the hosted live tier (local
+  `claude_cli`); 8 blocked by publisher bot checks. Check sheet and Tanvi sign-off gate:
+  `outreach/PREEXTRACT_CHECK.md` on branch `outreach/oct20`. It surfaced B-12..B-14 (target
+  normalization misses, Northern blots stored as westerns, unresolved targets never flagged
+  for review) in `tickets/bio-qa.md`; O-8 (research page abandons a job on transient 429s).
 - Still open: Render is free (Starter needs a card on file), `UNPAYWALL_EMAIL`, most OA publishers
   bot-block downloads (bring-your-own-PDF ticket), record 1189 feedback kept pending Nik's call.
   All in [`tickets/ops-2026-09-27.md`](tickets/ops-2026-09-27.md).
