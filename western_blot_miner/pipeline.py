@@ -291,10 +291,15 @@ def _split_text_context(text_context: str) -> tuple[str, str]:
 def _panel_context(summary: dict, candidate: dict, text_context: str) -> dict:
     """Map an OpenCV candidate + its retrieved text into an extract_panel context."""
     caption, methods = _split_text_context(text_context or "")
+    paper_id = summary.get("paper_id")
     return {
         "paper": {
-            "paper_id": summary.get("paper_id"),
-            "doi": summary.get("extracted_doi"),
+            "paper_id": paper_id,
+            # Live ingestion passes the DOI it fetched as paper_id; trust it
+            # when the PDF text has no DOI the regex can find (microPublication),
+            # or every record lands with paper_id NULL and a record_id hashed on None.
+            "doi": summary.get("extracted_doi")
+                   or (paper_id if str(paper_id or "").startswith("10.") else None),
         },
         "figure": {
             "page": candidate.get("page"),
