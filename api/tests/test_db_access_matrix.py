@@ -198,11 +198,10 @@ def test_hive_feedback_is_insert_and_read_only_on_feedback(conn):
 
 
 def test_hive_feedback_owns_search_history_access(conn):
-    assert run(conn, _as_role(conn, "hive_feedback",
-               "INSERT INTO search_history (session_id, query, normalized_query) "
-               "VALUES ('session-a', 'STAT3', 'STAT3')")) == "ok"
+    # Each helper call rolls back, so insert and read back in one statement.
     assert run(conn, _rows_as_role(conn, "hive_feedback",
-               "SELECT * FROM search_history WHERE session_id='session-a'")) == 1
+               "INSERT INTO search_history (session_id, query, normalized_query) "
+               "VALUES ('session-a', 'STAT3', 'STAT3') RETURNING *")) == 1
     assert run(conn, _as_role(conn, "hive_feedback",
                "UPDATE search_history SET query='pSTAT3' WHERE session_id='session-a'")) == "ok"
     assert run(conn, _as_role(conn, "hive_feedback",
