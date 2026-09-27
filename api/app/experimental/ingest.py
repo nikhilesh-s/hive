@@ -168,6 +168,7 @@ async def load_rows(job: Job, rows: list[dict], run_dir: Path) -> None:
                 crops[name] = p.read_bytes()
         r["image_crop_ref"] = name
         r["doi"] = r.get("doi") or job.doi
+        r["paper_id"] = r.get("paper_id") or job.doi  # NOT NULL in the live table
         r["job_id"] = job.job_id
         r["review_tier"] = "live_unreviewed"
     await db.replace_live_rows(job.doi, job.job_id, rows, crops, JSONB_COLS)
