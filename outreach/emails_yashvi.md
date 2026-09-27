@@ -2,6 +2,7 @@
 
 ## How to send
 
+- **Before sending anything:** find-and-replace `ACCESS_CODE` with the beta access code Nik gives you privately (one replace for the whole file). The research page is password-protected; the code in the link lets the researcher in with one click. Never post the code anywhere public.
 - Send each email by hand from your own mailbox, one recipient per email. No BCC, no bulk mail merge, no tracking pixels, no attachments.
 - Send 10-15 a day at most, Tuesday to Thursday, 8-10 am in the recipient's time zone. If two people are at the same school (for example Taabazuing and Burslem at Penn, who share a department), send them on different days.
 - Go in order: wave 1 first (Sep 29 to Oct 1), then wave 2 (Oct 6-8), then wave 3 (Oct 13-15). Follow-ups go as replies in the same thread, on the dates given, and stop after follow-up 2.
@@ -29,7 +30,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 You'd find the weak spots faster than anyone. Would you try to break it? Reply with a protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_davis_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_davis_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -81,7 +82,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 Would you try to break it? Reply with a protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=unc_chapel_hill_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=unc_chapel_hill_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -133,7 +134,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_penn_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_penn_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -185,7 +186,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=northwestern_unive_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=northwestern_unive_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -237,7 +238,7 @@ HiveBlot is an early beta from a small student team. It also turns published wes
 
 You'd find the weak spots faster than anyone. Would you try to break it? Reply with a protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (the band tool is the Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_virg_1
+Or try it yourself (the band tool is the Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_virg_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -289,7 +290,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein or site (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=vanderbilt_univers_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=vanderbilt_univers_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -341,7 +342,7 @@ HiveBlot is an early beta from a small student team. Its band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_roch_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_roch_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -393,7 +394,7 @@ HiveBlot is an early beta from a small student team. The band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_santa_cruz_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_santa_cruz_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -445,7 +446,7 @@ HiveBlot is an early beta from a small student team. It also turns published wes
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_penn_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_penn_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -497,7 +498,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_irvine_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_irvine_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -549,7 +550,7 @@ HiveBlot is an early beta from a small student team. Its band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=san_jos_state_univ_1
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=san_jos_state_univ_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -601,7 +602,7 @@ We're a small student team with an early beta called HiveBlot. Its band tool rep
 
 If a user lab is planning a blot, reply with the protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=vanderbilt_univers_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=vanderbilt_univers_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -640,7 +641,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_roch_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_roch_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -694,7 +695,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=stanford_universit_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=stanford_universit_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -731,7 +732,7 @@ We're a small student team with an early beta called HiveBlot. It turns publishe
 
 Reply with a cell model (and a clone if you like) and I'll send back what HiveBlot pulls out of the published CFTR westerns for it. It might also help labs that ask you for advice.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=unc_chapel_hill_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=unc_chapel_hill_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -768,7 +769,7 @@ HiveBlot is an early beta from a small student team. It also turns published wes
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=brown_university_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=brown_university_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -805,7 +806,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=cal_poly_san_luis__1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=cal_poly_san_luis__1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -842,7 +843,7 @@ HiveBlot, an early beta from a small student team, turns published westerns into
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=georgetown_univers_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=georgetown_univers_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -879,7 +880,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=tufts_university_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=tufts_university_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -916,7 +917,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_irvine_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_irvine_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -953,7 +954,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=case_western_reser_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=case_western_reser_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -990,7 +991,7 @@ HiveBlot, an early beta from a small student team, turns published westerns into
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=tufts_university_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=tufts_university_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1027,7 +1028,7 @@ HiveBlot is an early beta from a small student team. Its band tool handles the s
 
 If a user lab is planning a blot, reply with the protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=brown_university_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=brown_university_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1064,7 +1065,7 @@ We're a small student team with an early beta called HiveBlot. Its band tool rep
 
 If a user lab is planning a blot, reply with the protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=ucla_1
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=ucla_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1101,7 +1102,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 For your research students, or a course that runs westerns, it might work as a 20-minute pre-lab: students look up how the target has been blotted, then check whether their own image is quantifiable. Reply with a protein or epitope and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=bowdoin_college_1
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=bowdoin_college_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1138,7 +1139,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein or histone mark (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=northwestern_unive_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=northwestern_unive_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1175,7 +1176,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 If any of your lab sections run westerns, it might work as a 20-minute pre-lab: students look up how their target has been blotted, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=san_jos_state_univ_2
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=san_jos_state_univ_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1212,7 +1213,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 You'd find the weak spots quickly. Would you try to break it? Reply with a protein (and a cell line if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_virg_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_virg_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1249,7 +1250,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute pre-lab: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. A refused band makes a good teaching moment. Reply with the protein your students blot and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=barnard_college_1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=barnard_college_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1286,7 +1287,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute pre-lab for the spring cohort: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with the protein your students blot and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=case_western_reser_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=case_western_reser_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1323,7 +1324,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 If the new course includes westerns, it might work as a 20-minute pre-lab: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=uc_santa_cruz_2
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=uc_santa_cruz_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1362,7 +1363,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 If Chem 143 or your research students run westerns, it might work as a 20-minute pre-lab: look up how the target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=santa_clara_univer_1
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=santa_clara_univer_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1399,7 +1400,7 @@ HiveBlot, an early beta from a small student team, turns published western figur
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=uc_riverside_1
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=uc_riverside_1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1436,7 +1437,7 @@ HiveBlot is an early beta from a small student team. Its band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=cal_poly_san_luis__2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=cal_poly_san_luis__2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1473,7 +1474,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 For a course like that, it might work as a 20-minute pre-lab: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=bowdoin_college_2
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=bowdoin_college_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1510,7 +1511,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute pre-lab: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=ucla_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=ucla_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1549,7 +1550,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute exercise in a trainee workshop: trainees look up how their target has been blotted, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=georgetown_univers_2
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=georgetown_univers_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1588,7 +1589,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute pre-lab in BC3311: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=barnard_college_2
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=barnard_college_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1625,7 +1626,7 @@ HiveBlot is an early beta from a small student team. Its band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_riverside_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_riverside_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1662,7 +1663,7 @@ HiveBlot is an early beta from a small student team. Its band tool reports ratio
 
 If you or whoever runs the most westerns in your lab replies with a protein (and a cell line if it matters), I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=stanford_universit_2
+Or try it yourself: https://hiveblot-beta.vercel.app/experimental/research?lab=stanford_universit_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1699,7 +1700,7 @@ We're a small student team with an early beta called HiveBlot. Its band tool rep
 
 If a lab is planning a blot, reply with the protein (and the tissue if it matters) and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_davis_2
+Or try the band tool yourself (Densitometry tab): https://hiveblot-beta.vercel.app/experimental/research?lab=uc_davis_2&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
@@ -1736,7 +1737,7 @@ HiveBlot is an early beta from a small student team. It shows how a target has b
 
 It might work as a 20-minute pre-lab for student projects or a USF course that runs westerns: students look up how their target has been blotted before running it, then check whether their own image is quantifiable. Reply with a protein and I'll send back what HiveBlot pulls out of the published westerns for it.
 
-Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_san__1
+Or try it yourself (each paper takes a few minutes): https://hiveblot-beta.vercel.app/experimental/research?lab=university_of_san__1&access=ACCESS_CODE
 
 Yashvi [LAST NAME]
 HiveBlot (student team) · hiveblot-beta.vercel.app
