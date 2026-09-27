@@ -4,6 +4,7 @@ paper-QA endpoint shares with /search."""
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request
 from fastapi.responses import Response
@@ -31,6 +32,20 @@ logger = logging.getLogger("hive.experimental")
 
 router = APIRouter(prefix="/experimental", dependencies=[Depends(require_internal_key)],
                    tags=["experimental"])
+
+_spent: dict[str, tuple[str, int]] = {}
+
+
+def _spend_daily(kind: str, cap: int) -> None:
+    """Global per-UTC-day ceiling on paid model work (429 once reached)."""
+    # ponytail: in-process counter, resets on restart/deploy; count rows in the DB if restarts get frequent.
+    today = datetime.now(timezone.utc).date().isoformat()
+    day, used = _spent.get(kind, (today, 0))
+    if day != today:
+        used = 0
+    if used >= cap:
+        raise HTTPException(429, f"The beta's daily {kind} limit ({cap}) is reached. It resets at 00:00 UTC.")
+    _spent[kind] = (today, used + 1)
 
 
 class PaperSearchRequest(BaseModel):
@@ -112,10 +127,13 @@ async def papers_search(body: PaperSearchRequest):
 async def ingest_start(request: Request, body: IngestRequest, background: BackgroundTasks):
     ok, why = ingest.backend_ready()
     has_prior = (ingest.run_dir_for(ingest.fulltext.normalize_doi(body.doi)) / "supabase_rows.json").exists()
-    if not ok and not (body.reuse and has_prior):
+    reuse = body.reuse and has_prior
+    if not ok and not reuse:
         raise HTTPException(503, why)
+    if not reuse:  # re-opening a finished run costs nothing
+        _spend_daily("extraction", settings.daily_ingest_cap)
     try:
-        job = ingest.start_job(body.doi, reuse=body.reuse and has_prior)
+        job = ingest.start_job(body.doi, reuse=reuse)
     except ValueError:
         raise HTTPException(400, "Not a DOI")
     background.add_task(ingest.run_job, job.job_id)
@@ -211,4 +229,5 @@ async def live_crop(record_id: int = _RECORD_ID):
 async def ask(request: Request, body: AskRequest):
     """Grounded paper QA: deterministic retrieval over the reviewed corpus
     (+ live tier), then a model answer that may only cite the shown records."""
+    _spend_daily("question", settings.daily_ask_cap)
     return await ask_answer(body.question, body.doi or None, body.include_live)

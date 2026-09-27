@@ -16,6 +16,10 @@ app = FastAPI(
         "for external agents/integrations - see its description in this "
         "OpenAPI schema for how to call it."
     ),
+    # Not public: the schema lists every internal and experimental route.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
