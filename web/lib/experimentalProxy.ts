@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { clientIpHeader } from './clientIp';
 
 // Server-side proxy helper for the EXPERIMENTAL backend routes. Same trust
 // model as the beta proxies: INTERNAL_API_KEY never reaches the browser.
@@ -13,6 +14,7 @@ export async function proxyJson(path: string, init?: { method?: string; body?: u
       headers: {
         'Content-Type': 'application/json',
         ...(BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {}),
+        ...(await clientIpHeader()),
       },
       body: init?.body === undefined ? undefined : JSON.stringify(init.body),
     });
@@ -27,7 +29,10 @@ export async function proxyPng(path: string) {
   if (!BACKEND_URL) return NextResponse.json({ error: 'Not configured' }, { status: 500 });
   try {
     const resp = await fetch(`${BACKEND_URL}${path}`, {
-      headers: BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {},
+      headers: {
+        ...(BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {}),
+        ...(await clientIpHeader()),
+      },
     });
     if (!resp.ok) return NextResponse.json({ error: `Backend returned ${resp.status}` }, { status: resp.status });
     return new NextResponse(resp.body, { status: 200, headers: { 'Content-Type': 'image/png', 'Cache-Control': 'private, max-age=3600' } });

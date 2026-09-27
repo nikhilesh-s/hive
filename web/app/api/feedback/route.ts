@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientIpHeader } from '@/lib/clientIp';
 
 // Server-side proxy for researcher feedback. Feedback is stored in a separate
 // table (hiveblot_feedback) via an insert-only DB role — it can never mutate
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         ...(BACKEND_API_KEY ? { Authorization: `Bearer ${BACKEND_API_KEY}` } : {}),
+        ...(await clientIpHeader()),
       },
       body: JSON.stringify(body),
     });
