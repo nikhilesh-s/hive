@@ -147,7 +147,7 @@ async def ingest_list():
         try:
             stored = await list_ingest_jobs(20)
             ids = {j["job_id"] for j in mem}
-            mem += [j for j in stored if j["job_id"] not in ids]
+            mem += [ingest.interrupted(j) for j in stored if j["job_id"] not in ids]
         except Exception:
             pass
     return {"jobs": sorted(mem, key=lambda j: j["created_at"], reverse=True)[:20]}
@@ -176,7 +176,7 @@ async def ingest_status(job_id: str):
             logger.warning("ingest job lookup failed: %s", e)
             raise HTTPException(503, "Live tier unavailable") from e
         if stored:
-            return stored
+            return ingest.interrupted(stored)
     raise HTTPException(404, "Unknown job")
 
 
