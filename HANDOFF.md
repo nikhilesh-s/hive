@@ -21,6 +21,11 @@ separate, unimplemented feature specified in Ticket C.
 Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
 Outreach plan is on branch `outreach/oct20`.
 
+**2026-09-26:** owners and reminders to 10-20 are in
+[`SUN_SEP_26_MEETING_ACTION_ITEMS.md`](SUN_SEP_26_MEETING_ACTION_ITEMS.md) (goal: unique labs using
+the beta). CI on main was red after the search-history merge (test bug, fixed `8885a7b`). Pending
+release now needs migrations `20260920000007` and `20260925000007` before the API deploy.
+
 ## PAUSED 2026-09-20 22:00 PT — READ FIRST (state, flaws, exact resume steps)
 
 Nik paused all HiveBlot work. `main` is the only branch; everything below is on it and pushed.
