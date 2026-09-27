@@ -156,3 +156,43 @@ Deliberately not this week: changing CV thresholds before B-4 measures them;
 any LLM second-check on nulls before B-3 splits the causes; touching
 `identity_sample` / `record_id`; any copy claiming precision or recall on
 unseen papers; reseeding the hosted 475 rows from a changed pipeline.
+
+## Found 2026-09-27 on the first wave-1 pre-extraction (9 papers, live tier)
+
+Evidence query: `canonical_target IS NULL` grouped by DOI over rows ingested 2026-09-27;
+per-paper notes in `outreach/PREEXTRACT_CHECK.md` (branch `outreach/oct20`).
+
+### B-12 · Target normalization misses common protein names
+- What: extracted but unresolved (`canonical_target` NULL): Ras, GFP-KRAS, Bcl-xL, JNK,
+  α-tubulin, vinculin, α-actinin, MyHC, IL-18, LC3-I / LC3-II / LC3B-II, "Ph-eIF2α",
+  "non-phos-4EBP1", "α-CASP1", "α-CASP3 cl.", "CASP1p10", "Active β-catenin".
+- Why: `UniProtResolver` only queries `gene:<core>` (`western_blot_miner/resolve.py`), so a
+  protein name that is not the gene symbol never matches, and `biology.core_symbol` keeps
+  antibody prefixes ("α-" = anti-), form suffixes (-I/-II, cl., p20/p10), tags (GFP-, -myc)
+  and phospho prefixes ("Ph-", "non-phos-").
+- Acceptance: strip anti-/tag/form/phospho decorations into their own fields before lookup
+  (phospho goes to modification, cleavage to a form note); fall back to a
+  `protein_name:` search and the alias map; ambiguous families (Ras, JNK, ERK) resolve to
+  AMBIGUOUS with candidates, never to one guessed gene. Table-driven test over the names
+  above. Viral proteins (Vpr, Nef, Vif, gp120, p55) may stay unresolved but must be labeled
+  as non-human, not silently NULL.
+- Owner: Srushti (code) + Tanvi (expected mappings). Estimate: 1.5.
+
+### B-13 · Non-western blots are extracted as westerns
+- What: the Lyons NAR paper (10.1093/nar/gkag499) has ~455 live rows whose "targets" are
+  rRNA species (18S, 28S, 47S/45S, ITS2): Northern blots of rRNA processing, stored as
+  western blot evidence.
+- Acceptance: panel classification labels Northern / Southern / gel stain / dot blot and
+  keeps them out of `western_blot_records_live`; a regression fixture from this paper's
+  Northern panel. Tanvi confirms on the paper which panels are which.
+- Owner: Nik (pipeline) + Tanvi. Estimate: 1.
+
+### B-14 · An unresolved target does not set needs_review
+- What: Serra-Moreno (10.1371/journal.ppat.1014020) has 1206 live rows with no canonical
+  target and 0% `needs_review`; Taabazuing's paper is also 0%. `needs_review` is
+  `record_status != SUPPORTED` (`record_builder.py`), and the record status does not
+  consider the target's own resolution status.
+- Acceptance: a MISSING or AMBIGUOUS target makes the record at least AMBIGUOUS
+  (needs_review true) with an anomaly flag naming the unresolved target; test on one row
+  from each paper above. This is the trust signal researchers see first.
+- Owner: Srushti + Tanvi. Estimate: 0.5.
