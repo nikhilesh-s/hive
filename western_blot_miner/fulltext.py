@@ -139,22 +139,45 @@ def resolve_ids(identifier: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
     return resolve_ids_batch([identifier], timeout).get(identifier.lower(), {})
 
 
-def openalex_pdf_urls(doi: str, timeout: int = DEFAULT_TIMEOUT) -> list[str]:
-    """OpenAlex: every open-access location that lists a direct PDF URL for
-    this DOI, best location first. No key or contact email required."""
+def openalex_record(doi: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """OpenAlex's open-access view of a DOI ({} on any failure). Keyless."""
     try:
         resp = requests.get(OPENALEX.format(doi=doi), timeout=timeout, headers=_headers(),
-                            params={"select": "best_oa_location,locations"})
-        data = resp.json() if resp.status_code == 200 else {}
+                            params={"select": "best_oa_location,locations,open_access"})
+        return (resp.json() or {}) if resp.status_code == 200 else {}
     except (requests.RequestException, ValueError) as error:
         logger.debug("openalex failed for %s: %s", doi, error)
-        return []
+        return {}
+
+
+def openalex_pdf_urls(doi: str, timeout: int = DEFAULT_TIMEOUT, data: dict | None = None) -> list[str]:
+    """OpenAlex: every open-access location that lists a direct PDF URL for
+    this DOI, best location first. No key or contact email required."""
+    data = openalex_record(doi, timeout) if data is None else data
     urls: list[str] = []
     for loc in [data.get("best_oa_location") or {}] + list(data.get("locations") or []):
         url = (loc or {}).get("pdf_url")
         if url and url not in urls:
             urls.append(url)
     return urls
+
+
+_CITATION_PDF = re.compile(
+    r"<meta[^>]+name=[\"']citation_pdf_url[\"'][^>]+content=[\"']([^\"']+)"
+    r"|<meta[^>]+content=[\"']([^\"']+)[\"'][^>]+name=[\"']citation_pdf_url", re.I)
+
+
+def landing_pdf_url(doi: str, timeout: int = DEFAULT_TIMEOUT) -> Optional[str]:
+    """The publisher's own PDF link from its article page (the
+    citation_pdf_url tag scholarly indexers read). Pages behind a bot check
+    simply have no tag and return None."""
+    try:
+        resp = requests.get(f"https://doi.org/{doi}", timeout=timeout, headers=_headers(), allow_redirects=True)
+    except requests.RequestException as error:
+        logger.debug("landing page failed for %s: %s", doi, error)
+        return None
+    m = _CITATION_PDF.search(resp.text or "") if resp.status_code == 200 else None
+    return (m.group(1) or m.group(2)) if m else None
 
 
 def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> dict:
@@ -191,10 +214,21 @@ def fetch_pdf(doi: str, out_dir: str | Path, timeout: int = DEFAULT_TIMEOUT) -> 
         # 4. OpenAlex (Europe PMC and PMC block scripted PDF downloads since
         #    2026-08; publishers' own OA PDFs still answer a plain client)
         result["tried"].append("openalex")
-        for pdf_url in openalex_pdf_urls(doi, timeout):
+        record = openalex_record(doi, timeout)
+        for pdf_url in openalex_pdf_urls(doi, timeout, record):
             path = _download(pdf_url, out_dir / f"{doi.replace('/', '_')}.pdf", timeout)
             if path:
                 result.update(pdf_path=path, source="openalex")
+                return result
+        # 4b. open access per OpenAlex but no direct PDF link listed (common
+        #     for PLOS, Nature, microPublication): the publisher's own page
+        #     names its PDF. Only for OA papers; paywalled ones are never tried.
+        if (record.get("open_access") or {}).get("is_oa"):
+            result["tried"].append("publisher_landing")
+            pdf_url = landing_pdf_url(doi, timeout)
+            path = pdf_url and _download(pdf_url, out_dir / f"{doi.replace('/', '_')}.pdf", timeout)
+            if path:
+                result.update(pdf_path=path, source="publisher_landing")
                 return result
     if doi and _has_real_email():
         # 5. Unpaywall: every open-access location that offers a PDF
