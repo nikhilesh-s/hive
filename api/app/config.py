@@ -57,6 +57,10 @@ class Settings(BaseSettings):
     # arrives from the same Vercel proxy IP, so the key is effectively "all of
     # UCSF" — sharing the search limit silently dropped real feedback.
     feedback_rate_limit: str = "120/minute"
+    # Hard ceiling on paid model work per UTC day, across all users: live
+    # extractions (one model call per panel) and paper-QA answers.
+    daily_ingest_cap: int = 30
+    daily_ask_cap: int = 200
 
     # Stamped on every feedback row and returned by /health, so a demo laptop
     # and a hosted deployment are distinguishable in the F-1 export (F-5,
