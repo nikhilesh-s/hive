@@ -26,6 +26,20 @@ Outreach plan is on branch `outreach/oct20`.
 the beta). CI on main was red after the search-history merge (test bug, fixed `8885a7b`). Pending
 release now needs migrations `20260920000007` and `20260925000007` before the API deploy.
 
+**2026-09-27 — release shipped (supersedes the PAUSED block's "not deployed" and resume steps 1-4):**
+- Migrations 006 + 007 applied to Supabase. Render and Vercel both run `main`; `release/hosted`
+  tracks the deployed commit. Hosted smoke passed (zero-result, survey + opt-in contact,
+  not-useful, per-field ✓, search history add/delete); smoke rows deleted.
+- PR #4: `/experimental/*` is behind `BETA_ACCESS_CODE` (Vercel env; value only in
+  `~/.hive-secrets/beta_access.env`). Invite links use `?access=<code>`; `/access` form otherwise.
+  Daily caps: 30 extractions / 200 answers per UTC day. Rate limits keyed per researcher via
+  `X-Hive-Client-IP` (trusted only with the internal key). `/docs` and `/openapi.json` are 404.
+- PR #5: publisher `citation_pdf_url` fallback for OA papers (PLOS, Nature family, microPublication).
+- PR #6: records use the job's DOI when the PDF text has none (paper_id NOT NULL failure). Render at `a339c57`.
+- Still open: Render is free (Starter needs a card on file), `UNPAYWALL_EMAIL`, most OA publishers
+  bot-block downloads (bring-your-own-PDF ticket), record 1189 feedback kept pending Nik's call.
+  All in [`tickets/ops-2026-09-27.md`](tickets/ops-2026-09-27.md).
+
 ## PAUSED 2026-09-20 22:00 PT — READ FIRST (state, flaws, exact resume steps)
 
 Nik paused all HiveBlot work. `main` is the only branch; everything below is on it and pushed.
