@@ -383,3 +383,37 @@ def test_papers_search_reports_valency_failure_but_still_answers(client, monkeyp
     monkeypatch.setattr(ingest.fulltext, "pmc_search", lambda q, limit: [])
     r = client.post("/experimental/papers/search", json={"query": "STAT3"}, headers=AUTH)
     assert r.status_code == 200 and "token rejected" in r.json()["errors"]["valency"]
+
+
+def test_fetch_pdf_reads_the_publisher_page_only_for_open_access(monkeypatch, tmp_path):
+    """OpenAlex often marks a paper OA without a direct PDF link (PLOS, Nature,
+    microPublication); the publisher's citation_pdf_url tag names it. A
+    paywalled paper never reaches the publisher page."""
+    class R:
+        def __init__(self, status, content=b"", js=None, text=""):
+            self.status_code, self.content, self._js, self.text, self.headers = status, content, js, text, {}
+        def json(self):
+            return self._js
+
+    monkeypatch.delenv("UNPAYWALL_EMAIL", raising=False)
+    is_oa = {"v": True}
+
+    def fake_get(url, params=None, timeout=None, allow_redirects=True, headers=None):
+        if "idconv" in url:
+            return R(200, js={"records": [{"requested-id": "10.1000/pl", "doi": "10.1000/pl"}]})
+        if "openalex" in url:
+            return R(200, js={"open_access": {"is_oa": is_oa["v"]}, "best_oa_location": {"pdf_url": None},
+                              "locations": [{"pdf_url": None}]})
+        if url == "https://doi.org/10.1000/pl":
+            return R(200, text='<meta name="citation_pdf_url" content="https://pub.example/pl.pdf">')
+        if url == "https://pub.example/pl.pdf":
+            return R(200, content=b"%PDF-1.7 pub")
+        raise AssertionError(url)
+
+    monkeypatch.setattr(fulltext.requests, "get", fake_get)
+    got = fulltext.fetch_pdf("10.1000/pl", tmp_path / "a")
+    assert got["source"] == "publisher_landing" and got["tried"] == ["openalex", "publisher_landing"]
+
+    is_oa["v"] = False
+    got = fulltext.fetch_pdf("10.1000/pl", tmp_path / "b")
+    assert got["pdf_path"] is None and "publisher_landing" not in got["tried"]
