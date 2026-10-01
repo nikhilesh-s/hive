@@ -132,3 +132,44 @@ def test_saved_list_returns_database_rows(client, monkeypatch):
     assert [item["id"] for item in items] == [1189, 1190]
     assert items[0]["stable_row_key"] == "experiment-hash:1"
     assert items[0]["saved_at"].startswith("2026-09-27T")
+
+
+@pytest.mark.anyio
+async def test_supabase_rest_save_inserts_only_missing_records(monkeypatch):
+    from app import db
+
+    writes = []
+    monkeypatch.setattr(settings, "db_feedback_url", "")
+    monkeypatch.setattr(settings, "supabase_url", "https://example.supabase.co")
+    monkeypatch.setattr(settings, "supabase_api_key", "stub-key")
+
+    def fake_get(table, params):
+        if table == settings.table_name:
+            return [
+                {"id": 1189, "stable_row_key": "6057228515df6bd3:1"},
+                {"id": 1190, "stable_row_key": "6057228515df6bd3:2"},
+            ]
+        assert table == "saved_results"
+        return [{"stable_row_key": "6057228515df6bd3:1"}]
+
+    def fake_write(method, table, params, payload, prefer="return=representation"):
+        writes.append((method, table, params, payload, prefer))
+        return payload
+
+    monkeypatch.setattr(db, "_supabase_get", fake_get)
+    monkeypatch.setattr(db, "_supabase_write", fake_write)
+
+    records = [
+        {"record_id": 1189, "stable_row_key": "6057228515df6bd3:1"},
+        {"record_id": 1190, "stable_row_key": "6057228515df6bd3:2"},
+    ]
+    saved = await db.save_result_records(SESSION, records)
+
+    assert saved == ["6057228515df6bd3:1", "6057228515df6bd3:2"]
+    assert len(writes) == 1
+    assert writes[0][0:3] == ("POST", "saved_results", [])
+    assert writes[0][3] == [{
+        "session_id": SESSION,
+        "record_id": 1190,
+        "stable_row_key": "6057228515df6bd3:2",
+    }]
