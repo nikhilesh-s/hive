@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     # every endpoint now runs on the scoped Postgres roles below).
     supabase_url: str = ""
     supabase_key: str = ""
+    supabase_api_key: str = ""
+    supabase_project_id: str = ""
     # Optional: when set, /search uses the legacy OpenAI NL->SQL generator
     # (still behind sql_guard). Empty => the deterministic bio_query parser.
     openai_key: str = ""

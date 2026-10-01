@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { SearchInput } from '@/components/SearchInput';
-import DatabaseResultCard, { type LaneSummary } from '@/components/DatabaseResultCard';
+import DatabaseResultCard from '@/components/DatabaseResultCard';
 import FiltersBar, {
   activeFilterChips,
   buildFilterQuery,
@@ -15,81 +15,33 @@ import FiltersBar, {
 import SearchFeedback from '@/components/SearchFeedback';
 import BetaFeedback from '@/components/BetaFeedback';
 import { recordSearchHistory } from '@/lib/history';
-
-interface DatabaseResult {
-  id: number;
-  paper_id: string;
-  page: number | null;
-  western_blot_type: string;
-  sample: string;
-  organism: string | null;
-  treatment_context: string | null;
-  figure_label: string | null;
-  target: string;
-  condition: string;
-  band_detected: boolean;
-  confidence: number | null;
-  // Evidence Record extras used for grouping / lane display (optional —
-  // legacy rows simply lack them).
-  image_crop_ref?: string | null;
-  lane_condition?: string | null;
-  band_state?: string | null;
-  experiment_type?: string | null;
-  cell_line?: string | null;
-  modification_label?: string | null;
-  stable_row_key?: string | null;
-}
-
-// One card per EXPERIMENT, not per lane row: a 6-lane time course reads as one
-// result with a lane strip, not 6 near-identical cards.
-//
-// The card boundary IS the experiment identity that researcher feedback keys
-// to: `stable_row_key` is `<experiment hash>:<lane index>`, so the hash half
-// groups the lanes. Deriving the card from a separate composite key used to be
-// a second, parallel notion of "one experiment" — and the two disagreed. One
-// crop in PMC12706926 (page_004_cand_0025) prints H1792 and A549 side by side;
-// grouping split them on cell line while the identity hash did not, so feedback
-// left on the H1792 arm could rehydrate onto the A549 arm. The identity hash
-// now carries the sample, and grouping reads that same hash, so the two cannot
-// drift apart again.
-//
-// The composite fallback below is for rows with no stable_row_key (legacy rows
-// predating migration 003). It keeps its own cell-line component for exactly
-// the reason above.
-interface ResultGroup {
-  first: DatabaseResult;
-  lanes: LaneSummary[];
-}
-
-function groupResults(rows: DatabaseResult[]): ResultGroup[] {
-  const groups = new Map<string, ResultGroup>();
-  for (const r of rows) {
-    const key = r.stable_row_key
-      ? r.stable_row_key.split(':')[0]
-      : [
-          r.paper_id,
-          r.image_crop_ref ?? `p${r.page}`,
-          r.target,
-          r.experiment_type ?? '',
-          r.cell_line ?? r.sample ?? '',
-          r.modification_label ?? '',
-        ].join('|');
-    const lane: LaneSummary = {
-      condition: r.lane_condition ?? r.condition ?? null,
-      band_state: r.band_state ?? (r.band_detected == null ? null : r.band_detected ? 'present' : 'absent'),
-    };
-    const g = groups.get(key);
-    if (g) g.lanes.push(lane);
-    else groups.set(key, { first: r, lanes: [lane] });
-  }
-  return [...groups.values()];
-}
+import { groupResults, type DatabaseResult, type ResultGroup } from '@/lib/results';
+import { getSavedStatus, removeSavedResultRecords, saveResultRecords } from '@/lib/savedResults';
 
 interface SearchResponse {
   count: number;
   results: DatabaseResult[];
   question?: string;
   truncated?: boolean;
+}
+
+type SavedState = 'checking' | 'saved' | 'unsaved' | 'unavailable';
+
+function groupKey(group: ResultGroup): string | null {
+  return group.first.experiment_key || group.first.stable_row_key?.split(':')[0] || null;
+}
+
+function rowKeys(group: ResultGroup): string[] {
+  return group.sourceRows.map((row) => row.stable_row_key).filter((key): key is string => Boolean(key));
+}
+
+function deriveSavedStates(groupsToCheck: ResultGroup[], saved: Set<string>): Record<string, SavedState> {
+  return Object.fromEntries(groupsToCheck.flatMap((group) => {
+    const key = groupKey(group);
+    const keys = rowKeys(group);
+    if (!key) return [];
+    return [[key, keys.length > 0 && keys.every((rowKey) => saved.has(rowKey)) ? 'saved' : 'unsaved']];
+  }));
 }
 
 export default function SearchPage() {
@@ -107,6 +59,11 @@ export default function SearchPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<SearchFilters>(emptySearchFilters);
   const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(emptySearchFilters);
+  const [savedStates, setSavedStates] = useState<Record<string, SavedState>>({});
+  const [savedBusyKeys, setSavedBusyKeys] = useState<string[]>([]);
+  const [savedErrors, setSavedErrors] = useState<Record<string, string>>({});
+  const savedKeysRef = useRef<string[]>([]);
+  const savedGroupsRef = useRef<ResultGroup[]>([]);
 
   useEffect(() => {
     if (!filtersOpen) return;
@@ -135,9 +92,55 @@ export default function SearchPage() {
     setResults([]);
     setTruncated(false);
     setError(null);
+    setSavedStates({});
+    setSavedErrors({});
     setLoading(false);
     clearSearchUrl();
   };
+
+  async function refreshSavedStatus(keys: string[], searchSequence: number, groupsToCheck = groupResults(results)) {
+    if (!keys.length) return;
+    try {
+      const saved = await getSavedStatus(keys);
+      if (searchSequence !== seq.current) return;
+      setSavedStates((current) => ({ ...current, ...deriveSavedStates(groupsToCheck, saved) }));
+    } catch {
+      if (searchSequence !== seq.current) return;
+      const unavailable: Record<string, SavedState> = Object.fromEntries(groupsToCheck.flatMap((group) => {
+        const key = groupKey(group);
+        return key ? [[key, 'unavailable']] : [];
+      }));
+      setSavedStates((current) => ({ ...current, ...unavailable }));
+      setSavedErrors((current) => ({ ...current, ...Object.fromEntries(Object.keys(unavailable).map((key) => [key, 'Saved status unavailable'])) }));
+    }
+  }
+
+  async function handleSavedToggle(group: ResultGroup) {
+    const key = groupKey(group);
+    if (!key) return;
+    const keys = rowKeys(group);
+    if (!keys.length) return;
+    const state = savedStates[key] ?? 'checking';
+    if (state === 'checking' || savedBusyKeys.includes(key)) return;
+    if (state === 'unavailable') {
+      setSavedStates((current) => ({ ...current, [key]: 'checking' }));
+      setSavedErrors((current) => ({ ...current, [key]: '' }));
+      void refreshSavedStatus(keys, seq.current, [group]);
+      return;
+    }
+
+    setSavedBusyKeys((current) => [...current, key]);
+    setSavedErrors((current) => ({ ...current, [key]: '' }));
+    try {
+      if (state === 'saved') await removeSavedResultRecords(keys);
+      else await saveResultRecords(group.sourceRows.map((row) => ({ record_id: row.id, stable_row_key: row.stable_row_key || '' })));
+      setSavedStates((current) => ({ ...current, [key]: state === 'saved' ? 'unsaved' : 'saved' }));
+    } catch {
+      setSavedErrors((current) => ({ ...current, [key]: state === 'saved' ? 'Could not remove; retry.' : 'Could not save; retry.' }));
+    } finally {
+      setSavedBusyKeys((current) => current.filter((item) => item !== key));
+    }
+  }
 
   async function handleSearch(searchQuery: string, submittedFilters: SearchFilters = emptySearchFilters()) {
     setQuery(searchQuery);
@@ -174,8 +177,14 @@ export default function SearchPage() {
       const data: SearchResponse = await response.json();
       void recordSearchHistory(searchQuery, submittedFilters).catch(() => undefined);
       if (my !== seq.current) return; // a newer search started meanwhile
-      setResults(data.results || []);
+      const nextResults = data.results || [];
+      setResults(nextResults);
       setTruncated(data.truncated === true);
+      const nextGroups = groupResults(nextResults);
+      const groupKeys = nextGroups.map(groupKey).filter((key): key is string => Boolean(key));
+      const keys = [...new Set(nextGroups.flatMap(rowKeys))];
+      setSavedStates((current) => ({ ...current, ...Object.fromEntries(groupKeys.map((key) => [key, 'checking'])) }));
+      void refreshSavedStatus(keys, my, nextGroups);
     } catch (err) {
       if (my !== seq.current) return;
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -237,6 +246,37 @@ export default function SearchPage() {
 
   const groups = groupResults(results);
   const filterChips = activeFilterChips(appliedFilters);
+
+  useEffect(() => {
+    const currentGroups = groupResults(results);
+    savedGroupsRef.current = currentGroups;
+    savedKeysRef.current = [...new Set(currentGroups.flatMap(rowKeys))];
+  }, [results]);
+
+  useEffect(() => {
+    const revalidateSaved = async () => {
+      const keys = savedKeysRef.current;
+      const currentSequence = seq.current;
+      if (!keys.length) return;
+      const currentGroups = savedGroupsRef.current;
+      const groupKeys = currentGroups.map(groupKey).filter((key): key is string => Boolean(key));
+      setSavedStates((current) => ({ ...current, ...Object.fromEntries(groupKeys.map((key) => [key, 'checking'])) }));
+      try {
+        const saved = await getSavedStatus(keys);
+        if (currentSequence !== seq.current) return;
+        setSavedStates((current) => ({ ...current, ...deriveSavedStates(currentGroups, saved) }));
+      } catch {
+        if (currentSequence !== seq.current) return;
+        setSavedStates((current) => ({ ...current, ...Object.fromEntries(groupKeys.map((key) => [key, 'unavailable'])) }));
+      }
+    };
+    window.addEventListener('focus', revalidateSaved);
+    window.addEventListener('pageshow', revalidateSaved);
+    return () => {
+      window.removeEventListener('focus', revalidateSaved);
+      window.removeEventListener('pageshow', revalidateSaved);
+    };
+  }, []);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--background)', paddingTop: '16px' }}>
@@ -370,7 +410,15 @@ export default function SearchPage() {
                 </div>
                 <div className="hb-result-list">
                   {groups.map((g) => (
-                    <DatabaseResultCard key={g.first.id} data={g.first} lanes={g.lanes} />
+                    <DatabaseResultCard
+                      key={g.first.experiment_key || g.first.id}
+                      data={g.first}
+                      lanes={g.lanes}
+                      savedState={groupKey(g) ? (savedStates[groupKey(g) as string] ?? 'checking') : 'unavailable'}
+                      saveBusy={groupKey(g) ? savedBusyKeys.includes(groupKey(g) as string) : false}
+                      saveError={groupKey(g) ? savedErrors[groupKey(g) as string] : 'Experiment identity unavailable'}
+                      onSaveToggle={groupKey(g) ? () => void handleSavedToggle(g) : undefined}
+                    />
                   ))}
                 </div>
               </>

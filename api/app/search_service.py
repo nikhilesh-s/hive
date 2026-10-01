@@ -12,7 +12,8 @@ from fastapi import HTTPException
 
 from .bio_query import generate_bio_sql
 from .config import settings
-from .db import run_readonly_query
+from .db import run_readonly_query, run_supabase_search
+from .experiment_identity import identity_for_row
 from .schemas import SearchResponse
 from .sql_guard import SQLGuardError, guard_and_limit_sql
 
@@ -44,9 +45,12 @@ async def execute_search(query: str, limit: int, table_name: str | None = None) 
         raise HTTPException(400, str(e)) from e
 
     try:
-        results = await run_readonly_query(safe_sql)
+        if settings.supabase_url and settings.supabase_api_key:
+            results = await run_supabase_search(query, limit, table_name)
+        else:
+            results = await run_readonly_query(safe_sql)
     except Exception as e:
-        logger.exception("Read-only query execution failed")
+        logger.exception("Search query execution failed")
         raise HTTPException(500, "Search query failed") from e
 
     truncated = len(results) >= max(1, min(limit, settings.max_search_limit))
@@ -55,6 +59,10 @@ async def execute_search(query: str, limit: int, table_name: str | None = None) 
         # misstates the design: drop that experiment's partial lanes and say so.
         last = _experiment_key(results[-1])
         results = [r for r in results if _experiment_key(r) != last] or results
+
+    if not table_name:
+        for row in results:
+            row["experiment_key"], _ = identity_for_row(row)
 
     return SearchResponse(
         question=query,

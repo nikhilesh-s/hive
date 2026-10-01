@@ -13,6 +13,7 @@ import os
 
 os.environ.setdefault("SUPABASE_URL", "https://test.supabase.co")
 os.environ.setdefault("SUPABASE_KEY", "test-supabase-key")
+os.environ.setdefault("SUPABASE_API_KEY", "")
 os.environ.setdefault("OPENAI_KEY", "test-openai-key")
 os.environ.setdefault("DB_READONLY_URL", "postgresql://hive_readonly:test@localhost:5432/postgres")
 os.environ.setdefault("INTERNAL_API_KEY", "test-internal-key")

@@ -6,11 +6,12 @@ Free to change shape as the frontend's needs change.
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi import Path as PathParam
 
 from ..auth import require_internal_key
 from ..config import settings
+from ..crops import resolve_reviewed_crop
 from ..db import (
     clear_search_history,
     delete_search_history,
@@ -19,6 +20,10 @@ from ..db import (
     insert_feedback,
     list_search_history,
     search_targets,
+    list_saved_result_records,
+    remove_saved_result_records,
+    save_result_records,
+    saved_results_status,
     upsert_search_history,
 )
 from ..limiter import limiter
@@ -35,6 +40,12 @@ from ..schemas import (
     SearchHistoryItem,
     SearchHistoryResponse,
     SearchHistorySubmission,
+    SavedStatusRequest,
+    SavedStatusResponse,
+    SaveResultsRequest,
+    SaveResultsResponse,
+    UnsaveResultsRequest,
+    WesternBlotRecord,
 )
 from ..search_service import execute_search
 
@@ -112,8 +123,6 @@ async def record_crop(record_id: int = PathParam(ge=1, le=2**63 - 1)):
     arbitrary files. 404 (not 500) when the file isn't present: deployments
     without the crop archive degrade to the text-only evidence panel.
     """
-    from pathlib import Path
-
     from fastapi.responses import FileResponse
 
     try:
@@ -123,13 +132,8 @@ async def record_crop(record_id: int = PathParam(ge=1, le=2**63 - 1)):
         raise HTTPException(500, "Record lookup failed") from e
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")
-    base = Path(settings.crop_base_dir).resolve()
-    try:
-        crop = Path(str(row["image_crop_ref"])).resolve()
-        crop.relative_to(base)  # raises ValueError if outside the allowed dir
-    except ValueError:
-        raise HTTPException(404, "Crop path not servable")
-    if crop.suffix.lower() != ".png" or not crop.is_file():
+    crop = resolve_reviewed_crop(row["image_crop_ref"])
+    if crop is None:
         raise HTTPException(404, "Crop file not available")
     return FileResponse(crop, media_type="image/png")
 
@@ -289,3 +293,91 @@ async def remove_all_search_history(
         logger.exception("history clear failed")
         raise HTTPException(500, "Failed to clear history") from e
     return {"deleted": deleted}
+
+
+def _saved_session_id(session_id: str) -> str:
+    return _history_session_id(session_id)
+
+
+def _validated_stable_keys(keys: list[str]) -> list[str]:
+    out = []
+    for key in keys:
+        value = key.strip()
+        if not value:
+            raise HTTPException(400, "stable_row_keys cannot contain blanks")
+        out.append(value)
+    return list(dict.fromkeys(out))
+
+
+@router.post("/saved-results/status", response_model=SavedStatusResponse,
+             dependencies=[Depends(require_internal_key)])
+async def get_saved_results_status(body: SavedStatusRequest):
+    if not settings.db_feedback_url:
+        raise HTTPException(503, "Saved results storage is not configured")
+    session_id = _saved_session_id(body.session_id)
+    keys = _validated_stable_keys(body.stable_row_keys)
+    try:
+        saved = await saved_results_status(session_id, keys)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved status lookup failed")
+        raise HTTPException(500, "Saved status lookup failed") from e
+    return SavedStatusResponse(saved_keys=sorted(saved))
+
+
+@router.post("/saved-results", response_model=SaveResultsResponse,
+             dependencies=[Depends(require_internal_key)])
+async def add_saved_results(body: SaveResultsRequest):
+    if not settings.db_feedback_url:
+        raise HTTPException(503, "Saved results storage is not configured")
+    session_id = _saved_session_id(body.session_id)
+    records = [
+        {"record_id": item.record_id, "stable_row_key": item.stable_row_key.strip()}
+        for item in body.records
+    ]
+    keys = _validated_stable_keys([item["stable_row_key"] for item in records])
+    try:
+        saved_keys = await save_result_records(session_id, records)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results insert failed")
+        raise HTTPException(500, "Failed to save results") from e
+    return SaveResultsResponse(saved=True, saved_keys=sorted(set(saved_keys or keys)))
+
+
+@router.delete("/saved-results", dependencies=[Depends(require_internal_key)])
+async def discard_saved_results(body: UnsaveResultsRequest):
+    if not settings.db_feedback_url:
+        raise HTTPException(503, "Saved results storage is not configured")
+    session_id = _saved_session_id(body.session_id)
+    keys = _validated_stable_keys(body.stable_row_keys)
+    try:
+        await remove_saved_result_records(session_id, keys)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results removal failed")
+        raise HTTPException(500, "Failed to remove saved results") from e
+    return {"saved": False}
+
+
+@router.get("/saved-results", response_model=list[WesternBlotRecord],
+            dependencies=[Depends(require_internal_key)])
+async def get_saved_results(session_id: str = Query(..., min_length=1, max_length=128)):
+    if not settings.db_feedback_url:
+        raise HTTPException(503, "Saved results storage is not configured")
+    try:
+        rows = await list_saved_result_records(_saved_session_id(session_id))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results listing failed")
+        raise HTTPException(500, "Saved results could not be loaded") from e
+    for row in rows:
+        if row.get("saved_at") is not None:
+            row["saved_at"] = row["saved_at"].isoformat()
+    return rows
