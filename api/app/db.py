@@ -1,4 +1,9 @@
 import asyncpg
+import asyncio
+import json
+import re
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 from .config import settings
 
@@ -9,6 +14,52 @@ from .config import settings
 # read or write them, and the API must not depend on it either.
 
 _pool: asyncpg.Pool | None = None
+
+TERM_COLUMNS = (
+    "target", "raw_target_name", "canonical_target", "uniprot_id", "cell_line",
+    "sample", "treatment_name", "treatment_context", "antibody_target",
+    "modification_label", "antibody_catalog_number", "doi",
+)
+
+
+def _use_supabase_rest() -> bool:
+    return bool(settings.supabase_url and settings.supabase_api_key)
+
+
+def _rest_headers() -> dict[str, str]:
+    return {
+        "apikey": settings.supabase_api_key,
+        "Authorization": f"Bearer {settings.supabase_api_key}",
+        "Accept": "application/json",
+    }
+
+
+def _clean_like(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9/+.\- ]", "", value).strip()
+
+
+def _supabase_get(table: str, params: list[tuple[str, str]]) -> list[dict]:
+    base = settings.supabase_url.rstrip("/")
+    if not base.endswith("/rest/v1"):
+        base = f"{base}/rest/v1"
+    url = f"{base}/{table}?{urlencode(params)}"
+    req = Request(url, headers=_rest_headers())
+    with urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read().decode())
+
+
+async def run_supabase_search(query: str, limit: int, table_name: str | None = None) -> list[dict]:
+    table = table_name or settings.table_name
+    params: list[tuple[str, str]] = [
+        ("select", "*"),
+        ("order", "needs_review.asc,id.asc"),
+        ("limit", str(limit)),
+    ]
+    tokens = [_clean_like(t) for t in re.split(r"[\s,;]+", query) if len(t.strip()) >= 2]
+    for token in [t for t in tokens if t]:
+        ors = ",".join(f"{col}.ilike.*{token}*" for col in TERM_COLUMNS)
+        params.append(("or", f"({ors})"))
+    return await asyncio.to_thread(_supabase_get, table, params)
 
 
 async def _decode_json(conn: asyncpg.Connection) -> None:
@@ -54,6 +105,8 @@ async def run_readonly_query(sql: str) -> list[dict]:
 async def search_targets(name: str, limit: int) -> list[dict]:
     """Parameterized ILIKE on target for /proteins. Runs on the read-only
     role; the pattern is a bound parameter, never interpolated."""
+    if _use_supabase_rest():
+        return await run_supabase_search(name, limit)
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
@@ -67,6 +120,13 @@ async def search_targets(name: str, limit: int) -> list[dict]:
 async def fetch_record_by_id(record_id: int) -> dict | None:
     """One full row (including the provenance/validation JSONB envelopes) for
     the record-detail endpoint. Parameterized; runs on the read-only role."""
+    if _use_supabase_rest():
+        rows = await asyncio.to_thread(
+            _supabase_get,
+            settings.table_name,
+            [("select", "*"), ("id", f"eq.{record_id}"), ("limit", "1")],
+        )
+        return rows[0] if rows else None
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -184,6 +244,86 @@ async def clear_search_history(session_id: str) -> int:
             "DELETE FROM search_history WHERE session_id = $1", session_id,
         )
         return int(result.split()[-1])
+
+
+# --- Saved results (migration 008; same browser session id as history) -----
+async def saved_results_status(session_id: str, stable_row_keys: list[str]) -> set[str]:
+    if not stable_row_keys:
+        return set()
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT stable_row_key FROM saved_results "
+            "WHERE session_id = $1 AND stable_row_key = ANY($2::text[])",
+            session_id, stable_row_keys,
+        )
+        return {row["stable_row_key"] for row in rows}
+
+
+async def save_result_records(session_id: str, records: list[dict]) -> list[str]:
+    ids = [r["record_id"] for r in records]
+    keys = [r["stable_row_key"] for r in records]
+    readonly = await get_readonly_pool()
+    async with readonly.acquire() as conn:
+        valid_rows = await conn.fetch(
+            f"SELECT id, stable_row_key FROM {settings.table_name} "
+            "WHERE id = ANY($1::bigint[]) AND stable_row_key = ANY($2::text[])",
+            ids, keys,
+        )
+    valid = {(row["id"], row["stable_row_key"]) for row in valid_rows}
+    requested = {(r["record_id"], r["stable_row_key"]) for r in records}
+    if valid != requested:
+        raise ValueError("One or more saved records do not exist")
+
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            for record in records:
+                await conn.execute(
+                    "INSERT INTO saved_results (session_id, record_id, stable_row_key) "
+                    "VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+                    session_id, record["record_id"], record["stable_row_key"],
+                )
+    return keys
+
+
+async def remove_saved_result_records(session_id: str, stable_row_keys: list[str]) -> int:
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            "DELETE FROM saved_results "
+            "WHERE session_id = $1 AND stable_row_key = ANY($2::text[])",
+            session_id, stable_row_keys,
+        )
+        return int(result.split()[-1])
+
+
+async def list_saved_result_records(session_id: str) -> list[dict]:
+    pool = await get_feedback_pool()
+    async with pool.acquire() as conn:
+        saved = await conn.fetch(
+            "SELECT record_id, stable_row_key, saved_at FROM saved_results "
+            "WHERE session_id = $1 ORDER BY saved_at DESC, record_id",
+            session_id,
+        )
+    if not saved:
+        return []
+    saved_by_id = {row["record_id"]: row for row in saved}
+    readonly = await get_readonly_pool()
+    async with readonly.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT * FROM {settings.table_name} WHERE id = ANY($1::bigint[])",
+            list(saved_by_id),
+        )
+    by_id = {row["id"]: dict(row) for row in rows}
+    out = []
+    for saved_row in saved:
+        record = by_id.get(saved_row["record_id"])
+        if not record:
+            continue
+        record["saved_at"] = saved_row["saved_at"]
+        out.append(record)
+    return out
 
 
 # --- EXPERIMENTAL: live (unreviewed) tier ----------------------------------

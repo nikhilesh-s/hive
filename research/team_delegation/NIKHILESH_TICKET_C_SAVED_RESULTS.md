@@ -4,10 +4,28 @@
 **Handoff to:** Nikhilesh (Nik), for implementation with Claude
 **Target branch:** `experimental/ucsf-demo-2026-09-09`
 **Date:** 2026-09-25
-**Status:** Saved Results specification only; Search History companion is implemented.
+**Status:** Implemented locally on `feature/saved-results` (2026-10-01); not yet merged/deployed.
 **Repository inspection baseline:** `511d7b6`.
 
 ## 1. Goal
+
+### Current implementation scope (2026-10-01)
+
+- Reviewed-corpus saved results use the same anonymous browser session ID as
+  Search History (`hiveblot_session` in localStorage). No login or second saved
+  owner identity is introduced.
+- The existing `public.saved_results` table is lane-grain
+  (`session_id`, `record_id`, `stable_row_key`, `saved_at`). Saving a grouped
+  experiment inserts one row per underlying lane; removing deletes those stable
+  row keys for the same session only.
+- Migration 008 grants the existing `hive_feedback` role
+  `SELECT/INSERT/DELETE` on `saved_results` and adds permissive RLS policies for
+  that backend role only. Browser React still talks through Next.js -> FastAPI.
+- `/saved` returns saved lane records and reuses `groupResults()` plus
+  `DatabaseResultCard`, so six saved lanes display as one saved experiment.
+- Local verification: API pytest 220 passed / 15 skipped, web lint clean,
+  `tsc --noEmit` clean, `next build` clean. Hosted Supabase migration and
+  Vercel/Render deployment have not been performed.
 
 Add a **Save** button to experiment cards in HiveBlot Search and a dedicated **Saved** page where researchers can return to their saved experiments.
 

@@ -357,3 +357,22 @@ def test_crop_serves_png_inside_base_dir(client, monkeypatch, tmp_path):
     assert resp.status_code == 200
     assert resp.headers["content-type"] == "image/png"
     assert resp.content.startswith(b"\x89PNG")
+
+
+def test_crop_serves_legacy_pdf_run_path_from_staged_archive(client, monkeypatch, tmp_path):
+    archive = tmp_path / "api" / "crops"
+    png = archive / "10.1000_abc" / "panel_candidates" / "page_001_cand_0001.png"
+    png.parent.mkdir(parents=True)
+    png.write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 16)
+    legacy = (
+        "/Users/niks/hive/western_blot_miner/data/pdf_runs/"
+        "10.1000_abc/panel_candidates/page_001_cand_0001.png"
+    )
+    monkeypatch.setattr("app.crops.STAGED_CROP_ARCHIVE", archive)
+    _stub_record(monkeypatch, {"id": 1, "image_crop_ref": legacy})
+
+    resp = client.get("/records/1/crop", headers=AUTH)
+
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "image/png"
+    assert resp.content.startswith(b"\x89PNG")

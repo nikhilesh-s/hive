@@ -147,6 +147,10 @@ class WesternBlotRecord(BaseModel):
     # key is what let grouping and identity disagree (the H1792/A549 co-IP
     # collision); one source of truth removes that whole failure class.
     stable_row_key: str | None = None
+    # Canonical, reviewed-corpus experiment identity used by Save/Saved.
+    experiment_key: str | None = None
+    # Present only on /saved-results rows.
+    saved_at: str | None = None
 
     # EXPERIMENTAL: rows from live DOI ingestion carry 'live_unreviewed';
     # reviewed-corpus rows carry None. The UI badges anything non-null.
@@ -194,6 +198,35 @@ class SearchHistoryItem(BaseModel):
 
 class SearchHistoryResponse(BaseModel):
     items: list[SearchHistoryItem]
+
+
+class SavedRecordInput(BaseModel):
+    record_id: int = Field(ge=1, le=2**63 - 1)
+    stable_row_key: str = Field(min_length=1, max_length=128)
+
+
+class SavedStatusRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=128)
+    stable_row_keys: list[str] = Field(min_length=1, max_length=500)
+
+
+class SavedStatusResponse(BaseModel):
+    saved_keys: list[str]
+
+
+class SaveResultsRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=128)
+    records: list[SavedRecordInput] = Field(min_length=1, max_length=500)
+
+
+class UnsaveResultsRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=128)
+    stable_row_keys: list[str] = Field(min_length=1, max_length=500)
+
+
+class SaveResultsResponse(BaseModel):
+    saved: bool
+    saved_keys: list[str] = Field(default_factory=list)
 
 
 # --- record detail ("Why does HiveBlot say this?") --------------------------

@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 from ..auth import require_internal_key
 from ..config import settings
+from ..crops import resolve_reviewed_crop
 from ..db import fetch_live_crop, fetch_live_record, fetch_record_by_id
 from ..limiter import limiter
 
@@ -64,13 +65,8 @@ async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, di
     row = await fetch_record_by_id(record_id)
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")
-    base = Path(settings.crop_base_dir).resolve()
-    crop = Path(str(row["image_crop_ref"])).resolve()
-    try:
-        crop.relative_to(base)
-    except ValueError:
-        raise HTTPException(404, "Crop path not servable")
-    if crop.suffix.lower() != ".png" or not crop.is_file():
+    crop = resolve_reviewed_crop(row["image_crop_ref"])
+    if crop is None:
         raise HTTPException(404, "Crop file not available")
     prov = row.get("provenance") or {}
     n_lanes = len(prov.get("bands") or []) or None

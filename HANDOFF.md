@@ -7,6 +7,42 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Saved Results (2026-10-01)
+
+Saved Results is implemented on branch `feature/saved-results` using the existing
+Next.js -> FastAPI -> Supabase/Postgres pattern. It reuses the same anonymous
+browser session ID as Search History (`hiveblot_session` in localStorage); no
+second saved-user cookie or auth identity is used. Result cards save at lane
+row grain: saving one grouped experiment inserts one `saved_results` row per
+underlying `western_blot_records` lane, and unsaving deletes all of that card's
+stable row keys for the current session only. `/saved` loads saved lane rows,
+runs the existing `groupResults()` helper, and renders the same
+`DatabaseResultCard` component as Search.
+
+Backend routes added:
+- `POST /saved-results/status` batched by `session_id` + `stable_row_keys`
+- `POST /saved-results` validates every `(record_id, stable_row_key)` pair
+  against `western_blot_records`, then inserts idempotently
+- `DELETE /saved-results` deletes only the current session's supplied row keys
+- `GET /saved-results?session_id=...` returns `WesternBlotRecord[]` rows with
+  optional `saved_at`
+
+Migration 008 now assumes `public.saved_results` already exists with
+`session_id`, `record_id`, `stable_row_key`, and `saved_at`; it grants
+`SELECT/INSERT/DELETE` plus sequence access to `hive_feedback` and adds
+`hive_feedback_*_saved_results` RLS policies. Do not revert this to the older
+`owner_id/experiment_key/identity` design.
+
+Verification after this implementation:
+- `cd api && ../.venv/bin/python -m pytest`: 220 passed / 15 skipped
+- `cd web && npm run lint`: clean
+- `cd web && npx tsc --noEmit`: clean
+- `cd web && npm run build`: clean
+
+Known follow-up: apply migration 008 to the linked Supabase project before
+deploying this branch; otherwise saved-results endpoints will fail when the
+`hive_feedback` role lacks access to `public.saved_results`.
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->
@@ -14,8 +50,8 @@ Supabase architecture. It includes migration 007, session-scoped persistence,
 normalized deduplication, `/history`, rerun links through `/search?q=...`,
 individual deletion, clear-all confirmation, and loading/error/empty states.
 Authentication is not implemented, so ownership is browser-session scoped via
-the existing anonymous localStorage session ID; Saved Results remains a
-separate, unimplemented feature specified in Ticket C.
+the existing anonymous localStorage session ID. Saved Results now reuses that
+same session ID (see the 2026-10-01 section above).
 
 **2026-09-24:** team summary lives in [`TEAM_HANDOFF.md`](TEAM_HANDOFF.md).
 Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
