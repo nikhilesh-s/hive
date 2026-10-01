@@ -379,6 +379,7 @@ async def get_saved_results(session_id: str = Query(..., min_length=1, max_lengt
         logger.exception("saved results listing failed")
         raise HTTPException(500, "Saved results could not be loaded") from e
     for row in rows:
-        if row.get("saved_at") is not None:
-            row["saved_at"] = row["saved_at"].isoformat()
+        saved_at = row.get("saved_at")
+        if hasattr(saved_at, "isoformat"):
+            row["saved_at"] = saved_at.isoformat()
     return rows
