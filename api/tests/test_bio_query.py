@@ -60,7 +60,7 @@ def test_row_cap_drops_the_partial_last_experiment(monkeypatch):
     async def fake_query(sql):
         return rows
     monkeypatch.setattr(search_service, "run_readonly_query", fake_query)
-    monkeypatch.setattr(search_service.settings, "openai_key", "")   # deterministic parser, never a model call
+    monkeypatch.setattr(search_service.settings, "openai_key", "ignored-by-search")
     out = asyncio.run(search_service.execute_search("STAT3", 12))
     assert out.truncated and out.count == 10 and {r.stable_row_key.split(":")[0] for r in out.results} == {"e0", "e1"}
     out = asyncio.run(search_service.execute_search("STAT3", 100))

@@ -27,7 +27,7 @@ paper in that file was not opened. Nothing implemented.
 | 6 | Regex normalization | Extensive in `biology.py` (phospho sites, modification words, co-IP, catalog/vendor/dilution, kDa, dose/duration with figure-ref guards, band multiplicity, identifiers, 26 protein aliases, loading controls). | No cell-line normalizer ("Hep3B cells" vs "Hep3B"); no tissue routing (M11: 124 rows store a tissue in `cell_line`); no treatment vocabulary; **`extract_antibody` is never called on the records path** (`supabase_loader.py:326-345` vs `record_builder.py:52-58,392-426`), so catalog numbers the model omits are lost. All L1 catalog mismatches are `live=null / reviewed="4967"`. |
 | 7 | Missing data vs failed normalization | **No distinction.** `_v()` and `mk()` map both to NULL. No LLM second-check on null exists (escalation never inspects MISSING). | Testable without a model: re-scan the paper's full text with the field's own regex near the target symbol; hit = not recovered, no hit = not stated. Only ever run an LLM check on the "not recovered" bucket, never on "not stated". |
 | 8 | UniProt aliases | `UniProtResolver` (`resolve.py:82-146`): `gene:` + organism + reviewed, exact-gene wins, >1 hit → AMBIGUOUS with no accession, network failure → MISSING; curated ambiguity short-circuit stops `ERK`→EPHB2. 16/16 accessions verified live (`independent_scientific_qa.md:527`). | Only `gene:` is queried; UniProt synonym fields are never read, so a non-symbol alias resolves MISSING. `_core_symbol` truncates multi-word names. Organism from cell line is deliberately not used. Paper-stated antibody cross-reactivity caveats are dropped (Minor 6). |
-| 9 | DB + SQL search | Deterministic parser `bio_query.py:97-159` behind `sql_guard.py` (sqlglot, single SELECT, pinned table, function allowlist, forced LIMIT) and a read-only role. | **`api/app/nlp.py:26-39` describes the pre-migration-001 eleven-column schema** (no `modification_type`, `residue`, `canonical_target`, `antibody_vendor`). Setting `OPENAI_KEY` silently downgrades search. |
+| 9 | DB + SQL search | Deterministic parser `bio_query.py:97-159` behind `sql_guard.py` (sqlglot, single SELECT, pinned table, function allowlist, forced LIMIT) and a read-only role. | **Closed on `feature/saved-results`:** the stale `api/app/nlp.py` OpenAI NL-to-SQL path was deleted, so `OPENAI_KEY` no longer changes normal search behavior. |
 | 10 | Paper retrieval for QA | `ask.py:107-169`: lexical terms AND'd, back-off drops the last term first, DOI fallback, reviewed before live, `MAX_EXPERIMENTS=12`. | No relevance ranking: on a 334-row paper the twelve blocks are effectively the first twelve by id. QA never reads the PDF; a panel the CV filter dropped is invisible to `/ask`. |
 
 ## The L1 number, and what to do instead
@@ -136,11 +136,12 @@ experiments" invariant.
   before and after. Tanvi rules on which strings are lines vs tissues.
 - Estimate: 1.5. Depends on: nothing. Owner: Nik + Tanvi.
 
-### B-9 · Fix or delete the OpenAI NL→SQL path
-- Acceptance: either the prompt matches the current schema with a test that
-  every `TERM_COLUMNS` entry appears in it, or `nlp.py` and its branch in
-  `search_service.py:31-33` are removed and the suite passes. Recommend
-  deletion: the deterministic parser is what the demo, tests and docs use.
+### B-9 · Delete the OpenAI NL→SQL path
+- Status: closed on `feature/saved-results`.
+- Acceptance: `nlp.py` and its branch in `search_service.py` were removed and
+  the suite passes. Normal search now always uses deterministic `bio_query.py`
+  plus `sql_guard.py`; this avoids a second model-generated SQL path based on
+  an older schema prompt.
 - Estimate: 0.5. Depends on: nothing. Owner: Nik or Srushti.
 
 ### B-10 · Recruit external adjudicators for week 2

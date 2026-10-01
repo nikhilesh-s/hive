@@ -69,8 +69,8 @@ class WesternBlotRecord(BaseModel):
     condition: str | None = None
     band_detected: bool | None = None
     # Settled: confidence is a 0-1 score everywhere - `real` in
-    # db/schema.sql, REAL in the nlp.py prompt schema, `number` in the
-    # frontend (which renders it as `confidence * 100`%). An extraction
+    # db/schema.sql and `number` in the frontend (which renders it as
+    # `confidence * 100`%). An extraction
     # pipeline that produces "high"/"medium"/"low" must map to a score
     # before insert; don't reintroduce a text column on one side only.
     confidence: float | None = None

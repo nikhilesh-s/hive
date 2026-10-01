@@ -63,6 +63,17 @@ migration 009 is applied. Smoke with the STAT3 Tyr705 six-lane card returned
 instead of assuming asyncpg datetime objects; the saved page now returns 200 for
 the same six-lane STAT3 Tyr705 browser session.
 
+## B-9 Search NL-to-SQL Removal (2026-10-01)
+
+B-9 is closed on `feature/saved-results`: the stale `api/app/nlp.py` OpenAI
+natural-language-to-SQL path was deleted, and `api/app/search_service.py` now
+always uses the deterministic HiveBlot `api/app/bio_query.py` generator before
+`sql_guard.py`. This was intentional because `bio_query.py` already encodes the
+HiveBlot search concepts we support, is testable/inspectable, and stays aligned
+with the current Evidence Record schema. Normal search no longer changes
+behavior just because `OPENAI_KEY` is present. OpenAI-compatible extraction is a
+separate path controlled by `WBM_LLM_BACKEND`, not normal search.
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->
@@ -479,7 +490,8 @@ Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
   allowed; never `--bare`). Proven on real calls: text 6 s; the image path
   read the reviewed STAT3 crop correctly. Extraction and paper QA share one
   provider abstraction (`llm_client.complete_text`, `backend_status`).
-  `OPENAI_KEY` is optional; the OpenAI generator is lazy.
+  `OPENAI_KEY` is optional for this experimental backend family only; normal
+  search no longer uses the deleted OpenAI NL→SQL path.
 - **Open-access acquisition** fixed: Europe PMC's own PDF render (retry /
   backoff) → listed URL → legacy → Unpaywall (real `UNPAYWALL_EMAIL` only).
   Discovery annotates `oa_pdf`; the UI refuses papers without a PDF.
@@ -1488,7 +1500,7 @@ demo-blocking runtime failure justifies a change before UCSF. No P2 polish.
   HiveBlot frontend. Stood up an **embedded local Postgres** (`scripts/local_db.py`,
   pgserver — no cloud creds needed) with schema + migration 001 + **452 rows from
   3 real papers**; added a **deterministic biological SQL generator**
-  (`api/app/bio_query.py`) for the no-OPENAI_KEY path; fixed a latent sql_guard
+  (`api/app/bio_query.py`; now the normal search path); fixed a latent sql_guard
   bug (AND/OR rejected with sqlglot≥30); made the Supabase client lazy; processed
   papers 2+3 (mouse standard PMC9559174, co-IP PMC12706926) agent-in-the-loop;
   threaded **organism into UniProt** (mouse accessions correct); fixed 4 more
@@ -1717,12 +1729,12 @@ travels with each field; a disputed modification keeps its residue **unsettled**
   still need real Supabase. **Cloud Supabase remains a user action for the hosted
   beta**: create the project, run schema+migration, load `eval/demo/*/supabase_rows.json`,
   fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`.
-- **NOTE — /search SQL generation without OpenAI**: with `OPENAI_KEY` empty, /search
-  uses the deterministic biological parser (`api/app/bio_query.py`) — protein,
+- **NOTE — /search SQL generation**: /search uses the deterministic biological
+  parser (`api/app/bio_query.py`) — protein,
   phospho-site (Tyr705/S473), vendor+catalog, co-IP, loading-control, needs-review,
-  cell-line terms — through the same `sql_guard` + read-only role. With a key set, the
-  legacy OpenAI NL→SQL path is unchanged (bio parser is the fallback on its failure only
-  when no key; generation errors still 502).
+  cell-line terms — through the same `sql_guard` + read-only role. The legacy
+  OpenAI NL→SQL branch was removed for B-9 because its prompt described an older
+  schema and `bio_query.py` is the supported HiveBlot search generator.
 
 ## Immediate Next Task
 ~~Provenance detail endpoint + researcher feedback system + evidence UI~~ — **DONE (session 4)**.
@@ -1811,7 +1823,7 @@ outstanding deployment step is the Render API redeploy (Nik).
 | `migrations/001_evidence_record.sql` | Additive Evidence Record columns (+ rollback). |
 | `eval/score.py`, `eval/cases.json`, `eval/gold.json` | Biological benchmark (seed gold). |
 | `api/app/` | FastAPI backend (routers, sql_guard, auth, search_service). |
-| `api/app/bio_query.py` | Deterministic biological query→SQL (no-OPENAI_KEY path; same guard). |
+| `api/app/bio_query.py` | Deterministic biological query→SQL for normal search (same guard). |
 | `scripts/local_db.py` | Embedded local Postgres (pgserver): up / load / status / stop. |
 | `eval/tools/` | Agent-in-the-loop harness + per-paper observation builders. |
 | `eval/demo/` | 3 real papers: Evidence Records + Supabase rows + observations + READMEs. |

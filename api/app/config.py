@@ -17,8 +17,9 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     supabase_api_key: str = ""
     supabase_project_id: str = ""
-    # Optional: when set, /search uses the legacy OpenAI NL->SQL generator
-    # (still behind sql_guard). Empty => the deterministic bio_query parser.
+    # Kept so existing env files continue to load. Normal search no longer uses
+    # OPENAI_KEY; it always goes through the deterministic HiveBlot bio_query
+    # parser. OpenAI-compatible extraction, if enabled, reads env vars directly.
     openai_key: str = ""
 
     # Connection string for a Postgres role that only has SELECT on
@@ -93,6 +94,7 @@ class Settings(BaseSettings):
         Path(__file__).resolve().parents[2] / "western_blot_miner" / "data" / "pdf_runs"
     )
 
+    # Kept for backwards-compatible env loading; not used by normal search.
     openai_model: str = "gpt-4.1-mini"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

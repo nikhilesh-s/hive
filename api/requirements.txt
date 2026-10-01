@@ -4,6 +4,5 @@ asyncpg
 python-dotenv
 pydantic
 pydantic-settings
-openai
 sqlglot
 slowapi
