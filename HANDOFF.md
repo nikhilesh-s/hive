@@ -43,6 +43,11 @@ Known follow-up: apply migration 008 to the linked Supabase project before
 deploying this branch; otherwise saved-results endpoints will fail when the
 `hive_feedback` role lacks access to `public.saved_results`.
 
+Local dev note: when `DB_FEEDBACK_URL` is blank but `SUPABASE_URL` and
+`SUPABASE_API_KEY` are present, saved-results now uses the Supabase REST API for
+status/save/unsave/list. This keeps the search card saved button working in the
+local setup without falling back to any local database.
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->
