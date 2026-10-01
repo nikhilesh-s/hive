@@ -134,6 +134,20 @@ def test_saved_list_returns_database_rows(client, monkeypatch):
     assert items[0]["saved_at"].startswith("2026-09-27T")
 
 
+def test_saved_list_accepts_rest_timestamp_strings(client, monkeypatch):
+    async def fake_list(session_id):
+        assert session_id == SESSION
+        return [row(1189, 1, "2026-10-01T07:30:00+00:00")]
+
+    import app.routers.internal as internal
+    monkeypatch.setattr(internal, "list_saved_result_records", fake_list)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+
+    response = client.get("/saved-results", headers=AUTH, params={"session_id": SESSION})
+    assert response.status_code == 200
+    assert response.json()[0]["saved_at"] == "2026-10-01T07:30:00+00:00"
+
+
 @pytest.mark.anyio
 async def test_supabase_rest_save_inserts_only_missing_records(monkeypatch):
     from app import db

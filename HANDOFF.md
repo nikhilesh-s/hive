@@ -59,6 +59,9 @@ The local REST fallback now avoids that upsert path by checking existing saved
 keys and inserting only missing `saved_results` rows, so local Save works before
 migration 009 is applied. Smoke with the STAT3 Tyr705 six-lane card returned
 200 for first save, duplicate save, and unsave.
+`/saved` REST listing also handles `saved_at` strings returned by Supabase REST
+instead of assuming asyncpg datetime objects; the saved page now returns 200 for
+the same six-lane STAT3 Tyr705 browser session.
 
 ## Search History (2026-09-25)
 
