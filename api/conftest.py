@@ -5,8 +5,8 @@ config.Settings is instantiated at import time (deliberately - see config.py),
 so these have to be set before anything under app/ is imported. Putting this
 at api/ root also puts api/ on sys.path, so `from app...` resolves in tests.
 
-These are fake values: nothing in the test suite talks to Supabase, OpenAI, or
-Postgres.
+These are fake values: nothing in the test suite talks to Supabase, model
+providers, or Postgres.
 """
 
 import os

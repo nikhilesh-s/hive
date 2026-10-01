@@ -94,7 +94,7 @@ Nothing on the hosted-beta path depends on D-4.
 | B-6 | Correct the stale L1 report | Nik | 0.5 | ✓ |
 | B-7 | Escalation that escalates and merges | Nik | 1.5 | week 2 |
 | B-8 | Sample normalization + tissue routing (record_id stable) | Nik + Tanvi | 1.5 | week 2 |
-| B-9 | Fix or delete OpenAI NL→SQL | Srushti | 0.5 | ✓ |
+| B-9 | Delete OpenAI NL→SQL | Srushti | 0.5 | ✓ |
 | B-10 | External adjudicators for week 2 | Yashvi + Tanvi | 1 | ✓ |
 | B-11 | Band pattern / lane dose columns | Nik | 1 | stretch |
 

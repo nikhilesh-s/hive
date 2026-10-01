@@ -1,7 +1,7 @@
 """Deterministic biological query -> SQL generator.
 
-Used by /search when OPENAI_KEY is not configured (and as a way to serve the
-structured biological queries UCSF researchers actually type without any LLM):
+Used by /search and /v1/search (and as a way to serve the structured
+biological queries UCSF researchers actually type without any LLM):
 
     phospho STAT3 Tyr705      -> modification + residue/position + target term
     co-IP EGFR                -> experiment_type co_ip + target term
@@ -14,8 +14,8 @@ Design constraints:
     still goes through sql_guard.guard_and_limit_sql and executes under the
     scoped read-only role — this generator gets no special trust.
   * Deterministic and transparent: the generated SQL is returned to the client
-    in the response (same as the LLM path), so a researcher can see exactly
-    what was searched. No model, no guessing.
+    in the response, so a researcher can see exactly what was searched.
+    No model, no guessing.
   * Unrecognized tokens degrade to broad ILIKE term matching — never an error.
 """
 from __future__ import annotations

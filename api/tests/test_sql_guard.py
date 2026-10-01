@@ -45,8 +45,7 @@ def test_schema_qualified_table_is_allowed():
 def test_multi_condition_and_or_passes():
     # Regression: sqlglot >= 30 models AND/OR as exp.Func subclasses
     # (exp.Connector); the function allowlist must not reject boolean
-    # connectors, or every multi-concept query (which nlp.py's prompt rules
-    # 5/6/8 explicitly instruct the model to produce) 400s.
+    # connectors, or every multi-concept query produced by bio_query.py 400s.
     out = guard_and_limit_sql(
         f"SELECT * FROM {TABLE} WHERE (target ILIKE '%stat3%' OR canonical_target "
         f"ILIKE '%stat3%') AND (treatment_context ILIKE '%il-6%' OR condition "
