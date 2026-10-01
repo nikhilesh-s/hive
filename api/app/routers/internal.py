@@ -23,6 +23,7 @@ from ..db import (
     list_saved_result_records,
     remove_saved_result_records,
     save_result_records,
+    saved_results_configured,
     saved_results_status,
     upsert_search_history,
 )
@@ -312,7 +313,7 @@ def _validated_stable_keys(keys: list[str]) -> list[str]:
 @router.post("/saved-results/status", response_model=SavedStatusResponse,
              dependencies=[Depends(require_internal_key)])
 async def get_saved_results_status(body: SavedStatusRequest):
-    if not settings.db_feedback_url:
+    if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
     session_id = _saved_session_id(body.session_id)
     keys = _validated_stable_keys(body.stable_row_keys)
@@ -329,7 +330,7 @@ async def get_saved_results_status(body: SavedStatusRequest):
 @router.post("/saved-results", response_model=SaveResultsResponse,
              dependencies=[Depends(require_internal_key)])
 async def add_saved_results(body: SaveResultsRequest):
-    if not settings.db_feedback_url:
+    if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
     session_id = _saved_session_id(body.session_id)
     records = [
@@ -351,7 +352,7 @@ async def add_saved_results(body: SaveResultsRequest):
 
 @router.delete("/saved-results", dependencies=[Depends(require_internal_key)])
 async def discard_saved_results(body: UnsaveResultsRequest):
-    if not settings.db_feedback_url:
+    if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
     session_id = _saved_session_id(body.session_id)
     keys = _validated_stable_keys(body.stable_row_keys)
@@ -368,7 +369,7 @@ async def discard_saved_results(body: UnsaveResultsRequest):
 @router.get("/saved-results", response_model=list[WesternBlotRecord],
             dependencies=[Depends(require_internal_key)])
 async def get_saved_results(session_id: str = Query(..., min_length=1, max_length=128)):
-    if not settings.db_feedback_url:
+    if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
     try:
         rows = await list_saved_result_records(_saved_session_id(session_id))
