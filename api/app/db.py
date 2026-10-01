@@ -3,6 +3,7 @@ import asyncio
 import json
 import re
 from urllib.parse import urlencode
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from .config import settings
@@ -48,7 +49,13 @@ def _supabase_get(table: str, params: list[tuple[str, str]]) -> list[dict]:
         return json.loads(resp.read().decode())
 
 
-def _supabase_write(method: str, table: str, params: list[tuple[str, str]], payload: object | None = None) -> list[dict]:
+def _supabase_write(
+    method: str,
+    table: str,
+    params: list[tuple[str, str]],
+    payload: object | None = None,
+    prefer: str = "return=representation",
+) -> list[dict]:
     base = settings.supabase_url.rstrip("/")
     if not base.endswith("/rest/v1"):
         base = f"{base}/rest/v1"
@@ -58,7 +65,7 @@ def _supabase_write(method: str, table: str, params: list[tuple[str, str]], payl
     headers = {
         **_rest_headers(),
         "Content-Type": "application/json",
-        "Prefer": "resolution=ignore-duplicates,return=representation",
+        "Prefer": prefer,
     }
     data = None if payload is None else json.dumps(payload).encode()
     req = Request(url, data=data, headers=headers, method=method)
@@ -325,20 +332,30 @@ async def save_result_records(session_id: str, records: list[dict]) -> list[str]
         raise ValueError("One or more saved records do not exist")
 
     if _use_supabase_rest() and not settings.db_feedback_url:
-        await asyncio.to_thread(
-            _supabase_write,
-            "POST",
-            "saved_results",
-            [("on_conflict", "session_id,stable_row_key")],
-            [
-                {
-                    "session_id": session_id,
-                    "record_id": record["record_id"],
-                    "stable_row_key": record["stable_row_key"],
-                }
-                for record in records
-            ],
-        )
+        existing = await saved_results_status(session_id, keys)
+        missing = [record for record in records if record["stable_row_key"] not in existing]
+        if missing:
+            try:
+                await asyncio.to_thread(
+                    _supabase_write,
+                    "POST",
+                    "saved_results",
+                    [],
+                    [
+                        {
+                            "session_id": session_id,
+                            "record_id": record["record_id"],
+                            "stable_row_key": record["stable_row_key"],
+                        }
+                        for record in missing
+                    ],
+                )
+            except HTTPError as exc:
+                if exc.code != 409:
+                    raise
+                after_insert = await saved_results_status(session_id, keys)
+                if not set(keys).issubset(after_insert):
+                    raise
         return keys
 
     pool = await get_feedback_pool()

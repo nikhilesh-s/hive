@@ -55,6 +55,10 @@ PostgREST cannot use a partial unique index for
 `on_conflict=session_id,stable_row_key` and otherwise returns PostgreSQL 42P10.
 The local CLI is not linked/authenticated (`SUPABASE_ACCESS_TOKEN` missing), so
 apply `20261001000009_saved_results_upsert_index.sql` before hosted Save smoke.
+The local REST fallback now avoids that upsert path by checking existing saved
+keys and inserting only missing `saved_results` rows, so local Save works before
+migration 009 is applied. Smoke with the STAT3 Tyr705 six-lane card returned
+200 for first save, duplicate save, and unsave.
 
 ## Search History (2026-09-25)
 
