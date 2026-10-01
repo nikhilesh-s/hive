@@ -48,6 +48,14 @@ Local dev note: when `DB_FEEDBACK_URL` is blank but `SUPABASE_URL` and
 status/save/unsave/list. This keeps the search card saved button working in the
 local setup without falling back to any local database.
 
+**2026-10-01 follow-up:** migration 009 fixes Supabase REST save upserts by
+replacing the partial `saved_results_unique_session_record` index with a normal
+unique index on `(session_id, stable_row_key)`. This is required because
+PostgREST cannot use a partial unique index for
+`on_conflict=session_id,stable_row_key` and otherwise returns PostgreSQL 42P10.
+The local CLI is not linked/authenticated (`SUPABASE_ACCESS_TOKEN` missing), so
+apply `20261001000009_saved_results_upsert_index.sql` before hosted Save smoke.
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->
