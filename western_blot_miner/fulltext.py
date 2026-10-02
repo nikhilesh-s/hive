@@ -226,8 +226,6 @@ def paper_metadata(doi: str, timeout: int = DEFAULT_TIMEOUT, seed: dict | None =
     meta["pmcid"] = meta.get("pmcid") or ids.get("pmcid")
     sources = [s for s in (meta.get("metadata_source"), oa.get("metadata_source"), "ncbi" if ids else None) if s]
     meta["metadata_source"] = "+".join(dict.fromkeys(str(s) for s in sources)) or None
-    if isinstance(meta.get("authors"), list):
-        meta["authors"] = ", ".join(str(a) for a in meta["authors"] if a)
     try:
         meta["publication_year"] = int(str(meta["publication_year"])[:4]) if meta.get("publication_year") else None
     except (TypeError, ValueError):
