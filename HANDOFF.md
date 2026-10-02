@@ -7,7 +7,34 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
-## Saved Results (2026-10-01)
+## Google OAuth Implementation (2026-10-02)
+
+Branch: `feature/saved-results`. Previous commit: `5053e65`; the commit containing
+this entry implements Google OAuth (resolve its SHA with `git log -1`).
+Frontend now has Supabase browser/server clients (`web/lib/supabase/`), a
+PKCE `/auth/callback` route with internal-only `next`, `/auth/error`, session
+refresh in the existing proxy, and navigation login/email/sign-out controls.
+Packages: `@supabase/ssr` 0.12.7 and `@supabase/supabase-js` 2.117.2.
+Saved Results, Search History, anonymous session IDs, API code, and scientific
+tables were not changed. Existing experimental beta access gate is preserved.
+
+Verified: lint/typecheck/build clean; 2 redirect tests passed; biological
+checks 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
+pipeline 13/13; seed benchmark 34/34. Existing localhost:3001 server responds
+200; missing-code callback responds 307 to `/auth/error`, rejecting an external
+next. Browser automation tooling was unavailable in this session.
+
+Blocker / exact next task: add `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to `web/.env` and Vercel. No public
+Supabase auth variables were present in web/.env at implementation time.
+Allow localhost:3001 and production `/auth/callback` URLs in Supabase.
+Then test with an allowed Google user: login, callback, refresh persistence,
+Authentication Users entry, and sign-out. None of those authenticated steps
+or production deployment was verified. See `web/AUTH.md` for the setup.
+Dependency audit also reports existing Next.js/transitive advisories; dependency
+upgrades beyond adding Supabase were not part of this task.
+
+## Saved Results Details (2026-10-01)
 
 Saved Results is implemented on branch `feature/saved-results` using the existing
 Next.js -> FastAPI -> Supabase/Postgres pattern. It reuses the same anonymous

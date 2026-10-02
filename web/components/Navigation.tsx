@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AuthControl } from '@/components/AuthControl';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -72,6 +73,7 @@ export function Navigation() {
       </div>
 
       <ThemeToggle />
+      <AuthControl />
 
     </nav>
   );
