@@ -1,5 +1,20 @@
 import type { DatabaseResult } from '@/lib/results';
 import { sessionId } from '@/lib/feedback';
+import { createClient } from '@/lib/supabase/client';
+import { authConfig } from '@/lib/supabase/config';
+
+// Remount account-specific views on identity changes, including another tab's
+// sign-out. This also discards in-flight results belonging to the previous owner.
+export function watchSavedOwner(): () => void {
+  if (!authConfig()) return () => {};
+  let owner: string | null | undefined;
+  const { data: { subscription } } = createClient().auth.onAuthStateChange((_event, session) => {
+    const nextOwner = session?.user.id ?? null;
+    if (owner !== undefined && owner !== nextOwner) window.location.reload();
+    owner = nextOwner;
+  });
+  return () => subscription.unsubscribe();
+}
 
 export interface SavedRecordInput {
   record_id: number;

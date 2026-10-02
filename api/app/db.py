@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 import re
+from uuid import UUID
 from urllib.parse import urlencode
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -405,8 +406,19 @@ async def clear_search_history(session_id: str) -> int:
         return int(result.split()[-1])
 
 
-# --- Saved results (migration 008; same browser session id as history) -----
-async def saved_results_status(session_id: str, stable_row_keys: list[str]) -> set[str]:
+# UUID owners originate only from the trusted BFF header; strings are the
+# existing anonymous browser session. Never infer ownership from string shape.
+def _saved_owner_scope(owner: str | UUID) -> tuple[str, str, list[tuple[str, str]]]:
+    if isinstance(owner, UUID):
+        return "user_id", "user_id = $1", [("user_id", f"eq.{owner}")]
+    return "session_id", "session_id = $1 AND user_id IS NULL", [
+        ("session_id", f"eq.{owner}"), ("user_id", "is.null"),
+    ]
+
+
+# --- Saved results (anonymous browser session or verified account) --------
+async def saved_results_status(owner: str | UUID, stable_row_keys: list[str]) -> set[str]:
+    _, predicate, filters = _saved_owner_scope(owner)
     if not stable_row_keys:
         return set()
     if _use_supabase_rest() and not settings.db_feedback_url:
@@ -415,7 +427,7 @@ async def saved_results_status(session_id: str, stable_row_keys: list[str]) -> s
             "saved_results",
             [
                 ("select", "stable_row_key"),
-                ("session_id", f"eq.{session_id}"),
+                *filters,
                 ("stable_row_key", _pg_in(stable_row_keys)),
             ],
         )
@@ -424,13 +436,14 @@ async def saved_results_status(session_id: str, stable_row_keys: list[str]) -> s
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             "SELECT stable_row_key FROM saved_results "
-            "WHERE session_id = $1 AND stable_row_key = ANY($2::text[])",
-            session_id, stable_row_keys,
+            f"WHERE {predicate} AND stable_row_key = ANY($2::text[])",
+            owner, stable_row_keys,
         )
         return {row["stable_row_key"] for row in rows}
 
 
-async def save_result_records(session_id: str, records: list[dict]) -> list[str]:
+async def save_result_records(owner: str | UUID, records: list[dict]) -> list[str]:
+    column, _, _ = _saved_owner_scope(owner)
     ids = [r["record_id"] for r in records]
     keys = [r["stable_row_key"] for r in records]
     if _use_supabase_rest():
@@ -457,7 +470,7 @@ async def save_result_records(session_id: str, records: list[dict]) -> list[str]
         raise ValueError("One or more saved records do not exist")
 
     if _use_supabase_rest() and not settings.db_feedback_url:
-        existing = await saved_results_status(session_id, keys)
+        existing = await saved_results_status(owner, keys)
         missing = [record for record in records if record["stable_row_key"] not in existing]
         if missing:
             try:
@@ -468,7 +481,7 @@ async def save_result_records(session_id: str, records: list[dict]) -> list[str]
                     [],
                     [
                         {
-                            "session_id": session_id,
+                            column: str(owner),
                             "record_id": record["record_id"],
                             "stable_row_key": record["stable_row_key"],
                         }
@@ -478,7 +491,7 @@ async def save_result_records(session_id: str, records: list[dict]) -> list[str]
             except HTTPError as exc:
                 if exc.code != 409:
                     raise
-                after_insert = await saved_results_status(session_id, keys)
+                after_insert = await saved_results_status(owner, keys)
                 if not set(keys).issubset(after_insert):
                     raise
         return keys
@@ -488,21 +501,22 @@ async def save_result_records(session_id: str, records: list[dict]) -> list[str]
         async with conn.transaction():
             for record in records:
                 await conn.execute(
-                    "INSERT INTO saved_results (session_id, record_id, stable_row_key) "
+                    f"INSERT INTO saved_results ({column}, record_id, stable_row_key) "
                     "VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
-                    session_id, record["record_id"], record["stable_row_key"],
+                    owner, record["record_id"], record["stable_row_key"],
                 )
     return keys
 
 
-async def remove_saved_result_records(session_id: str, stable_row_keys: list[str]) -> int:
+async def remove_saved_result_records(owner: str | UUID, stable_row_keys: list[str]) -> int:
+    _, predicate, filters = _saved_owner_scope(owner)
     if _use_supabase_rest() and not settings.db_feedback_url:
         await asyncio.to_thread(
             _supabase_write,
             "DELETE",
             "saved_results",
             [
-                ("session_id", f"eq.{session_id}"),
+                *filters,
                 ("stable_row_key", _pg_in(stable_row_keys)),
             ],
         )
@@ -511,20 +525,21 @@ async def remove_saved_result_records(session_id: str, stable_row_keys: list[str
     async with pool.acquire() as conn:
         result = await conn.execute(
             "DELETE FROM saved_results "
-            "WHERE session_id = $1 AND stable_row_key = ANY($2::text[])",
-            session_id, stable_row_keys,
+            f"WHERE {predicate} AND stable_row_key = ANY($2::text[])",
+            owner, stable_row_keys,
         )
         return int(result.split()[-1])
 
 
-async def list_saved_result_records(session_id: str) -> list[dict]:
+async def list_saved_result_records(owner: str | UUID) -> list[dict]:
+    _, predicate, filters = _saved_owner_scope(owner)
     if _use_supabase_rest() and not settings.db_feedback_url:
         saved = await asyncio.to_thread(
             _supabase_get,
             "saved_results",
             [
                 ("select", "record_id,stable_row_key,saved_at"),
-                ("session_id", f"eq.{session_id}"),
+                *filters,
                 ("order", "saved_at.desc,record_id.asc"),
             ],
         )
@@ -533,8 +548,8 @@ async def list_saved_result_records(session_id: str) -> list[dict]:
         async with pool.acquire() as conn:
             saved = await conn.fetch(
                 "SELECT record_id, stable_row_key, saved_at FROM saved_results "
-                "WHERE session_id = $1 ORDER BY saved_at DESC, record_id",
-                session_id,
+                f"WHERE {predicate} ORDER BY saved_at DESC, record_id",
+                owner,
             )
     if not saved:
         return []

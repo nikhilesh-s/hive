@@ -6,6 +6,7 @@ Free to change shape as the frontend's needs change.
 
 import logging
 import re
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi import Path as PathParam
@@ -323,7 +324,13 @@ async def remove_all_search_history(
     return {"deleted": deleted}
 
 
-def _saved_session_id(session_id: str) -> str:
+def _saved_owner(session_id: str | None, user_id: UUID | None) -> str | UUID:
+    # X-Hive-User-Id is asserted by Next.js after getUser(), never forwarded
+    # from the browser. Every caller must also pass require_internal_key.
+    if user_id is not None:
+        return user_id
+    if session_id is None:
+        raise HTTPException(400, "Anonymous saved results require session_id")
     return _history_session_id(session_id)
 
 
@@ -339,13 +346,13 @@ def _validated_stable_keys(keys: list[str]) -> list[str]:
 
 @router.post("/saved-results/status", response_model=SavedStatusResponse,
              dependencies=[Depends(require_internal_key)])
-async def get_saved_results_status(body: SavedStatusRequest):
+async def get_saved_results_status(body: SavedStatusRequest, x_hive_user_id: UUID | None = Header(default=None)):
     if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
-    session_id = _saved_session_id(body.session_id)
+    owner = _saved_owner(body.session_id, x_hive_user_id)
     keys = _validated_stable_keys(body.stable_row_keys)
     try:
-        saved = await saved_results_status(session_id, keys)
+        saved = await saved_results_status(owner, keys)
     except HTTPException:
         raise
     except Exception as e:
@@ -356,17 +363,17 @@ async def get_saved_results_status(body: SavedStatusRequest):
 
 @router.post("/saved-results", response_model=SaveResultsResponse,
              dependencies=[Depends(require_internal_key)])
-async def add_saved_results(body: SaveResultsRequest):
+async def add_saved_results(body: SaveResultsRequest, x_hive_user_id: UUID | None = Header(default=None)):
     if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
-    session_id = _saved_session_id(body.session_id)
+    owner = _saved_owner(body.session_id, x_hive_user_id)
     records = [
         {"record_id": item.record_id, "stable_row_key": item.stable_row_key.strip()}
         for item in body.records
     ]
     keys = _validated_stable_keys([item["stable_row_key"] for item in records])
     try:
-        saved_keys = await save_result_records(session_id, records)
+        saved_keys = await save_result_records(owner, records)
     except ValueError as e:
         raise HTTPException(400, str(e)) from e
     except HTTPException:
@@ -378,13 +385,13 @@ async def add_saved_results(body: SaveResultsRequest):
 
 
 @router.delete("/saved-results", dependencies=[Depends(require_internal_key)])
-async def discard_saved_results(body: UnsaveResultsRequest):
+async def discard_saved_results(body: UnsaveResultsRequest, x_hive_user_id: UUID | None = Header(default=None)):
     if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
-    session_id = _saved_session_id(body.session_id)
+    owner = _saved_owner(body.session_id, x_hive_user_id)
     keys = _validated_stable_keys(body.stable_row_keys)
     try:
-        await remove_saved_result_records(session_id, keys)
+        await remove_saved_result_records(owner, keys)
     except HTTPException:
         raise
     except Exception as e:
@@ -395,11 +402,14 @@ async def discard_saved_results(body: UnsaveResultsRequest):
 
 @router.get("/saved-results", response_model=list[WesternBlotRecord],
             dependencies=[Depends(require_internal_key)])
-async def get_saved_results(session_id: str = Query(..., min_length=1, max_length=128)):
+async def get_saved_results(
+    session_id: str | None = Query(default=None, min_length=1, max_length=128),
+    x_hive_user_id: UUID | None = Header(default=None),
+):
     if not saved_results_configured():
         raise HTTPException(503, "Saved results storage is not configured")
     try:
-        rows = await list_saved_result_records(_saved_session_id(session_id))
+        rows = await list_saved_result_records(_saved_owner(session_id, x_hive_user_id))
     except HTTPException:
         raise
     except Exception as e:
