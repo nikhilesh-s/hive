@@ -51,6 +51,16 @@ interface DatabaseResult {
   doi?: string | null;
   pmcid?: string | null;
   title?: string | null;
+  paper_flags?: {
+    access_status?: string | null;
+    access_url?: string | null;
+    access_source?: string | null;
+    access_checked_at?: string | null;
+    relevance_status?: string | null;
+    relevance_score?: number | null;
+    relevance_reason?: string | null;
+    relevance_checked_at?: string | null;
+  } | null;
 }
 
 export interface LaneSummary {
@@ -183,6 +193,19 @@ function Chip({ children }: { children: ReactNode }) {
   return <span className="hb-result-chip">{children}</span>;
 }
 
+const ACCESS_LABELS: Record<string, string> = {
+  open_access: 'Open access',
+  no_open_copy_found: 'Paywalled · Check institutional access',
+  unknown: 'Access unknown',
+};
+
+const RELEVANCE_LABELS: Record<string, string> = {
+  likely_relevant: 'Likely relevant',
+  possibly_relevant: 'Possibly relevant',
+  low_relevance: 'Low relevance',
+  unknown: 'Relevance unknown',
+};
+
 function experimentLabel(blotType?: string | null): string | null {
   if (!blotType) return null;
   if (blotType === 'co_ip') return 'co-IP';
@@ -275,6 +298,12 @@ export default function DatabaseResultCard({
   const reasons = review && review.label !== 'Supported' ? reviewReasons(data) : [];
   const designTag = deriveDesignTag(lanes, data.treatment_context);
   const sourceId = data.doi || data.paper_id;
+  const accessLabel = data.paper_flags?.access_status
+    ? ACCESS_LABELS[data.paper_flags.access_status] ?? titleCase(data.paper_flags.access_status)
+    : null;
+  const relevanceLabel = data.paper_flags?.relevance_status
+    ? RELEVANCE_LABELS[data.paper_flags.relevance_status] ?? titleCase(data.paper_flags.relevance_status)
+    : null;
   const saveLabel = saveBusy
     ? (savedState === 'saved' ? 'Removing…' : 'Saving…')
     : savedState === 'checking' ? 'Checking…'
@@ -305,6 +334,18 @@ export default function DatabaseResultCard({
           {live && (
             <div className="hb-live-badge" title="Extracted live by the model + deterministic engine; no human review">
               LIVE · UNREVIEWED
+            </div>
+          )}
+          {(accessLabel || relevanceLabel) && (
+            <div className="hb-paper-flag-row" aria-label="Paper access and relevance">
+              {accessLabel && data.paper_flags?.access_url ? (
+                <a className="hb-paper-flag" href={data.paper_flags.access_url} target="_blank" rel="noreferrer">
+                  {accessLabel}
+                </a>
+              ) : accessLabel ? (
+                <span className="hb-paper-flag">{accessLabel}</span>
+              ) : null}
+              {relevanceLabel && <span className="hb-paper-flag">{relevanceLabel}</span>}
             </div>
           )}
 

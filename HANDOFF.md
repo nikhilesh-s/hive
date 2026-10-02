@@ -87,6 +87,37 @@ up to 80 chars. Invalid values are nulled/ignored server-side. These tags are
 outreach attribution only, not auth or ownership, and `western_blot_records`
 is untouched.
 
+## Paper Access / Relevance Flags (2026-10-02)
+
+The main reviewed-corpus Results page now shows paper-level access and
+relevance badges when matching metadata exists in `public.ingest_jobs`. The
+bug was architectural: PR #11-style paper metadata was only present on the
+paper/research discovery surface and/or another branch, while the normal
+`/search` response still returned only `western_blot_records` fields to
+`DatabaseResultCard`.
+
+Fix on `feature/saved-results`:
+- Added migration 011 / Supabase migration
+  `20261002000011_ingest_jobs_paper_access_relevance.sql` for nullable
+  `ingest_jobs` metadata, access, and relevance columns plus DOI/query indexes.
+- Added reviewed-search enrichment that joins by
+  `western_blot_records.doi -> ingest_jobs.doi` without modifying either
+  `western_blot_records` or `western_blot_records_live`.
+- Access badges are DOI-level: `open_access`, `no_open_copy_found`, `unknown`.
+- Relevance badges are query-dependent and only attach when the
+  `ingest_jobs.discovery_query` matches the current search after simple
+  whitespace/case normalization, so relevance from another query is not shown.
+- `DatabaseResultCard` renders these as paper-level badges separate from the
+  scientific `Supported` / review badge. If no ingest job matches, no paper
+  badge is shown.
+
+Verification:
+- `cd api && ../.venv/bin/python -m pytest`: 228 passed / 15 skipped
+- `cd web && npm run lint`: clean
+- `cd web && npx tsc --noEmit`: clean
+- `cd web && npm run build`: clean
+- `git diff --check`: clean
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->

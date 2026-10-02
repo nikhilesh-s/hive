@@ -1,12 +1,15 @@
 import asyncpg
 import asyncio
 import json
+import logging
 import re
 from urllib.parse import urlencode
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from .config import settings
+
+logger = logging.getLogger("hive.api")
 
 # Every database access in this API goes through one of two asyncpg pools,
 # each bound to a scoped Postgres role (hive_readonly / hive_feedback). There
@@ -78,6 +81,19 @@ def _pg_in(values: list[object]) -> str:
     return f"in.({','.join(str(v) for v in values)})"
 
 
+def _norm_doi(value: object) -> str | None:
+    text = str(value or "").strip().lower()
+    return text or None
+
+
+def _norm_query(value: object) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def _iso(value: object) -> str | None:
+    return value.isoformat() if hasattr(value, "isoformat") else (str(value) if value else None)
+
+
 def saved_results_configured() -> bool:
     return bool(settings.db_feedback_url or _use_supabase_rest())
 
@@ -134,6 +150,111 @@ async def run_readonly_query(sql: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(sql)
         return [dict(row) for row in rows]
+
+
+INGEST_PAPER_FLAG_COLUMNS = (
+    "doi",
+    "access_status",
+    "access_url",
+    "access_source",
+    "access_checked_at",
+    "relevance_status",
+    "relevance_score",
+    "relevance_reason",
+    "relevance_checked_at",
+    "discovery_query",
+    "updated_at",
+    "created_at",
+)
+
+
+def _paper_flags_from_job(job: dict, query: str) -> dict | None:
+    flags: dict[str, object] = {}
+    access_status = job.get("access_status")
+    if access_status:
+        flags.update({
+            "access_status": access_status,
+            "access_url": job.get("access_url"),
+            "access_source": job.get("access_source"),
+            "access_checked_at": _iso(job.get("access_checked_at")),
+        })
+
+    if _norm_query(job.get("discovery_query")) == _norm_query(query):
+        relevance_status = job.get("relevance_status")
+        if relevance_status:
+            flags.update({
+                "relevance_status": relevance_status,
+                "relevance_score": job.get("relevance_score"),
+                "relevance_reason": job.get("relevance_reason"),
+                "relevance_checked_at": _iso(job.get("relevance_checked_at")),
+            })
+
+    return flags or None
+
+
+def _job_sort_key(job: dict) -> tuple[bool, str, str]:
+    return (
+        bool(job.get("access_status") or job.get("relevance_status")),
+        str(job.get("updated_at") or ""),
+        str(job.get("created_at") or ""),
+    )
+
+
+async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
+    """Attach DOI-level ingest_jobs access/relevance metadata to reviewed rows.
+
+    Access is paper-level and can be shown for any DOI match. Relevance is
+    query-dependent and is only shown when the ingest job's discovery_query
+    matches the current search query after simple whitespace/case normalization.
+    """
+    original_dois = sorted({str(row.get("doi")).strip() for row in rows if str(row.get("doi") or "").strip()})
+    dois = sorted({_norm_doi(doi) for doi in original_dois if _norm_doi(doi)})
+    if not dois:
+        return rows
+
+    try:
+        if _use_supabase_rest():
+            rest_dois = sorted(set(original_dois + dois))
+            jobs = await asyncio.to_thread(
+                _supabase_get,
+                "ingest_jobs",
+                [
+                    ("select", ",".join(INGEST_PAPER_FLAG_COLUMNS)),
+                    ("doi", _pg_in(rest_dois)),
+                ],
+            )
+        else:
+            pool = await get_readonly_pool()
+            async with pool.acquire() as conn:
+                fetched = await conn.fetch(
+                    f"SELECT {', '.join(INGEST_PAPER_FLAG_COLUMNS)} "
+                    "FROM ingest_jobs WHERE lower(doi) = ANY($1::text[])",
+                    dois,
+                )
+            jobs = [dict(row) for row in fetched]
+    except Exception as e:
+        logger.info("Paper flag lookup skipped: %s", e)
+        return rows
+
+    by_doi: dict[str, list[dict]] = {}
+    for job in jobs:
+        doi = _norm_doi(job.get("doi"))
+        if doi:
+            by_doi.setdefault(doi, []).append(job)
+
+    for matches in by_doi.values():
+        matches.sort(key=_job_sort_key, reverse=True)
+
+    for row in rows:
+        doi = _norm_doi(row.get("doi"))
+        if not doi:
+            continue
+        for job in by_doi.get(doi, []):
+            flags = _paper_flags_from_job(job, query)
+            if flags:
+                row["paper_flags"] = flags
+                break
+    return rows
 
 
 async def search_targets(name: str, limit: int) -> list[dict]:
