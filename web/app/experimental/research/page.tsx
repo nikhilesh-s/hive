@@ -17,18 +17,25 @@ interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
   pmcid?: string | null; year?: string | null; venue?: string | null; url?: string | null; source?: string;
   oa_pdf?: boolean; is_oa?: boolean;
+  access_status?: 'open_access' | 'no_open_copy_found' | 'unknown' | null;
+  access_url?: string | null; access_source?: string | null;
+  relevance_status?: 'likely_relevant' | 'possibly_relevant' | 'low_relevance' | 'unknown' | null;
+  relevance_score?: number | null; relevance_reason?: string | null;
+  pmid?: string | null; journal?: string | null;
 }
 interface Job {
   job_id: string; doi: string; status: string; message: string; pmcid?: string | null;
   candidates?: number | null; records?: number | null; rows?: number | null; backend?: string | null;
   error?: string | null; created_at: string; updated_at: string;
+  access_status?: string | null; access_url?: string | null; access_source?: string | null;
+  relevance_status?: string | null; relevance_score?: number | null; relevance_reason?: string | null;
 }
 interface LivePaper { doi: string; title?: string | null; job_id?: string | null; rows: number; experiments: number; ingested_at?: string | null }
 interface Status { model_backend_ready: boolean; model_backend: string; valency_configured: boolean; ingest_db_configured: boolean; live_rows: number | null }
 interface Block { ref: string; tier: string; record_id: number; doi: string | null; headline: string; lanes: number; text: string }
 interface AskResponse { evidence: Block[]; answer: string | null; cited: string[]; model: string | null; note: string | null }
 
-const STAGES = ['fetching', 'preprocessing', 'extracting', 'loading', 'done'];
+const STAGES = ['metadata', 'checking_access', 'fetching', 'preprocessing', 'extracting', 'loading', 'done'];
 const MONO = 'var(--font-mono), monospace';
 const TOPICS = ['STAT3 phosphorylation hepatocellular carcinoma', 'autophagy LC3B western blot lung cancer', 'GAPDH loading control mouse tissue'];
 
@@ -41,6 +48,19 @@ function Stepper({ status }: { status: string }) {
       ))}
     </ol>
   );
+}
+
+function accessLabel(status?: string | null) {
+  if (status === 'open_access') return 'Open access';
+  if (status === 'no_open_copy_found') return 'Paywalled · Check institutional access';
+  return 'Access unknown';
+}
+
+function relevanceLabel(status?: string | null) {
+  if (status === 'likely_relevant') return 'Likely relevant';
+  if (status === 'possibly_relevant') return 'Possibly relevant';
+  if (status === 'low_relevance') return 'Low relevance';
+  return 'Relevance unknown';
 }
 
 function renderAnswer(text: string, cited: string[]) {
@@ -97,7 +117,7 @@ export default function ResearchPage() {
   // Poll a running job every 2 s; on done, load its rows and refresh the ingested list.
   // A job that can no longer be read (404 after an API restart, backend down) stops the poll with an error.
   useEffect(() => {
-    if (!job || job.status === 'done' || job.status === 'failed') return;
+    if (!job || job.status === 'done' || job.status === 'failed' || job.status === 'awaiting_full_text') return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       const my = seq.current;
@@ -183,7 +203,24 @@ export default function ResearchPage() {
   async function extract(doi: string) {
     const my = invalidate();
     try {
-      const r = await post('/api/experimental/ingest', { doi });
+      const r = await post('/api/experimental/ingest', {
+        doi,
+        query: topic,
+        title: selected?.title,
+        abstract: selected?.abstract,
+        authors: selected?.authors,
+        journal: selected?.journal || selected?.venue,
+        year: selected?.year,
+        pmid: selected?.pmid,
+        pmcid: selected?.pmcid,
+        source: selected?.source,
+        access_status: selected?.access_status,
+        access_url: selected?.access_url,
+        access_source: selected?.access_source,
+        relevance_status: selected?.relevance_status,
+        relevance_score: selected?.relevance_score,
+        relevance_reason: selected?.relevance_reason,
+      });
       const d = await r.json();
       if (my !== seq.current) return; // another paper was chosen meanwhile
       if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
@@ -270,19 +307,24 @@ export default function ResearchPage() {
                   {p.year ? ` · ${p.year}` : ''}{p.venue ? ` · ${p.venue}` : ''}
                   {p.doi ? <> · <a href={`https://doi.org/${p.doi}`} target="_blank" rel="noreferrer">{p.doi}</a></> : ' · no DOI'}
                   <span className="hb-result-chip" style={{ marginLeft: 8 }}>{(p.source || '').startsWith('valency') ? 'Valency' : 'PMC'}</span>
-                  {oa ? (
-                    <span className="hb-result-chip" style={{ marginLeft: 6, color: 'var(--accent)' }}>open-access PDF · {p.pmcid}</span>
-                  ) : (
-                    <span className="hb-result-chip" style={{ marginLeft: 6 }}>{p.pmcid ? `${p.pmcid} · no downloadable PDF` : 'not in PMC · cannot extract'}</span>
-                  )}
+                  <span className="hb-result-chip" style={{ marginLeft: 6 }}>
+                    {relevanceLabel(p.relevance_status)}
+                  </span>
+                  <span className="hb-result-chip" style={{ marginLeft: 6, color: p.access_status === 'open_access' ? 'var(--accent)' : undefined }}>
+                    {accessLabel(p.access_status)}
+                  </span>
                   {have && <span className="hb-live-badge" style={{ marginLeft: 6 }}>ALREADY EXTRACTED · {have.experiments} exp</span>}
                 </div>
                 {p.abstract && <p className="hb-live-abstract">{p.abstract.slice(0, 240)}{p.abstract.length > 240 ? '…' : ''}</p>}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <button type="button" className="hb-evidence-toggle" disabled={!p.doi || busy || (!oa && !have)} onClick={() => choose(p)}
-                    title={!oa && !have ? 'HiveBlot only reads papers with a downloadable open-access PDF' : undefined}>
-                    {have ? 'Open extracted evidence' : oa ? 'Choose this paper' : 'No open-access PDF'}
+                  <button type="button" className="hb-evidence-toggle" disabled={!p.doi || busy} onClick={() => choose(p)}>
+                    {have ? 'Open extracted evidence' : p.access_status === 'open_access' ? 'Choose this paper' : 'Review paper access'}
                   </button>
+                  {p.access_status === 'no_open_copy_found' && p.doi && (
+                    <a className="hb-evidence-toggle" href={p.access_url || `https://doi.org/${p.doi}`} target="_blank" rel="noreferrer">
+                      Check institutional access
+                    </a>
+                  )}
                 </div>
               </li>
             );
@@ -317,13 +359,15 @@ export default function ResearchPage() {
           </p>
           {!selectedIngested && !job && (
             <div className="hb-live-form">
-              <button type="button" onClick={() => selected.doi && extract(selected.doi)} disabled={!selected.doi || !status?.model_backend_ready}>
-                Extract this paper live
+              <button type="button" onClick={() => selected.doi && extract(selected.doi)} disabled={!selected.doi}>
+                {selected.access_status === 'no_open_copy_found' ? 'Save access check' : 'Check access & extract'}
               </button>
               <span className="hb-live-note" style={{ margin: 0, alignSelf: 'center' }}>
-                {status?.model_backend_ready
-                  ? 'Open-access PDF → panel detection → the model reads each candidate panel (several in parallel) → deterministic biology. Roughly a minute per few panels; a figure-heavy paper can take 5–10 minutes, so an already-extracted paper is the safer live demo.'
-                  : 'No model backend configured; open an already-extracted paper instead.'}
+                {selected.access_status === 'no_open_copy_found'
+                  ? 'HiveBlot will save the metadata and access/relevance flags. If no open copy is available, check your institutional access; scientific extraction will not be fabricated.'
+                  : status?.model_backend_ready
+                    ? 'Metadata → relevance → access check → open PDF retrieval → panel detection → model extraction → deterministic biology.'
+                    : 'Metadata/access checks can still run, but extraction needs a configured model backend.'}
               </span>
             </div>
           )}
@@ -341,7 +385,14 @@ export default function ResearchPage() {
                 {job.doi}{job.pmcid ? ` · ${job.pmcid}` : ''} · job {job.job_id}{job.backend ? ` · ${job.backend}` : ''} · {elapsed}s
               </div>
               <Stepper status={job.status} />
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                {job.relevance_status && <span className="hb-result-chip">{relevanceLabel(job.relevance_status)}</span>}
+                {job.access_status && <span className="hb-result-chip">{accessLabel(job.access_status)}</span>}
+              </div>
               <p className={`hb-live-message${job.status === 'failed' ? ' is-error' : ''}`}>{job.error || job.message}</p>
+              {job.status === 'awaiting_full_text' && job.access_url && (
+                <p><a className="hb-evidence-toggle" href={job.access_url} target="_blank" rel="noreferrer">Check institutional access</a></p>
+              )}
               {job.status === 'failed' && livePapers.length > 0 && (
                 <p className="hb-live-note">Fallback: open an already-extracted paper from the list above.</p>
               )}
