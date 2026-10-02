@@ -272,12 +272,22 @@ def test_job_fails_fast_without_a_model_backend(monkeypatch):
     assert job.status == "failed" and "model" in job.error.lower()
 
 
-def test_job_fails_cleanly_when_no_open_access_pdf(monkeypatch):
-    monkeypatch.setenv("WBM_LLM_BACKEND", "mock")
-    monkeypatch.setattr(ingest.fulltext, "fetch_pdf", lambda doi, out: {"pdf_path": None, "pmcid": None})
-    job = ingest.start_job("10.1000/closed")
+def test_job_preserves_metadata_when_no_open_copy_is_found(monkeypatch):
+    monkeypatch.setattr(ingest.fulltext, "paper_metadata",
+                        lambda doi, seed=None: {"title": "STAT3 paper", "abstract": "STAT3 signaling",
+                                                "pmid": "1", "pmcid": None,
+                                                "metadata_source": "openalex"})
+    monkeypatch.setattr(ingest.fulltext, "check_access",
+                        lambda doi, pmcid=None: {"access_status": "no_open_copy_found",
+                                                 "access_url": f"https://doi.org/{doi}",
+                                                 "access_source": "openalex",
+                                                 "oa_pdf": False})
+    job = ingest.start_job("10.1000/closed", discovery_query="STAT3 western blot")
     _run(ingest.run_job(job.job_id))
-    assert job.status == "failed" and "open-access" in job.error
+    assert job.status == "awaiting_full_text"
+    assert job.access_status == "no_open_copy_found"
+    assert job.title == "STAT3 paper"
+    assert job.error is None
 
 
 def test_job_runs_the_pipeline_and_loads_live_rows(monkeypatch, tmp_path):
