@@ -191,13 +191,16 @@ async def run_job(job_id: str) -> Job:
             }
             meta = await loop.run_in_executor(
                 None, lambda: fulltext.paper_metadata(job.doi, seed=seed))
+            meta_authors = meta.get("authors")
+            if isinstance(meta_authors, list):
+                meta_authors = ", ".join(str(a) for a in meta_authors if a)
             await _set(
                 job,
                 pmid=meta.get("pmid"),
                 pmcid=meta.get("pmcid"),
                 title=meta.get("title"),
                 abstract=meta.get("abstract"),
-                authors=meta.get("authors"),
+                authors=meta_authors,
                 journal=meta.get("journal"),
                 publication_year=meta.get("publication_year"),
                 metadata_source=meta.get("metadata_source"),
