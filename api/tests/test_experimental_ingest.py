@@ -265,8 +265,20 @@ def _run(coro):
     return asyncio.run(coro)
 
 
-def test_job_fails_fast_without_a_model_backend(monkeypatch):
+def test_job_fails_after_retrieval_without_a_model_backend(monkeypatch, tmp_path):
     monkeypatch.delenv("WBM_LLM_BACKEND", raising=False)
+    monkeypatch.setattr(ingest.fulltext, "paper_metadata",
+                        lambda doi, seed=None: {"title": "T", "pmcid": "PMC1",
+                                                "metadata_source": "openalex"})
+    monkeypatch.setattr(ingest.fulltext, "check_access",
+                        lambda doi, pmcid=None: {"access_status": "open_access",
+                                                 "access_url": "https://example.org/p.pdf",
+                                                 "access_source": "openalex",
+                                                 "oa_pdf": True})
+    monkeypatch.setattr(ingest.fulltext, "fetch_pdf",
+                        lambda doi, out: {"pdf_path": str(tmp_path / "p.pdf"),
+                                          "pmcid": "PMC1", "pmid": "1",
+                                          "source": "openalex"})
     job = ingest.start_job("10.3892/br.2026.2108")
     _run(ingest.run_job(job.job_id))
     assert job.status == "failed" and "model" in job.error.lower()
@@ -367,10 +379,19 @@ def test_experimental_routes_require_internal_key(client):
     assert client.post("/experimental/ingest", json={"doi": "10.1000/x"}).status_code == 401
 
 
-def test_ingest_returns_503_without_model_backend(client, monkeypatch):
+def test_ingest_can_start_access_check_without_model_backend(client, monkeypatch):
     monkeypatch.delenv("WBM_LLM_BACKEND", raising=False)
-    r = client.post("/experimental/ingest", json={"doi": "10.3892/br.2026.2108"}, headers=AUTH)
-    assert r.status_code == 503 and "model" in r.json()["detail"].lower()
+
+    async def fake_run(job_id):
+        return ingest.JOBS[job_id]
+
+    monkeypatch.setattr(ingest, "run_job", fake_run)
+    r = client.post("/experimental/ingest",
+                    json={"doi": "10.3892/br.2026.2108",
+                          "query": "STAT3 western blot"},
+                    headers=AUTH)
+    assert r.status_code == 200
+    assert r.json()["doi"] == "10.3892/br.2026.2108"
 
 
 def test_ingest_rejects_non_doi(client, monkeypatch):
