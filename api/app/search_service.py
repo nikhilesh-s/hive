@@ -12,7 +12,7 @@ from fastapi import HTTPException
 
 from .bio_query import generate_bio_sql
 from .config import settings
-from .db import run_readonly_query, run_supabase_search
+from .db import attach_paper_flags, run_readonly_query, run_supabase_search
 from .experiment_identity import identity_for_row
 from .schemas import SearchResponse
 from .sql_guard import SQLGuardError, guard_and_limit_sql
@@ -54,6 +54,7 @@ async def execute_search(query: str, limit: int, table_name: str | None = None) 
     if not table_name:
         for row in results:
             row["experiment_key"], _ = identity_for_row(row)
+        results = await attach_paper_flags(results, query)
 
     return SearchResponse(
         question=query,

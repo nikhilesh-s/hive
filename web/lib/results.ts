@@ -26,6 +26,16 @@ export interface DatabaseResult {
   stable_row_key?: string | null;
   experiment_key?: string | null;
   saved_at?: string | null;
+  paper_flags?: {
+    access_status?: string | null;
+    access_url?: string | null;
+    access_source?: string | null;
+    access_checked_at?: string | null;
+    relevance_status?: string | null;
+    relevance_score?: number | null;
+    relevance_reason?: string | null;
+    relevance_checked_at?: string | null;
+  } | null;
   review_tier?: string | null;
   job_id?: string | null;
 }

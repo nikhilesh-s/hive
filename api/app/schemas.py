@@ -152,6 +152,10 @@ class WesternBlotRecord(BaseModel):
     # Present only on /saved-results rows.
     saved_at: str | None = None
 
+    # Paper-level metadata from ingest_jobs. This is deliberately separate
+    # from scientific review fields such as needs_review/protein_status.
+    paper_flags: dict | None = None
+
     # EXPERIMENTAL: rows from live DOI ingestion carry 'live_unreviewed';
     # reviewed-corpus rows carry None. The UI badges anything non-null.
     review_tier: str | None = None
