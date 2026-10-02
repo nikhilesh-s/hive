@@ -11,6 +11,8 @@ const ALLOWED_KEYS = new Set([
   'feedback_scope', 'record_id', 'stable_row_key', 'paper_id', 'figure_label', 'search_query',
   'field_name', 'model_value', 'feedback_type', 'suggested_value', 'comment',
   'ui_location', 'session_id',
+  // Outreach attribution only. Not auth, not identity, never sent to evidence rows.
+  'lab_tag', 'utm_source',
   // Only ever present when the researcher ticked the opt-in (F-5). Stored,
   // never read back: the rehydration response has no contact field.
   'contact',

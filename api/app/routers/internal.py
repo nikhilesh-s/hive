@@ -5,6 +5,7 @@ Free to change shape as the frontend's needs change.
 """
 
 import logging
+import re
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi import Path as PathParam
@@ -53,6 +54,23 @@ from ..search_service import execute_search
 logger = logging.getLogger("hive.api")
 
 router = APIRouter()
+
+LAB_TAG_RE = re.compile(r"^[a-z0-9_]{1,40}$")
+UTM_VALUE_RE = re.compile(r"^[A-Za-z0-9_.-]{1,80}$")
+
+
+def _clean_lab_tag(value: str | None) -> str | None:
+    if value is None:
+        return None
+    value = value.strip()
+    return value if LAB_TAG_RE.fullmatch(value) else None
+
+
+def _clean_utm_value(value: str | None) -> str | None:
+    if value is None:
+        return None
+    value = value.strip()
+    return value if UTM_VALUE_RE.fullmatch(value) else None
 
 
 @router.get("/health")
@@ -210,6 +228,8 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         "comment": body.comment,
         "ui_location": body.ui_location,
         "session_id": body.session_id,
+        "lab_tag": _clean_lab_tag(body.lab_tag),
+        "utm_source": _clean_utm_value(body.utm_source),
         "contact": body.contact,
     }
     try:
@@ -260,7 +280,14 @@ async def record_search_history(request: Request, body: SearchHistorySubmission)
     query = body.query.strip()
     normalized_query = " ".join(query.split())
     try:
-        row = await upsert_search_history(session_id, query, normalized_query, body.filters)
+        row = await upsert_search_history(
+            session_id,
+            query,
+            normalized_query,
+            body.filters,
+            lab_tag=_clean_lab_tag(body.lab_tag),
+            utm_source=_clean_utm_value(body.utm_source),
+        )
     except Exception as e:
         logger.exception("history insert failed")
         raise HTTPException(500, "Failed to store search history") from e

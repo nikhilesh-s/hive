@@ -48,6 +48,16 @@ experimental extraction are separate from normal search and use
 Both `/search` and `/v1/search` are rate-limited (`SEARCH_RATE_LIMIT` /
 `AGENT_RATE_LIMIT`).
 
+## Outreach attribution
+
+Outreach links may include `?lab=<tag>&utm_source=<source>`. The web client
+stores valid values in localStorage and attaches them to search-history and
+feedback writes only. `lab` becomes `lab_tag` and must match
+`^[a-z0-9_]{1,40}$`; `utm_source` is a short campaign/source string using only
+letters, numbers, `_`, `-`, and `.`. These tags are attribution, not
+authentication or ownership, and they are never written to
+`western_blot_records`.
+
 ## Setup
 
 1. Create a new Supabase project.

@@ -228,7 +228,9 @@ async def insert_feedback(fields: dict) -> int:
 
 
 async def upsert_search_history(session_id: str, query: str,
-                                normalized_query: str, filters: dict) -> dict:
+                                normalized_query: str, filters: dict,
+                                lab_tag: str | None = None,
+                                utm_source: str | None = None) -> dict:
     """Record a successfully executed search for one anonymous session.
 
     The unique key makes repeated searches useful history rather than a list
@@ -239,12 +241,14 @@ async def upsert_search_history(session_id: str, query: str,
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "INSERT INTO search_history "
-            "(session_id, query, normalized_query, filters, last_searched_at) "
-            "VALUES ($1, $2, $3, $4::jsonb, now()) "
+            "(session_id, query, normalized_query, filters, last_searched_at, lab_tag, utm_source) "
+            "VALUES ($1, $2, $3, $4::jsonb, now(), $5, $6) "
             "ON CONFLICT (session_id, normalized_query, filters) DO UPDATE SET "
-            "query = EXCLUDED.query, last_searched_at = now() "
+            "query = EXCLUDED.query, last_searched_at = now(), "
+            "lab_tag = COALESCE(EXCLUDED.lab_tag, search_history.lab_tag), "
+            "utm_source = COALESCE(EXCLUDED.utm_source, search_history.utm_source) "
             "RETURNING id, query, filters, created_at, last_searched_at",
-            session_id, query, normalized_query, filters,
+            session_id, query, normalized_query, filters, lab_tag, utm_source,
         )
         return dict(row)
 
