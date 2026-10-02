@@ -169,7 +169,8 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
 
     good = {"feedback_scope": "field", "record_id": 42, "field_name": "cell_line",
             "feedback_type": "incorrect", "model_value": "Hep3B",
-            "suggested_value": "HepG2", "comment": "wrong line"}
+            "suggested_value": "HepG2", "comment": "wrong line",
+            "lab_tag": "rice_university_1", "utm_source": "email-wave1"}
     r = client.post("/feedback", json=good, headers=AUTH)
     assert r.status_code == 200 and r.json()["feedback_id"] == 7
     # correction stored as suggested_value; nothing resembling an UPDATE of
@@ -180,6 +181,8 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
     # F-5: a real app_version, not the old hardcoded "beta-local"; contact is
     # None unless the researcher opted in.
     assert inserted["app_version"] == settings.app_version != "beta-local"
+    assert inserted["lab_tag"] == "rice_university_1"
+    assert inserted["utm_source"] == "email-wave1"
     assert inserted["contact"] is None
     r = client.post("/feedback", headers=AUTH,
                     json={"feedback_scope": "ui", "comment": "call me", "contact": "a@lab.edu"})
@@ -198,6 +201,33 @@ def test_feedback_endpoint_validates_and_inserts(client, monkeypatch):
 
     # auth required
     assert client.post("/feedback", json=good).status_code in (401, 403)
+
+
+def test_feedback_invalid_attribution_is_nulled(client, monkeypatch):
+    inserted = {}
+
+    async def fake_insert(fields):
+        inserted.update(fields)
+        return 7
+
+    import app.routers.internal as internal
+    monkeypatch.setattr(internal, "insert_feedback", fake_insert)
+    monkeypatch.setattr(settings, "db_feedback_url", "postgresql://stub")
+
+    response = client.post(
+        "/feedback",
+        headers=AUTH,
+        json={
+            "feedback_scope": "ui",
+            "comment": "hello",
+            "lab_tag": "Rice University",
+            "utm_source": "email wave 1!",
+        },
+    )
+
+    assert response.status_code == 200
+    assert inserted["lab_tag"] is None
+    assert inserted["utm_source"] is None
 
 
 def test_feedback_rejects_nul_and_mismatched_record_keys(client, monkeypatch):

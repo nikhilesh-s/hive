@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import AttributionCapture from "@/components/AttributionCapture";
 
 const themeBootScript = `
 (function () {
@@ -64,6 +65,7 @@ export default function RootLayout({
         className={`${plexSerif.variable} ${plexSans.variable} ${plexMono.variable}`}
         style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
       >
+        <AttributionCapture />
         <Navigation />
         <main style={{ flex: 1 }}>
           {children}

@@ -41,9 +41,10 @@ def test_history_requires_auth(client):
 def test_history_post_normalizes_whitespace(client, monkeypatch):
     captured = {}
 
-    async def fake_upsert(session_id, query, normalized_query, filters):
+    async def fake_upsert(session_id, query, normalized_query, filters, lab_tag=None, utm_source=None):
         captured.update(session_id=session_id, query=query,
-                       normalized_query=normalized_query, filters=filters)
+                       normalized_query=normalized_query, filters=filters,
+                       lab_tag=lab_tag, utm_source=utm_source)
         return _row(query=query, filters=filters)
 
     import app.routers.internal as internal
@@ -53,7 +54,9 @@ def test_history_post_normalizes_whitespace(client, monkeypatch):
         "/history",
         headers=AUTH,
         json={"session_id": "browser-a", "query": "  phospho   STAT3 Tyr705  ",
-              "filters": {"protein": "STAT3"}},
+              "filters": {"protein": "STAT3"},
+              "lab_tag": "rice_university_1",
+              "utm_source": "email-wave1"},
     )
     assert response.status_code == 200
     assert captured == {
@@ -61,7 +64,33 @@ def test_history_post_normalizes_whitespace(client, monkeypatch):
         "query": "phospho   STAT3 Tyr705",
         "normalized_query": "phospho STAT3 Tyr705",
         "filters": {"protein": "STAT3"},
+        "lab_tag": "rice_university_1",
+        "utm_source": "email-wave1",
     }
+
+
+def test_history_invalid_attribution_is_nulled(client, monkeypatch):
+    captured = {}
+
+    async def fake_upsert(session_id, query, normalized_query, filters, lab_tag=None, utm_source=None):
+        captured.update(lab_tag=lab_tag, utm_source=utm_source)
+        return _row(query=query, filters=filters)
+
+    import app.routers.internal as internal
+    monkeypatch.setattr(internal, "upsert_search_history", fake_upsert)
+
+    response = client.post(
+        "/history",
+        headers=AUTH,
+        json={
+            "session_id": "browser-a",
+            "query": "STAT3",
+            "lab_tag": "Rice University",
+            "utm_source": "email wave 1!",
+        },
+    )
+    assert response.status_code == 200
+    assert captured == {"lab_tag": None, "utm_source": None}
 
 
 def test_history_list_is_session_scoped(client, monkeypatch):

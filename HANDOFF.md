@@ -74,6 +74,19 @@ with the current Evidence Record schema. Normal search no longer changes
 behavior just because `OPENAI_KEY` is present. OpenAI-compatible extraction is a
 separate path controlled by `WBM_LLM_BACKEND`, not normal search.
 
+## Outreach Attribution (2026-10-01)
+
+Outreach attribution is implemented for the live migration
+`20261001231317_add_outreach_attribution_to_activity_tables.sql`, which added
+nullable `lab_tag` and `utm_source` columns to `search_history` and
+`hiveblot_feedback` only. The web client captures `?lab=...` and
+`?utm_source=...`, validates them, stores them in localStorage, and attaches
+them to search-history and feedback writes. `lab_tag` accepts
+`^[a-z0-9_]{1,40}$`; `utm_source` accepts alphanumeric plus `_`, `-`, and `.`
+up to 80 chars. Invalid values are nulled/ignored server-side. These tags are
+outreach attribution only, not auth or ownership, and `western_blot_records`
+is untouched.
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->

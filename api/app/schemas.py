@@ -186,6 +186,8 @@ class SearchHistorySubmission(BaseModel):
     session_id: str = Field(min_length=1, max_length=128)
     query: str = Field(min_length=1, max_length=500)
     filters: dict = Field(default_factory=dict)
+    lab_tag: str | None = None
+    utm_source: str | None = None
 
 
 class SearchHistoryItem(BaseModel):
@@ -358,6 +360,9 @@ class FeedbackSubmission(BaseModel):
     comment: str | None = Field(default=None, max_length=4000)
     ui_location: str | None = Field(default=None, max_length=200)
     session_id: str | None = Field(default=None, max_length=64)
+    # Outreach attribution only. These are not authentication, ownership, or PII.
+    lab_tag: str | None = None
+    utm_source: str | None = None
     # F-5 (migration 006): optional, sent ONLY when the researcher ticked the
     # explicit opt-in. Never returned by the rehydration path (FeedbackItem
     # below has no contact field), so it cannot render in another browser.
