@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { savedOwnerHeaders } from '@/lib/savedOwner';
 
 const BACKEND_URL = process.env.API_BASE_URL;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY;
@@ -15,11 +16,11 @@ export async function GET(request: NextRequest) {
   const session = request.nextUrl.searchParams.get('session_id') || '';
   try {
     const upstream = await fetch(`${BACKEND_URL}/saved-results?session_id=${encodeURIComponent(session)}`, {
-      headers: { Authorization: `Bearer ${INTERNAL_API_KEY}` },
+      headers: { Authorization: `Bearer ${INTERNAL_API_KEY}`, ...await savedOwnerHeaders() },
       cache: 'no-store',
     });
     const data = await upstream.json().catch(() => ({}));
-    return NextResponse.json(data, { status: upstream.status });
+    return NextResponse.json(data, { status: upstream.status, headers: { 'Cache-Control': 'private, no-store' } });
   } catch {
     return NextResponse.json({ error: 'Saved results could not be loaded' }, { status: 502 });
   }
@@ -35,12 +36,13 @@ export async function POST(request: NextRequest) {
       headers: {
         Authorization: `Bearer ${INTERNAL_API_KEY}`,
         'Content-Type': 'application/json',
+        ...await savedOwnerHeaders(),
       },
       body: JSON.stringify(body),
       cache: 'no-store',
     });
     const data = await upstream.json().catch(() => ({}));
-    return NextResponse.json(data, { status: upstream.status });
+    return NextResponse.json(data, { status: upstream.status, headers: { 'Cache-Control': 'private, no-store' } });
   } catch {
     return NextResponse.json({ error: 'Result could not be saved' }, { status: 502 });
   }
@@ -56,12 +58,13 @@ export async function DELETE(request: NextRequest) {
       headers: {
         Authorization: `Bearer ${INTERNAL_API_KEY}`,
         'Content-Type': 'application/json',
+        ...await savedOwnerHeaders(),
       },
       body: JSON.stringify(body),
       cache: 'no-store',
     });
     const data = await upstream.json().catch(() => ({}));
-    return NextResponse.json(data, { status: upstream.status });
+    return NextResponse.json(data, { status: upstream.status, headers: { 'Cache-Control': 'private, no-store' } });
   } catch {
     return NextResponse.json({ error: 'Saved result could not be removed' }, { status: 502 });
   }

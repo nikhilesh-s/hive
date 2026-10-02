@@ -16,7 +16,7 @@ import SearchFeedback from '@/components/SearchFeedback';
 import BetaFeedback from '@/components/BetaFeedback';
 import { recordSearchHistory } from '@/lib/history';
 import { groupResults, type DatabaseResult, type ResultGroup } from '@/lib/results';
-import { getSavedStatus, removeSavedResultRecords, saveResultRecords } from '@/lib/savedResults';
+import { getSavedStatus, removeSavedResultRecords, saveResultRecords, watchSavedOwner } from '@/lib/savedResults';
 
 interface SearchResponse {
   count: number;
@@ -45,6 +45,7 @@ function deriveSavedStates(groupsToCheck: ResultGroup[], saved: Set<string>): Re
 }
 
 export default function SearchPage() {
+  useEffect(watchSavedOwner, []);
   const [query, setQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<DatabaseResult[]>([]);

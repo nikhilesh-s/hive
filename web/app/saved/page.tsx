@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import { groupResults, type DatabaseResult, type ResultGroup } from '@/lib/results';
-import { loadSavedResults, removeSavedResultRecords } from '@/lib/savedResults';
+import { loadSavedResults, removeSavedResultRecords, watchSavedOwner } from '@/lib/savedResults';
 
 function formatSavedAt(value: string): string {
   const date = new Date(value);
@@ -13,6 +13,7 @@ function formatSavedAt(value: string): string {
 }
 
 export default function SavedPage() {
+  useEffect(watchSavedOwner, []);
   const [rows, setRows] = useState<DatabaseResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);

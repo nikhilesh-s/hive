@@ -212,7 +212,7 @@ class SavedRecordInput(BaseModel):
 
 
 class SavedStatusRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=128)
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
     stable_row_keys: list[str] = Field(min_length=1, max_length=500)
 
 
@@ -221,12 +221,12 @@ class SavedStatusResponse(BaseModel):
 
 
 class SaveResultsRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=128)
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
     records: list[SavedRecordInput] = Field(min_length=1, max_length=500)
 
 
 class UnsaveResultsRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=128)
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
     stable_row_keys: list[str] = Field(min_length=1, max_length=500)
 
 

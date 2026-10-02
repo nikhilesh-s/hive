@@ -7,6 +7,56 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Authenticated Saved Results (2026-10-02)
+
+Branch: `feature/saved-results`. Base/latest commit before this task: `ee0ed15`.
+This entry is committed with the implementation; resolve that commit with
+`git log -1 --format=%H -- HANDOFF.md`.
+
+Saved Results now uses the verified Supabase `user.id` for account saves and
+the existing `hiveblot_session` localStorage ID for anonymous saves. Next.js
+Saved Results handlers call the existing server client's `auth.getUser()` and
+assert `X-Hive-User-Id` only over the internal-key-protected API. Browser-supplied
+owner IDs/headers and emails never determine account ownership. Verification
+errors fail closed. All status/save/list/unsave paths share the same scope in
+both REST and direct Postgres: user UUID for accounts; session ID AND user_id
+IS NULL for anonymous. New account rows have no session ID. Search/Saved reload
+on account changes and responses are private/no-store. Google auth was not
+redesigned; experiment grouping and all lane keys remain unchanged.
+
+No anonymous-to-account merge is implemented. A separate claim feature needs
+explicit consent, proof of the anonymous session, verified account identity,
+transactional deduplication of all lane keys, and deletion only after success.
+The current localStorage session is a bearer identifier, not strong ownership
+proof. See `web/AUTH.md` for the trust boundary and deployment order.
+
+Supabase inspected: saved_results already has nullable session_id/user_id,
+auth.users foreign key, unique owner/key indexes, and RLS enabled. Browser
+roles have no direct grants. No schema change is required for the tested
+server-only REST path. Existing migration 008 grants/policies for hive_feedback
+are still absent on this project: apply it before a deployment that uses
+DB_FEEDBACK_URL. No new broad browser RLS policies should be added.
+
+Verification: API 237 passed / 15 skipped (including DB-dependent tests);
+web redirect/ownership tests 7 passed; lint, typecheck, production build and
+diff check passed. Biology 165/165, reconciliation 21/21, enrichment 18/18,
+extraction 10/10, pipeline 13/13; seed benchmark 34/34.
+Live `web/tests/saved-results.smoke.mjs` passed through local Next.js -> API ->
+Supabase with temporary real Supabase sessions: anonymous save/refresh/unsave,
+six-lane account save/idempotency/status/list, one regrouped card, independent
+second-device session, sign-out/sign-in persistence, two-account isolation,
+and owner-scoped unsave. Reviewed scientific table contents were identical
+before/after. Temporary accounts and saves removed; independent DB counts
+confirmed zero remaining test users/saves. Saved page HTTP 200 and grouping
+verified; interactive Google login/browser visual behavior was not automated.
+
+Next: manually verify Save/Unsave on Search and Saved with the working Google
+account at localhost:3000, including sign-out while viewing Saved. Deploy API
+before web; production deployment not performed. The paper access/relevance
+population gap is unrelated and remains open. User's api/.env.example edits
+are unrelated and excluded from this commit. Local API remains on port 8000
+and web on port 3000.
+
 ## Google OAuth Implementation (2026-10-02)
 
 Branch: `feature/saved-results`. Previous commit: `5053e65`; the commit containing
