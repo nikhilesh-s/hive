@@ -298,7 +298,6 @@ export default function ResearchPage() {
         <ul className="hb-live-papers">
           {papers.map((p, i) => {
             const have = ingested(p.doi);
-            const oa = !!p.oa_pdf;                      // Europe PMC lists a downloadable open-access PDF
             return (
               <li key={`${p.doi || p.title}-${i}`} className={selected?.doi && selected.doi === p.doi ? 'is-selected' : ''}>
                 <div className="hb-live-paper-title">{p.title || 'Untitled'}</div>
