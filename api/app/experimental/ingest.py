@@ -91,7 +91,7 @@ _SLOTS = asyncio.Semaphore(max(1, settings.ingest_concurrency))
 def interrupted(stored: dict) -> dict:
     """A persisted job missing from this process's JOBS that never finished was
     killed by a restart (jobs only run in-process): report it as failed."""
-    if stored.get("status") in ("done", "failed"):
+    if stored.get("status") in ("done", "failed", "awaiting_full_text"):
         return stored
     return {**stored, "status": "failed",
             "error": "Interrupted by a server restart. Start the extraction again."}
