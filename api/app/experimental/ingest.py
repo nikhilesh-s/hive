@@ -37,7 +37,7 @@ from .. import db  # noqa: E402
 PDF_DIR = Path(os.environ.get("WBM_PDF_CACHE", str(REPO / "western_blot_miner" / "data" / "live_pdfs")))
 JSONB_COLS = {"aliases_used_in_paper", "experiment_flags", "antibody_source_evidence",
               "provenance", "validation", "anomaly_flags", "experiment_type_evidence"}
-STAGES = ("queued", "fetching", "preprocessing", "extracting", "loading", "done", "failed")
+STAGES = ("queued", "metadata", "checking_access", "fetching", "preprocessing", "extracting", "loading", "awaiting_full_text", "done", "failed")
 
 
 def _now() -> str:
@@ -51,8 +51,23 @@ class Job:
     status: str = "queued"
     message: str = "Queued"
     pmcid: str | None = None
+    pmid: str | None = None
     paper_id: str | None = None
     title: str | None = None
+    abstract: str | None = None
+    authors: str | None = None
+    journal: str | None = None
+    publication_year: int | None = None
+    metadata_source: str | None = None
+    discovery_query: str | None = None
+    access_status: str | None = None
+    access_url: str | None = None
+    access_source: str | None = None
+    access_checked_at: str | None = None
+    relevance_status: str | None = None
+    relevance_score: float | None = None
+    relevance_reason: str | None = None
+    relevance_checked_at: str | None = None
     candidates: int | None = None
     records: int | None = None
     rows: int | None = None
@@ -95,11 +110,40 @@ def run_dir_for(doi: str) -> Path:
     return REPO / "western_blot_miner" / "data" / "pdf_runs" / re.sub(r"[^A-Za-z0-9._-]+", "_", doi)
 
 
-def start_job(doi: str, reuse: bool = False) -> Job:
+def start_job(doi: str, reuse: bool = False, *, discovery_query: str | None = None,
+              metadata: dict | None = None) -> Job:
     doi = fulltext.normalize_doi(doi)
     if not doi:
         raise ValueError("not a DOI")
-    job = Job(job_id=uuid.uuid4().hex[:12], doi=doi, reuse=reuse)
+    metadata = metadata or {}
+    authors = metadata.get("authors")
+    if isinstance(authors, list):
+        authors = ", ".join(str(a) for a in authors if a)
+    year = metadata.get("publication_year") or metadata.get("year")
+    try:
+        year = int(str(year)[:4]) if year else None
+    except (TypeError, ValueError):
+        year = None
+    job = Job(
+        job_id=uuid.uuid4().hex[:12],
+        doi=doi,
+        reuse=reuse,
+        discovery_query=discovery_query,
+        pmcid=metadata.get("pmcid"),
+        pmid=metadata.get("pmid"),
+        title=metadata.get("title"),
+        abstract=metadata.get("abstract"),
+        authors=authors,
+        journal=metadata.get("journal") or metadata.get("venue"),
+        publication_year=year,
+        metadata_source=metadata.get("metadata_source") or metadata.get("source"),
+        access_status=metadata.get("access_status"),
+        access_url=metadata.get("access_url"),
+        access_source=metadata.get("access_source"),
+        relevance_status=metadata.get("relevance_status"),
+        relevance_score=metadata.get("relevance_score"),
+        relevance_reason=metadata.get("relevance_reason"),
+    )
     JOBS[job.job_id] = job
     return job
 
@@ -137,16 +181,82 @@ async def run_job(job_id: str) -> Job:
         if _SLOTS.locked():
             await _set(job, message="Waiting for another extraction to finish (one runs at a time)…")
         async with _SLOTS:
+            # Metadata, relevance, and access are useful even when full text is
+            # unavailable, so they deliberately run before any model work.
+            await _set(job, status="metadata", message="Fetching paper metadata…")
+            seed = {
+                "title": job.title, "abstract": job.abstract, "authors": job.authors,
+                "journal": job.journal, "publication_year": job.publication_year,
+                "pmid": job.pmid, "pmcid": job.pmcid, "metadata_source": job.metadata_source,
+            }
+            meta = await loop.run_in_executor(
+                None, lambda: fulltext.paper_metadata(job.doi, seed=seed))
+            await _set(
+                job,
+                pmid=meta.get("pmid"),
+                pmcid=meta.get("pmcid"),
+                title=meta.get("title"),
+                abstract=meta.get("abstract"),
+                authors=meta.get("authors"),
+                journal=meta.get("journal"),
+                publication_year=meta.get("publication_year"),
+                metadata_source=meta.get("metadata_source"),
+            )
+
+            relevance = fulltext.assess_relevance(job.discovery_query, meta)
+            await _set(
+                job,
+                relevance_status=relevance.get("relevance_status"),
+                relevance_score=relevance.get("relevance_score"),
+                relevance_reason=relevance.get("relevance_reason"),
+                relevance_checked_at=_now(),
+                status="checking_access",
+                message="Checking open-access availability…",
+            )
+
+            access = await loop.run_in_executor(
+                None, lambda: fulltext.check_access(job.doi, pmcid=job.pmcid))
+            await _set(
+                job,
+                access_status=access.get("access_status"),
+                access_url=access.get("access_url"),
+                access_source=access.get("access_source"),
+                access_checked_at=_now(),
+            )
+
+            if job.access_status == "no_open_copy_found":
+                await _set(
+                    job,
+                    status="awaiting_full_text",
+                    message="No open copy found. Check institutional access; extraction can continue once full text is available.",
+                )
+                return job
+
+            await _set(job, status="fetching", message="Retrieving usable open-access full text…")
+            got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
+            if not got.get("pdf_path"):
+                await _set(
+                    job,
+                    pmcid=got.get("pmcid") or job.pmcid,
+                    status="awaiting_full_text",
+                    message=(
+                        "Open-access metadata was found, but HiveBlot could not retrieve a usable PDF automatically. "
+                        "Open the source in your browser or provide the PDF later."
+                        if job.access_status == "open_access"
+                        else "Access could not be confirmed and no usable PDF was retrieved."
+                    ),
+                )
+                return job
+
             ok, why = backend_ready()
             if not ok:
                 raise RuntimeError(why)
             job.backend = why
-            await _set(job, status="fetching", message="Locating open-access full text (Europe PMC / Unpaywall)…")
-            got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
-            if not got.get("pdf_path"):
-                raise RuntimeError("No open-access PDF is available for this DOI (PMC / Unpaywall); "
-                                   "HiveBlot only reads papers it is allowed to download.")
-            await _set(job, pmcid=got.get("pmcid"), status="preprocessing",
+            await _set(job, pmcid=got.get("pmcid") or job.pmcid, pmid=got.get("pmid") or job.pmid,
+                       access_status="open_access",
+                       access_source=job.access_source or got.get("source"),
+                       access_url=job.access_url or f"https://doi.org/{job.doi}",
+                       status="preprocessing",
                        message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
             summary = await loop.run_in_executor(
                 None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
