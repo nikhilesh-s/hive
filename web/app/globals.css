@@ -105,6 +105,8 @@ body {
 }
 
 .hb-navigation {
+  flex-wrap: wrap;
+  row-gap: 12px;
   align-items: center;
   backdrop-filter: blur(14px);
   background: var(--nav-background);
@@ -128,6 +130,7 @@ body {
 }
 
 .hb-navigation-links {
+  flex-wrap: wrap;
   align-items: center;
   display: flex;
   gap: 34px;
@@ -2129,3 +2132,7 @@ a.hb-paper-flag {
   .hb-history-delete { margin-top: 2px; }
   .hb-saved-unavailable { align-items: flex-start; flex-direction: column; gap: 16px; padding: 18px; }
 }
+.hb-auth-control { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; max-width: 240px; font-size: 12px; }
+.hb-auth-control span { overflow-wrap: anywhere; min-width: 0; }
+.hb-auth-control button { background: transparent; border: 1px solid var(--border); color: var(--accent); padding: 8px; cursor: pointer; font: inherit; }
+.hb-auth-control button:disabled { opacity: .6; cursor: default; }
