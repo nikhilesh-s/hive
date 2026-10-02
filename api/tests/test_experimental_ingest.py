@@ -292,6 +292,15 @@ def test_job_preserves_metadata_when_no_open_copy_is_found(monkeypatch):
 
 def test_job_runs_the_pipeline_and_loads_live_rows(monkeypatch, tmp_path):
     monkeypatch.setenv("WBM_LLM_BACKEND", "mock")
+    monkeypatch.setattr(ingest.fulltext, "paper_metadata",
+                        lambda doi, seed=None: {"title": "STAT3 paper", "abstract": "STAT3 western blot",
+                                                "pmid": "1", "pmcid": "PMC1",
+                                                "metadata_source": "openalex"})
+    monkeypatch.setattr(ingest.fulltext, "check_access",
+                        lambda doi, pmcid=None: {"access_status": "open_access",
+                                                 "access_url": "https://example.org/p.pdf",
+                                                 "access_source": "openalex",
+                                                 "oa_pdf": True})
     run_dir = tmp_path / "run"
     (run_dir / "panel_candidates").mkdir(parents=True)
     crop = run_dir / "panel_candidates" / "page_003_cand_0001.png"
