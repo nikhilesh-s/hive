@@ -145,8 +145,10 @@ def status_warnings(text: str, blocks: list[dict]) -> list[str]:
                 b["status"]["modification_type"] == "phosphorylation" or b["status"]["modification_status"] in ("CONFLICTING", "AMBIGUOUS")
                 for b in cited):
             add(f"A sentence states a phosphorylation that none of its cited records ({', '.join(refs)}) records.")
-        if _SAYS_TOTAL.search(bare) and all(b["status"]["modification_status"] in (None, "MISSING")
-                                            and not b["status"]["modification_label"] for b in cited):
+        if _SAYS_TOTAL.search(bare) and all(
+                b["status"]["modification_status"] in (None, "MISSING", "NOT_STATED", "NOT_RECOVERED")
+                and not b["status"]["modification_label"] for b in cited
+        ):
             add(f"A sentence calls the protein total / unmodified, but the cited records ({', '.join(refs)}) do not state a modification.")
         low = bare.lower()
         named = {b["ref"] for b in blocks
