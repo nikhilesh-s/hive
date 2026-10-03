@@ -280,12 +280,12 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
         primary, conf, status = "standard_western", 0.55, SUPPORTED
         flags.append("standard_western")
     else:
-        primary, conf, status = None, 0.2, MISSING
+        primary, conf, status = None, 0.0, NOT_RECOVERED
 
     exp_type = EvidenceField(value=primary, confidence=conf, status=status, sources=sources)
     exp_flags = EvidenceField.supported(sorted(set(flags)), conf, sources) if flags else EvidenceField.missing()
 
-    ip_bait = EvidenceField.missing()
+    ip_bait = EvidenceField.not_recovered() if "co_ip" in flags else EvidenceField.missing()
     if "co_ip" in flags:
         bait = None
         bait_src = None
@@ -575,7 +575,7 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
         clone=mk(ab.get("clone"), det_v=det.get("clone")),
         dilution=mk(ab.get("dilution"), det_v=det.get("dilution")),
         phospho_specific=EvidenceField.supported(bool(phospho_specific), 0.85, src)
-        if ab.get("target") else EvidenceField.missing(),
+        if ab.get("target") else EvidenceField.not_recovered(),
         detection_confidence=round(detection_conf, 2),
         association_confidence=round(assoc, 2),
     )
@@ -642,13 +642,18 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
             ] if caption else [
                 Source(type="methods", rank=RANK_METHODS, text=_snippet(methods, core))
             ])
-            if (caption or methods) else EvidenceField.not_recovered()
+            if (
+                core and (
+                    core.lower() in (caption or "").lower()
+                    or core.lower() in (methods or "").lower()
+                )
+            ) else EvidenceField.not_recovered()
         )
     expected = res.expected_mass_kda
     expected_f = EvidenceField.supported(
         expected, 0.9, [Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                text=f"{res.uniprot_id} {expected} kDa (expected)")]) \
-        if expected is not None else EvidenceField.missing()
+        if expected is not None else EvidenceField.not_recovered()
     recon = "not_comparable"
     if reported is not None and expected is not None:
         recon = "match" if abs(reported - expected) / expected <= 0.2 else "discrepancy"
