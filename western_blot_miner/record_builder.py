@@ -822,6 +822,11 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
     if record.target.canonical_target.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="PROTEIN_AMBIGUOUS", severity="med",
                                  detail="Protein name maps to more than one reviewed UniProt entry."))
+    elif record.target.canonical_target.status in (MISSING, NOT_RECOVERED, NOT_STATED):
+        flags.append(AnomalyFlag(
+            code="PROTEIN_NOT_RECOVERED", severity="med",
+            detail="HiveBlot could not reliably normalize this printed target to a reviewed protein entry.",
+        ))
     if record.molecular_weight.reconciliation == "discrepancy":
         flags.append(AnomalyFlag(code="MW_DISCREPANCY", severity="med",
                                  detail="Reported migration differs from the expected (UniProt) mass."))
