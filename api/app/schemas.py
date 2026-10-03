@@ -245,17 +245,22 @@ class FieldEvidence(BaseModel):
     never hidden)."""
     value: object = None
     confidence: float | None = None
-    status: str | None = None       # SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING
+    status: str | None = None       # SUPPORTED / AMBIGUOUS / CONFLICTING / NOT_STATED / NOT_RECOVERED / MISSING
     sources: list[dict] = []        # [{type, text}] — provenance snippets
     candidates: list[dict] = []     # [{value, source_type, confidence}] when unsettled
 
 
 class RecordAntibody(BaseModel):
     target: str | None = None
+    target_status: str | None = None
     vendor: str | None = None
+    vendor_status: str | None = None
     catalog_number: str | None = None
+    catalog_number_status: str | None = None
     clone: str | None = None
+    clone_status: str | None = None
     dilution: str | None = None
+    dilution_status: str | None = None
     role: str | None = None          # detection | immunoprecipitation
     phospho_specific: bool | None = None
     detection_confidence: float | None = None
