@@ -46,7 +46,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "HiveBlot — Western blot evidence search (beta)",
   description:
-    "Experiment-level Western blot evidence from a reviewed reference corpus (3 papers, 93 experiments, 475 evidence rows). Every value traceable to its source; uncertainty and conflicts shown, never guessed.",
+    "Experiment-level Western blot evidence from a reviewed reference corpus. Every value traceable to its source; uncertainty and conflicts shown, never guessed.",
 };
 
 export default function RootLayout({
