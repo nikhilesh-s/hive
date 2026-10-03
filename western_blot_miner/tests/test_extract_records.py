@@ -67,6 +67,15 @@ def main():
     check("total row stays total (no caption contamination)",
           total.modification.modification_type.value is None
           and total.modification.modification_type.status == "SUPPORTED")
+    # The target-scoped methods snippets were examined and contain no clone or
+    # dilution, so these are source-silence findings rather than parser failures.
+    check("missing antibody clone -> NOT_STATED",
+          pstat3.antibodies[0].clone.status == "NOT_STATED")
+    check("missing antibody dilution -> NOT_STATED",
+          pstat3.antibodies[0].dilution.status == "NOT_STATED")
+    # The caption explicitly names STAT3 but states no molecular weight.
+    check("reported MW absent from examined source -> NOT_STATED",
+          pstat3.molecular_weight.reported_kda.status == "NOT_STATED")
 
     # supabase projection: conflicting/missing -> NULL scalars; band_detected preserved
     rows = records_to_supabase_rows(records)
