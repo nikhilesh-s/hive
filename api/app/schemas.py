@@ -91,7 +91,7 @@ class WesternBlotRecord(BaseModel):
     raw_target_name: str | None = None
     canonical_target: str | None = None
     uniprot_id: str | None = None
-    protein_status: str | None = None  # SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING
+    protein_status: str | None = None  # SUPPORTED / AMBIGUOUS / CONFLICTING / NOT_STATED / NOT_RECOVERED / MISSING
     # Modification (phospho, cleavage, ...). value is NULL when CONFLICTING.
     modification_type: str | None = None
     residue: str | None = None
