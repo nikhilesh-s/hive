@@ -3,9 +3,9 @@
 // "Why HiveBlot says this" — full provenance for one Evidence Record, plus the
 // researcher feedback controls. Feedback is stored BESIDE the AI extraction
 // (separate table, insert-only role); a correction never mutates the record.
-// Uncertainty rendering rule: silence = settled. Only AMBIGUOUS (?),
-// CONFLICTING (⚠) and MISSING (—) get glyphs; disagreement is always shown,
-// never silently resolved.
+// Uncertainty rendering rule: silence = settled. AMBIGUOUS/CONFLICTING and
+// unavailable states carry restrained markers; source disagreement is always
+// shown and never silently resolved.
 
 import { useEffect, useState } from 'react';
 
@@ -116,6 +116,11 @@ function unavailableLabel(status?: string | null): string {
   if (status === 'NOT_STATED') return 'Not reported in the paper';
   if (status === 'NOT_RECOVERED') return 'Not recovered from the source';
   return 'Unavailable';
+}
+
+function UnavailableText({ status }: { status?: string | null }) {
+  const marker = statusGlyph(status);
+  return <span title={marker?.title}>{unavailableLabel(status)}</span>;
 }
 
 function fmtValue(name: string, fe: FieldEvidence, all: Record<string, FieldEvidence>): string {
@@ -499,12 +504,12 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
               <span style={{ fontFamily: MONO, fontSize: '10px', color: ab.role === 'immunoprecipitation' ? GOLD : LABEL }}>
                 [{ab.role === 'immunoprecipitation' ? 'IP bait' : 'detection'}]
               </span>{' '}
-              {ab.target || unavailableLabel(ab.target_status)}
+              {ab.target || <UnavailableText status={ab.target_status} />}
               <span style={{ color: DIM }}>
-                {' · vendor: '}{ab.vendor || unavailableLabel(ab.vendor_status)}
-                {' · catalog: '}{ab.catalog_number ? `#${ab.catalog_number}` : unavailableLabel(ab.catalog_number_status)}
-                {' · clone: '}{ab.clone || unavailableLabel(ab.clone_status)}
-                {' · dilution: '}{ab.dilution || unavailableLabel(ab.dilution_status)}
+                {' · vendor: '}{ab.vendor || <UnavailableText status={ab.vendor_status} />}
+                {' · catalog: '}{ab.catalog_number ? `#${ab.catalog_number}` : <UnavailableText status={ab.catalog_number_status} />}
+                {' · clone: '}{ab.clone || <UnavailableText status={ab.clone_status} />}
+                {' · dilution: '}{ab.dilution || <UnavailableText status={ab.dilution_status} />}
               </span>
               {ab.phospho_specific ? <span style={{ color: TEAL }}> · phospho-specific</span> : ''}
               {ab.association_confidence != null && ab.association_confidence < 0.8 && (
