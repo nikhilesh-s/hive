@@ -1,5 +1,7 @@
 'use client';
 
+import { useCorpusStats } from '@/lib/corpusStats';
+
 // Every number and capability claim on this page must be traceable to
 // HANDOFF.md / research/TEAM_BETA_HANDOFF.md. Nothing here may imply
 // literature-wide coverage, automated ingestion accuracy, or densitometry.
@@ -22,6 +24,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function About() {
+  const { stats, error } = useCorpusStats();
+  const pendingCount = error ? '-' : '...';
   return (
     <div className="hb-page">
       <section className="hb-page-hero">
@@ -46,15 +50,16 @@ export default function About() {
 
       <Section title="What the beta contains today">
         <div className="hb-stat-row" aria-label="Current corpus size">
-          <div className="hb-stat"><div className="hb-stat-n">3</div><div className="hb-stat-l">REVIEWED PAPERS</div></div>
-          <div className="hb-stat"><div className="hb-stat-n">93</div><div className="hb-stat-l">EXPERIMENT GROUPS</div></div>
-          <div className="hb-stat"><div className="hb-stat-n">475</div><div className="hb-stat-l">EVIDENCE ROWS</div></div>
+          <div className="hb-stat"><div className="hb-stat-n">{stats?.reviewed_papers ?? pendingCount}</div><div className="hb-stat-l">REVIEWED PAPERS</div></div>
+          <div className="hb-stat"><div className="hb-stat-n">{stats?.experiment_groups ?? pendingCount}</div><div className="hb-stat-l">EXPERIMENT GROUPS</div></div>
+          <div className="hb-stat"><div className="hb-stat-n">{stats?.evidence_rows ?? pendingCount}</div><div className="hb-stat-l">EVIDENCE ROWS</div></div>
         </div>
+        {!stats && <p className="hb-page-p" role="status">{error ? 'Corpus statistics are temporarily unavailable.' : 'Loading corpus statistics...'}</p>}
         <p className="hb-page-p">
           The corpus is intentionally small and reviewed. Every row was checked
           field-by-field by a human and then by an independent scientific QA pass. One
-          row is one lane of one blot panel; rows group into experiments. The three
-          papers:
+          row is one lane of one blot panel; rows group into experiments. Selected
+          papers from the reviewed corpus:
         </p>
         <ul className="hb-page-list">
           {PAPERS.map(([doi, what]) => (
@@ -67,7 +72,7 @@ export default function About() {
           ))}
         </ul>
         <p className="hb-page-p">
-          A search that returns nothing usually means the topic is not in these three
+          A search that returns nothing usually means the topic is not in the reviewed
           papers. It does not mean no such evidence exists in the literature, and the
           search page says so.
         </p>
@@ -109,8 +114,8 @@ export default function About() {
           <div>
             <h3 className="hb-page-h3" style={{ color: 'var(--warning)' }}>Not demonstrated yet</h3>
             <ul className="hb-page-list">
-              <li>Coverage of the wider literature (the corpus is three papers)</li>
-              <li>Automated extraction accuracy on papers HiveBlot has not been shown; the model-reading step for these three papers ran with a human in the loop</li>
+              <li>Coverage of the wider literature beyond the reviewed corpus</li>
+              <li>Automated extraction accuracy on papers HiveBlot has not been shown; the model-reading step for the selected papers above ran with a human in the loop</li>
               <li>Precision, recall or F1 on unseen papers: no such number exists yet</li>
               <li>Densitometry or any quantitative band-intensity inference</li>
             </ul>

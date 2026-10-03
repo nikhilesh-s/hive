@@ -7,6 +7,30 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Live Reviewed-Corpus Statistics (2026-10-02)
+
+Branch: `feature/saved-results`. Previous commit: `c4bea0b`; this entry is
+committed with the implementation (resolve its SHA with
+`git log -1 --format=%H -- HANDOFF.md`).
+
+Search and About now load reviewed-paper, experiment-group, and evidence-row
+totals from the API rather than displaying hard-coded corpus sizes. The API
+uses the same experiment identity helper as search, pages through REST results
+when configured for Supabase, and caches the computed totals for 60 seconds.
+Failures are shown as unavailable/loading states rather than substituting stale
+or invented counts. The About copy now accurately distinguishes selected
+papers from the reviewed corpus.
+
+Verification: API 237 passed / 15 skipped; biological checks 165/165,
+reconciliation 21/21, enrichment 18/18, extraction 10/10, pipeline 13/13;
+seed benchmark 34/34. Web lint, TypeScript check, production build, and
+`git diff --check` passed.
+
+Not deployed. Exact next task: verify the live totals on Search and About
+against the configured API, then continue the pending manual Saved Results
+Google-account verification documented below. The uncommitted
+`api/.env.example` edits are unrelated and were not included.
+
 ## Authenticated Saved Results (2026-10-02)
 
 Branch: `feature/saved-results`. Base/latest commit before this task: `ee0ed15`.

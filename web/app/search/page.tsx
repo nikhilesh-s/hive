@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useCorpusStats } from '@/lib/corpusStats';
 import { SearchInput } from '@/components/SearchInput';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import FiltersBar, {
@@ -45,6 +46,7 @@ function deriveSavedStates(groupsToCheck: ResultGroup[], saved: Set<string>): Re
 }
 
 export default function SearchPage() {
+  const { stats: corpusStats, error: corpusStatsError } = useCorpusStats();
   useEffect(watchSavedOwner, []);
   const [query, setQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -336,7 +338,7 @@ export default function SearchPage() {
               <div className="hb-results-title">
                 <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '16px', fontWeight: 600, color: 'var(--accent)' }}>RESULTS</span>
                 <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 500, color: 'var(--text-primary)' }}>Western blot evidence</span>
-                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '10px', color: 'var(--text-subtle)' }}>reviewed corpus · 3 papers</span>
+                <span style={{ fontFamily: 'var(--font-mono), monospace', fontSize: '10px', color: 'var(--text-subtle)' }}>reviewed corpus{corpusStats ? ` · ${corpusStats.reviewed_papers} paper${corpusStats.reviewed_papers === 1 ? '' : 's'}` : corpusStatsError ? ' · statistics unavailable' : ' · loading statistics...'}</span>
               </div>
               <p className="hb-results-count">
                 {loading
@@ -430,7 +432,7 @@ export default function SearchPage() {
               <div style={{ textAlign: 'center', paddingTop: '40px', color: 'var(--text-secondary)' }}>
                 <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '16px', lineHeight: 1.6 }}>
                   No matching Western blot evidence was found in the current HiveBlot
-                  beta dataset (3 reviewed papers). This does not mean no such evidence
+                  beta dataset{corpusStats ? ` (${corpusStats.reviewed_papers} reviewed paper${corpusStats.reviewed_papers === 1 ? '' : 's'})` : ''}. This does not mean no such evidence
                   exists in the literature — the beta corpus is deliberately small.
                 </p>
                 <div className="hb-search-feedback-wrap">
@@ -443,7 +445,9 @@ export default function SearchPage() {
           <div style={{ textAlign: 'center', paddingTop: '80px', color: 'var(--text-secondary)' }}>
             <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '18px', lineHeight: 1.6 }}>
               Search a reviewed corpus of experiment-level Western blot evidence:
-              3 papers · 93 experiments · 475 evidence rows.
+              {' '}{corpusStats
+                ? `${corpusStats.reviewed_papers} paper${corpusStats.reviewed_papers === 1 ? '' : 's'} · ${corpusStats.experiment_groups} experiment${corpusStats.experiment_groups === 1 ? '' : 's'} · ${corpusStats.evidence_rows} evidence row${corpusStats.evidence_rows === 1 ? '' : 's'}.`
+                : corpusStatsError ? 'Corpus statistics are temporarily unavailable.' : 'Loading corpus statistics...'}
             </p>
             <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', marginTop: '12px', color: 'var(--text-subtle)', lineHeight: 1.6 }}>
               Type a protein, a phosphosite (Tyr705), an antibody vendor and catalog number (CST 9145),

@@ -13,6 +13,7 @@ from fastapi import Path as PathParam
 
 from ..auth import require_internal_key
 from ..config import settings
+from ..corpus_stats import CorpusStats, get_corpus_stats
 from ..crops import resolve_reviewed_crop
 from ..db import (
     clear_search_history,
@@ -92,6 +93,15 @@ def index():
         "search": "POST /search (internal, INTERNAL_API_KEY)",
         "agent_search": "POST /v1/search (AGENT_API_KEYS)",
     }
+
+
+@router.get("/corpus-stats", response_model=CorpusStats, dependencies=[Depends(require_internal_key)])
+async def corpus_stats():
+    try:
+        return await get_corpus_stats()
+    except Exception as e:
+        logger.exception("reviewed corpus stats lookup failed")
+        raise HTTPException(503, "Corpus statistics are temporarily unavailable") from e
 
 
 @router.get("/proteins", response_model=ProteinSearchResponse, dependencies=[Depends(require_internal_key)])
