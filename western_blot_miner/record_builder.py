@@ -634,20 +634,23 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
         hit, src_type, src_rank = _kda_hit(caption), "figure_caption", RANK_CAPTION
     reported = hit[0] if hit else None
     # Source text is the verbatim matched window, typed by the channel it came from.
+    # A NOT_STATED claim must cite the relevant source channel that actually
+    # contains this target; never attach an unrelated caption merely because a
+    # caption exists while the target only appears in methods.
+    missing_reported_sources: list[Source] = []
+    if core and core.lower() in (caption or "").lower():
+        missing_reported_sources = [
+            Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, core))
+        ]
+    elif core and core.lower() in (methods or "").lower():
+        missing_reported_sources = [
+            Source(type="methods", rank=RANK_METHODS, text=_snippet(methods, core))
+        ]
     reported_f = EvidenceField.supported(
         reported, 0.8, [Source(type=src_type, rank=src_rank, text=hit[1])]) \
         if hit else (
-            EvidenceField.not_stated([
-                Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, core))
-            ] if caption else [
-                Source(type="methods", rank=RANK_METHODS, text=_snippet(methods, core))
-            ])
-            if (
-                core and (
-                    core.lower() in (caption or "").lower()
-                    or core.lower() in (methods or "").lower()
-                )
-            ) else EvidenceField.not_recovered()
+            EvidenceField.not_stated(missing_reported_sources)
+            if missing_reported_sources else EvidenceField.not_recovered()
         )
     expected = res.expected_mass_kda
     expected_f = EvidenceField.supported(
