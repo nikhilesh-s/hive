@@ -25,7 +25,7 @@ paper in that file was not opened. Nothing implemented.
 | 4 | Statuses supported / not supported / ambiguous / contradicting | Vocabulary is `SUPPORTED / AMBIGUOUS / CONFLICTING / MISSING` (`evidence_record.py:19-22`); CONFLICTING keeps `value=None` with candidates; `_v()` nulls both CONFLICTING and MISSING in the flat row; phospho search deliberately includes disputed rows (`bio_query.py:110-118`). | **"Not supported" (paper contradicts the value) is not expressible**; `MISSING` means silent, not contradicted. `AMBIGUOUS` is inconsistent: `EvidenceField.ambiguous` keeps the top candidate as the searchable value while two other producers null it (`record_builder.py:355,192-197`). Convention, not invariant. |
 | 5 | Escalate on ambiguous/conflicting | Exists behind `WBM_ESCALATE=False` (`extract_records.py:139-152`, `pipeline.py:147-150`). | `get_client(escalation=True)` only changes model for Bedrock (`llm_client.py:320-332`); on `claude_cli` it is a second ~20 s call to the same Sonnet. And line `:152` **replaces every record in the panel**, including SUPPORTED ones. |
 | 6 | Regex normalization | Extensive in `biology.py` (phospho sites, modification words, co-IP, catalog/vendor/dilution, kDa, dose/duration with figure-ref guards, band multiplicity, identifiers, 26 protein aliases, loading controls). | No cell-line normalizer ("Hep3B cells" vs "Hep3B"); no tissue routing (M11: 124 rows store a tissue in `cell_line`); no treatment vocabulary; **`extract_antibody` is never called on the records path** (`supabase_loader.py:326-345` vs `record_builder.py:52-58,392-426`), so catalog numbers the model omits are lost. All L1 catalog mismatches are `live=null / reviewed="4967"`. |
-| 7 | Missing data vs failed normalization | **No distinction.** `_v()` and `mk()` map both to NULL. No LLM second-check on null exists (escalation never inspects MISSING). | Testable without a model: re-scan the paper's full text with the field's own regex near the target symbol; hit = not recovered, no hit = not stated. Only ever run an LLM check on the "not recovered" bucket, never on "not stated". |
+| 7 | Missing data vs failed normalization | **Implemented on `feature/saved-results` for new extractions.** EvidenceField now distinguishes `NOT_STATED` (relevant verified paper text was examined and the field was absent) from `NOT_RECOVERED` (coverage/extraction/normalization cannot support that stronger claim); legacy `MISSING` remains neutral. Flat searchable columns stay NULL for all three. | Classification is deliberately conservative and no historical rows were rewritten. A full-corpus backfill still requires reprocessing the original source material; old NULL/MISSING values cannot be classified from the database alone. |
 | 8 | UniProt aliases | `UniProtResolver` (`resolve.py:82-146`): `gene:` + organism + reviewed, exact-gene wins, >1 hit → AMBIGUOUS with no accession, network failure → MISSING; curated ambiguity short-circuit stops `ERK`→EPHB2. 16/16 accessions verified live (`independent_scientific_qa.md:527`). | Only `gene:` is queried; UniProt synonym fields are never read, so a non-symbol alias resolves MISSING. `_core_symbol` truncates multi-word names. Organism from cell line is deliberately not used. Paper-stated antibody cross-reactivity caveats are dropped (Minor 6). |
 | 9 | DB + SQL search | Deterministic parser `bio_query.py:97-159` behind `sql_guard.py` (sqlglot, single SELECT, pinned table, function allowlist, forced LIMIT) and a read-only role. | **Closed on `feature/saved-results`:** the stale `api/app/nlp.py` OpenAI NL-to-SQL path was deleted, so `OPENAI_KEY` no longer changes normal search behavior. |
 | 10 | Paper retrieval for QA | `ask.py:107-169`: lexical terms AND'd, back-off drops the last term first, DOI fallback, reviewed before live, `MAX_EXPERIMENTS=12`. | No relevance ranking: on a 334-row paper the twelve blocks are effectively the first twelve by id. QA never reads the PDF; a panel the CV filter dropped is invisible to `/ask`. |
@@ -82,13 +82,17 @@ experiments" invariant.
 - Estimate: 1. Depends on: nothing. Owner: Nik + Tanvi.
 
 ### B-3 · Null provenance: `not_stated` vs `not_recovered`
-- Acceptance: `null_reason` on the field envelope, set by re-scanning the
-  paper's full text with that field's regex near the core symbol (copy
-  `_kda_near_core`, `record_builder.py:445-461`); a pytest over the three
-  reviewed papers emits the two-way table per nullable field; zero model
-  calls; the evidence panel shows the distinction.
-- Estimate: 2 (+0.5 web). Depends on: B-2 (shared helper). Owner: Nik +
-  Srushti (panel) + Tanvi (adjudicate a sample of `not_stated`).
+- Status: implemented on `feature/saved-results` for the EvidenceField status
+  contract, API pass-through, evidence-panel wording/tooltips, and conservative
+  new-extraction classification. The implementation uses the existing
+  `provenance` JSON status field rather than a new database column.
+- Historical reviewed/live rows were **not** bulk rewritten. Reclassifying them
+  requires re-running source-aware extraction against the original paper text;
+  a NULL or legacy `MISSING` alone is insufficient evidence.
+- Follow-up QA: Tanvi should adjudicate a sample of newly generated
+  `NOT_STATED` fields, especially target-scoped antibody metadata and
+  reported molecular weight, before any corpus-wide reprocessing.
+- Owner: Nik + Srushti (panel) + Tanvi (adjudication).
 
 ### B-4 · Panel inventory and CV recall measurement
 - Status 2026-09-15: scaffold landed. `scripts/experiments/panel_inventory_review.py`
