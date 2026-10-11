@@ -457,3 +457,38 @@ def test_fetch_pdf_reads_the_publisher_page_only_for_open_access(monkeypatch, tm
     is_oa["v"] = False
     got = fulltext.fetch_pdf("10.1000/pl", tmp_path / "b")
     assert got["pdf_path"] is None and "publisher_landing" not in got["tried"]
+
+
+def test_upsert_ingest_job_sends_datetimes_for_checked_at(monkeypatch):
+    """Job timestamps are ISO strings; asyncpg rejects strings for timestamptz,
+    which silently froze every persisted job at its first stage (PR #11)."""
+    import asyncio
+    from datetime import datetime, timezone
+    from app import db
+
+    sent = {}
+
+    class Conn:
+        async def execute(self, sql, *args):
+            sent["args"] = args
+
+    class Acquire:
+        async def __aenter__(self):
+            return Conn()
+
+        async def __aexit__(self, *exc):
+            return False
+
+    class Pool:
+        def acquire(self):
+            return Acquire()
+
+    async def fake_pool():
+        return Pool()
+
+    monkeypatch.setattr(db, "get_ingest_pool", fake_pool)
+    now = datetime.now(timezone.utc).isoformat()
+    asyncio.run(db.upsert_ingest_job({"job_id": "j1", "status": "done",
+                                      "access_checked_at": now, "relevance_checked_at": now}))
+    stamps = [a for a in sent["args"] if isinstance(a, datetime)]
+    assert len(stamps) == 2 and not any(isinstance(a, str) and a == now for a in sent["args"])

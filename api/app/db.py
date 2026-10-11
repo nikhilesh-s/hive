@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 import re
+from datetime import datetime
 from uuid import UUID
 from urllib.parse import urlencode
 from urllib.error import HTTPError
@@ -650,6 +651,12 @@ async def list_ingest_jobs(limit: int = 20) -> list[dict]:
         return out
 
 
+def _ts(value):
+    """Job timestamps are ISO strings (they reach the browser as JSON); asyncpg
+    needs datetimes for timestamptz columns."""
+    return datetime.fromisoformat(value) if isinstance(value, str) else value
+
+
 async def upsert_ingest_job(job: dict) -> None:
     pool = await get_ingest_pool()
     cols = (
@@ -666,7 +673,7 @@ async def upsert_ingest_job(job: dict) -> None:
             f"INSERT INTO ingest_jobs ({', '.join(cols)}, updated_at) "
             f"VALUES ({', '.join(f'${i}' for i in range(1, len(cols) + 1))}, now()) "
             f"ON CONFLICT (job_id) DO UPDATE SET {sets}, updated_at = now()",
-            *[job.get(c) for c in cols])
+            *[_ts(job.get(c)) if c.endswith("_checked_at") else job.get(c) for c in cols])
 
 
 async def replace_live_rows(doi: str, job_id: str, rows: list[dict],
