@@ -55,9 +55,9 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 | Ticket | What | Pri | Status |
 |---|---|---|---|
 | R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | done 10-11 (36569fa) |
-| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | keys added 10-11; Nik tests Google sign-in |
+| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | keys live; only Nik's Google sign-in test left |
 | R-3 | Deploy web, hosted smoke test | P1 | done 10-11 (web ac85a6e, smoke passed) |
-| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | merged 10-11 (ac85a6e); acceptance check pending |
+| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | done 10-11 (3839ee3) |
 | O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik |
 | O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
 | O-1 | Render paid plan | P2 | Nik decides |
