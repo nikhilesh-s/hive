@@ -644,7 +644,7 @@ async def list_ingest_jobs(limit: int = 20) -> list[dict]:
         out = []
         for r in rows:
             d = dict(r)
-            for k in ("created_at", "updated_at"):
+            for k in ("created_at", "updated_at", "access_checked_at", "relevance_checked_at"):
                 d[k] = d[k].isoformat() if d.get(k) else None
             out.append(d)
         return out
@@ -652,8 +652,14 @@ async def list_ingest_jobs(limit: int = 20) -> list[dict]:
 
 async def upsert_ingest_job(job: dict) -> None:
     pool = await get_ingest_pool()
-    cols = ("job_id", "doi", "status", "message", "pmcid", "paper_id", "title",
-            "candidates", "records", "rows", "backend", "error")
+    cols = (
+        "job_id", "doi", "status", "message", "pmcid", "pmid", "paper_id", "title",
+        "abstract", "authors", "journal", "publication_year", "metadata_source",
+        "discovery_query", "access_status", "access_url", "access_source",
+        "access_checked_at", "relevance_status", "relevance_score",
+        "relevance_reason", "relevance_checked_at",
+        "candidates", "records", "rows", "backend", "error",
+    )
     sets = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols[1:])
     async with pool.acquire() as conn:
         await conn.execute(
