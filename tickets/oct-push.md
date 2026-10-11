@@ -153,3 +153,15 @@ work is on `main` but not deployed: the Vercel web build is from 9-26.
   each open-access PDF in a browser and upload it on the research page. Tanvi then runs
   Q-1 on them.
 - Acceptance: all 8 are in the live tier, or each has a stated reason.
+
+## W-4 · Stop trusting browser-sent paper metadata on `/ingest` — Srushti (Codex) · P2
+- Found in the PR #11 review. The ingest request now accepts title, abstract, authors,
+  journal, pmid, pmcid, `access_*` and `relevance_*` from the browser, with no length
+  limits. `paper_metadata` keeps a browser-sent title or pmcid ahead of OpenAlex/NCBI, and
+  `check_access` trusts the sent pmcid, so a wrong one can make it check the wrong paper.
+  The access and relevance values are recomputed on the server, but they are still accepted.
+- Do: drop `access_*` and `relevance_*` from the request model. Cap the lengths (title 500,
+  abstract 5000, authors 50 × 200, journal 300). Require pmid to be digits and pmcid to match
+  `PMC\d+`. Prefer OpenAlex/NCBI values, using browser values only to fill gaps.
+- Acceptance: tests that an oversize field returns 422, a bad pmcid returns 422, and a
+  browser-sent title is replaced by the OpenAlex title when one exists.

@@ -54,10 +54,10 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 ### Release (Nik + Nik's Claude; these need credentials)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | PR #12 green |
-| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | todo |
-| R-3 | Deploy web, hosted smoke test | P1 | todo (after R-1, R-2) |
-| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | PR #11 updated, needs review |
+| R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | done 10-11 (36569fa) |
+| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | keys added 10-11; Nik tests Google sign-in |
+| R-3 | Deploy web, hosted smoke test | P1 | done 10-11 (web ac85a6e, smoke passed) |
+| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | merged 10-11 (ac85a6e); acceptance check pending |
 | O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik |
 | O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
 | O-1 | Render paid plan | P2 | Nik decides |
@@ -72,7 +72,8 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 | B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | todo |
 | B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | todo |
 | O-8 | Research page gives up on transient 429s | P3 | todo |
-| W-3 | Phone and Safari pass on the hosted site | P2 | after R-3 |
+| W-3 | Phone and Safari pass on the hosted site | P2 | todo (site is deployed) |
+| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo |
 
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |
