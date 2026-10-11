@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
+import { jobFinished } from '@/lib/ingestJob';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -64,7 +65,7 @@ export default function LivePage() {
 
   // Poll the running job every 2 s; stop on a terminal state or when the job can no longer be read.
   useEffect(() => {
-    if (!job || job.status === 'done' || job.status === 'failed') return;
+    if (!job || jobFinished(job.status)) return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       setElapsed(Math.round((Date.now() - started) / 1000));
@@ -188,7 +189,7 @@ export default function LivePage() {
                 <span className="hb-result-chip" style={{ marginLeft: 8 }}>{p.source}</span>
               </div>
               {p.abstract && <p className="hb-live-abstract">{p.abstract.slice(0, 280)}{p.abstract.length > 280 ? '…' : ''}</p>}
-              <button type="button" className="hb-evidence-toggle" disabled={!p.doi || !!(job && job.status !== 'done' && job.status !== 'failed')} onClick={() => p.doi && startIngest(p.doi)}>
+              <button type="button" className="hb-evidence-toggle" disabled={!p.doi || !!(job && !jobFinished(job.status))} onClick={() => p.doi && startIngest(p.doi)}>
                 Extract this paper
               </button>
             </li>
@@ -196,7 +197,7 @@ export default function LivePage() {
         </ul>
         <div className="hb-live-form" style={{ marginTop: 18 }}>
           <input value={doi} onChange={(e) => setDoi(e.target.value)} placeholder="…or paste a DOI: 10.3892/br.2026.2108" aria-label="DOI" />
-          <button type="button" disabled={!doi.trim() || !!(job && job.status !== 'done' && job.status !== 'failed')} onClick={() => startIngest(doi.trim())}>Extract DOI</button>
+          <button type="button" disabled={!doi.trim() || !!(job && !jobFinished(job.status))} onClick={() => startIngest(doi.trim())}>Extract DOI</button>
         </div>
         {startErr && <p className="hb-live-error">{startErr}</p>}
       </section>
