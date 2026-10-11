@@ -64,6 +64,21 @@ class IngestRequest(BaseModel):
     doi: str = Field(min_length=6, max_length=200)
     force: bool = False
     reuse: bool = False   # load this DOI's previous extraction run without calling the model
+    query: str | None = Field(default=None, max_length=300)
+    title: str | None = None
+    abstract: str | None = None
+    authors: list[str] | None = None
+    journal: str | None = None
+    year: str | int | None = None
+    pmid: str | None = None
+    pmcid: str | None = None
+    source: str | None = None
+    access_status: str | None = None
+    access_url: str | None = None
+    access_source: str | None = None
+    relevance_status: str | None = None
+    relevance_score: float | None = None
+    relevance_reason: str | None = None
 
 
 @router.get("/status")
@@ -119,21 +134,39 @@ async def papers_search(body: PaperSearchRequest):
             continue
         seen.add(key)
         deduped.append(r)
-    return {"query": body.query, "results": deduped[: body.limit], "sources_used": used, "errors": errors}
+    try:
+        deduped = ingest.fulltext.annotate_paper_signals(deduped[: body.limit], body.query)
+    except Exception as e:
+        errors["paper_signals"] = f"{type(e).__name__}: {e}"[:200]
+        deduped = deduped[: body.limit]
+    return {"query": body.query, "results": deduped, "sources_used": used, "errors": errors}
 
 
 @router.post("/ingest")
 @limiter.limit("6/minute")
 async def ingest_start(request: Request, body: IngestRequest, background: BackgroundTasks):
-    ok, why = ingest.backend_ready()
     has_prior = (ingest.run_dir_for(ingest.fulltext.normalize_doi(body.doi)) / "supabase_rows.json").exists()
     reuse = body.reuse and has_prior
-    if not ok and not reuse:
-        raise HTTPException(503, why)
-    if not reuse:  # re-opening a finished run costs nothing
+    if not reuse:  # metadata/access checks are cheap; the existing cap still bounds requested extraction jobs
         _spend_daily("extraction", settings.daily_ingest_cap)
+    metadata = {
+        "title": body.title,
+        "abstract": body.abstract,
+        "authors": body.authors,
+        "journal": body.journal,
+        "year": body.year,
+        "pmid": body.pmid,
+        "pmcid": body.pmcid,
+        "source": body.source,
+        "access_status": body.access_status,
+        "access_url": body.access_url,
+        "access_source": body.access_source,
+        "relevance_status": body.relevance_status,
+        "relevance_score": body.relevance_score,
+        "relevance_reason": body.relevance_reason,
+    }
     try:
-        job = ingest.start_job(body.doi, reuse=reuse)
+        job = ingest.start_job(body.doi, reuse=reuse, discovery_query=body.query, metadata=metadata)
     except ValueError:
         raise HTTPException(400, "Not a DOI")
     background.add_task(ingest.run_job, job.job_id)
