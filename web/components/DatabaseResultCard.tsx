@@ -51,6 +51,16 @@ interface DatabaseResult {
   doi?: string | null;
   pmcid?: string | null;
   title?: string | null;
+  paper_flags?: {
+    access_status?: string | null;
+    access_url?: string | null;
+    access_source?: string | null;
+    access_checked_at?: string | null;
+    relevance_status?: string | null;
+    relevance_score?: number | null;
+    relevance_reason?: string | null;
+    relevance_checked_at?: string | null;
+  } | null;
 }
 
 export interface LaneSummary {
@@ -69,6 +79,10 @@ interface DatabaseResultCardProps {
   // reads ONE experiment instead of N near-identical rows. Optional: a card
   // without it renders the single row exactly as before.
   lanes?: LaneSummary[];
+  savedState?: 'checking' | 'saved' | 'unsaved' | 'unavailable';
+  saveBusy?: boolean;
+  saveError?: string | null;
+  onSaveToggle?: () => void;
 }
 
 const MONO = 'var(--font-mono), monospace';
@@ -179,6 +193,19 @@ function Chip({ children }: { children: ReactNode }) {
   return <span className="hb-result-chip">{children}</span>;
 }
 
+const ACCESS_LABELS: Record<string, string> = {
+  open_access: 'Open access',
+  no_open_copy_found: 'Paywalled · Check institutional access',
+  unknown: 'Access unknown',
+};
+
+const RELEVANCE_LABELS: Record<string, string> = {
+  likely_relevant: 'Likely relevant',
+  possibly_relevant: 'Possibly relevant',
+  low_relevance: 'Low relevance',
+  unknown: 'Relevance unknown',
+};
+
 function experimentLabel(blotType?: string | null): string | null {
   if (!blotType) return null;
   if (blotType === 'co_ip') return 'co-IP';
@@ -186,7 +213,15 @@ function experimentLabel(blotType?: string | null): string | null {
   return titleCase(blotType);
 }
 
-export default function DatabaseResultCard({ data, lanes, live = false }: DatabaseResultCardProps) {
+export default function DatabaseResultCard({
+  data,
+  lanes,
+  live = false,
+  savedState,
+  saveBusy = false,
+  saveError,
+  onSaveToggle,
+}: DatabaseResultCardProps) {
   const apiBase = live ? '/api/experimental/record' : '/api/record';
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [cropFailed, setCropFailed] = useState(false);
@@ -263,6 +298,17 @@ export default function DatabaseResultCard({ data, lanes, live = false }: Databa
   const reasons = review && review.label !== 'Supported' ? reviewReasons(data) : [];
   const designTag = deriveDesignTag(lanes, data.treatment_context);
   const sourceId = data.doi || data.paper_id;
+  const accessLabel = data.paper_flags?.access_status
+    ? ACCESS_LABELS[data.paper_flags.access_status] ?? titleCase(data.paper_flags.access_status)
+    : null;
+  const relevanceLabel = data.paper_flags?.relevance_status
+    ? RELEVANCE_LABELS[data.paper_flags.relevance_status] ?? titleCase(data.paper_flags.relevance_status)
+    : null;
+  const saveLabel = saveBusy
+    ? (savedState === 'saved' ? 'Removing…' : 'Saving…')
+    : savedState === 'checking' ? 'Checking…'
+      : savedState === 'unavailable' ? 'Retry status'
+        : savedState === 'saved' ? 'Saved' : 'Save result';
   const indicatorChips = [
     experimentLabel(blotType),
     data.modification_label?.toLowerCase().includes('phospho') ? 'Phospho' : null,
@@ -288,6 +334,18 @@ export default function DatabaseResultCard({ data, lanes, live = false }: Databa
           {live && (
             <div className="hb-live-badge" title="Extracted live by the model + deterministic engine; no human review">
               LIVE · UNREVIEWED
+            </div>
+          )}
+          {(accessLabel || relevanceLabel) && (
+            <div className="hb-paper-flag-row" aria-label="Paper access and relevance">
+              {accessLabel && data.paper_flags?.access_url ? (
+                <a className="hb-paper-flag" href={data.paper_flags.access_url} target="_blank" rel="noreferrer">
+                  {accessLabel}
+                </a>
+              ) : accessLabel ? (
+                <span className="hb-paper-flag">{accessLabel}</span>
+              ) : null}
+              {relevanceLabel && <span className="hb-paper-flag">{relevanceLabel}</span>}
             </div>
           )}
 
@@ -397,16 +455,42 @@ export default function DatabaseResultCard({ data, lanes, live = false }: Databa
               }
             />
           )}
-          <button
-            type="button"
-            className="hb-evidence-toggle"
-            onClick={() => setEvidenceOpen((o) => !o)}
-            aria-expanded={evidenceOpen}
-            aria-controls={`hb-evidence-${data.id}`}
-          >
-            {evidenceOpen ? 'Hide evidence' : 'Evidence & sources'}
-            <span aria-hidden="true">{evidenceOpen ? ' ▴' : ' ▾'}</span>
-          </button>
+          <div className="hb-result-card-actions">
+            {onSaveToggle && !live && (
+              <div className="hb-save-control">
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={savedState === 'saved'}
+                  className={`hb-save-check${savedState === 'saved' ? ' is-saved' : ''}${saveBusy ? ' is-busy' : ''}`}
+                  onClick={() => { if (!saveBusy && savedState !== 'checking') onSaveToggle(); }}
+                  aria-disabled={saveBusy || savedState === 'checking'}
+                  aria-busy={saveBusy}
+                  aria-label={savedState === 'saved' ? `Remove ${headline} from saved experiments` :
+                    savedState === 'unavailable' ? `Retry saved status for ${headline}` : `Save ${headline} experiment`}
+                  title={savedState === 'saved' ? 'Select to remove from Saved' : undefined}
+                >
+                  <span className="hb-save-box" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" focusable="false">
+                      <path className="hb-save-tick" d="M3.6 8.4 6.7 11.4 12.4 5" />
+                    </svg>
+                  </span>
+                  <span className="hb-save-label" key={saveLabel}>{saveLabel}</span>
+                </button>
+                {saveError && <span className="hb-save-error" role="status">{saveError}</span>}
+              </div>
+            )}
+            <button
+              type="button"
+              className="hb-evidence-toggle"
+              onClick={() => setEvidenceOpen((o) => !o)}
+              aria-expanded={evidenceOpen}
+              aria-controls={`hb-evidence-${data.id}`}
+            >
+              {evidenceOpen ? 'Hide evidence' : 'Evidence & sources'}
+              <span aria-hidden="true">{evidenceOpen ? ' ▴' : ' ▾'}</span>
+            </button>
+          </div>
         </section>
       </div>
       {evidenceOpen && (

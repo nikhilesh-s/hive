@@ -7,6 +7,218 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Live Reviewed-Corpus Statistics (2026-10-02)
+
+Branch: `feature/saved-results`. Previous commit: `c4bea0b`; this entry is
+committed with the implementation (resolve its SHA with
+`git log -1 --format=%H -- HANDOFF.md`).
+
+Search and About now load reviewed-paper, experiment-group, and evidence-row
+totals from the API rather than displaying hard-coded corpus sizes. The API
+uses the same experiment identity helper as search, pages through REST results
+when configured for Supabase, and caches the computed totals for 60 seconds.
+Failures are shown as unavailable/loading states rather than substituting stale
+or invented counts. The About copy now accurately distinguishes selected
+papers from the reviewed corpus.
+
+Verification: API 237 passed / 15 skipped; biological checks 165/165,
+reconciliation 21/21, enrichment 18/18, extraction 10/10, pipeline 13/13;
+seed benchmark 34/34. Web lint, TypeScript check, production build, and
+`git diff --check` passed.
+
+Not deployed. Exact next task: verify the live totals on Search and About
+against the configured API, then continue the pending manual Saved Results
+Google-account verification documented below. The uncommitted
+`api/.env.example` edits are unrelated and were not included.
+
+## Authenticated Saved Results (2026-10-02)
+
+Branch: `feature/saved-results`. Base/latest commit before this task: `ee0ed15`.
+This entry is committed with the implementation; resolve that commit with
+`git log -1 --format=%H -- HANDOFF.md`.
+
+Saved Results now uses the verified Supabase `user.id` for account saves and
+the existing `hiveblot_session` localStorage ID for anonymous saves. Next.js
+Saved Results handlers call the existing server client's `auth.getUser()` and
+assert `X-Hive-User-Id` only over the internal-key-protected API. Browser-supplied
+owner IDs/headers and emails never determine account ownership. Verification
+errors fail closed. All status/save/list/unsave paths share the same scope in
+both REST and direct Postgres: user UUID for accounts; session ID AND user_id
+IS NULL for anonymous. New account rows have no session ID. Search/Saved reload
+on account changes and responses are private/no-store. Google auth was not
+redesigned; experiment grouping and all lane keys remain unchanged.
+
+No anonymous-to-account merge is implemented. A separate claim feature needs
+explicit consent, proof of the anonymous session, verified account identity,
+transactional deduplication of all lane keys, and deletion only after success.
+The current localStorage session is a bearer identifier, not strong ownership
+proof. See `web/AUTH.md` for the trust boundary and deployment order.
+
+Supabase inspected: saved_results already has nullable session_id/user_id,
+auth.users foreign key, unique owner/key indexes, and RLS enabled. Browser
+roles have no direct grants. No schema change is required for the tested
+server-only REST path. Existing migration 008 grants/policies for hive_feedback
+are still absent on this project: apply it before a deployment that uses
+DB_FEEDBACK_URL. No new broad browser RLS policies should be added.
+
+Verification: API 237 passed / 15 skipped (including DB-dependent tests);
+web redirect/ownership tests 7 passed; lint, typecheck, production build and
+diff check passed. Biology 165/165, reconciliation 21/21, enrichment 18/18,
+extraction 10/10, pipeline 13/13; seed benchmark 34/34.
+Live `web/tests/saved-results.smoke.mjs` passed through local Next.js -> API ->
+Supabase with temporary real Supabase sessions: anonymous save/refresh/unsave,
+six-lane account save/idempotency/status/list, one regrouped card, independent
+second-device session, sign-out/sign-in persistence, two-account isolation,
+and owner-scoped unsave. Reviewed scientific table contents were identical
+before/after. Temporary accounts and saves removed; independent DB counts
+confirmed zero remaining test users/saves. Saved page HTTP 200 and grouping
+verified; interactive Google login/browser visual behavior was not automated.
+
+Next: manually verify Save/Unsave on Search and Saved with the working Google
+account at localhost:3000, including sign-out while viewing Saved. Deploy API
+before web; production deployment not performed. The paper access/relevance
+population gap is unrelated and remains open. User's api/.env.example edits
+are unrelated and excluded from this commit. Local API remains on port 8000
+and web on port 3000.
+
+## Google OAuth Implementation (2026-10-02)
+
+Branch: `feature/saved-results`. Previous commit: `5053e65`; the commit containing
+this entry implements Google OAuth (resolve its SHA with `git log -1`).
+Frontend now has Supabase browser/server clients (`web/lib/supabase/`), a
+PKCE `/auth/callback` route with internal-only `next`, `/auth/error`, session
+refresh in the existing proxy, and navigation login/email/sign-out controls.
+Packages: `@supabase/ssr` 0.12.7 and `@supabase/supabase-js` 2.117.2.
+Saved Results, Search History, anonymous session IDs, API code, and scientific
+tables were not changed. Existing experimental beta access gate is preserved.
+
+Verified: lint/typecheck/build clean; 2 redirect tests passed; biological
+checks 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
+pipeline 13/13; seed benchmark 34/34. Existing localhost:3001 server responds
+200; missing-code callback responds 307 to `/auth/error`, rejecting an external
+next. Browser automation tooling was unavailable in this session.
+
+Blocker / exact next task: add `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to `web/.env` and Vercel. No public
+Supabase auth variables were present in web/.env at implementation time.
+Allow localhost:3001 and production `/auth/callback` URLs in Supabase.
+Then test with an allowed Google user: login, callback, refresh persistence,
+Authentication Users entry, and sign-out. None of those authenticated steps
+or production deployment was verified. See `web/AUTH.md` for the setup.
+Dependency audit also reports existing Next.js/transitive advisories; dependency
+upgrades beyond adding Supabase were not part of this task.
+
+## Saved Results Details (2026-10-01)
+
+Saved Results is implemented on branch `feature/saved-results` using the existing
+Next.js -> FastAPI -> Supabase/Postgres pattern. It reuses the same anonymous
+browser session ID as Search History (`hiveblot_session` in localStorage); no
+second saved-user cookie or auth identity is used. Result cards save at lane
+row grain: saving one grouped experiment inserts one `saved_results` row per
+underlying `western_blot_records` lane, and unsaving deletes all of that card's
+stable row keys for the current session only. `/saved` loads saved lane rows,
+runs the existing `groupResults()` helper, and renders the same
+`DatabaseResultCard` component as Search.
+
+Backend routes added:
+- `POST /saved-results/status` batched by `session_id` + `stable_row_keys`
+- `POST /saved-results` validates every `(record_id, stable_row_key)` pair
+  against `western_blot_records`, then inserts idempotently
+- `DELETE /saved-results` deletes only the current session's supplied row keys
+- `GET /saved-results?session_id=...` returns `WesternBlotRecord[]` rows with
+  optional `saved_at`
+
+Migration 008 now assumes `public.saved_results` already exists with
+`session_id`, `record_id`, `stable_row_key`, and `saved_at`; it grants
+`SELECT/INSERT/DELETE` plus sequence access to `hive_feedback` and adds
+`hive_feedback_*_saved_results` RLS policies. Do not revert this to the older
+`owner_id/experiment_key/identity` design.
+
+Verification after this implementation:
+- `cd api && ../.venv/bin/python -m pytest`: 220 passed / 15 skipped
+- `cd web && npm run lint`: clean
+- `cd web && npx tsc --noEmit`: clean
+- `cd web && npm run build`: clean
+
+Known follow-up: apply migration 008 to the linked Supabase project before
+deploying this branch; otherwise saved-results endpoints will fail when the
+`hive_feedback` role lacks access to `public.saved_results`.
+
+Local dev note: when `DB_FEEDBACK_URL` is blank but `SUPABASE_URL` and
+`SUPABASE_API_KEY` are present, saved-results now uses the Supabase REST API for
+status/save/unsave/list. This keeps the search card saved button working in the
+local setup without falling back to any local database.
+
+**2026-10-01 follow-up:** migration 009 fixes Supabase REST save upserts by
+replacing the partial `saved_results_unique_session_record` index with a normal
+unique index on `(session_id, stable_row_key)`. This is required because
+PostgREST cannot use a partial unique index for
+`on_conflict=session_id,stable_row_key` and otherwise returns PostgreSQL 42P10.
+The local CLI is not linked/authenticated (`SUPABASE_ACCESS_TOKEN` missing), so
+apply `20261001000009_saved_results_upsert_index.sql` before hosted Save smoke.
+The local REST fallback now avoids that upsert path by checking existing saved
+keys and inserting only missing `saved_results` rows, so local Save works before
+migration 009 is applied. Smoke with the STAT3 Tyr705 six-lane card returned
+200 for first save, duplicate save, and unsave.
+`/saved` REST listing also handles `saved_at` strings returned by Supabase REST
+instead of assuming asyncpg datetime objects; the saved page now returns 200 for
+the same six-lane STAT3 Tyr705 browser session.
+
+## B-9 Search NL-to-SQL Removal (2026-10-01)
+
+B-9 is closed on `feature/saved-results`: the stale `api/app/nlp.py` OpenAI
+natural-language-to-SQL path was deleted, and `api/app/search_service.py` now
+always uses the deterministic HiveBlot `api/app/bio_query.py` generator before
+`sql_guard.py`. This was intentional because `bio_query.py` already encodes the
+HiveBlot search concepts we support, is testable/inspectable, and stays aligned
+with the current Evidence Record schema. Normal search no longer changes
+behavior just because `OPENAI_KEY` is present. OpenAI-compatible extraction is a
+separate path controlled by `WBM_LLM_BACKEND`, not normal search.
+
+## Outreach Attribution (2026-10-01)
+
+Outreach attribution is implemented for the live migration
+`20261001231317_add_outreach_attribution_to_activity_tables.sql`, which added
+nullable `lab_tag` and `utm_source` columns to `search_history` and
+`hiveblot_feedback` only. The web client captures `?lab=...` and
+`?utm_source=...`, validates them, stores them in localStorage, and attaches
+them to search-history and feedback writes. `lab_tag` accepts
+`^[a-z0-9_]{1,40}$`; `utm_source` accepts alphanumeric plus `_`, `-`, and `.`
+up to 80 chars. Invalid values are nulled/ignored server-side. These tags are
+outreach attribution only, not auth or ownership, and `western_blot_records`
+is untouched.
+
+## Paper Access / Relevance Flags (2026-10-02)
+
+The main reviewed-corpus Results page now shows paper-level access and
+relevance badges when matching metadata exists in `public.ingest_jobs`. The
+bug was architectural: PR #11-style paper metadata was only present on the
+paper/research discovery surface and/or another branch, while the normal
+`/search` response still returned only `western_blot_records` fields to
+`DatabaseResultCard`.
+
+Fix on `feature/saved-results`:
+- Added migration 011 / Supabase migration
+  `20261002000011_ingest_jobs_paper_access_relevance.sql` for nullable
+  `ingest_jobs` metadata, access, and relevance columns plus DOI/query indexes.
+- Added reviewed-search enrichment that joins by
+  `western_blot_records.doi -> ingest_jobs.doi` without modifying either
+  `western_blot_records` or `western_blot_records_live`.
+- Access badges are DOI-level: `open_access`, `no_open_copy_found`, `unknown`.
+- Relevance badges are query-dependent and only attach when the
+  `ingest_jobs.discovery_query` matches the current search after simple
+  whitespace/case normalization, so relevance from another query is not shown.
+- `DatabaseResultCard` renders these as paper-level badges separate from the
+  scientific `Supported` / review badge. If no ingest job matches, no paper
+  badge is shown.
+
+Verification:
+- `cd api && ../.venv/bin/python -m pytest`: 228 passed / 15 skipped
+- `cd web && npm run lint`: clean
+- `cd web && npx tsc --noEmit`: clean
+- `cd web && npm run build`: clean
+- `git diff --check`: clean
+
 ## Search History (2026-09-25)
 
 Search History is implemented on `main` via the existing Next.js -> FastAPI ->
@@ -14,8 +226,8 @@ Supabase architecture. It includes migration 007, session-scoped persistence,
 normalized deduplication, `/history`, rerun links through `/search?q=...`,
 individual deletion, clear-all confirmation, and loading/error/empty states.
 Authentication is not implemented, so ownership is browser-session scoped via
-the existing anonymous localStorage session ID; Saved Results remains a
-separate, unimplemented feature specified in Ticket C.
+the existing anonymous localStorage session ID. Saved Results now reuses that
+same session ID (see the 2026-10-01 section above).
 
 **2026-09-24:** team summary lives in [`TEAM_HANDOFF.md`](TEAM_HANDOFF.md).
 Branch layout changed (see there): `main`, `release/hosted`, `outreach/oct20`, old branches as `archive/*` tags.
@@ -423,7 +635,8 @@ Architecture: `research/DEMO_DAY_ARCHITECTURE.md`. Latest commit: `git log -1`.
   allowed; never `--bare`). Proven on real calls: text 6 s; the image path
   read the reviewed STAT3 crop correctly. Extraction and paper QA share one
   provider abstraction (`llm_client.complete_text`, `backend_status`).
-  `OPENAI_KEY` is optional; the OpenAI generator is lazy.
+  `OPENAI_KEY` is optional for this experimental backend family only; normal
+  search no longer uses the deleted OpenAI NL→SQL path.
 - **Open-access acquisition** fixed: Europe PMC's own PDF render (retry /
   backoff) → listed URL → legacy → Unpaywall (real `UNPAYWALL_EMAIL` only).
   Discovery annotates `oa_pdf`; the UI refuses papers without a PDF.
@@ -1432,7 +1645,7 @@ demo-blocking runtime failure justifies a change before UCSF. No P2 polish.
   HiveBlot frontend. Stood up an **embedded local Postgres** (`scripts/local_db.py`,
   pgserver — no cloud creds needed) with schema + migration 001 + **452 rows from
   3 real papers**; added a **deterministic biological SQL generator**
-  (`api/app/bio_query.py`) for the no-OPENAI_KEY path; fixed a latent sql_guard
+  (`api/app/bio_query.py`; now the normal search path); fixed a latent sql_guard
   bug (AND/OR rejected with sqlglot≥30); made the Supabase client lazy; processed
   papers 2+3 (mouse standard PMC9559174, co-IP PMC12706926) agent-in-the-loop;
   threaded **organism into UniProt** (mouse accessions correct); fixed 4 more
@@ -1661,12 +1874,12 @@ travels with each field; a disputed modification keeps its residue **unsettled**
   still need real Supabase. **Cloud Supabase remains a user action for the hosted
   beta**: create the project, run schema+migration, load `eval/demo/*/supabase_rows.json`,
   fill `SUPABASE_URL`/`SUPABASE_KEY`/`DB_READONLY_URL`.
-- **NOTE — /search SQL generation without OpenAI**: with `OPENAI_KEY` empty, /search
-  uses the deterministic biological parser (`api/app/bio_query.py`) — protein,
+- **NOTE — /search SQL generation**: /search uses the deterministic biological
+  parser (`api/app/bio_query.py`) — protein,
   phospho-site (Tyr705/S473), vendor+catalog, co-IP, loading-control, needs-review,
-  cell-line terms — through the same `sql_guard` + read-only role. With a key set, the
-  legacy OpenAI NL→SQL path is unchanged (bio parser is the fallback on its failure only
-  when no key; generation errors still 502).
+  cell-line terms — through the same `sql_guard` + read-only role. The legacy
+  OpenAI NL→SQL branch was removed for B-9 because its prompt described an older
+  schema and `bio_query.py` is the supported HiveBlot search generator.
 
 ## Immediate Next Task
 ~~Provenance detail endpoint + researcher feedback system + evidence UI~~ — **DONE (session 4)**.
@@ -1755,7 +1968,7 @@ outstanding deployment step is the Render API redeploy (Nik).
 | `migrations/001_evidence_record.sql` | Additive Evidence Record columns (+ rollback). |
 | `eval/score.py`, `eval/cases.json`, `eval/gold.json` | Biological benchmark (seed gold). |
 | `api/app/` | FastAPI backend (routers, sql_guard, auth, search_service). |
-| `api/app/bio_query.py` | Deterministic biological query→SQL (no-OPENAI_KEY path; same guard). |
+| `api/app/bio_query.py` | Deterministic biological query→SQL for normal search (same guard). |
 | `scripts/local_db.py` | Embedded local Postgres (pgserver): up / load / status / stop. |
 | `eval/tools/` | Agent-in-the-loop harness + per-paper observation builders. |
 | `eval/demo/` | 3 real papers: Evidence Records + Supabase rows + observations + READMEs. |

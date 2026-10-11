@@ -5,12 +5,16 @@ Free to change shape as the frontend's needs change.
 """
 
 import logging
+import re
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi import Path as PathParam
 
 from ..auth import require_internal_key
 from ..config import settings
+from ..corpus_stats import CorpusStats, get_corpus_stats
+from ..crops import resolve_reviewed_crop
 from ..db import (
     clear_search_history,
     delete_search_history,
@@ -19,6 +23,11 @@ from ..db import (
     insert_feedback,
     list_search_history,
     search_targets,
+    list_saved_result_records,
+    remove_saved_result_records,
+    save_result_records,
+    saved_results_configured,
+    saved_results_status,
     upsert_search_history,
 )
 from ..limiter import limiter
@@ -35,12 +44,35 @@ from ..schemas import (
     SearchHistoryItem,
     SearchHistoryResponse,
     SearchHistorySubmission,
+    SavedStatusRequest,
+    SavedStatusResponse,
+    SaveResultsRequest,
+    SaveResultsResponse,
+    UnsaveResultsRequest,
+    WesternBlotRecord,
 )
 from ..search_service import execute_search
 
 logger = logging.getLogger("hive.api")
 
 router = APIRouter()
+
+LAB_TAG_RE = re.compile(r"^[a-z0-9_]{1,40}$")
+UTM_VALUE_RE = re.compile(r"^[A-Za-z0-9_.-]{1,80}$")
+
+
+def _clean_lab_tag(value: str | None) -> str | None:
+    if value is None:
+        return None
+    value = value.strip()
+    return value if LAB_TAG_RE.fullmatch(value) else None
+
+
+def _clean_utm_value(value: str | None) -> str | None:
+    if value is None:
+        return None
+    value = value.strip()
+    return value if UTM_VALUE_RE.fullmatch(value) else None
 
 
 @router.get("/health")
@@ -61,6 +93,15 @@ def index():
         "search": "POST /search (internal, INTERNAL_API_KEY)",
         "agent_search": "POST /v1/search (AGENT_API_KEYS)",
     }
+
+
+@router.get("/corpus-stats", response_model=CorpusStats, dependencies=[Depends(require_internal_key)])
+async def corpus_stats():
+    try:
+        return await get_corpus_stats()
+    except Exception as e:
+        logger.exception("reviewed corpus stats lookup failed")
+        raise HTTPException(503, "Corpus statistics are temporarily unavailable") from e
 
 
 @router.get("/proteins", response_model=ProteinSearchResponse, dependencies=[Depends(require_internal_key)])
@@ -112,8 +153,6 @@ async def record_crop(record_id: int = PathParam(ge=1, le=2**63 - 1)):
     arbitrary files. 404 (not 500) when the file isn't present: deployments
     without the crop archive degrade to the text-only evidence panel.
     """
-    from pathlib import Path
-
     from fastapi.responses import FileResponse
 
     try:
@@ -123,13 +162,8 @@ async def record_crop(record_id: int = PathParam(ge=1, le=2**63 - 1)):
         raise HTTPException(500, "Record lookup failed") from e
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")
-    base = Path(settings.crop_base_dir).resolve()
-    try:
-        crop = Path(str(row["image_crop_ref"])).resolve()
-        crop.relative_to(base)  # raises ValueError if outside the allowed dir
-    except ValueError:
-        raise HTTPException(404, "Crop path not servable")
-    if crop.suffix.lower() != ".png" or not crop.is_file():
+    crop = resolve_reviewed_crop(row["image_crop_ref"])
+    if crop is None:
         raise HTTPException(404, "Crop file not available")
     return FileResponse(crop, media_type="image/png")
 
@@ -205,6 +239,8 @@ async def submit_feedback(request: Request, body: FeedbackSubmission):
         "comment": body.comment,
         "ui_location": body.ui_location,
         "session_id": body.session_id,
+        "lab_tag": _clean_lab_tag(body.lab_tag),
+        "utm_source": _clean_utm_value(body.utm_source),
         "contact": body.contact,
     }
     try:
@@ -255,7 +291,14 @@ async def record_search_history(request: Request, body: SearchHistorySubmission)
     query = body.query.strip()
     normalized_query = " ".join(query.split())
     try:
-        row = await upsert_search_history(session_id, query, normalized_query, body.filters)
+        row = await upsert_search_history(
+            session_id,
+            query,
+            normalized_query,
+            body.filters,
+            lab_tag=_clean_lab_tag(body.lab_tag),
+            utm_source=_clean_utm_value(body.utm_source),
+        )
     except Exception as e:
         logger.exception("history insert failed")
         raise HTTPException(500, "Failed to store search history") from e
@@ -289,3 +332,101 @@ async def remove_all_search_history(
         logger.exception("history clear failed")
         raise HTTPException(500, "Failed to clear history") from e
     return {"deleted": deleted}
+
+
+def _saved_owner(session_id: str | None, user_id: UUID | None) -> str | UUID:
+    # X-Hive-User-Id is asserted by Next.js after getUser(), never forwarded
+    # from the browser. Every caller must also pass require_internal_key.
+    if user_id is not None:
+        return user_id
+    if session_id is None:
+        raise HTTPException(400, "Anonymous saved results require session_id")
+    return _history_session_id(session_id)
+
+
+def _validated_stable_keys(keys: list[str]) -> list[str]:
+    out = []
+    for key in keys:
+        value = key.strip()
+        if not value:
+            raise HTTPException(400, "stable_row_keys cannot contain blanks")
+        out.append(value)
+    return list(dict.fromkeys(out))
+
+
+@router.post("/saved-results/status", response_model=SavedStatusResponse,
+             dependencies=[Depends(require_internal_key)])
+async def get_saved_results_status(body: SavedStatusRequest, x_hive_user_id: UUID | None = Header(default=None)):
+    if not saved_results_configured():
+        raise HTTPException(503, "Saved results storage is not configured")
+    owner = _saved_owner(body.session_id, x_hive_user_id)
+    keys = _validated_stable_keys(body.stable_row_keys)
+    try:
+        saved = await saved_results_status(owner, keys)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved status lookup failed")
+        raise HTTPException(500, "Saved status lookup failed") from e
+    return SavedStatusResponse(saved_keys=sorted(saved))
+
+
+@router.post("/saved-results", response_model=SaveResultsResponse,
+             dependencies=[Depends(require_internal_key)])
+async def add_saved_results(body: SaveResultsRequest, x_hive_user_id: UUID | None = Header(default=None)):
+    if not saved_results_configured():
+        raise HTTPException(503, "Saved results storage is not configured")
+    owner = _saved_owner(body.session_id, x_hive_user_id)
+    records = [
+        {"record_id": item.record_id, "stable_row_key": item.stable_row_key.strip()}
+        for item in body.records
+    ]
+    keys = _validated_stable_keys([item["stable_row_key"] for item in records])
+    try:
+        saved_keys = await save_result_records(owner, records)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results insert failed")
+        raise HTTPException(500, "Failed to save results") from e
+    return SaveResultsResponse(saved=True, saved_keys=sorted(set(saved_keys or keys)))
+
+
+@router.delete("/saved-results", dependencies=[Depends(require_internal_key)])
+async def discard_saved_results(body: UnsaveResultsRequest, x_hive_user_id: UUID | None = Header(default=None)):
+    if not saved_results_configured():
+        raise HTTPException(503, "Saved results storage is not configured")
+    owner = _saved_owner(body.session_id, x_hive_user_id)
+    keys = _validated_stable_keys(body.stable_row_keys)
+    try:
+        await remove_saved_result_records(owner, keys)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results removal failed")
+        raise HTTPException(500, "Failed to remove saved results") from e
+    return {"saved": False}
+
+
+@router.get("/saved-results", response_model=list[WesternBlotRecord],
+            dependencies=[Depends(require_internal_key)])
+async def get_saved_results(
+    session_id: str | None = Query(default=None, min_length=1, max_length=128),
+    x_hive_user_id: UUID | None = Header(default=None),
+):
+    if not saved_results_configured():
+        raise HTTPException(503, "Saved results storage is not configured")
+    try:
+        rows = await list_saved_result_records(_saved_owner(session_id, x_hive_user_id))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("saved results listing failed")
+        raise HTTPException(500, "Saved results could not be loaded") from e
+    for row in rows:
+        saved_at = row.get("saved_at")
+        if hasattr(saved_at, "isoformat"):
+            row["saved_at"] = saved_at.isoformat()
+    return rows

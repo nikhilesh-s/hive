@@ -1,4 +1,4 @@
-"""Database access matrix for the application tables (migration 007).
+"""Database access matrix for the application tables (migration 008).
 
 Runs the canonical SQL chain (base schema -> 001 -> 002 -> 003 -> 004) on a
 scratch Postgres and then checks, role by role, what each one can do. This is
@@ -38,6 +38,7 @@ CHAIN = [
     "migrations/005_experimental_live_tables.sql",   # EXPERIMENTAL live tier
     "migrations/006_feedback_contact.sql",           # F-5 opt-in contact column
     "migrations/007_search_history.sql",
+    "migrations/008_saved_results.sql",
 ]
 LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
             "VALUES ('live-paper', 'STAT3', 'job1')")
@@ -63,6 +64,7 @@ async def _apply_chain(conn):
         await conn.execute(f"DROP TABLE IF EXISTS {t} CASCADE")
     await conn.execute("DROP TABLE IF EXISTS hiveblot_feedback CASCADE")
     await conn.execute("DROP TABLE IF EXISTS search_history CASCADE")
+    await conn.execute("DROP TABLE IF EXISTS saved_results CASCADE")
     await conn.execute("DROP TABLE IF EXISTS western_blot_records CASCADE")
     for rel in CHAIN:
         sql = (REPO / rel).read_text()
@@ -129,9 +131,10 @@ def run(conn, coro):
 def test_rls_enabled_on_both_tables(conn):
     rows = run(conn, conn.fetch(
         "SELECT relname, relrowsecurity FROM pg_class WHERE relname IN "
-        "('western_blot_records', 'hiveblot_feedback', 'search_history')"))
+        "('western_blot_records', 'hiveblot_feedback', 'search_history', 'saved_results')"))
     assert {r["relname"]: r["relrowsecurity"] for r in rows} == {
-        "western_blot_records": True, "hiveblot_feedback": True, "search_history": True}
+        "western_blot_records": True, "hiveblot_feedback": True, "search_history": True,
+        "saved_results": True}
 
 
 def test_policies_target_explicit_roles(conn):
@@ -159,6 +162,8 @@ def test_public_client_roles_have_no_access(conn, role):
     assert run(conn, _as_role(conn, role, "DELETE FROM hiveblot_feedback")) == denied
     assert run(conn, _as_role(conn, role, "SELECT * FROM search_history")) == denied
     assert run(conn, _as_role(conn, role, "DELETE FROM search_history")) == denied
+    assert run(conn, _as_role(conn, role, "SELECT * FROM saved_results")) == denied
+    assert run(conn, _as_role(conn, role, "DELETE FROM saved_results")) == denied
 
 
 def test_public_client_roles_get_no_future_tables(conn):
@@ -207,6 +212,41 @@ def test_hive_feedback_owns_search_history_access(conn):
     assert run(conn, _as_role(conn, "hive_feedback",
                "DELETE FROM search_history WHERE session_id='session-a'")) == "ok"
     assert run(conn, _as_role(conn, "hive_feedback", "SELECT * FROM western_blot_records")) == "42501"
+
+
+def test_hive_feedback_owns_saved_results_access(conn):
+    async def exercise():
+        record = await conn.fetchrow(
+            "SELECT id, stable_row_key FROM western_blot_records "
+            "WHERE stable_row_key IS NOT NULL LIMIT 1")
+        if record is None:
+            pytest.skip("fixture has no stable_row_key rows")
+        tr = conn.transaction()
+        await tr.start()
+        try:
+            await conn.execute("SET LOCAL ROLE hive_feedback")
+            await conn.execute(
+                "INSERT INTO saved_results (session_id, record_id, stable_row_key) "
+                "VALUES ('session-a', $1, $2) ON CONFLICT DO NOTHING",
+                record["id"], record["stable_row_key"])
+            await conn.execute(
+                "INSERT INTO saved_results (session_id, record_id, stable_row_key) "
+                "VALUES ('session-a', $1, $2) ON CONFLICT DO NOTHING",
+                record["id"], record["stable_row_key"])
+            assert await conn.fetchval("SELECT count(*) FROM saved_results") == 1
+            await conn.execute(
+                "DELETE FROM saved_results WHERE session_id = 'session-a' "
+                "AND stable_row_key = $1", record["stable_row_key"])
+            assert await conn.fetchval("SELECT count(*) FROM saved_results") == 0
+        finally:
+            await tr.rollback()
+
+    run(conn, exercise())
+
+
+def test_saved_results_grants_do_not_expand_feedback_access(conn):
+    assert run(conn, _as_role(conn, "hive_feedback", "SELECT * FROM western_blot_records")) == "42501"
+    assert run(conn, _as_role(conn, "hive_feedback", "SELECT * FROM saved_results")) == "ok"
 
 
 def test_live_tier_matrix(conn):

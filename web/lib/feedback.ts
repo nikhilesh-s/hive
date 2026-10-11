@@ -1,5 +1,6 @@
 // Client helpers for the researcher-feedback system (beta).
 // Anonymous session id only — no login, no PII.
+import { getAttribution } from '@/lib/attribution';
 
 export interface FeedbackPayload {
   feedback_scope: 'field' | 'record' | 'missing_field' | 'search' | 'ui';
@@ -34,7 +35,7 @@ export async function submitFeedback(payload: FeedbackPayload): Promise<boolean>
     const resp = await fetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...payload, session_id: sessionId() }),
+      body: JSON.stringify({ ...payload, ...getAttribution(), session_id: sessionId() }),
     });
     return resp.ok;
   } catch {

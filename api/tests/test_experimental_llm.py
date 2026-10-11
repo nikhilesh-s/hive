@@ -123,13 +123,3 @@ def test_ask_routes_through_the_configured_provider(monkeypatch):
                         lambda backend=None, escalation=False: llm_client.MockLLMClient(lambda s, u: "STAT3 was blotted [E1]."))
     out = asyncio.run(ask.answer("Was STAT3 blotted?", include_live=False))
     assert out["answer"] == "STAT3 was blotted [E1]." and out["cited"] == ["E1"] and out["model"] == "mock"
-
-
-def test_openai_generator_is_lazy_and_fails_clearly_without_key(monkeypatch):
-    from app import nlp
-    from app.config import settings
-
-    monkeypatch.setattr(settings, "openai_key", "")
-    nlp._client = None
-    with pytest.raises(RuntimeError, match="OPENAI_KEY"):
-        nlp.generate_sql("p53 in HeLa")

@@ -24,6 +24,18 @@ export interface DatabaseResult {
   cell_line?: string | null;
   modification_label?: string | null;
   stable_row_key?: string | null;
+  experiment_key?: string | null;
+  saved_at?: string | null;
+  paper_flags?: {
+    access_status?: string | null;
+    access_url?: string | null;
+    access_source?: string | null;
+    access_checked_at?: string | null;
+    relevance_status?: string | null;
+    relevance_score?: number | null;
+    relevance_reason?: string | null;
+    relevance_checked_at?: string | null;
+  } | null;
   review_tier?: string | null;
   job_id?: string | null;
 }
@@ -31,21 +43,28 @@ export interface DatabaseResult {
 export interface ResultGroup {
   first: DatabaseResult;
   lanes: LaneSummary[];
+  sourceRows: DatabaseResult[];
 }
 
 export function groupResults(rows: DatabaseResult[]): ResultGroup[] {
   const groups = new Map<string, ResultGroup>();
   for (const r of rows) {
-    const key = r.stable_row_key
-      ? r.stable_row_key.split(':')[0]
-      : [r.paper_id, r.image_crop_ref ?? `p${r.page}`, r.target, r.experiment_type ?? '', r.cell_line ?? r.sample ?? '', r.modification_label ?? ''].join('|');
+    const key = r.experiment_key || (
+      r.stable_row_key
+        ? r.stable_row_key.split(':')[0]
+        : [r.paper_id, r.image_crop_ref ?? `p${r.page}`, r.target, r.experiment_type ?? '', r.cell_line ?? r.sample ?? '', r.modification_label ?? ''].join('|')
+    );
     const lane: LaneSummary = {
       condition: r.lane_condition ?? r.condition ?? null,
       band_state: r.band_state ?? (r.band_detected == null ? null : r.band_detected ? 'present' : 'absent'),
     };
     const g = groups.get(key);
-    if (g) g.lanes.push(lane);
-    else groups.set(key, { first: r, lanes: [lane] });
+    if (g) {
+      g.lanes.push(lane);
+      g.sourceRows.push(r);
+    } else {
+      groups.set(key, { first: r, lanes: [lane], sourceRows: [r] });
+    }
   }
   return [...groups.values()];
 }

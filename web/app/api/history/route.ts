@@ -48,6 +48,8 @@ export async function POST(request: NextRequest) {
         session_id: raw.session_id,
         query: raw.query,
         filters: raw.filters && typeof raw.filters === 'object' ? raw.filters : {},
+        lab_tag: typeof raw.lab_tag === 'string' ? raw.lab_tag : null,
+        utm_source: typeof raw.utm_source === 'string' ? raw.utm_source : null,
       }),
     });
     const data = await response.json().catch(() => ({}));
