@@ -7,6 +7,39 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Release of Srushti's Oct 1-3 work, PR #11, ticket board (2026-10-11)
+
+- **Released.** Main and `release/hosted` are at `ac85a6e`. Render (API) and Vercel (web) both
+  run it.
+  - PR #12 fixed the red main CI: the web lockfile was out of sync, and migration 008 now
+    creates `saved_results`. It also lined up the Supabase CLI history with the remote.
+  - `supabase db push` applied `20261011000008/9/11`. `hive_feedback` now has
+    SELECT/INSERT/DELETE plus policies on `saved_results`, and migration history shows no
+    drift.
+  - Vercel production now has `NEXT_PUBLIC_SUPABASE_URL` and
+    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Supabase Auth already allowed the prod
+    `/auth/callback`, and Google sign-in is enabled.
+  - Hosted smoke test passed: search and live counts; anonymous save, then `/saved` shows
+    it, then remove; `?lab=smoke_test` reaches `search_history.lab_tag` (row deleted); the
+    access gate; `/auth/callback` without a code redirects to `/auth/error`.
+  - Not verified: Google sign-in with a real account (Nik, R-2). The first request after
+    idle still returns 503 for about 30 s while free-tier Render wakes up (O-1).
+- **PR #11** (Srushti, metadata-first ingestion) merged and deployed.
+  - The research page shows access and relevance badges.
+  - A paywalled paper's job (10.1007/s11033-011-0734-1) ended `awaiting_full_text` in
+    2 s, with the institutional-access link.
+  - The review found browser-sent metadata trusted too far; that is ticket W-4.
+  - The deploy check found every paper button stayed disabled after `awaiting_full_text`.
+    PR #15 fixes it on both research and live.
+  - The open-access extraction run is still to do (R-4).
+- **Ticket board:** `tickets/README.md` is the single board, with owners (Srushti + Codex,
+  Yashvi + Claude, Tanvi bio QA, Nik release) and the rules agents follow. New tickets are
+  in `tickets/oct-push.md`; team updates go in `tickets/team-log.md`.
+- **Outreach:** wave 1 was 27 emails (Yashvi 9-30, Tanvi 10-05), with 0 replies and almost
+  no visits.
+- **Exact next task:** merge PR #15 and redeploy web, then run one open-access extraction to
+  close R-4. Nik tests Google sign-in (R-2).
+
 ## Live Reviewed-Corpus Statistics (2026-10-02)
 
 Branch: `feature/saved-results`. Previous commit: `c4bea0b`; this entry is
