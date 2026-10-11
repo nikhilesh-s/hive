@@ -7,6 +7,36 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Review of Srushti's Oct 1-3 work, CI fix, ticket board (2026-10-11)
+
+Branch: `tickets/board-2026-10-11` (this entry). Main is `b9e9c04`.
+
+- **What landed on main Oct 1-2 (pushed directly, no PR):** Saved Results (session and Google
+  account), Supabase Google OAuth, live corpus counts, `?lab=`/`?utm_source=` attribution
+  (migration 010 applied live), access badges on reviewed results (011), B-9 deletion. Main was
+  rewritten on 10-08 (`4f3f77b` became `b9e9c04`) with an identical tree.
+- **Main CI was red** from those pushes. PR #12 (`fix/main-ci-migrations`) fixes it: npm-10
+  lockfile sync, and migration 008 now creates `saved_results` (it had been created only from the
+  dashboard). The Supabase CLI history now matches the remote: remote-only `20261001071053` and
+  `20261002070715` were added, and pending copies were renumbered `20261011000008/9/11`.
+  `supabase db push --dry-run` plans exactly those three.
+- **PR #11** (`feature/paper-access-relevance`): merged main and #12 in (no force-push) and
+  dropped its duplicate `migrations/008_ingest_access_relevance.*`. Local API 251, miner 133 and
+  web build all pass. Waiting on Nik's review.
+- **Not merged:** B-3 missing-data provenance (17 commits on `feature/saved-results`, no PR).
+- **Production today:** Render runs the main code (deployed 10-04, same tree as `b9e9c04`).
+  Vercel is from 09-26 and has no `NEXT_PUBLIC_SUPABASE_*` vars. Live `hive_feedback` has no grants
+  on `saved_results`. Render is still on the free plan. `UNPAYWALL_EMAIL` is still unset.
+- **Ticket board:** `tickets/README.md` is now the single list of open work, with owners
+  (Agent / Srushti-Codex / Tanvi / Yashvi / Nik) and a how-to for agents. New specs: O-9 deploy,
+  O-10 phone/Safari, O-11 blocked wave-1 papers, W-0.4 deep link (`tickets/product.md`), B-15
+  ImageJ check, OUT-1..4 (`tickets/outreach.md`). Team updates go in `tickets/team-log.md`.
+- **Outreach:** 27 wave-1 emails sent (Yashvi 09-30, Tanvi 10-05), zero replies. Since 09-28
+  there were 12 searches (one session a day), 0 feedback and 0 jobs.
+
+Exact next task: once Nik merges PR #12, run O-9 (db push, Vercel vars and auth redirect, web
+deploy, smoke test).
+
 ## Live Reviewed-Corpus Statistics (2026-10-02)
 
 Branch: `feature/saved-results`. Previous commit: `c4bea0b`; this entry is

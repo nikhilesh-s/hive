@@ -197,3 +197,19 @@ per-paper notes in `outreach/PREEXTRACT_CHECK.md` (branch `outreach/oct20`).
   (needs_review true) with an anomaly flag naming the unresolved target; test on one row
   from each paper above. This is the trust signal researchers see first.
 - Owner: Srushti + Tanvi. Estimate: 0.5.
+
+## Added 2026-10-11
+
+### B-15 · Check 10 extracted panels by hand with ImageJ — Tanvi
+Why: no person has checked HiveBlot's readouts against the actual crops since the UCSF push. This
+is the evidence we need before telling any lab the extraction is good.
+- Pick 10 panels from the hosted live tier. Spread them across at least 4 papers, and include 2
+  from the papers flagged in B-12/B-13.
+- For each panel, open the crop. Check target, antibody (vendor, catalog, dilution against the
+  paper's methods) and band present/absent per lane, against HiveBlot's row.
+- In ImageJ (Analyze > Gels), measure the bands of one lane pair per panel and compare the
+  direction and rough ratio with what HiveBlot shows on the band-reading page. Note saturation or
+  clipping.
+- Record one row per panel in `eval/manual_check_2026-10.csv`: record_id, doi, field, HiveBlot
+  value, Tanvi's value, match (yes/no/unclear), note. Agents turn each mismatch into a B ticket.
+- Done when 10 rows are in, with a one-paragraph summary at the top of `team-log.md`.

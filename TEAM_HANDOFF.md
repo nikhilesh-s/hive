@@ -56,23 +56,7 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 
 ## 4. Tickets left
 
-| ID | What | Owner | Blocker / next step |
-|---|---|---|---|
-| F-8 | Deploy F-1..F-6 and smoke test hosted | Nik | Migration 006 first, then Render, then Vercel. Steps in `HANDOFF.md` |
-| F-7 | Weekly feedback triage | Tanvi | Needs F-8 so new feedback lands |
-| W-0.2 | Daily cap on ingest and ask | Nik | None. Do before any outreach |
-| W-0.4 | `/experimental/research?doi=` deep link | Srushti | None |
-| J-1 | Journal-access flag (OA / no OA / may need institution) | Srushti | Deferred ticket `tickets/journal-access-later.md` |
-| D-7 | Real ground truth: dilution series, Source Data survey | Yashvi + Tanvi | Needs one lab to agree |
-| D-name | Name of the densitometry page | Nik | Decision only |
-| B-3 | `not_stated` vs `not_recovered` for empty fields | Nik + Srushti + Tanvi | None |
-| B-4 | Recall/precision script (inventory part done) | Tanvi + Nik | Tanvi fills the panel inventories |
-| B-5 | `compare_records.py`, 3 repeats per paper | Nik | None; needed before B-7 |
-| B-7 | Escalation that merges instead of replaces | Nik | After B-5 |
-| B-8 | Sample normalization and tissue routing | Nik + Tanvi | `record_id` must not change |
-| B-9 | Delete OpenAI NL-to-SQL | Srushti | Done on `feature/saved-results`; search uses `bio_query.py` |
-| B-10 | External adjudicators | Yashvi + Tanvi | Outreach replies can supply them |
-| B-11 | Band pattern and lane dose as columns | Nik | Stretch |
+The live list, with owners and status, is [`tickets/README.md`](tickets/README.md) (updated 2026-10-11). Team updates: [`tickets/team-log.md`](tickets/team-log.md).
 
 ## 5. Ideas still on the table
 
@@ -98,7 +82,7 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 - Targets: 80 sent, 20 replies, 12 users, 8 papers corrected by authors, 150 field labels,
   3 design partners, 1 dilution-series commitment.
 - Max ~20 new emails a day, three touches then stop, opt-outs removed the same day.
-  **Nothing has been sent. Every email is sent by hand, one at a time, from Nik's mailbox.**
+  **Wave 1 sent: Yashvi 13 on 09-30, Tanvi 14 on 10-05, by hand, one at a time. Zero replies as of 10-11.**
 
 Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 `git show outreach/oct20:outreach/prospects.csv`.
@@ -118,13 +102,18 @@ Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 
 ## 7. Who does what this week
 
-- **Nik:** deploy (migration 006, Render, Vercel, F-8 smoke test). Daily cap on ingest and ask.
-  Move Render to Starter. Set `UNPAYWALL_EMAIL`. Pre-extract papers Mon-Tue, then all sending and replies.
-- **Srushti:** `?doi=` deep link on the research page. Journal-access flag. Any bug a tester reports.
-- **Tanvi:** fix stale copy in the docs pack and hardcoded corpus counts. Spot-check every extracted
-  paper before it goes in an email. Weekly F-7 triage (extraction bugs become B tickets).
-- **Yashvi:** send the overdue UCSF follow-up (Tally form + research page). Own the prospect sheet
-  (status per row). Handle concierge requests.
+Week of 2026-10-12 (ticket IDs from [`tickets/README.md`](tickets/README.md)):
+
+- **Nik:** merge PR #12, review PR #11, pick the `UNPAYWALL_EMAIL` mailbox (O-7), decide record
+  1189 (O-6), add a card to Render (O-1), sign in with Google after the deploy (O-9).
+- **Claude (agent):** deploy the Oct 1-3 work (O-9), extract the blocked wave-1 papers (O-11),
+  open the B-3 PR, outreach rewrite and batch 2 (OUT-1..3), bio-QA code fixes (B-12..14).
+- **Srushti (Codex):** `?doi=` deep link (W-0.4), PDF upload (O-2), research-page polling (O-8),
+  phone check after the deploy (O-10).
+- **Tanvi:** wave-1 follow-ups, ImageJ check of 10 panels (B-15), sign off pre-extracted papers,
+  review the B-3 wording.
+- **Yashvi:** wave-1 follow-up 2, UCSF Tally form (10-12), warm intros (OUT-4), grants log on
+  `yashvi-outreach`.
 
 ## 8. Branches
 
