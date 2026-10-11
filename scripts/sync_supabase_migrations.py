@@ -14,9 +14,10 @@ PAIRS = [
     ("migrations/005_experimental_live_tables.sql", "supabase/migrations/20260905000006_experimental_live_tables.sql"),
     ("migrations/006_feedback_contact.sql", "supabase/migrations/20260920000007_feedback_contact.sql"),
     ("migrations/007_search_history.sql", "supabase/migrations/20260925000007_search_history.sql"),
-    ("migrations/008_saved_results.sql", "supabase/migrations/20260927000008_saved_results.sql"),
-    ("migrations/009_saved_results_upsert_index.sql", "supabase/migrations/20261001000009_saved_results_upsert_index.sql"),
+    ("migrations/008_saved_results.sql", "supabase/migrations/20261011000008_saved_results.sql"),
+    ("migrations/009_saved_results_upsert_index.sql", "supabase/migrations/20261011000009_saved_results_upsert_index.sql"),
     ("migrations/010_outreach_attribution_activity_tables.sql", "supabase/migrations/20261001231317_add_outreach_attribution_to_activity_tables.sql"),
+    ("migrations/011_ingest_jobs_paper_access_relevance.sql", "supabase/migrations/20261011000011_ingest_jobs_paper_access_relevance.sql"),
 ]
 
 if __name__ == "__main__":
