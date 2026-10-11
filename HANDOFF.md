@@ -22,7 +22,7 @@
   - Hosted smoke test passed: search and live counts; anonymous save, then `/saved` shows
     it, then remove; `?lab=smoke_test` reaches `search_history.lab_tag` (row deleted); the
     access gate; `/auth/callback` without a code redirects to `/auth/error`.
-  - Not verified: Google sign-in with a real account (Nik, R-2). The first request after
+  - Nik verified Google sign-in and Save on the live site (R-2 done). The first request after
     idle still returns 503 for about 30 s while free-tier Render wakes up (O-1).
 - **PR #11** (Srushti, metadata-first ingestion) merged and deployed.
   - The research page shows access and relevance badges.
@@ -42,8 +42,9 @@
   in `tickets/oct-push.md`; team updates go in `tickets/team-log.md`.
 - **Outreach:** wave 1 was 27 emails (Yashvi 9-30, Tanvi 10-05), with 0 replies and almost
   no visits.
-- **Exact next task:** Nik tests Google sign-in on the live site (R-2). Agents then pick up
-  W-1, O-2 and W-2 (Srushti) and G-1 and G-2 (Yashvi).
+- **Exact next task:** the release is closed (R-1 to R-4 done). Agents pick up W-1, O-2 and W-2
+  (Srushti) and G-1 and G-2 (Yashvi). Tanvi does Q-1 and Q-2. Nik owes O-7 (mailbox) and the
+  decisions in TEAM_HANDOFF section 9. `TEAM_HANDOFF.md` was rewritten to the 10-11 state.
 
 ## Live Reviewed-Corpus Statistics (2026-10-02)
 

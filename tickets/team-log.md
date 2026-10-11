@@ -16,8 +16,14 @@ Tickets live in [`README.md`](README.md).
 - **Srushti**: Oct 1-3 she built Saved Results (anonymous and Google-account), Google sign-in,
   live corpus counts, `?lab=` / `?utm_source=` attribution, paper access badges on search results
   and the B-9 deletion, pushed straight to `main`. B-3 is on `feature/saved-results` (no PR yet).
-  PR #11 is open. None of it is on the live website yet (R-1 to R-3). She asked for edit access to the
-  Tally responses.
-- **Nik / Claude**: PR #12 fixes main CI (web lockfile, `saved_results` migration, Supabase
-  migration history). PR #11 was brought up to date with main and its duplicate migration removed.
+  PR #11 (metadata-first ingestion) was merged. All of it went live
+  10-11. She asked for edit access to the Tally responses.
+- **Nik / Claude**: shipped Srushti's work and PR #11 (R-1 to R-4):
+  - PR #12 fixed main CI (lockfile, `saved_results` migration, Supabase history).
+  - Supabase migrations were pushed and the Vercel keys added; web and API are deployed.
+  - Two PR #11 bugs were found live and fixed: buttons stuck after "awaiting full text"
+    (#15), and job saves failing past the first step (#16).
+  - Nik verified Google sign-in and Save on the live site.
+  - Ticket board merged (#14); duplicate #13 closed.
+  - Render and `release/hosted` are at `3839ee3`.
 - **Usage since 09-28**: 12 searches (one session a day), 0 feedback, 0 extraction jobs.
