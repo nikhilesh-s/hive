@@ -31,14 +31,19 @@
   - The review found browser-sent metadata trusted too far; that is ticket W-4.
   - The deploy check found every paper button stayed disabled after `awaiting_full_text`.
     PR #15 fixes it on both research and live.
-  - The open-access extraction run is still to do (R-4).
+  - Open-access extraction verified live: PLOS ONE 10.1371/journal.pone.0193022 gave 25
+    experiments and 158 lane rows (job e04856ab406a).
+  - The same check found every ingest_jobs write after the first stage failing:
+    `*_checked_at` was sent to asyncpg as a string. PR #16 fixed it, five frozen test
+    jobs were corrected, and a new job now persists `awaiting_full_text`.
+  - Main, Render and `release/hosted` are at `3839ee3`; Vercel web is at `ffc54a0`, and PR #16 has no web changes.
 - **Ticket board:** `tickets/README.md` is the single board, with owners (Srushti + Codex,
   Yashvi + Claude, Tanvi bio QA, Nik release) and the rules agents follow. New tickets are
   in `tickets/oct-push.md`; team updates go in `tickets/team-log.md`.
 - **Outreach:** wave 1 was 27 emails (Yashvi 9-30, Tanvi 10-05), with 0 replies and almost
   no visits.
-- **Exact next task:** merge PR #15 and redeploy web, then run one open-access extraction to
-  close R-4. Nik tests Google sign-in (R-2).
+- **Exact next task:** Nik tests Google sign-in on the live site (R-2). Agents then pick up
+  W-1, O-2 and W-2 (Srushti) and G-1 and G-2 (Yashvi).
 
 ## Live Reviewed-Corpus Statistics (2026-10-02)
 
