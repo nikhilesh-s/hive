@@ -1,106 +1,103 @@
-# Post-UCSF sprint — ship Wednesday 2026-09-16
+# Ticket board
 
-Written 2026-09-09 after the UCSF meeting. Three tracks, each with its own
-ticket file:
+This board is the single list of open work. Every ticket lives in one track file
+in this folder; the board says who owns it, how urgent it is, and where it
+stands. The 2026-09-16 sprint plan that used to be here is now
+[`sprint-2026-09-16.md`](sprint-2026-09-16.md).
 
-- [`feedback.md`](feedback.md) — Track F: researcher feedback we can pull and analyze (**priority 1**, cheapest, and the founder's direct question)
-- [`densitometry.md`](densitometry.md) — Track D: band reading with honest uncertainty and refusal
-- [`bio-qa.md`](bio-qa.md) — Track B: scientific validity of extraction (Tanvi's questions, unparked)
+## How to work a ticket (people and coding agents)
 
-Meeting notes from UCSF are not in the repo yet. When Nik dispatches them,
-add a `ucsf-notes.md` here and turn each concrete request into a ticket on
-the matching track; do not rewrite the plan around them until then.
+Point Codex or Claude at this file and the ticket ID, e.g. *"Work ticket W-1 from
+tickets/README.md."* The agent follows these rules:
 
-## Decisions Nik has to make first (Thursday morning)
+1. **Read first, and only this:** [`AGENTS.md`](../AGENTS.md) (biology rules that
+   cannot be broken), this board, and the ticket. Read `HANDOFF.md` only from the top
+   down to the first older dated section; it is long.
+2. **One ticket, one branch, one PR.** Branch from `main` as
+   `<ticket-id>-<short-slug>` (e.g. `w-1-doi-deep-link`). PR title starts with the
+   ticket ID. Never push to `main`. Never merge your own PR. Nik merges.
+3. **Claim it.** In your first commit, set the ticket's board row to
+   `doing (<name>, <date>)`. In the PR, set it to `PR #<n>`. Nik sets `done` on merge.
+4. **Done means** the ticket's *Acceptance* is met, new behavior has a test, and CI is
+   green. Run the CI checks locally before you push:
+   ```bash
+   cd api && python -m pytest -q
+   ```
+   ```bash
+   python -m pytest -q western_blot_miner/tests --ignore=western_blot_miner/tests/test_densitometry.py
+   ```
+   ```bash
+   cd web && npm ci && npx tsc --noEmit && npm run lint && npm run build
+   ```
+5. **Hands off:** live Supabase, Render and Vercel (no deploys, no `supabase db push`,
+   no dashboard edits). Also secrets and `.env` files, and the reviewed
+   `western_blot_records` data. Schema changes go in `migrations/NNN_*.sql`, then run
+   `python scripts/sync_supabase_migrations.py`. Nik applies them.
+6. **Never invent scientific values.** An empty field stays empty, with its reason
+   (see B-3). Do not work around publisher bot checks.
+7. **Stuck for more than 30 minutes, or the ticket is unclear?** Add a `Questions:`
+   line under the ticket, push it, tell Nik, and move on to the next ticket.
+8. **PR body:** what changed, how it was tested, and what is left.
 
-| # | Decision | Recommendation |
-|---|---|---|
-| D-0 | **Release vehicle for the 09-16 beta.** The hosted beta is frozen at `7d80b8b` (`feature/bio-context-beta`, API `96678c8`). The demo branch carries the experimental stack with `experimental_enabled` defaulting to true, the densitometry route and the local-only research page. | Cut `release/beta-2026-09-16` from `feature/bio-context-beta`, cherry-pick only F-2..F-6 (+ B-9 if done), deploy that. Experimental work stays on `experimental/*` and local. Do not ship the experimental branch to Vercel/Render. |
-| D-1 | **What to call the densitometry page.** There is no calibration in the repo and most reviewed crops are clipped. | "Band reading (experimental)" with the refusal policy in D-3/D-6. Reserve the word densitometry for a calibrated feature. |
-| D-2 | **Reseeding the hosted 475 rows** after B-1 / B-2 / B-8 change extraction output. | Not this week. Measure first (B-5), Tanvi reviews the diff, reseed in week 2. `record_id` stability is a hard test in B-8. |
-| D-3 | **Is a 20 s escalation call per ambiguous panel acceptable** on `claude_cli`? | Defer B-7 to week 2 unless B-5 shows it buys something. |
+**Accountability:** owners post in the team chat every Thursday and Sunday:
+tickets closed, PRs open, anything blocked.
 
-## Definition of shipped, 2026-09-16
+## Board (updated 2026-10-11)
 
-**Hosted beta (what UCSF researchers touch):**
-- F-2 zero-result capture, F-3 useful / not-what-I-needed, F-4 three-question survey, F-5 opt-in contact + real `app_version`, F-6 separate rate limit and honest failure state, all deployed (F-8), each verified with one hosted row read back through the F-1 export.
-- `scripts/export_feedback.py` works against production; the first F-7 triage has been run on whatever rows exist.
+P1 = this week, P2 = next, P3 = when free. Track files:
+[oct-push](oct-push.md) (R, W, Q, G), [bio-qa](bio-qa.md) (B),
+[ops](ops-2026-09-27.md) (O), [feedback](feedback.md) (F),
+[densitometry](densitometry.md) (D).
 
-**Experimental stack (local, demo-able):**
-- D-1 region reaches the API, D-2 researcher-defined lanes, D-3 saturation refusal, D-4 ranges instead of decimals, D-6 refusal card + method block + JSON export, page renamed per D-1. The 59.7% is retired with a written baseline (D-5 header).
+### Release (Nik + Nik's Claude; these need credentials)
+| Ticket | What | Pri | Status |
+|---|---|---|---|
+| R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | PR #12 green |
+| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | todo |
+| R-3 | Deploy web, hosted smoke test | P1 | todo (after R-1, R-2) |
+| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | PR #11 updated, needs review |
+| O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik |
+| O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
+| O-1 | Render paid plan | P2 | Nik decides |
 
-**Extraction validity:**
-- B-1 caption/methods separation and B-2 antibody backstop landed on the experimental branch with tests; B-6 stale L1 table fixed; B-4 panel inventory checked in for all three papers.
-- B-5 first `compare_records.py` run published if time allows; otherwise Monday of week 2.
+### Srushti (+ Codex)
+| Ticket | What | Pri | Status |
+|---|---|---|---|
+| W-1 | `?doi=` deep link opens an extracted paper | P1 | todo |
+| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | todo |
+| W-2 | Open the B-3 PR from `feature/saved-results` | P1 | todo |
+| B-14 | Unresolved target must set needs_review | P2 | todo |
+| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | todo |
+| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | todo |
+| O-8 | Research page gives up on transient 429s | P3 | todo |
+| W-3 | Phone and Safari pass on the hosted site | P2 | after R-3 |
 
-**Explicitly not shipped this week:** loading-control ratios, anything stored for densitometry, B-3 null provenance, B-7 escalation, B-8 sample routing, B-9, unseen-paper accuracy claims of any kind.
+### Tanvi (bio QA; no code)
+| Ticket | What | Pri | Status |
+|---|---|---|---|
+| Q-1 | Sign off the 9 wave-1 pre-extracted papers | P1 | todo, by Wed 10/14 |
+| Q-2 | ImageJ spot-check of lane readouts, 10 panels | P1 | todo, by Fri 10/16 |
+| Q-3 | 30 expected target names for B-12 | P2 | todo |
+| Q-4 | 5+ non-western panel examples for B-13 | P2 | todo |
+| B-3 | Review "not stated" vs "not recovered" wording on the W-2 PR | P1 | waits on W-2 |
+| F-7 | Weekly feedback triage | P3 | ongoing (no new rows since 9-16) |
 
-## Timeline
+### Yashvi (+ Claude)
+| Ticket | What | Pri | Status |
+|---|---|---|---|
+| G-1 | Outreach and grants log on `yashvi-outreach` | P1 | todo |
+| G-2 | Email v2 plus spam check, for Nik's approval | P1 | todo, by Tue 10/13 |
+| G-3 | Batch 2: about 100 first authors, papers pre-extracted | P2 | after G-2 approved |
+| G-4 | Fix the stale "live search isn't hosted" line | P3 | todo |
+| G-5 | Upload the 8 blocked wave-1 PDFs | P2 | after O-2 |
+| O-3 | `export_feedback.py --since` drops same-day rows | P3 | todo |
 
-Working days: Thu 10, Fri 11, Mon 14, Tue 15, Wed 16 (ship by end of day).
-Half-days per person: Nik 10, Srushti 10, Tanvi 8, Yashvi 6. Weekend is
-buffer, not plan.
+### Done (recent)
+B-1, B-2, B-6, B-9 (bdd5410), F-0 to F-6, F-8 (release of 2026-09-27), Ticket C saved
+results (on main; ships with R-3), `?lab=` attribution (47d4071), live corpus
+counts (b9e9c04), reviewed-results access flags (2a7d0b8). O-4 and O-5 are accepted
+as-is.
 
-| Day | Nik | Srushti | Tanvi | Yashvi |
-|---|---|---|---|---|
-| **Thu 10** | D-0..D-3 decisions; cut release branch; F-1 export script (0.5); F-6 limit (0.5); B-6 L1 fix (0.5) | F-2 zero-result (0.5); D-1 region proxy (0.5) | B-4 panel inventory, paper 1 of 3 (1) | F-4 survey wording (0.5); send UCSF thank-you + ask for the eval papers and lab contacts (0.5) |
-| **Fri 11** | B-1 caption/methods (1.5); F-3 api half (0.5) | F-3 web half (0.5); D-2 lane dividers, web (2) | B-4 inventory papers 2–3 (1); D-3 threshold study on the Butler set (0.5) | B-10 adjudicator outreach (1) |
-| **Mon 14** | D-2 api (1); B-2 antibody backstop (1) | F-4 survey build (1); F-5 checkbox + F-6 UI (0.5); D-2 finish (0.5) | B-2 spot-check recovered catalogs (0.5); D-5 author LC3B:ACTB values, first pass (1) | D-7 dilution-series ask to one lab (0.5); collect any UCSF replies into `ucsf-notes.md` (0.5) |
-| **Tue 15** | D-3 saturation gate (1.5); F-5 migration + api (0.5) | D-6 refusal card, method block, export (2) | D-5 author values, finish (0.5); F-7 first triage on live rows (0.5); D-7 protocol draft (0.5) | Buffer / follow-ups |
-| **Wed 16** | D-4 ranges (2, morning); **F-8 deploy + hosted smoke** (1, afternoon); HANDOFF | B-9 OpenAI path (0.5); D-6 polish; release QA on the hosted beta (1) | B-10 annotation brief (0.5); review D-6 copy for overclaims (0.5) | Confirm survey reaches researchers; note who to follow up with |
-
-Nik is at 10.5 half-days against 10. The release valve is D-4: if Tuesday
-slips, D-4 moves to week 2 and Wednesday morning goes to deploy and smoke.
-Nothing on the hosted-beta path depends on D-4.
-
-## Week 2 backlog (2026-09-17 onward), in order
-
-1. B-5 `compare_records.py` three-repeat run, then B-1/B-2 before-vs-after.
-2. B-3 null provenance (`not_stated` vs `not_recovered`).
-3. B-8 sample normalization and tissue routing, then D-2 reseed decision.
-4. B-7 escalation that escalates and merges.
-5. D-5 synthetic recovery study (error vs clip fraction, vs box jitter).
-6. D-7 / B-10 follow-through: dilution series, external adjudicators.
-7. Loading-control pairing data model (record ↔ strip position). Not
-   before the reseed decision.
-8. Supabase pausing questions in `super-based-ticket.md` (project is active
-   today; the 7-day inactivity risk stays while traffic is low).
-
-## Ticket index
-
-| ID | Title | Owner | Half-days | This week |
-|---|---|---|---|---|
-| F-0 | Supabase awake, feedback writes end to end | Nik | done | ✓ |
-| F-1 | `scripts/export_feedback.py` | Nik | 0.5 | ✓ |
-| F-2 | Capture zero-result searches | Srushti | 0.5 | ✓ |
-| F-3 | Result-level useful / not what I needed | Srushti + Nik | 1 | ✓ |
-| F-4 | Three-question end-of-session survey | Yashvi + Srushti | 1 | ✓ |
-| F-5 | Opt-in contact + real `app_version` (migration 006) | Nik + Srushti | 1 | ✓ |
-| F-6 | Separate feedback rate limit; honest failure state | Nik + Srushti | 0.5 | ✓ |
-| F-7 | Weekly feedback triage | Tanvi | 0.5/pass | first pass ✓ |
-| F-8 | Beta release + hosted smoke | Nik | 1 | ✓ |
-| D-1 | Forward `region` to the API | Srushti | 0.5 | ✓ |
-| D-2 | Researcher-defined lanes | Srushti + Nik | 3 | ✓ |
-| D-3 | Saturation gate on the band core | Nik + Tanvi | 2 | ✓ |
-| D-4 | Ranges, not point values | Nik | 2 | ✓ (valve) |
-| D-5 | Retire D1; synthetic study; author-value comparison | Nik + Tanvi | 3 | header + author values only |
-| D-6 | Refusal card, method block, export, storage decision | Srushti + Nik | 2 | ✓ |
-| D-7 | Real ground truth (dilution series, Source Data survey) | Yashvi + Tanvi | 1 + weeks | start |
-| B-1 | Caption / methods separation in live extraction | Nik | 1.5 | ✓ |
-| B-2 | Deterministic antibody backstop | Nik + Tanvi | 1 | ✓ |
-| B-3 | Null provenance `not_stated` / `not_recovered` | Nik + Srushti + Tanvi | 2.5 | week 2 |
-| B-4 | Panel inventory + CV recall measurement | Tanvi + Nik | 2 | inventory ✓, script week 2 |
-| B-5 | `compare_records.py` three repeats per paper | Nik | 2 | if ahead |
-| B-6 | Correct the stale L1 report | Nik | 0.5 | ✓ |
-| B-7 | Escalation that escalates and merges | Nik | 1.5 | week 2 |
-| B-8 | Sample normalization + tissue routing (record_id stable) | Nik + Tanvi | 1.5 | week 2 |
-| B-9 | Delete OpenAI NL→SQL | Srushti | 0.5 | ✓ |
-| B-10 | External adjudicators for week 2 | Yashvi + Tanvi | 1 | ✓ |
-| B-11 | Band pattern / lane dose columns | Nik | 1 | stretch |
-
-## Rules that do not move this week
-
-Reviewed corpus stays human-reviewed and unchanged on the hosted beta. Live
-tier stays badged `LIVE · UNREVIEWED`. Conflicting stays unresolved. Band
-presence ≠ densitometry; the reserved intensity columns stay NULL. No
-accuracy number for unseen papers anywhere. No secrets in tickets or HANDOFF.
+### Parked (not this push)
+B-4 (scaffold landed, review pending), B-5, B-7, B-8, B-10, B-11, all of D-1 to D-7
+(see the status block in `densitometry.md`), and `journal-access-later.md`.
