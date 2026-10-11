@@ -29,7 +29,7 @@ BODY = {"query": "p53 in HeLa cells", "limit": 10}
 def _no_real_search(monkeypatch):
     """
     Stub the shared pipeline: these tests are about auth and rate limiting,
-    not about NL->SQL. Both routers import execute_search by value, so both
+    not about query generation. Both routers import execute_search by value, so both
     module namespaces get patched.
     """
 

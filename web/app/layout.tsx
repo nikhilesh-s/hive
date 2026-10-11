@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import AttributionCapture from "@/components/AttributionCapture";
 
 const themeBootScript = `
 (function () {
@@ -45,7 +46,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "HiveBlot — Western blot evidence search (beta)",
   description:
-    "Experiment-level Western blot evidence from a reviewed reference corpus (3 papers, 93 experiments, 475 evidence rows). Every value traceable to its source; uncertainty and conflicts shown, never guessed.",
+    "Experiment-level Western blot evidence from a reviewed reference corpus. Every value traceable to its source; uncertainty and conflicts shown, never guessed.",
 };
 
 export default function RootLayout({
@@ -64,6 +65,7 @@ export default function RootLayout({
         className={`${plexSerif.variable} ${plexSans.variable} ${plexMono.variable}`}
         style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
       >
+        <AttributionCapture />
         <Navigation />
         <main style={{ flex: 1 }}>
           {children}

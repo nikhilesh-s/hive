@@ -1,4 +1,5 @@
 import type { SearchFilters } from '@/components/FiltersBar';
+import { getAttribution } from '@/lib/attribution';
 import { sessionId } from '@/lib/feedback';
 
 export interface SearchHistoryEntry {
@@ -49,7 +50,7 @@ export async function recordSearchHistory(query: string, filters: SearchFilters)
   await fetch('/api/history', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId(), query, filters }),
+    body: JSON.stringify({ session_id: sessionId(), query, filters, ...getAttribution() }),
   });
 }
 

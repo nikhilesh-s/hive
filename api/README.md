@@ -23,19 +23,40 @@ of the internal and external paths drifting apart.
 
 ## How search works
 
-1. GPT (`OPENAI_MODEL`, default `gpt-4.1-mini`) turns the question into a
-   PostgreSQL `SELECT` (`app/nlp.py`).
+1. `app/bio_query.py` deterministically turns the search text into a
+   HiveBlot-specific PostgreSQL `SELECT`. This parser knows the biology-facing
+   search concepts HiveBlot supports (targets, phospho-sites, antibody
+   vendor/catalog terms, cell lines, co-IP, and related fields) and keeps the
+   generated SQL inspectable in every response.
 2. `app/sql_guard.py` parses that SQL into an AST (via `sqlglot`) and rejects
    anything that isn't a single `SELECT` against `western_blot_records`,
    rejects disallowed functions, and rewrites in a server-enforced `LIMIT`
-   regardless of what the model produced.
+   regardless of what the query generator produced.
 3. The validated query runs through a **dedicated Postgres role that only has
    SELECT on `western_blot_records`** (`DB_READONLY_URL`, see `db/schema.sql`)
    - not the Supabase service-role key. A bug in step 2 still can't turn into
    a full-database read/write.
 
+The old OpenAI natural-language-to-SQL path was removed on purpose. HiveBlot
+already has `bio_query.py`, which is deterministic, testable, and aligned with
+the current Evidence Record fields. Keeping a second model-generated SQL path
+made normal search depend on whether `OPENAI_KEY` happened to be set, and its
+prompt described an older, smaller schema. OpenAI-compatible model backends for
+experimental extraction are separate from normal search and use
+`WBM_LLM_BACKEND`, not this search path.
+
 Both `/search` and `/v1/search` are rate-limited (`SEARCH_RATE_LIMIT` /
-`AGENT_RATE_LIMIT`) since each call costs an OpenAI request.
+`AGENT_RATE_LIMIT`).
+
+## Outreach attribution
+
+Outreach links may include `?lab=<tag>&utm_source=<source>`. The web client
+stores valid values in localStorage and attaches them to search-history and
+feedback writes only. `lab` becomes `lab_tag` and must match
+`^[a-z0-9_]{1,40}$`; `utm_source` is a short campaign/source string using only
+letters, numbers, `_`, `-`, and `.`. These tags are attribution, not
+authentication or ownership, and they are never written to
+`western_blot_records`.
 
 ## Setup
 

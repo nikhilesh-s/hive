@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AuthControl } from '@/components/AuthControl';
 
 export function Navigation() {
+  const pathname = usePathname();
   return (
     <nav className="hb-navigation">
       {/* Logo */}
@@ -38,33 +41,39 @@ export function Navigation() {
       {/* Nav Links */}
       <div className="hb-navigation-links">
         <Link href="/search">
-          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" aria-current={pathname === '/search' ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             SEARCH
           </span>
         </Link>
+        <Link href="/saved">
+          <span className="vt-navlink" aria-current={pathname === '/saved' ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+            SAVED
+          </span>
+        </Link>
         <Link href="/history">
-          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" aria-current={pathname === '/history' ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             HISTORY
           </span>
         </Link>
         <Link href="/about">
-          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" aria-current={pathname === '/about' ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             ABOUT
           </span>
         </Link>
         <Link href="/learn">
-          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" aria-current={pathname === '/learn' ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             LEARN
           </span>
         </Link>
         <Link href="/experimental/research">
-          <span className="vt-navlink" style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
+          <span className="vt-navlink" aria-current={pathname.startsWith('/experimental/research') ? 'page' : undefined} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, letterSpacing: '1.2px' }}>
             RESEARCH
           </span>
         </Link>
       </div>
 
       <ThemeToggle />
+      <AuthControl />
 
     </nav>
   );

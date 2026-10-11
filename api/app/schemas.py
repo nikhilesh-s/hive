@@ -69,8 +69,8 @@ class WesternBlotRecord(BaseModel):
     condition: str | None = None
     band_detected: bool | None = None
     # Settled: confidence is a 0-1 score everywhere - `real` in
-    # db/schema.sql, REAL in the nlp.py prompt schema, `number` in the
-    # frontend (which renders it as `confidence * 100`%). An extraction
+    # db/schema.sql and `number` in the frontend (which renders it as
+    # `confidence * 100`%). An extraction
     # pipeline that produces "high"/"medium"/"low" must map to a score
     # before insert; don't reintroduce a text column on one side only.
     confidence: float | None = None
@@ -147,6 +147,14 @@ class WesternBlotRecord(BaseModel):
     # key is what let grouping and identity disagree (the H1792/A549 co-IP
     # collision); one source of truth removes that whole failure class.
     stable_row_key: str | None = None
+    # Canonical, reviewed-corpus experiment identity used by Save/Saved.
+    experiment_key: str | None = None
+    # Present only on /saved-results rows.
+    saved_at: str | None = None
+
+    # Paper-level metadata from ingest_jobs. This is deliberately separate
+    # from scientific review fields such as needs_review/protein_status.
+    paper_flags: dict | None = None
 
     # EXPERIMENTAL: rows from live DOI ingestion carry 'live_unreviewed';
     # reviewed-corpus rows carry None. The UI badges anything non-null.
@@ -182,6 +190,8 @@ class SearchHistorySubmission(BaseModel):
     session_id: str = Field(min_length=1, max_length=128)
     query: str = Field(min_length=1, max_length=500)
     filters: dict = Field(default_factory=dict)
+    lab_tag: str | None = None
+    utm_source: str | None = None
 
 
 class SearchHistoryItem(BaseModel):
@@ -194,6 +204,35 @@ class SearchHistoryItem(BaseModel):
 
 class SearchHistoryResponse(BaseModel):
     items: list[SearchHistoryItem]
+
+
+class SavedRecordInput(BaseModel):
+    record_id: int = Field(ge=1, le=2**63 - 1)
+    stable_row_key: str = Field(min_length=1, max_length=128)
+
+
+class SavedStatusRequest(BaseModel):
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
+    stable_row_keys: list[str] = Field(min_length=1, max_length=500)
+
+
+class SavedStatusResponse(BaseModel):
+    saved_keys: list[str]
+
+
+class SaveResultsRequest(BaseModel):
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
+    records: list[SavedRecordInput] = Field(min_length=1, max_length=500)
+
+
+class UnsaveResultsRequest(BaseModel):
+    session_id: str | None = Field(default=None, min_length=1, max_length=128)
+    stable_row_keys: list[str] = Field(min_length=1, max_length=500)
+
+
+class SaveResultsResponse(BaseModel):
+    saved: bool
+    saved_keys: list[str] = Field(default_factory=list)
 
 
 # --- record detail ("Why does HiveBlot say this?") --------------------------
@@ -325,6 +364,9 @@ class FeedbackSubmission(BaseModel):
     comment: str | None = Field(default=None, max_length=4000)
     ui_location: str | None = Field(default=None, max_length=200)
     session_id: str | None = Field(default=None, max_length=64)
+    # Outreach attribution only. These are not authentication, ownership, or PII.
+    lab_tag: str | None = None
+    utm_source: str | None = None
     # F-5 (migration 006): optional, sent ONLY when the researcher ticked the
     # explicit opt-in. Never returned by the rehydration path (FeedbackItem
     # below has no contact field), so it cannot render in another browser.

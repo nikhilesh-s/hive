@@ -49,7 +49,8 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 - **Stale copy.** The docs pack at repo root (`UCSF_BETA_*.md`, `BETA_EMAIL_*.md`,
   `HOSTING_STATUS.md` and others) still says live search is "not yet in this link". Corpus counts
   are hardcoded in `web/app/about/page.tsx` and `web/app/search/page.tsx`.
-- **B-9:** `api/app/nlp.py` describes an old schema. Setting `OPENAI_KEY` silently makes search worse.
+- **B-9 closed on `feature/saved-results`:** the stale `api/app/nlp.py` OpenAI NL-to-SQL path was deleted.
+  Normal search now always uses deterministic `api/app/bio_query.py` plus `sql_guard.py`.
 - Smaller: record 1189 shows internal feedback to testers; API `/docs` is public; reviewed crops
   are baked into the Docker image. Not tested hosted: per-field ✓/✗ after F-6, mobile, other browsers.
 
@@ -69,7 +70,7 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 | B-5 | `compare_records.py`, 3 repeats per paper | Nik | None; needed before B-7 |
 | B-7 | Escalation that merges instead of replaces | Nik | After B-5 |
 | B-8 | Sample normalization and tissue routing | Nik + Tanvi | `record_id` must not change |
-| B-9 | Fix or delete OpenAI NL-to-SQL | Srushti | Recommend delete |
+| B-9 | Delete OpenAI NL-to-SQL | Srushti | Done on `feature/saved-results`; search uses `bio_query.py` |
 | B-10 | External adjudicators | Yashvi + Tanvi | Outreach replies can supply them |
 | B-11 | Band pattern and lane dose as columns | Nik | Stretch |
 
@@ -139,7 +140,7 @@ Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 3. Let authors correct live rows, or ask for corrections by email reply?
 4. Daily cap only, or also a shared beta key, before strangers get the link?
 5. Densitometry page name. Recommendation: "Band reading (experimental)".
-6. B-9: delete the OpenAI NL-to-SQL path (recommended) or fix it?
+6. B-9 is closed on `feature/saved-results`; normal search no longer depends on `OPENAI_KEY`.
 7. Delete the internal feedback on record 1189?
 8. Hide API `/docs` (`docs_url=None`)?
 9. Close Copilot PR nikhilesh-s/hive#2.
