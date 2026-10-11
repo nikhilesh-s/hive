@@ -44,7 +44,7 @@ tickets/README.md."* The agent follows these rules:
 **Accountability:** owners post in the team chat every Thursday and Sunday:
 tickets closed, PRs open, anything blocked.
 
-## Board (updated 2026-10-11)
+## Board (updated 2026-10-11, end of day)
 
 P1 = this week, P2 = next, P3 = when free. Track files:
 [oct-push](oct-push.md) (R, W, Q, G), [bio-qa](bio-qa.md) (B),
@@ -55,7 +55,7 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 | Ticket | What | Pri | Status |
 |---|---|---|---|
 | R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | done 10-11 (36569fa) |
-| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | keys live; only Nik's Google sign-in test left |
+| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | done 10-11 (Nik verified sign-in + Save) |
 | R-3 | Deploy web, hosted smoke test | P1 | done 10-11 (web ac85a6e, smoke passed) |
 | R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | done 10-11 (3839ee3) |
 | O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik |
