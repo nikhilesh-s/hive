@@ -7,6 +7,29 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Ticket board, CI fix, PR #11 refresh (2026-10-11)
+
+- **Main CI was red** after Srushti's direct pushes of Oct 1–2. There were two causes:
+  the web lockfile was out of sync, and migration 008 granted on `saved_results` without
+  creating it (the table came from the Supabase dashboard). PR #12
+  (`fix/main-ci-migrations`) fixes both and lines up the Supabase CLI history with the
+  remote. CI is green; it is not merged yet.
+- **Production:** Render runs main's API (deployed 10-04). Vercel web is from 9-26, so none
+  of Saved Results, Google sign-in, live counts or `?lab=` capture is live. Live
+  `hive_feedback` has no grants on `saved_results` until PR #12's migrations are pushed.
+- **PR #11** (Srushti, metadata-first ingestion) now has main and PR #12 merged in, and
+  its duplicate `migrations/008_ingest_access_relevance.*` is gone. Checks pass locally.
+  It needs Nik's review: it changes live ingestion behavior.
+- **Ticket board:** `tickets/README.md` is now the single board, with owners
+  (Srushti + Codex, Yashvi + Claude, Tanvi bio QA, Nik release) and the rules agents follow.
+  New tickets are in `tickets/oct-push.md` (R, W, Q, G). The old sprint plan moved to
+  `tickets/sprint-2026-09-16.md`.
+- **Outreach:** wave 1 was 27 emails (Yashvi 9-30, Tanvi 10-05), with 0 replies and almost
+  no visits. Yashvi has sent her follow-up 1 and scheduled the UCSF Tally follow-up for
+  Mon 10-12 08:00.
+- **Exact next task:** R-1 (merge #12, `supabase db push`), then R-2 and R-3 (Vercel keys,
+  deploy, smoke test).
+
 ## Live Reviewed-Corpus Statistics (2026-10-02)
 
 Branch: `feature/saved-results`. Previous commit: `c4bea0b`; this entry is
