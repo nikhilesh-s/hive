@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
+import { jobFinished } from '@/lib/ingestJob';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -117,7 +118,7 @@ export default function ResearchPage() {
   // Poll a running job every 2 s; on done, load its rows and refresh the ingested list.
   // A job that can no longer be read (404 after an API restart, backend down) stops the poll with an error.
   useEffect(() => {
-    if (!job || job.status === 'done' || job.status === 'failed' || job.status === 'awaiting_full_text') return;
+    if (!job || jobFinished(job.status)) return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       const my = seq.current;
@@ -252,7 +253,7 @@ export default function ResearchPage() {
   }
 
   const groups = groupResults(rows);
-  const busy = !!(job && job.status !== 'done' && job.status !== 'failed');
+  const busy = !!(job && !jobFinished(job.status));
   const selectedIngested = selected ? ingested(selected.doi) : undefined;
 
   return (
