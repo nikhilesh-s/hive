@@ -39,6 +39,8 @@ tickets/README.md."* The agent follows these rules:
    line under the ticket, push it, tell Nik, and move on to the next ticket.
 8. **PR body:** what changed, how it was tested, and what is left.
 
+**Team updates** go in [`team-log.md`](team-log.md), dated, facts only.
+
 **Accountability:** owners post in the team chat every Thursday and Sunday:
 tickets closed, PRs open, anything blocked.
 
