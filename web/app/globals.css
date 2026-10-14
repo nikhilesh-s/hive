@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+.hb-upload-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 16px; margin: 8px 0; border: 1px solid var(--accent); border-radius: 4px; background: var(--surface); color: var(--accent); font: inherit; cursor: pointer; text-decoration: none; }
+.hb-upload-button:disabled { opacity: .5; cursor: default; }
+.hb-upload-dialog { width: min(520px, calc(100% - 32px)); max-height: calc(100dvh - 40px); margin: auto; padding: 24px; background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-strong); border-radius: 8px; }
+.hb-upload-dialog::backdrop { background: rgba(0, 0, 0, .65); }
+.hb-upload-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.hb-upload-dialog h2 { font-size: 24px; margin: 0; }
+.hb-upload-dialog header button { border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; }
+.hb-upload-dialog label { display: grid; gap: 8px; margin: 18px 0; }
+.hb-upload-dialog input:not([type=checkbox]) { width: 100%; min-width: 0; padding: 12px; border: 1px solid var(--border-strong); border-radius: 4px; color: var(--text-primary); background: var(--input-background); }
+.hb-upload-dialog .hb-upload-rights { display: flex; align-items: flex-start; gap: 10px; }
+.hb-upload-rights input { margin-top: 5px; flex: 0 0 auto; }
+.hb-upload-status { border-top: 1px solid var(--border); padding-top: 16px; overflow-wrap: anywhere; }
+.hb-upload-dialog progress { width: 100%; accent-color: var(--accent); }
+.hb-upload-error { color: var(--error, #e65454); overflow-wrap: anywhere; }
+
 :root {
   --background: #06090c;
   --surface: #0a0d0f;

@@ -164,7 +164,7 @@ async def _set(job: Job, **fields) -> None:
     await _persist(job)
 
 
-async def run_job(job_id: str) -> Job:
+async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
     job = JOBS[job_id]
     loop = asyncio.get_running_loop()
     try:
@@ -183,13 +183,13 @@ async def run_job(job_id: str) -> Job:
         async with _SLOTS:
             # Metadata, relevance, and access are useful even when full text is
             # unavailable, so they deliberately run before any model work.
-            await _set(job, status="metadata", message="Fetching paper metadata…")
+            await _set(job, status="metadata", message="Using the supplied PDF…" if uploaded_pdf else "Fetching paper metadata…")
             seed = {
                 "title": job.title, "abstract": job.abstract, "authors": job.authors,
                 "journal": job.journal, "publication_year": job.publication_year,
                 "pmid": job.pmid, "pmcid": job.pmcid, "metadata_source": job.metadata_source,
             }
-            meta = await loop.run_in_executor(
+            meta = seed if uploaded_pdf else await loop.run_in_executor(
                 None, lambda: fulltext.paper_metadata(job.doi, seed=seed))
             meta_authors = meta.get("authors")
             if isinstance(meta_authors, list):
@@ -214,17 +214,17 @@ async def run_job(job_id: str) -> Job:
                 relevance_reason=relevance.get("relevance_reason"),
                 relevance_checked_at=_now(),
                 status="checking_access",
-                message="Checking open-access availability…",
+                message="Using supplied full text; access status is unverified." if uploaded_pdf else "Checking open-access availability…",
             )
 
-            access = await loop.run_in_executor(
+            access = {} if uploaded_pdf else await loop.run_in_executor(
                 None, lambda: fulltext.check_access(job.doi, pmcid=job.pmcid))
             await _set(
                 job,
                 access_status=access.get("access_status"),
                 access_url=access.get("access_url"),
                 access_source=access.get("access_source"),
-                access_checked_at=_now(),
+                access_checked_at=None if uploaded_pdf else _now(),
             )
 
             if job.access_status == "no_open_copy_found":
@@ -235,8 +235,8 @@ async def run_job(job_id: str) -> Job:
                 )
                 return job
 
-            await _set(job, status="fetching", message="Retrieving usable open-access full text…")
-            got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
+            await _set(job, status="fetching", message="Reading supplied full text…" if uploaded_pdf else "Retrieving usable open-access full text…")
+            got = {"pdf_path": str(uploaded_pdf)} if uploaded_pdf else await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
             if not got.get("pdf_path"):
                 await _set(
                     job,
@@ -256,17 +256,24 @@ async def run_job(job_id: str) -> Job:
                 raise RuntimeError(why)
             job.backend = why
             await _set(job, pmcid=got.get("pmcid") or job.pmcid, pmid=got.get("pmid") or job.pmid,
-                       access_status="open_access",
+                       access_status=job.access_status if uploaded_pdf else "open_access",
                        access_source=job.access_source or got.get("source"),
-                       access_url=job.access_url or f"https://doi.org/{job.doi}",
+                       access_url=job.access_url if uploaded_pdf else job.access_url or f"https://doi.org/{job.doi}",
                        status="preprocessing",
                        message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
             summary = await loop.run_in_executor(
                 None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
+            if uploaded_pdf and summary.get("extracted_doi") and fulltext.normalize_doi(summary["extracted_doi"]) != job.doi:
+                raise RuntimeError("The DOI detected in this PDF differs from the supplied DOI. Check the paper and DOI before retrying.")
+            if uploaded_pdf:
+                (Path(summary["out_dir"]) / "upload_metadata.json").write_text(
+                    json.dumps({"source": "upload", "doi": job.doi, "job_id": job.job_id}), encoding="utf-8")
             n = summary.get("llm_candidate_count", 0)
             await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
                        message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
             rec = await loop.run_in_executor(None, lambda: pipeline.run_records_stage(summary, use_cache=False))
+            if uploaded_pdf and rec.get("failures"):
+                raise RuntimeError("One or more panel extractions failed. No partial upload results were stored; retry after checking the model service.")
             rows = json.loads(Path(rec["rows_path"]).read_text(encoding="utf-8"))
             await _set(job, records=rec.get("records"), rows=len(rows), status="loading",
                        message="Storing live rows and crops…")
@@ -276,6 +283,9 @@ async def run_job(job_id: str) -> Job:
     except Exception as exc:
         logger.exception("ingest job %s failed", job_id)
         await _set(job, status="failed", error=str(exc)[:500], message="Extraction failed")
+    finally:
+        if uploaded_pdf:
+            uploaded_pdf.unlink(missing_ok=True)
     return job
 
 

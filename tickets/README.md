@@ -66,7 +66,7 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 | Ticket | What | Pri | Status |
 |---|---|---|---|
 | W-1 | `?doi=` deep link opens an extracted paper | P1 | PR #19 |
-| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | todo |
+| O-2 | Upload PDF for a DOI on Search and Research (API + web) | P1 | implemented; visual/auth/model acceptance pending; see `o2-pdf-upload-verification.md` |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | todo |
 | B-14 | Unresolved target must set needs_review | P2 | todo |
 | B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | todo |
