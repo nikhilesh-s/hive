@@ -628,6 +628,40 @@ async def fetch_live_record(record_id: int) -> dict | None:
         return dict(row) if row else None
 
 
+async def lookup_live_paper(doi: str) -> dict:
+    """Exact DOI read through the existing beta-wide readonly role.
+
+    A completed run, rather than a discovery hit or an in-progress job, is
+    required. Do not use the capped search path: it can drop partial experiments.
+    """
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT r.*, j.discovery_query AS original_query, j.title AS stored_title "
+            f"FROM {settings.live_table_name} r JOIN ingest_jobs j ON j.job_id = r.job_id "
+            "WHERE lower(r.doi) = $1 AND j.status = 'done' ORDER BY r.id", doi)
+        if rows:
+            results = [dict(row) for row in rows]
+            original_query = results[0].pop("original_query", None)
+            title = results[0].get("title") or results[0].get("stored_title")
+            for row in results:
+                row.pop("original_query", None)
+                row.pop("stored_title", None)
+            return {"status": "found", "doi": doi, "paper": {
+                "doi": doi, "title": title,
+                "job_id": results[0].get("job_id"), "discovery_query": original_query,
+                "rows": len(results), "experiments": len({
+                    (r.get("stable_row_key") or "").split(":")[0] or str(r["id"])
+                    for r in results}),
+            }, "results": results}
+        job = await conn.fetchrow(
+            "SELECT status FROM ingest_jobs WHERE lower(doi) = $1 "
+            "ORDER BY created_at DESC LIMIT 1", doi)
+    pending = job and job["status"] not in {"done", "failed", "awaiting_full_text"}
+    return {"status": "pending" if pending else "not_extracted", "doi": doi,
+            "paper": None, "results": []}
+
+
 async def fetch_live_crop(job_id: str | None, filename: str) -> bytes | None:
     if not job_id:
         return None

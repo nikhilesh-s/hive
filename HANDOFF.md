@@ -7,6 +7,46 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## W-1 DOI deep links and stored-paper lookup (2026-10-13)
+
+Branch: `w-1-doi-deep-link`, isolated worktree `/private/tmp/hiveblot-w1`.
+Base: `f77d311710603e3bea949a432094134195cbc711` (origin/main).
+This entry is committed with W-1; resolve its implementation SHA with
+`git log -1 --format=%H -- web/lib/storedPaper.ts`.
+
+Research links with `?doi=` normalize DOI URLs, prefixes, whitespace and case,
+then open stored completed live evidence with the original discovery query
+when recorded. The existing research input also accepts DOIs without invoking
+paper discovery or extraction. Missing papers retain the DOI and show the
+existing explicit extraction button; pending jobs and lookup errors are
+distinct states. No lookup starts an ingest job, inference or quota spend.
+The access gate already preserves DOI/lab parameters; browser tests cover
+successful and failed access verification, refresh and encoded DOI suffixes.
+
+Added read-only GET `/experimental/live/paper?doi=...` behind the existing
+internal-key boundary and `/api/experimental/stored-paper` behind the server
+beta-access gate. Uses the existing readonly PostgreSQL pool, configured live
+table and `ingest_jobs`; exact bound DOI lookup joins completed runs and avoids
+the recent-50-paper list and search's 500-row truncation. Response shaping uses
+`WesternBlotRecord`. No migrations, extraction-pipeline or quota changes.
+Live evidence remains shared within beta access, not account-owned. Lab tags
+are attribution only. Reviewed-only papers are outside this live-tier ticket.
+
+Verification: API 257 passed / 16 skipped (DB tests checked separately);
+local PostgreSQL permission matrix 14 passed / 1 skipped, including exact DOI,
+completed-only matching and all 501 lanes; miner pytest 133 passed / 2 skipped;
+biology 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
+pipeline 13/13; seed benchmark 34/34; web unit tests 11 passed; browser 13
+scenarios passed at desktop/mobile with no extraction/discovery POSTs.
+TypeScript, lint, production build and diff checks pass.
+
+Not deployed; hosted Supabase, Render and Vercel were not modified. Older runs
+without a persisted discovery query cannot display that original query.
+Next: review/merge W-1 via Nik, deploy API before web, then verify a real wave-1
+DOI through a fresh beta access visit. Continue with O-2 in a separate branch.
+Original checkout remains on `feature/saved-results` with its five local edits
+preserved. Local preview uses an isolated test database, not the hosted corpus.
+
 ## Release of Srushti's Oct 1-3 work, PR #11, ticket board (2026-10-11)
 
 - **Released.** Main and `release/hosted` are at `ac85a6e`. Render (API) and Vercel (web) both
