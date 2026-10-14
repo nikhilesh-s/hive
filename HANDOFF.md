@@ -11,9 +11,9 @@
 
 Branch: `w-6-paper-access-flags`; worktree `/private/tmp/hiveblot-w6`.
 Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
-Split flags-only from local audit `1e53518`; implementation and this handoff
-are committed together. Resolve the implementation SHA with
-`git log -1 --format=%H -- web/lib/paperAccess.ts`.
+Split flags-only from local audit `1e53518`. Implementation commit: `6a2de69`.
+PR: https://github.com/nikhilesh-s/hive/pull/21. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
 
 Missing/invalid metadata displays Access unknown. No open copy found no longer
 asserts Paywalled. Access and query-scoped relevance use independent checks;
@@ -31,8 +31,8 @@ TypeScript, lint and production build passed. CI includes the new regressions.
 
 Report: `research/W6_PAPER_ACCESS_VERIFICATION.md`. Local fixtures are not
 source-paper access classifications. No Supabase access metadata was modified;
-original checkout, combined audit and W-1 preserved. Next: push only W-6,
-request Nik's review, verify CI and leave unmerged. Missing metadata and
+original checkout, combined audit and W-1 preserved. Next: verify PR #21 CI,
+await Nik's review and leave unmerged/undeployed. Missing metadata and
 institutional entitlement remain limitations; source-backed population and
 deployment require separate authorization.
 

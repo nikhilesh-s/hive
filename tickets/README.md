@@ -74,7 +74,7 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 | O-8 | Research page gives up on transient 429s | P3 | todo |
 | W-3 | Phone and Safari pass on the hosted site | P2 | todo (site is deployed) |
 | W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo |
-| W-6 | Honest access labels and independent access-metadata selection | P1 | doing (Srushti, 2026-10-14) |
+| W-6 | Honest access labels and independent access-metadata selection | P1 | PR #21 |
 
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |
