@@ -11,8 +11,11 @@
 
 Branch: `o-2-pdf-upload`, worktree `/private/tmp/hiveblot-o2`.
 Base commit: `d6bc7717e459e69cdd7fda7419373f4b3f3ea000` (W-1 PR #19, unmerged).
-Implementation and this handoff are committed together; resolve the latest SHA
-with `git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
+Implementation commit: `e84ffceb86ca5383570870cfe3f966cbc7181407`.
+Latest handoff/CI packaging follow-up: resolve with
+`git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
+Draft PR: https://github.com/nikhilesh-s/hive/pull/22; Nik (`nikhilesh-s`) review
+requested. Base remains `w-1-doi-deep-link`; PR is open, draft and unmerged.
 
 Shared upload dialog is available on Search and Research. Explicit submission
 requires beta access plus a server-verified Supabase user. A five-minute DOI/user
@@ -47,8 +50,12 @@ model API 8205. Screenshots at `/private/tmp/hiveblot-o2-screenshots/`; fixture 
 at `/private/tmp/hiveblot-o2-sample.pdf`. See `tickets/o2-pdf-upload-verification.md`
 for flow, source files, precise test caveats and reproduction prerequisites.
 Original checkout and its five edits are unchanged (diff fingerprint verified).
-Next: open one draft O-2 PR targeting `w-1-doi-deep-link`, request Nik's review,
-leave unmerged; then obtain visual acceptance and genuine auth/model verification.
+GitHub API/miner, PostgreSQL and hygiene checks passed on the implementation;
+the initial web check found npm 11 had dropped npm 10-required optional lock
+entries. This follow-up restores those existing entries without changing their
+versions. CI must pass on the follow-up before acceptance.
+Next: finish PR #22 CI, then obtain visual acceptance and genuine auth/model
+verification. Leave draft and unmerged while those checks remain outstanding.
 Retarget only after W-1 merges. Do not deploy or mutate hosted Supabase.
 
 ## W-1 DOI deep links and stored-paper lookup (2026-10-13)
