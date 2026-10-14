@@ -13,6 +13,7 @@ import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
 import { jobFinished } from '@/lib/ingestJob';
+import { paperAccessLabel } from '@/lib/paperAccess';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -52,9 +53,7 @@ function Stepper({ status }: { status: string }) {
 }
 
 function accessLabel(status?: string | null) {
-  if (status === 'open_access') return 'Open access';
-  if (status === 'no_open_copy_found') return 'Paywalled · Check institutional access';
-  return 'Access unknown';
+  return paperAccessLabel(status);
 }
 
 function relevanceLabel(status?: string | null) {
