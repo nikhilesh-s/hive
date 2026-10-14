@@ -11,7 +11,7 @@
 
 Branch: `w-1-doi-deep-link`, isolated worktree `/private/tmp/hiveblot-w1`.
 Base: `f77d311710603e3bea949a432094134195cbc711` (origin/main).
-Latest implementation commit: `ab23dd7` (this follow-up records PR metadata).
+Core implementation commit: `ab23dd7`; PR metadata follow-up: `3fda112`.
 Draft PR: https://github.com/nikhilesh-s/hive/pull/19 (opened 2026-10-14).
 
 Research links with `?doi=` normalize DOI URLs, prefixes, whitespace and case,
@@ -39,10 +39,13 @@ biology 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
 pipeline 13/13; seed benchmark 34/34; web unit tests 11 passed; browser 13
 scenarios passed at desktop/mobile with no extraction/discovery POSTs.
 TypeScript, lint, production build and diff checks pass.
+GitHub's API/miner, PostgreSQL RLS, web build and hygiene checks passed on
+`3fda112`. The web CI job now also runs the frontend unit tests. The same 13
+browser scenarios passed against the local production build as well as dev.
 
 Not deployed; hosted Supabase, Render and Vercel were not modified. Older runs
 without a persisted discovery query cannot display that original query.
-Next: finish CI review on PR #19 and have Nik review/merge W-1, deploy API before web, then verify a real wave-1
+Next: have Nik review/merge PR #19 after its CI checks, deploy API before web, then verify a real wave-1
 DOI through a fresh beta access visit. Continue with O-2 in a separate branch.
 Original checkout remains on `feature/saved-results` with its five local edits
 preserved. Local preview uses an isolated test database, not the hosted corpus.
