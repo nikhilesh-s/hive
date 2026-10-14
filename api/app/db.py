@@ -671,6 +671,15 @@ async def fetch_live_crop(job_id: str | None, filename: str) -> bytes | None:
             "SELECT png FROM ingest_crops WHERE job_id = $1 AND filename = $2", job_id, filename)
 
 
+async def latest_ingest_job(doi: str) -> dict | None:
+    pool = await get_readonly_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT job_id, status FROM ingest_jobs WHERE lower(doi) = $1 "
+            "ORDER BY created_at DESC LIMIT 1", doi)
+    return dict(row) if row else None
+
+
 async def list_ingest_jobs(limit: int = 20) -> list[dict]:
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:

@@ -7,6 +7,50 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## O-2 PDF Upload on Search and Research (2026-10-14)
+
+Branch: `o-2-pdf-upload`, worktree `/private/tmp/hiveblot-o2`.
+Base commit: `d6bc7717e459e69cdd7fda7419373f4b3f3ea000` (W-1 PR #19, unmerged).
+Implementation and this handoff are committed together; resolve the latest SHA
+with `git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
+
+Shared upload dialog is available on Search and Research. Explicit submission
+requires beta access plus a server-verified Supabase user. A five-minute DOI/user
+capability allows direct bounded PDF streaming to FastAPI without exposing the
+internal key or sending large files through Next.js. File validation includes
+50 MiB bounds, PDF signature/readability/encryption and rights confirmation.
+Completed/pending DOI jobs are reused; new uploads reuse existing quota, job,
+OpenCV/model/reconciliation, live-row and crop storage. Uploads never establish
+open access, carry persisted upload source metadata, and cannot write reviewed
+Search data. No new tables/migrations or model implementation. W-1 opens results.
+Access/sign-in return paths preserve DOI/lab; no redirect or refresh submits PDFs.
+
+Verification: API 288 passed / 17 skipped; disposable PostgreSQL matrix 15 passed
+/ 1 skipped; frontend 14 passed; 30 desktop/mobile browser checks; TypeScript,
+lint, production build and whitespace checks pass. Miner pytest 133 passed /
+2 skipped; biology 165, reconcile 21, enrich 18, extraction 10, pipeline 13,
+stable-row-key 34, densitometry 116; seed benchmark 34/34 (not wet-lab accuracy).
+Real upload/preprocessing/reconciliation/storage/W-1 retrieval tested against
+isolated PostgreSQL with explicit mock model and test identity. Reviewed fixture
+rows remain 475; two mock unreviewed rows are separate. No production data touched.
+
+NOT COMPLETE: Srushti must visually inspect the preview. Real Google OAuth and
+real AI extraction remain unverified: public auth variables are intentionally
+unconfigured in the preview, no model credentials are available, and the local
+Claude CLI is logged out. The dialog exposes missing sign-in configuration.
+Inherited production dependency audit reports five affected packages, including
+critical Next.js advisories; do not claim production readiness or upgrade them
+in this ticket. Existing single-process job/quota and restart limitations remain.
+
+Preview: frontend port 3022 (Webpack dev), normal API 8204, separate test-only mock
+model API 8205. Screenshots at `/private/tmp/hiveblot-o2-screenshots/`; fixture PDF
+at `/private/tmp/hiveblot-o2-sample.pdf`. See `tickets/o2-pdf-upload-verification.md`
+for flow, source files, precise test caveats and reproduction prerequisites.
+Original checkout and its five edits are unchanged (diff fingerprint verified).
+Next: open one draft O-2 PR targeting `w-1-doi-deep-link`, request Nik's review,
+leave unmerged; then obtain visual acceptance and genuine auth/model verification.
+Retarget only after W-1 merges. Do not deploy or mutate hosted Supabase.
+
 ## W-1 DOI deep links and stored-paper lookup (2026-10-13)
 
 Branch: `w-1-doi-deep-link`, isolated worktree `/private/tmp/hiveblot-w1`.

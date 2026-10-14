@@ -1,5 +1,7 @@
 'use client';
 
+import { PdfUpload } from '@/components/PdfUpload';
+
 // EXPERIMENTAL — the one-page UCSF research flow:
 //   topic → find papers (Valency / PMC, source shown) → choose an open-access
 //   paper → extract live or open an already-ingested copy → progress →
@@ -328,6 +330,7 @@ export default function ResearchPage() {
 
       <section className="hb-page-section">
         <h2 className="hb-page-h2">1. Find papers</h2>
+        <PdfUpload initialDoi={topic} />
         <form onSubmit={findPapers} className="hb-live-form" role="search">
           <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic or DOI" aria-label="Research topic or DOI" />
           <button type="submit" disabled={searching || lookupLoading || busy || !topic.trim()}>{searching || lookupLoading ? 'Searching…' : 'Find papers'}</button>
