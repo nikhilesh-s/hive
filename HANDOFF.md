@@ -11,9 +11,9 @@
 
 Branch: `w-5-dynamic-corpus-counts`; worktree `/private/tmp/hiveblot-w5`.
 Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
-Split counts-only from local audit `1e53518`; implementation and this handoff
-are committed together. Resolve the implementation SHA with
-`git log -1 --format=%H -- web/lib/corpusStatsRequest.ts`.
+Split counts-only from local audit `1e53518`. Implementation commit: `2bc1f10`.
+PR: https://github.com/nikhilesh-s/hive/pull/20. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
 
 Home now uses the live count hook. Transient stats/network failures retry with
 bounds and abort cleanup; invalid/auth failures are not retried. No fake totals.
@@ -30,8 +30,8 @@ production build passed. CI runs frontend and database regressions.
 
 Report: `research/W5_CORPUS_COUNTS_VERIFICATION.md`. No Supabase writes,
 production changes or modifications to the original checkout. The combined
-audit and W-1 remain preserved. Next: push only this branch, request Nik's
-review on W-5, verify CI and leave the PR unmerged. Persistent backend failure
+audit and W-1 remain preserved. Next: verify PR #20 CI and await Nik's review;
+leave the PR unmerged and undeployed. Persistent backend failure
 still reports unavailable after bounded retries; release verification awaits
 an authorized deployment.
 
