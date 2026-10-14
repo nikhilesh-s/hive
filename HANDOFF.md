@@ -11,8 +11,8 @@
 
 Branch: `w-1-doi-deep-link`, isolated worktree `/private/tmp/hiveblot-w1`.
 Base: `f77d311710603e3bea949a432094134195cbc711` (origin/main).
-This entry is committed with W-1; resolve its implementation SHA with
-`git log -1 --format=%H -- web/lib/storedPaper.ts`.
+Latest implementation commit: `ab23dd7` (this follow-up records PR metadata).
+Draft PR: https://github.com/nikhilesh-s/hive/pull/19 (opened 2026-10-14).
 
 Research links with `?doi=` normalize DOI URLs, prefixes, whitespace and case,
 then open stored completed live evidence with the original discovery query
@@ -42,7 +42,7 @@ TypeScript, lint, production build and diff checks pass.
 
 Not deployed; hosted Supabase, Render and Vercel were not modified. Older runs
 without a persisted discovery query cannot display that original query.
-Next: review/merge W-1 via Nik, deploy API before web, then verify a real wave-1
+Next: finish CI review on PR #19 and have Nik review/merge W-1, deploy API before web, then verify a real wave-1
 DOI through a fresh beta access visit. Continue with O-2 in a separate branch.
 Original checkout remains on `feature/saved-results` with its five local edits
 preserved. Local preview uses an isolated test database, not the hosted corpus.

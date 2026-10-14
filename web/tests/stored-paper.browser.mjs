@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const base = process.env.W1_TEST_URL || 'http://127.0.0.1:3017';
+const base = process.env.W1_TEST_URL || 'http://localhost:3017';
 const code = process.env.W1_TEST_ACCESS_CODE;
 assert.ok(code, 'Set W1_TEST_ACCESS_CODE to the local server access code');
 const output = process.env.W1_TEST_OUTPUT || '/private/tmp/hiveblot-w1-browser-output';
