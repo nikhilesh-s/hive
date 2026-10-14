@@ -194,21 +194,15 @@ def _paper_flags_from_job(job: dict, query: str) -> dict | None:
     return flags or None
 
 
-def _job_sort_key(job: dict) -> tuple[bool, str, str]:
-    return (
-        bool(job.get("access_status") or job.get("relevance_status")),
-        str(job.get("updated_at") or ""),
-        str(job.get("created_at") or ""),
-    )
-
-
 async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
-    """Attach DOI-level ingest_jobs access/relevance metadata to reviewed rows.
+    """Attach DOI-level ingest_jobs access/relevance metadata to evidence rows.
 
     Access is paper-level and can be shown for any DOI match. Relevance is
     query-dependent and is only shown when the ingest job's discovery_query
     matches the current search query after simple whitespace/case normalization.
     """
+    for row in rows:
+        row["paper_flags"] = {"access_status": "unknown"}
     original_dois = sorted({str(row.get("doi")).strip() for row in rows if str(row.get("doi") or "").strip()})
     dois = sorted({_norm_doi(doi) for doi in original_dois if _norm_doi(doi)})
     if not dois:
@@ -230,7 +224,7 @@ async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
             async with pool.acquire() as conn:
                 fetched = await conn.fetch(
                     f"SELECT {', '.join(INGEST_PAPER_FLAG_COLUMNS)} "
-                    "FROM ingest_jobs WHERE lower(doi) = ANY($1::text[])",
+                    "FROM ingest_jobs WHERE lower(trim(doi)) = ANY($1::text[])",
                     dois,
                 )
             jobs = [dict(row) for row in fetched]
@@ -244,18 +238,25 @@ async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
         if doi:
             by_doi.setdefault(doi, []).append(job)
 
-    for matches in by_doi.values():
-        matches.sort(key=_job_sort_key, reverse=True)
-
     for row in rows:
         doi = _norm_doi(row.get("doi"))
         if not doi:
             continue
-        for job in by_doi.get(doi, []):
-            flags = _paper_flags_from_job(job, query)
-            if flags:
-                row["paper_flags"] = flags
-                break
+        matches = by_doi.get(doi, [])
+        # Access and relevance can be recorded by different runs. A newer
+        # relevance-only job must not hide a previously recorded access check.
+        for kind in ("access", "relevance"):
+            eligible = [job for job in matches if job.get(f"{kind}_status") and (
+                kind == "access" or _norm_query(job.get("discovery_query")) == _norm_query(query))]
+            if not eligible:
+                continue
+            latest = max(eligible, key=lambda job: str(
+                job.get(f"{kind}_checked_at") or job.get("updated_at") or job.get("created_at") or ""))
+            flags = _paper_flags_from_job(latest, query) or {}
+            row["paper_flags"].update({k: v for k, v in flags.items() if k.startswith(f"{kind}_")})
+        if row["paper_flags"].get("access_status") not in {"open_access", "no_open_copy_found", "unknown"}:
+            row["paper_flags"] = {k: v for k, v in row["paper_flags"].items() if not k.startswith("access_")}
+            row["paper_flags"]["access_status"] = "unknown"
     return rows
 
 

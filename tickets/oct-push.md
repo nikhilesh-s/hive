@@ -165,3 +165,16 @@ work is on `main` but not deployed: the Vercel web build is from 9-26.
   `PMC\d+`. Prefer OpenAlex/NCBI values, using browser values only to fill gaps.
 - Acceptance: tests that an oversize field returns 422, a bad pmcid returns 422, and a
   browser-sent title is replaced by the OpenAlex title when one exists.
+
+## W-6 - Honest paper-access flags - Srushti - P1
+- Problem: missing metadata hid badges; no_open_copy_found claimed Paywalled;
+  selecting one job for both access and relevance could hide a valid access check.
+- Scope: unknown defaults, conservative labels, independent metadata selection,
+  and access flags on existing reviewed/live search responses.
+- Acceptance: open/no-open-copy/unknown cases pass API, readonly PostgreSQL,
+  frontend and browser tests. Missing metadata must never imply open or closed
+  access, and query-scoped relevance must not override a paper's access check.
+- Limitations: all three reviewed papers currently lack access metadata;
+  retain unknown until source-backed metadata exists. No institutional entitlement
+  is inferred. Do not populate or alter access metadata in Supabase.
+- No corpus-count changes, migrations, extraction changes or deployment.
