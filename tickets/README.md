@@ -65,7 +65,7 @@ P1 = this week, P2 = next, P3 = when free. Track files:
 ### Srushti (+ Codex)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| W-1 | `?doi=` deep link opens an extracted paper | P1 | todo |
+| W-1 | `?doi=` deep link opens an extracted paper | P1 | doing (Srushti + Codex, 2026-10-13) |
 | O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | todo |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | todo |
 | B-14 | Unresolved target must set needs_review | P2 | todo |
