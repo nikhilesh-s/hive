@@ -45,9 +45,11 @@ Do not merge or deploy this branch as part of this task.
 - PostgreSQL role/metadata/W-1 matrix: 15 passed / 1 skipped, using a separate
   disposable database; the ingest role cannot write the reviewed table.
 - Frontend unit tests: 14 passed; TypeScript, lint and production build pass.
-- Browser: 30 desktop/mobile checks, including both entry points, real beta gate
+- Browser: 32 desktop/mobile checks, including both entry points, real beta gate
   and anonymous denial, DOI/lab restoration, refresh, unchanged reviewed Search,
   stored evidence, progress, processing, 503 reconnection, failure and both themes.
+  The normal API's actual missing-model error is verified separately from model
+  fixtures. GitHub API/miner, PostgreSQL, web and hygiene checks pass on `78f3423`.
 - Miner pytest: 133 passed / 2 skipped. Biology 165, reconciliation 21, enrichment
   18, extraction 10, pipeline 13, stable-row-key 34, densitometry 116 checks pass.
   Seed benchmark: 34/34 (self-consistency, not wet-lab accuracy).

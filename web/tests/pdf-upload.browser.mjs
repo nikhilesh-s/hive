@@ -52,6 +52,17 @@ try {
     await modal.getByRole('button', { name: 'Upload and extract', exact: true }).click();
     await modal.getByRole('alert').filter({ hasText: 'Sign in' }).waitFor();
     await screen('sign-in-required'); checks++;
+    // A test identity can reach the normal API, which must honestly reject
+    // extraction when no real model is configured (no mocked model here).
+    await modal.getByLabel('DOI', { exact: true }).fill('10.1000/o2-no-model-unextracted');
+    await page.route('**/api/experimental/upload', async route => {
+      const response = await context.request.post('http://localhost:8204/experimental/upload-ticket', { headers: auth, data: route.request().postDataJSON() });
+      await route.fulfill({ status: response.status(), json: { ...await response.json(), upload_url: 'http://localhost:8204/experimental/uploads' } });
+    });
+    await modal.getByRole('button', { name: 'Upload and extract', exact: true }).click();
+    await modal.getByRole('alert').filter({ hasText: 'No extraction model configured' }).waitFor();
+    await screen('real-model-prerequisite'); checks++;
+    await page.unroute('**/api/experimental/upload');
     await modal.getByRole('button', { name: 'Close upload' }).click();
     await page.goto(`${base}/search?q=STAT3`);
     await page.getByRole('button', { name: 'Upload PDF', exact: true }).waitFor();

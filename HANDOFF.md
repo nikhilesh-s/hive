@@ -12,7 +12,8 @@
 Branch: `o-2-pdf-upload`, worktree `/private/tmp/hiveblot-o2`.
 Base commit: `d6bc7717e459e69cdd7fda7419373f4b3f3ea000` (W-1 PR #19, unmerged).
 Implementation commit: `e84ffceb86ca5383570870cfe3f966cbc7181407`.
-Latest handoff/CI packaging follow-up: resolve with
+CI packaging fix: `78f3423d6e914c36e860561849f1849a7291c1d1`.
+Latest handoff/browser-verification follow-up: resolve with
 `git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
 Draft PR: https://github.com/nikhilesh-s/hive/pull/22; Nik (`nikhilesh-s`) review
 requested. Base remains `w-1-doi-deep-link`; PR is open, draft and unmerged.
@@ -29,7 +30,7 @@ Search data. No new tables/migrations or model implementation. W-1 opens results
 Access/sign-in return paths preserve DOI/lab; no redirect or refresh submits PDFs.
 
 Verification: API 288 passed / 17 skipped; disposable PostgreSQL matrix 15 passed
-/ 1 skipped; frontend 14 passed; 30 desktop/mobile browser checks; TypeScript,
+/ 1 skipped; frontend 14 passed; 32 desktop/mobile browser checks; TypeScript,
 lint, production build and whitespace checks pass. Miner pytest 133 passed /
 2 skipped; biology 165, reconcile 21, enrich 18, extraction 10, pipeline 13,
 stable-row-key 34, densitometry 116; seed benchmark 34/34 (not wet-lab accuracy).
@@ -50,12 +51,13 @@ model API 8205. Screenshots at `/private/tmp/hiveblot-o2-screenshots/`; fixture 
 at `/private/tmp/hiveblot-o2-sample.pdf`. See `tickets/o2-pdf-upload-verification.md`
 for flow, source files, precise test caveats and reproduction prerequisites.
 Original checkout and its five edits are unchanged (diff fingerprint verified).
-GitHub API/miner, PostgreSQL and hygiene checks passed on the implementation;
-the initial web check found npm 11 had dropped npm 10-required optional lock
-entries. This follow-up restores those existing entries without changing their
-versions. CI must pass on the follow-up before acceptance.
-Next: finish PR #22 CI, then obtain visual acceptance and genuine auth/model
-verification. Leave draft and unmerged while those checks remain outstanding.
+GitHub API/miner, PostgreSQL, web and hygiene checks all passed on `78f3423`.
+The initial npm 11/npm 10 optional-lock compatibility failure was corrected
+without changing the existing dependency versions; npm 10 clean-install dry-run
+also passes. Final browser coverage adds actual normal-API missing-model refusal
+(not a mocked service error), without creating a job or consuming quota.
+Next: obtain Srushti's visual acceptance, genuine OAuth/model verification and
+Nik's review of PR #22. Leave draft and unmerged while these remain outstanding.
 Retarget only after W-1 merges. Do not deploy or mutate hosted Supabase.
 
 ## W-1 DOI deep links and stored-paper lookup (2026-10-13)
