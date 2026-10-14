@@ -7,6 +7,34 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## W-5 Corpus Counts Review (2026-10-14)
+
+Branch: `w-5-dynamic-corpus-counts`; worktree `/private/tmp/hiveblot-w5`.
+Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
+Split counts-only from local audit `1e53518`; implementation and this handoff
+are committed together. Resolve the implementation SHA with
+`git log -1 --format=%H -- web/lib/corpusStatsRequest.ts`.
+
+Home now uses the live count hook. Transient stats/network failures retry with
+bounds and abort cleanup; invalid/auth failures are not retried. No fake totals.
+Existing backend cache is 60 seconds; no Realtime or schema changes. No
+paper-access changes in this ticket. User authorized pushing this dedicated
+branch and opening a PR for Nik; never merge or deploy it.
+
+Read-only Supabase check: 3 reviewed papers / 93 experiment groups / 475 rows.
+API 243 passed / 16 skipped; isolated PostgreSQL matrix+count test 14 passed /
+1 skipped; frontend 11 passed; browser 16 desktop/mobile scenarios; miner
+133 passed / 2 skipped; biology/reconcile/enrich/extract/pipeline 165/21/18/10/13;
+stable keys 34; densitometry 116; seed benchmark 34/34. TypeScript, lint,
+production build passed. CI runs frontend and database regressions.
+
+Report: `research/W5_CORPUS_COUNTS_VERIFICATION.md`. No Supabase writes,
+production changes or modifications to the original checkout. The combined
+audit and W-1 remain preserved. Next: push only this branch, request Nik's
+review on W-5, verify CI and leave the PR unmerged. Persistent backend failure
+still reports unavailable after bounded retries; release verification awaits
+an authorized deployment.
+
 ## Release of Srushti's Oct 1-3 work, PR #11, ticket board (2026-10-11)
 
 - **Released.** Main and `release/hosted` are at `ac85a6e`. Render (API) and Vercel (web) both
