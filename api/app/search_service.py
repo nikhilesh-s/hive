@@ -54,7 +54,7 @@ async def execute_search(query: str, limit: int, table_name: str | None = None) 
     if not table_name:
         for row in results:
             row["experiment_key"], _ = identity_for_row(row)
-        results = await attach_paper_flags(results, query)
+    results = await attach_paper_flags(results, query)
 
     return SearchResponse(
         question=query,

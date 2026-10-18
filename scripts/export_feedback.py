@@ -21,9 +21,15 @@ import csv
 import json
 import os
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 
 TABLE = "hiveblot_feedback"
+
+
+def _since_bound(since: date) -> datetime:
+    # created_at is timestamptz; asyncpg binds a bare date as midnight in the
+    # *local* zone, which drops same-day rows west of UTC. Pin to UTC midnight.
+    return datetime(since.year, since.month, since.day, tzinfo=timezone.utc)
 
 
 async def _rows(dsn: str, since: date | None) -> tuple[list[str], list[dict]]:
@@ -33,7 +39,7 @@ async def _rows(dsn: str, since: date | None) -> tuple[list[str], list[dict]]:
     args: list[object] = []
     if since is not None:
         sql += " WHERE created_at >= $1"
-        args.append(since)
+        args.append(_since_bound(since))
     sql += " ORDER BY created_at, feedback_id"
     conn = await asyncpg.connect(dsn)
     try:
