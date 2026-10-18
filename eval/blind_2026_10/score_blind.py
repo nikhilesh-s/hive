@@ -397,8 +397,10 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
     result = {"annotator": annotator, "seal_check": seal,
               "frozen_code_diff_vs_f77d311": code or "none",
               "papers": papers, "pooled": dict(totals),
-              "pooled_metrics_raw": {f: metrics(pooled_raw[f]) for f in FIELDS},
-              "pooled_metrics_adjudicated": {f: metrics(pooled_adj[f]) for f in FIELDS},
+              "pooled_metrics_raw": {**{f: metrics(pooled_raw[f]) for f in FIELDS},
+                                     "ALL FIELDS": metrics(sum(pooled_raw.values(), Counter()))},
+              "pooled_metrics_adjudicated": {**{f: metrics(pooled_adj[f]) for f in FIELDS},
+                                             "ALL FIELDS": metrics(sum(pooled_adj.values(), Counter()))},
               "adjudicated": bool(verdicts)}
     (out / "results.json").write_text(json.dumps(result, indent=2) + "\n")
     with (out / "adjudication_sheet.csv").open("w", newline="") as f:
