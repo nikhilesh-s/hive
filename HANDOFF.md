@@ -7,6 +7,35 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## W-6 Paper Access Review (2026-10-14)
+
+Branch: `w-6-paper-access-flags`; worktree `/private/tmp/hiveblot-w6`.
+Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
+Split flags-only from local audit `1e53518`. Implementation commit: `6a2de69`.
+PR: https://github.com/nikhilesh-s/hive/pull/21. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
+
+Missing/invalid metadata displays Access unknown. No open copy found no longer
+asserts Paywalled. Access and query-scoped relevance use independent checks;
+reviewed/live search attach the flags. No count-hook/Home changes, extraction,
+scientific values, quotas or production-schema changes. User authorized pushing
+this dedicated branch and requesting Nik's review; never merge or deploy it.
+
+Read-only Supabase verification: 3 reviewed papers / 93 groups / 475 rows, and
+zero reviewed papers with access metadata. Do not fabricate or backfill labels.
+API 242 passed / 16 skipped; isolated PostgreSQL matrix+access test 14 passed /
+1 skipped; frontend 9 passed; browser 12 desktop/mobile Search/Research cases;
+miner 133 passed / 2 skipped; biology/reconcile/enrich/extract/pipeline
+165/21/18/10/13; stable keys 34; densitometry 116; seed benchmark 34/34.
+TypeScript, lint and production build passed. CI includes the new regressions.
+
+Report: `research/W6_PAPER_ACCESS_VERIFICATION.md`. Local fixtures are not
+source-paper access classifications. No Supabase access metadata was modified;
+original checkout, combined audit and W-1 preserved. Next: verify PR #21 CI,
+await Nik's review and leave unmerged/undeployed. Missing metadata and
+institutional entitlement remain limitations; source-backed population and
+deployment require separate authorization.
+
 ## W-5 Corpus Counts Review (2026-10-14)
 
 Branch: `w-5-dynamic-corpus-counts`; worktree `/private/tmp/hiveblot-w5`.

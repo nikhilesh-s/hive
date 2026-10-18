@@ -32,7 +32,7 @@ Built and running on our side, coming in the next drop once hosted: live literat
 
 ## Known limitations
 
-The corpus is intentionally small, so most searches outside these 3 papers will return nothing. Automated extraction accuracy on papers HiveBlot has not seen has not been measured yet. The free-tier hosting means the first search after a quiet period can take 30-60 seconds. Paper access in the live search runs through Valency and PMC open access; paywalled papers are reported as such, not scraped. Broader access may be needed later.
+The corpus is intentionally small, so most searches outside these 3 papers will return nothing. Automated extraction accuracy on papers HiveBlot has not seen has not been measured yet. The free-tier hosting means the first search after a quiet period can take 30-60 seconds. Paper access in the live search runs through Valency and PMC open access; papers with no open copy are labeled "No open copy found / Check institutional access" (and "Access unknown" when no check is on file), not scraped. Broader access may be needed later.
 
 ## Feedback link
 
