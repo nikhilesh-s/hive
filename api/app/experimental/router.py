@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timezone
+from typing import Literal
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
@@ -19,10 +20,11 @@ from ..db import (
     fetch_live_record,
     list_ingest_jobs,
     list_live_papers,
+    lookup_live_paper,
 )
 from ..limiter import limiter
 from ..record_detail import build_record_detail
-from ..schemas import RecordDetail, SearchRequest, SearchResponse
+from ..schemas import RecordDetail, SearchRequest, SearchResponse, WesternBlotRecord
 from ..search_service import execute_search
 from ..valency import ValencyClient, ValencyError
 from . import ingest
@@ -79,6 +81,22 @@ class IngestRequest(BaseModel):
     relevance_status: str | None = None
     relevance_score: float | None = None
     relevance_reason: str | None = None
+
+
+class StoredPaper(BaseModel):
+    doi: str
+    title: str | None = None
+    job_id: str | None = None
+    discovery_query: str | None = None
+    rows: int
+    experiments: int
+
+
+class StoredPaperResponse(BaseModel):
+    status: Literal["found", "not_extracted", "pending"]
+    doi: str
+    paper: StoredPaper | None = None
+    results: list[WesternBlotRecord] = []
 
 
 @router.get("/status")
@@ -194,6 +212,23 @@ async def live_papers():
     except Exception as e:
         logger.warning("live papers listing failed: %s", e)
         return {"papers": [], "error": "live tier unavailable"}
+
+
+@router.get("/live/paper", response_model=StoredPaperResponse)
+async def stored_paper(doi: str = Query(min_length=1, max_length=200)):
+    """Read existing evidence only; the router requires the internal BFF key.
+
+    Live evidence is shared within the beta access context, not account-owned.
+    The lab tag is attribution and must never grant access to data.
+    """
+    normalized = ingest.fulltext.normalize_doi(doi)  # same normalizer ingest stores with
+    if not normalized:
+        raise HTTPException(422, "Not a DOI")
+    try:
+        return await lookup_live_paper(normalized)
+    except Exception as e:
+        logger.warning("stored paper lookup failed: %s", e)
+        raise HTTPException(503, "Stored evidence is temporarily unavailable") from e
 
 
 @router.get("/ingest/{job_id}")
