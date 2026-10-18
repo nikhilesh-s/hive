@@ -75,7 +75,7 @@ jobs:
         working-directory: api
         env:
           HIVE_DB_TEST_URL: postgresql://postgres:postgres@localhost:5432/hiveblot_rlstest
-        run: python -m pytest -q tests/test_db_access_matrix.py -v
+        run: python -m pytest -q tests/test_db_access_matrix.py tests/*_db.py -v
 
   web:
     name: Web typecheck, lint, build

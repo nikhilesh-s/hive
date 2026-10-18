@@ -9,7 +9,7 @@
 
 ## W-1 DOI deep links and stored-paper lookup (2026-10-13)
 
-Branch: `w-1-doi-deep-link`, isolated worktree `/private/tmp/hiveblot-w1`.
+Branch: `w-1-doi-deep-link`.
 Base: `f77d311710603e3bea949a432094134195cbc711` (origin/main).
 Core implementation commit: `ab23dd7`; PR metadata follow-up: `3fda112`.
 Draft PR: https://github.com/nikhilesh-s/hive/pull/19 (opened 2026-10-14).
@@ -47,8 +47,35 @@ Not deployed; hosted Supabase, Render and Vercel were not modified. Older runs
 without a persisted discovery query cannot display that original query.
 Next: have Nik review/merge PR #19 after its CI checks, deploy API before web, then verify a real wave-1
 DOI through a fresh beta access visit. Continue with O-2 in a separate branch.
-Original checkout remains on `feature/saved-results` with its five local edits
-preserved. Local preview uses an isolated test database, not the hosted corpus.
+Local preview uses an isolated test database, not the hosted corpus.
+
+## W-5 Corpus Counts Review (2026-10-14)
+
+Branch: `w-5-dynamic-corpus-counts`; worktree `/private/tmp/hiveblot-w5`.
+Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
+Split counts-only from local audit `1e53518`. Implementation commit: `2bc1f10`.
+PR: https://github.com/nikhilesh-s/hive/pull/20. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
+
+Home now uses the live count hook. Transient stats/network failures retry with
+bounds and abort cleanup; invalid/auth failures are not retried. No fake totals.
+Existing backend cache is 60 seconds; no Realtime or schema changes. No
+paper-access changes in this ticket. User authorized pushing this dedicated
+branch and opening a PR for Nik; never merge or deploy it.
+
+Read-only Supabase check: 3 reviewed papers / 93 experiment groups / 475 rows.
+API 243 passed / 16 skipped; isolated PostgreSQL matrix+count test 14 passed /
+1 skipped; frontend 11 passed; browser 16 desktop/mobile scenarios; miner
+133 passed / 2 skipped; biology/reconcile/enrich/extract/pipeline 165/21/18/10/13;
+stable keys 34; densitometry 116; seed benchmark 34/34. TypeScript, lint,
+production build passed. CI runs frontend and database regressions.
+
+Report: `research/W5_CORPUS_COUNTS_VERIFICATION.md`. No Supabase writes,
+production changes or modifications to the original checkout. The combined
+audit and W-1 remain preserved. Next: verify PR #20 CI and await Nik's review;
+leave the PR unmerged and undeployed. Persistent backend failure
+still reports unavailable after bounded retries; release verification awaits
+an authorized deployment.
 
 ## Release of Srushti's Oct 1-3 work, PR #11, ticket board (2026-10-11)
 

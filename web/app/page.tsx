@@ -1,6 +1,7 @@
 'use client';
 
 import { SearchInput } from '@/components/SearchInput';
+import { useCorpusStats } from '@/lib/corpusStats';
 
 // Headline typewriter is pure CSS (steps() animation in globals.css) so the
 // page ships no effect-driven state; reduced-motion users see the full line.
@@ -18,6 +19,7 @@ function TypewriterHeadline() {
 }
 
 export default function Home() {
+  const { stats, error } = useCorpusStats();
   // One results surface: home searches route to /search, which renders the
   // biological Evidence Record cards.
   const handleSearch = (query: string) => {
@@ -104,7 +106,9 @@ export default function Home() {
 
           <p className="hb-home-scope">
             Search experiment-level Western blot evidence from a <strong>reviewed reference
-            corpus</strong>: 3 papers · 93 experiments · 475 evidence rows. Every value is
+            corpus</strong>: {stats
+              ? `${stats.reviewed_papers} paper${stats.reviewed_papers === 1 ? '' : 's'} · ${stats.experiment_groups} experiment${stats.experiment_groups === 1 ? '' : 's'} · ${stats.evidence_rows} evidence row${stats.evidence_rows === 1 ? '' : 's'}.`
+              : error ? 'Corpus statistics are temporarily unavailable.' : 'Loading corpus statistics...'} Every value is
             traceable to the figure, caption or methods sentence it came from; uncertainty
             and conflicts are shown, never guessed.
           </p>
