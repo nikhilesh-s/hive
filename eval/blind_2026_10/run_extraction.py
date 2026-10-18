@@ -34,9 +34,12 @@ def frozen_code_check() -> None:
         raise SystemExit(f"system code differs from frozen {FROZEN_SHA}:\n{diff}")
 
 
+ONLY = set(sys.argv[3:])  # optional PMCIDs: run a subset (e.g. while the 4th paper is undecided)
+
+
 def frozen_papers() -> list[dict]:
     papers = json.loads((HERE / "papers.json").read_text())["papers"]
-    return [p for p in papers if p["status"] == "frozen"]
+    return [p for p in papers if p["status"] == "frozen" and (not ONLY or p["pmcid"] in ONLY)]
 
 
 def stamp(path: Path, **kv) -> None:
