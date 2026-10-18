@@ -79,10 +79,17 @@ Nothing to run.
 
 ## 5. Lock the human labels
 
-1. Put Tanvi's CSVs in `eval/blind_2026_10/annotations/tanvi/`: `panels.csv`, `targets.csv`,
-   `lanes.csv`, `timelog.csv`.
-2. Put Yashvi's `crop_map.csv` in `eval/blind_2026_10/annotations/crop_map.csv`.
-3. Then commit:
+Check progress at any time. This shows row counts only:
+
+```bash
+$PY eval/blind_2026_10/fetch_annotations.py status
+```
+
+When both are done, pull the Google Sheets into `annotations/` and commit:
+
+```bash
+$PY eval/blind_2026_10/fetch_annotations.py pull
+```
 
 ```bash
 git add eval/blind_2026_10/annotations && git commit -m "Blind benchmark: lock annotations and crop map" && git push
