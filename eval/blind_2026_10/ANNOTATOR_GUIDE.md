@@ -5,7 +5,7 @@ against. They need to be your own reading of each paper, and they must not be in
 HiveBlot in any way.
 
 Expect about 4 hours in total: roughly 15 minutes per paper for the inventory, plus about 6
-minutes per fully annotated panel. Please finish by **Mon 2026-10-20, 12:00 PT**.
+minutes per fully annotated panel. Please finish by **Tue 2026-10-20, 12:00 PT**.
 
 ## Rules (please read)
 
