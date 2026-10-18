@@ -18,10 +18,26 @@ test('normalizes DOI links and preserves suffix punctuation', () => {
     assert.equal(isDoiQuery(value), true);
   }
   assert.equal(normalizeDoi('10.1000/a(b);c'), '10.1000/a(b);c');
-  for (const value of ['bad', '10.1/a', '10.1000/has space', 'x10.1000/a', '10.1000/' + 'a'.repeat(200)]) {
+  for (const value of ['bad', '10.1/a', '10.1000/' + 'a'.repeat(200)]) {
     assert.equal(normalizeDoi(value), '');
   }
   assert.equal(isDoiQuery('STAT3 western blot'), false);
+  assert.equal(isDoiQuery('10.5 mM STAT3'), false); // not a DOI: runs a topic search
+});
+
+test('normalizes like western_blot_miner.fulltext.normalize_doi', () => {
+  const cases = {
+    'https://doi.org/10.3892/BR.2026.2108': '10.3892/br.2026.2108',
+    'doi:10.1186/s12964-025-02385-8.': '10.1186/s12964-025-02385-8',
+    '10.1000/ABC).': '10.1000/abc',
+    '10.1000/a,': '10.1000/a',
+    '(https://doi.org/10.1000/ABC);': '10.1000/abc',
+    'see doi 10.1000/ABC': '10.1000/abc',
+    '10.1000/has space': '10.1000/has',
+    'x10.1000/a': '10.1000/a',
+    'not a doi': '',
+  };
+  for (const [value, expected] of Object.entries(cases)) assert.equal(normalizeDoi(value), expected, value);
 });
 
 test('encoded DOI and lab survive the access next path', () => {
@@ -29,7 +45,7 @@ test('encoded DOI and lab survive the access next path', () => {
   const gate = new URL('http://localhost/access');
   gate.searchParams.set('next', target);
   const restored = new URL(safeNext(gate.searchParams.get('next')), gate);
-  assert.equal(normalizeDoi(restored.searchParams.get('doi')), '10.1000/a(b)');
+  assert.equal(normalizeDoi(restored.searchParams.get('doi')), '10.1000/a(b'); // trailing ")" dropped, as in ingest
   assert.equal(restored.searchParams.get('lab'), 'smith_lab');
 });
 

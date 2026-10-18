@@ -631,15 +631,16 @@ async def fetch_live_record(record_id: int) -> dict | None:
 async def lookup_live_paper(doi: str) -> dict:
     """Exact DOI read through the existing beta-wide readonly role.
 
-    A completed run, rather than a discovery hit or an in-progress job, is
-    required. Do not use the capped search path: it can drop partial experiments.
+    Found means live rows exist for the DOI; the job row only adds the original
+    query and may be missing (manual loads, failed best-effort persist). Do not
+    use the capped search path: it can drop partial experiments.
     """
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             f"SELECT r.*, j.discovery_query AS original_query, j.title AS stored_title "
-            f"FROM {settings.live_table_name} r JOIN ingest_jobs j ON j.job_id = r.job_id "
-            "WHERE lower(r.doi) = $1 AND j.status = 'done' ORDER BY r.id", doi)
+            f"FROM {settings.live_table_name} r LEFT JOIN ingest_jobs j ON j.job_id = r.job_id "
+            "WHERE lower(r.doi) = $1 ORDER BY r.id", doi)
         if rows:
             results = [dict(row) for row in rows]
             original_query = results[0].pop("original_query", None)
@@ -655,9 +656,10 @@ async def lookup_live_paper(doi: str) -> dict:
                     for r in results}),
             }, "results": results}
         job = await conn.fetchrow(
-            "SELECT status FROM ingest_jobs WHERE lower(doi) = $1 "
-            "ORDER BY created_at DESC LIMIT 1", doi)
-    pending = job and job["status"] not in {"done", "failed", "awaiting_full_text"}
+            "SELECT status, updated_at > now() - interval '30 minutes' AS fresh "
+            "FROM ingest_jobs WHERE lower(doi) = $1 ORDER BY created_at DESC LIMIT 1", doi)
+    # A restart leaves `extracting` forever (jobs run in-process); old ones are not pending.
+    pending = job and job["fresh"] and job["status"] not in {"done", "failed", "awaiting_full_text"}
     return {"status": "pending" if pending else "not_extracted", "doi": doi,
             "paper": None, "results": []}
 

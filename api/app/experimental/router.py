@@ -4,7 +4,6 @@ paper-QA endpoint shares with /search."""
 from __future__ import annotations
 
 import logging
-import re
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -222,9 +221,8 @@ async def stored_paper(doi: str = Query(min_length=1, max_length=200)):
     Live evidence is shared within the beta access context, not account-owned.
     The lab tag is attribution and must never grant access to data.
     """
-    normalized = re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", "", doi.strip(),
-                        flags=re.IGNORECASE).strip().lower()
-    if not re.fullmatch(r"10\.\d{4,9}/\S+", normalized):
+    normalized = ingest.fulltext.normalize_doi(doi)  # same normalizer ingest stores with
+    if not normalized:
         raise HTTPException(422, "Not a DOI")
     try:
         return await lookup_live_paper(normalized)
