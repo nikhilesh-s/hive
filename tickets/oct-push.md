@@ -46,6 +46,17 @@ work is on `main` but not deployed: the Vercel web build is from 9-26.
 
 ---
 
+## W-5 - Dynamic corpus counts and recovery - Srushti - P1
+- Problem: homepage totals were hardcoded, and a transient statistics failure
+  left Home/Search/About unavailable until refresh.
+- Scope: use the existing database-backed statistics hook on Home; retry
+  transient failures with bounds and abort cleanup; never substitute fake totals.
+- Acceptance: independent Supabase totals agree with the API; Home/Search/About
+  reflect changed API values; transient recovery, cache/pagination, readonly
+  database integration and frontend/browser tests pass.
+- Limitations: backend cache remains 60 seconds; no Realtime subscription.
+- No access-label changes, migrations, production data writes or deployment.
+
 ## W-1 · `?doi=` deep link that opens an already-extracted paper — Srushti (Codex) · P1
 - Why: follow-up 2 should take each researcher straight to their own extracted paper.
   Today `/experimental/research` reads no URL parameters. The promised link format
