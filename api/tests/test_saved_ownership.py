@@ -75,7 +75,7 @@ async def test_rest_six_lane_lifecycle_isolates_accounts_and_anonymous(monkeypat
                 return False
             if value.startswith('eq.') and str(row.get(key)) != value[3:]:
                 return False
-            if value.startswith('in.') and str(row.get(key)) not in value[4:-1].split(','):
+            if value.startswith('in.') and str(row.get(key)) not in [v.strip('"') for v in value[4:-1].split(',')]:
                 return False
         return True
 

@@ -116,6 +116,48 @@ def test_lookup_failure_or_absent_doi_does_not_imply_restricted_access(monkeypat
     assert all(row["paper_flags"] == {"access_status": "unknown"} for row in rows)
 
 
+def test_unverified_job_cannot_set_access_or_relevance_label(monkeypatch):
+    # /experimental/ingest stores caller-supplied access/relevance with checked_at NULL.
+    jobs = [
+        {"job_id": "a", "doi": "10.1/example", "access_status": "open_access",
+         "access_url": "https://evil.example/x", "access_checked_at": None,
+         "relevance_status": "likely_relevant", "discovery_query": "STAT3", "relevance_checked_at": None},
+    ]
+    monkeypatch.setattr(db, "_use_supabase_rest", lambda: True)
+    monkeypatch.setattr(db, "_supabase_get", lambda *args: jobs)
+    flags = asyncio.run(db.attach_paper_flags([{"doi": "10.1/example"}], "STAT3"))[0]["paper_flags"]
+    assert flags == {"access_status": "unknown"}
+
+    # A verified older check still wins over a newer unverified claim.
+    jobs.append({"job_id": "b", "doi": "10.1/example", "access_status": "no_open_copy_found",
+                 "access_checked_at": "2026-10-01T00:00:00Z"})
+    flags = asyncio.run(db.attach_paper_flags([{"doi": "10.1/example"}], "STAT3"))[0]["paper_flags"]
+    assert flags["access_status"] == "no_open_copy_found"
+    assert "relevance_status" not in flags
+
+
+def test_latest_check_compares_timestamps_not_strings_and_ties_break_by_job_id(monkeypatch):
+    from datetime import datetime, timezone
+    jobs = [
+        {"job_id": "a", "doi": "10.1/example", "access_status": "open_access",
+         "access_checked_at": "2026-10-03T00:00:00Z"},
+        # Later instant, passed as a datetime object (asyncpg path) next to a string.
+        {"job_id": "b", "doi": "10.1/example", "access_status": "no_open_copy_found",
+         "access_checked_at": datetime(2026, 10, 3, 1, tzinfo=timezone.utc)},
+    ]
+    monkeypatch.setattr(db, "_use_supabase_rest", lambda: True)
+    monkeypatch.setattr(db, "_supabase_get", lambda *args: jobs)
+    assert asyncio.run(db.attach_paper_flags([{"doi": "10.1/example"}], "q"))[0]["paper_flags"]["access_status"] == "no_open_copy_found"
+
+    jobs[1]["access_checked_at"] = "2026-10-03T00:00:00+00:00"  # same instant, different spelling
+    assert asyncio.run(db.attach_paper_flags([{"doi": "10.1/example"}], "q"))[0]["paper_flags"]["access_status"] == "no_open_copy_found"
+
+
+def test_pg_in_quotes_values_with_postgrest_metacharacters():
+    assert db._pg_in(["10.1/a,b", "10.1/(x)", 7]) == 'in.("10.1/a,b","10.1/(x)","7")'
+    assert db._pg_in(['a"b', "c\\d"]) == 'in.("a\\"b","c\\\\d")'
+
+
 def test_search_service_keeps_scientific_identity_and_adds_flags(monkeypatch):
     rows = [{
         "id": 1,
