@@ -5,11 +5,17 @@ export interface CorpusStats {
 }
 
 const RETRY_DELAYS = [1000, 3000, 8000];
-const TRANSIENT = new Set([429, 502, 503, 504]);
+// 502 is the proxy's non-retryable upstream-auth failure; only 429/503 are retried.
+const TRANSIENT = new Set([429, 503]);
+
+// signal.throwIfAborted() is missing on older Safari/Chrome.
+function checkAborted(signal?: AbortSignal) {
+  if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+}
 
 function pause(ms: number, signal?: AbortSignal) {
   return new Promise<void>((resolve, reject) => {
-    signal?.throwIfAborted();
+    checkAborted(signal);
     const abort = () => {
       clearTimeout(timer);
       reject(signal?.reason ?? new DOMException('Aborted', 'AbortError'));
@@ -24,7 +30,7 @@ function pause(ms: number, signal?: AbortSignal) {
 
 export async function fetchCorpusStats(signal?: AbortSignal): Promise<CorpusStats> {
   for (let attempt = 0; ; attempt++) {
-    signal?.throwIfAborted();
+    checkAborted(signal);
     let response: Response;
     try {
       response = await fetch('/api/corpus-stats', { cache: 'no-store', signal });

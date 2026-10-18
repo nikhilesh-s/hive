@@ -1,10 +1,18 @@
-"""Real PostgreSQL counts; all fixture records are rolled back."""
+"""Real PostgreSQL counts; all count fixtures are rolled back.
+
+Self-sufficient: it applies the same schema + role chain as
+test_db_access_matrix.py (reusing its helper) before the rollback-only
+transaction, so it passes on a fresh throwaway database in any test order.
+Like the matrix test, that setup drops and recreates the app tables, so
+HIVE_DB_TEST_URL must be a SUPERUSER connection to a scratch database.
+"""
 import asyncio
 import os
 
 import pytest
 
 from app import corpus_stats as stats, db
+from test_db_access_matrix import _apply_chain
 
 DB_URL = os.environ.get('HIVE_DB_TEST_URL', '')
 pytestmark = pytest.mark.skipif(not DB_URL, reason='HIVE_DB_TEST_URL not set')
@@ -16,6 +24,7 @@ def test_counts_change_with_database_records(monkeypatch):
     async def exercise():
         conn = await asyncpg.connect(DB_URL)
         await db._decode_json(conn)
+        await _apply_chain(conn)
         transaction = conn.transaction()
         await transaction.start()
 
