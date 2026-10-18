@@ -53,3 +53,11 @@ is done, rank 8 (PMC7757890) is in the frozen list provisionally.
 - **If not:** rank 8 stays, and ranks 3, 5, 6 and 7 are logged as access failures.
 
 This depends on access only. Rank 8's Stage 1 output was produced while it was provisional.
+
+**A2 resolved, 2026-10-18.** Nik downloaded rank 3 (PMC7948984) in a browser. Its DOI was
+checked against the PDF text, and the file is frozen with SHA-256 `ee043119b233…`. Rank 3
+replaces rank 8 (PMC7757890), which is dropped from the frozen list:
+- Rank 8's Stage 1 output was produced and is not used.
+- Its model stage was never run.
+
+Final papers: ranks 1, 2, 3 and 4.

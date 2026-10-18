@@ -27,15 +27,12 @@ minutes per fully annotated panel. Please finish by **Mon 2026-10-20, 12:00 PT**
 
 ## Papers (in this order)
 
-Paper 8 is the fourth paper unless Nik tells you paper 3 has replaced it. **Start with papers
-1, 2 and 4**, and do the fourth paper last.
-
 | Order | ID | DOI | PDF pages | Panel sampling sequence (use in step 2) |
 |---|---|---|---|---|
 | 1 | PMC9283986 | 10.3389/fnagi.2022.921573 | 23 | 36, 31, 16, 69, 5, 21, 73, 65, 63, 54, 78, 28, 20, 80, 48, 56, 10, 71, 32, 60, 12, 53, 39, 11 |
 | 2 | PMC5328321 | 10.2147/OTT.S117933 | 14 | 58, 10, 48, 78, 69, 26, 18, 8, 37, 65, 66, 2, 29, 57, 33, 70, 80, 36, 32, 62, 52, 39, 77, 6 |
+| 3 | PMC7948984 | 10.1074/jbc.RA120.014479 | 13 | 73, 10, 28, 5, 16, 64, 11, 27, 6, 13, 49, 51, 20, 41, 66, 56, 79, 54, 18, 29, 57, 38, 31, 42 |
 | 4 | PMC4393234 | 10.1371/journal.pone.0123604 | 17 | 31, 19, 26, 5, 54, 78, 49, 13, 64, 3, 1, 22, 6, 30, 2, 35, 36, 58, 67, 47, 15, 72, 68, 60 |
-| 8* | PMC7757890 | 10.1371/journal.pone.0244356 | 24 | 64, 6, 33, 41, 16, 42, 19, 13, 61, 76, 40, 65, 1, 17, 66, 49, 32, 72, 73, 35, 3, 31, 21, 15 |
 
 If a sequence runs out before you have chosen 6 panels, the full sequence is in `papers.json`.
 Nik can also send it to you.

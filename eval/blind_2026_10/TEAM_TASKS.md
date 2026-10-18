@@ -6,8 +6,7 @@ benchmark comes before every other ticket.
 ## Tanvi: primary annotator (about 4 h, due Mon 10-20 12:00 PT)
 
 1. Read `ANNOTATOR_GUIDE.md` in this folder. It is self-contained.
-2. Annotate papers 1, 2 and 4 first, then the fourth paper Nik confirms (8, or 3 if it replaces
-   8). Write into the Google Sheet Nik shares; it has one tab per template in
+2. Annotate papers 1 to 4 in order. Write into the Google Sheet Nik shares; it has one tab per template in
    `annotations/TEMPLATE/`.
 3. While you do this:
    - Don't open HiveBlot for these papers.
@@ -27,7 +26,7 @@ benchmark comes before every other ticket.
 ## Yashvi: crop mapper (about 45 min, due Sun 10-19 21:00 PT)
 
 1. Nik shares the folder `mapper_pack/`. It holds one folder per paper of cropped figure images
-   plus `crop_map.csv`, and the four PDFs.
+   (57 crops), `crop_map.csv`, and the four PDFs.
 2. For each crop (one row in `crop_map.csv`):
    - Open the image.
    - Find where it comes from in the PDF. The `page` column tells you the page.
