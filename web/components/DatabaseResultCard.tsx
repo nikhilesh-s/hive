@@ -4,7 +4,7 @@ import { useState, type ReactNode } from 'react';
 
 import EvidencePanel from '@/components/EvidencePanel';
 import { formatLaneLabel } from '@/lib/lanes';
-import { paperAccessLabel } from '@/lib/paperAccess';
+import { paperAccessLabel, safeHttpUrl } from '@/lib/paperAccess';
 
 // NOTE: every Evidence Record field below is OPTIONAL. Legacy rows (pre-migration
 // 001) simply omit them and the card falls back to the original base fields, so
@@ -294,6 +294,7 @@ export default function DatabaseResultCard({
   const designTag = deriveDesignTag(lanes, data.treatment_context);
   const sourceId = data.doi || data.paper_id;
   const accessLabel = paperAccessLabel(data.paper_flags?.access_status);
+  const accessHref = safeHttpUrl(data.paper_flags?.access_url);
   const relevanceLabel = data.paper_flags?.relevance_status
     ? RELEVANCE_LABELS[data.paper_flags.relevance_status] ?? titleCase(data.paper_flags.relevance_status)
     : null;
@@ -331,8 +332,8 @@ export default function DatabaseResultCard({
           )}
           {(accessLabel || relevanceLabel) && (
             <div className="hb-paper-flag-row" aria-label="Paper access and relevance">
-              {accessLabel && data.paper_flags?.access_url ? (
-                <a className="hb-paper-flag" href={data.paper_flags.access_url} target="_blank" rel="noreferrer">
+              {accessLabel && accessHref ? (
+                <a className="hb-paper-flag" href={accessHref} target="_blank" rel="noreferrer">
                   {accessLabel}
                 </a>
               ) : accessLabel ? (

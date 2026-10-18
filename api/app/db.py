@@ -3,7 +3,7 @@ import asyncio
 import json
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 from urllib.parse import urlencode
 from urllib.error import HTTPError
@@ -80,7 +80,9 @@ def _supabase_write(
 
 
 def _pg_in(values: list[object]) -> str:
-    return f"in.({','.join(str(v) for v in values)})"
+    # Double-quote each value so commas/parentheses in DOIs or keys stay literal.
+    quoted = (str(v).replace("\\", "\\\\").replace('"', '\\"') for v in values)
+    return "in.(" + ",".join(f'"{v}"' for v in quoted) + ")"
 
 
 def _norm_doi(value: object) -> str | None:
@@ -90,6 +92,19 @@ def _norm_doi(value: object) -> str | None:
 
 def _norm_query(value: object) -> str:
     return " ".join(str(value or "").strip().lower().split())
+
+
+def _ts(value: object) -> datetime:
+    """Parse a datetime or ISO string to an aware UTC datetime (None/garbage sorts oldest)."""
+    oldest = datetime.min.replace(tzinfo=timezone.utc)
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return oldest
+    if not isinstance(value, datetime):
+        return oldest
+    return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
 def _iso(value: object) -> str | None:
@@ -155,6 +170,7 @@ async def run_readonly_query(sql: str) -> list[dict]:
 
 
 INGEST_PAPER_FLAG_COLUMNS = (
+    "job_id",
     "doi",
     "access_status",
     "access_url",
@@ -245,13 +261,15 @@ async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
         matches = by_doi.get(doi, [])
         # Access and relevance can be recorded by different runs. A newer
         # relevance-only job must not hide a previously recorded access check.
+        # Only a job whose check actually ran (checked_at set) may supply a
+        # label; unverified caller-supplied values stay "Access unknown".
         for kind in ("access", "relevance"):
-            eligible = [job for job in matches if job.get(f"{kind}_status") and (
+            eligible = [job for job in matches if job.get(f"{kind}_status") and job.get(f"{kind}_checked_at") and (
                 kind == "access" or _norm_query(job.get("discovery_query")) == _norm_query(query))]
             if not eligible:
                 continue
-            latest = max(eligible, key=lambda job: str(
-                job.get(f"{kind}_checked_at") or job.get("updated_at") or job.get("created_at") or ""))
+            latest = max(eligible, key=lambda job: (
+                _ts(job.get(f"{kind}_checked_at")), str(job.get("job_id") or "")))
             flags = _paper_flags_from_job(latest, query) or {}
             row["paper_flags"].update({k: v for k, v in flags.items() if k.startswith(f"{kind}_")})
         if row["paper_flags"].get("access_status") not in {"open_access", "no_open_copy_found", "unknown"}:
