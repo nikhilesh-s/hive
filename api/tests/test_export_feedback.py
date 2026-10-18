@@ -15,6 +15,7 @@ import io
 import os
 import subprocess
 import sys
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -22,7 +23,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[2]
 DB_URL = os.environ.get("HIVE_DB_TEST_URL", "")
 
-pytestmark = pytest.mark.skipif(not DB_URL, reason="HIVE_DB_TEST_URL not set")
+needs_db = pytest.mark.skipif(not DB_URL, reason="HIVE_DB_TEST_URL not set")
 
 FEEDBACK_MIGRATIONS = [  # only the ones that touch hiveblot_feedback
     "migrations/002_feedback.sql",
@@ -62,6 +63,7 @@ def _export(*args: str) -> str:
     return out.stdout
 
 
+@needs_db
 def test_export_csv_header_and_row():
     fid = asyncio.run(_seed())
     try:
@@ -75,3 +77,12 @@ def test_export_csv_header_and_row():
     assert len(mine) == 1 and mine[0]["comment"] == "export-test"
     ids = [int(r["feedback_id"]) for r in rows]
     assert ids == sorted(ids), "rows are not ordered by created_at"
+
+
+def test_since_bound_is_utc_midnight():
+    # No DB needed. A bare date was bound as local-zone midnight, so
+    # `--since 2026-09-16` skipped 2026-09-16 UTC rows west of UTC.
+    sys.path.insert(0, str(REPO / "scripts"))
+    from export_feedback import _since_bound
+
+    assert _since_bound(date(2026, 9, 16)) == datetime(2026, 9, 16, tzinfo=timezone.utc)
