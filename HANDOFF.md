@@ -7,6 +7,77 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Blind benchmark and PR merges (2026-10-18)
+
+### Main
+
+Main is at `d01f08d` after these merges, all with CI green:
+- W-5 (#20)
+- W-6 (#21), with review fixes: an `access_checked_at` / `relevance_checked_at` value is required
+  before a job can set a label, PostgREST `in.()` values are quoted, and `access_url` must be
+  http(s)
+- O-3 (#25)
+- G-4 (#26)
+- W-1 (#19), with review fixes: a LEFT JOIN on live rows, a 30-minute stale-pending guard, and
+  ingest's `normalize_doi` shared with the web
+
+Other PRs:
+- Copilot #2 is closed.
+- B-3 is now draft PR #24 (`feature/saved-results`). It changes `record_builder.py`, so hold it
+  until the benchmark is scored.
+- O-2 (#22) is moved onto main and stays a draft until Srushti's checks and the security review
+  are done.
+
+Deployment:
+- **Nothing is deployed.** Render (`3839ee3`) and Vercel (`ffc54a0`) still run the 10-11
+  release. R-5 deploys the merged web/API changes, API first, then a smoke test.
+
+### Blind extraction benchmark (P0)
+
+- **Where:** branch `eval/blind-benchmark-2026-10`, worktree `/Users/niks/hive-blind-eval`,
+  folder `eval/blind_2026_10/`. Private data lives outside the repo in
+  `/Users/niks/hive-blind-eval-private`: the PDFs, the sealed model outputs and the mapper pack.
+  Never commit it, and never share `runs/` before scoring.
+- **Design:** pre-registered at `38bf0a6`, with amendments A1 and A2 in `DEVIATIONS.md`.
+  - The draw is seeded with `20261018` over 15 eligible papers from `eval/candidates.json`.
+  - Frozen papers: ranks 1, 2 and 4 (PMC9283986, PMC5328321, PMC4393234), plus rank 8
+    (PMC7757890) provisionally until Nik tries a browser download of rank 3 (PMC7948984).
+- **System under test:** `western_blot_miner/` at `f77d311`, the production default model
+  `claude-opus-5` through the local `claude_cli` backend, concurrency 1, no uploads.
+- **Stage 1:** 298 crops were found and 66 sent to the model.
+- **Model stage:** started 2026-10-18 for ranks 1, 2 and 4. The log is
+  `/Users/niks/hive-blind-eval-private/extract_run1.log`.
+- **Scorer:** `score_blind.py` (self-test passes). It aligns on figure, panel, target and lane
+  index, and it refuses to run if a sealed output changed.
+
+### Production usage (read-only, 10-18)
+
+- 16 anonymous searches in 8 sessions, no lab tags.
+- The last feedback was 9-16.
+- No confirmed lab use. See `research/ADOPTION_STATUS_2026-10-18.md` on the benchmark branch.
+
+### Security
+
+The `hive_ingest` DB password was printed in an agent session on 10-18. Rotate it (ticket O-9):
+1. `ALTER ROLE`.
+2. Update Render `DB_INGEST_URL` and `~/hive_ingest_dsn.txt`.
+3. Redeploy.
+
+### Tests run 10-18
+
+- Biology 165/165, densitometry 116/116, reconcile 21/21, extract 10/10, pipeline 13/13.
+- Seed benchmark 34/34.
+- Benchmark scorer self-test passes.
+- PR CI green on #19, #20, #21, #25 and #26.
+
+### Exact next task
+
+1. When the model stage finishes, settle rank 3 or rank 8 and run the 4th paper.
+2. Run `run_extraction.py seal`, then commit and push the seal **before** any annotation
+   arrives.
+3. When Tanvi's sheet and Yashvi's crop map arrive, follow `RUNBOOK.md` steps 5-7.
+4. Then do R-5.
+
 ## W-6 Paper Access Review (2026-10-14)
 
 Branch: `w-6-paper-access-flags`; worktree `/private/tmp/hiveblot-w6`.
