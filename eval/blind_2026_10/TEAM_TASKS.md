@@ -3,7 +3,7 @@
 The goal is one honest, human-checked accuracy number for HiveBlot by **Tue 2026-10-20**. This
 benchmark comes before every other ticket.
 
-## Tanvi: primary annotator (about 4 h, due Mon 10-20 12:00 PT)
+## Tanvi: primary annotator (about 4 h, due Tue 10-20 12:00 PT)
 
 1. Read `ANNOTATOR_GUIDE.md` in this folder. It is self-contained.
 2. Annotate papers 1 to 4 in order. Write into the Google Sheet Nik shares; it has one tab per template in
@@ -21,9 +21,9 @@ benchmark comes before every other ticket.
 ## Second annotator (optional; anyone with Western-blot experience except Tanvi and Nik)
 
 - Annotate **paper 1 only** (PMC9283986), steps 1 to 3 of the guide, independently of Tanvi.
-- This gives an agreement figure. It takes about 1 h and is due Mon 10-20 12:00 PT.
+- This gives an agreement figure. It takes about 1 h and is due Tue 10-20 12:00 PT.
 
-## Yashvi: crop mapper (about 45 min, due Sun 10-19 21:00 PT)
+## Yashvi: crop mapper (about 45 min, due Mon 10-19 21:00 PT)
 
 1. Nik shares the folder `mapper_pack/`. It holds one folder per paper of cropped figure images
    (57 crops), `crop_map.csv`, and the four PDFs.
