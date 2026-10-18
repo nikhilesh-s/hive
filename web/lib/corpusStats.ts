@@ -1,22 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-export interface CorpusStats {
-  reviewed_papers: number;
-  experiment_groups: number;
-  evidence_rows: number;
-}
-
-export async function fetchCorpusStats(signal?: AbortSignal): Promise<CorpusStats> {
-  const response = await fetch('/api/corpus-stats', { cache: 'no-store', signal });
-  if (!response.ok) throw new Error('Corpus statistics are unavailable');
-  const data = await response.json();
-  if (!data || !['reviewed_papers', 'experiment_groups', 'evidence_rows'].every(
-    (key) => Number.isSafeInteger(data[key]) && data[key] >= 0,
-  )) throw new Error('Invalid corpus statistics');
-  return data;
-}
+import { fetchCorpusStats, type CorpusStats } from './corpusStatsRequest';
+export { fetchCorpusStats, type CorpusStats } from './corpusStatsRequest';
 
 export function useCorpusStats() {
   const [stats, setStats] = useState<CorpusStats | null>(null);
