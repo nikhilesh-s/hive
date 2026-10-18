@@ -59,18 +59,19 @@ benchmark measures commit `f77d311`, which is what production runs.
 | Ticket | What | Owner | Status |
 |---|---|---|---|
 | E-1 | Pre-register, draw 4 papers, freeze PDFs, Stage 1 | Nik + Claude | done 10-18 (`38bf0a6`, `5ba7945`) |
-| E-2 | Model stage on the frozen papers, then seal outputs | Nik + Claude | running 10-18; paper 4 waits on E-3 |
-| E-3 | Browser download of PMC7948984 (or log the skip) | Nik | todo |
-| E-4 | Blind annotation of 4 papers (`ANNOTATOR_GUIDE.md`) | Tanvi | todo, due Mon 10-20 12:00 PT |
-| E-5 | Map 66 crops to figure and panel (`TEAM_TASKS.md`) | Yashvi | todo, due Sun 10-19 21:00 PT |
+| E-2 | Model stage on the frozen papers, then seal outputs | Nik + Claude | papers 1, 2 and 4 done 10-18; paper 3 running |
+| E-3 | Browser download of PMC7948984 (or log the skip) | Nik | done 10-18 (rank 3 replaces rank 8) |
+| E-4 | Blind annotation of 4 papers (`ANNOTATOR_GUIDE.md`) | Tanvi | shared 10-18 (Drive folder + Sheet); due Mon 10-20 12:00 PT |
+| E-5 | Map 57 crops to figure and panel (`TEAM_TASKS.md`) | Yashvi | shared 10-18 (Drive folder + Sheet); due Sun 10-19 21:00 PT |
 | E-6 | Second annotator on paper 1 (optional) | Nik picks | todo |
 | E-7 | Score, adjudicate, report (`RUNBOOK.md` steps 5-7) | Nik + Claude | after E-4, E-5 |
 
 ### Release (Nik + Nik's Claude; these need credentials)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| O-9 | Rotate the `hive_ingest` DB password (it was printed in an agent session on 10-18), then update Render `DB_INGEST_URL` and redeploy | P0 | Nik decides; Claude can do it |
-| R-5 | Deploy W-1, W-5, W-6, O-3 (API first, then web), then a hosted smoke test | P1 | todo; no extraction-code changes in it |
+| O-9 | Rotate the `hive_ingest` DB password (it was printed in an agent session on 10-18) | P0 | done 10-18 (role, Render, `api/.env`, DSN file; new login verified) |
+| O-10 | Rotate the gswitch `FASTMCP_SERVER_AUTH_GOOGLE_JWT_SIGNING_KEY` (also printed 10-18); re-authorize the ChatGPT connector afterwards | P1 | Nik decides |
+| R-5 | Deploy W-1, W-5, W-6, O-3, O-8, W-7 (API first, then web), then a hosted smoke test | P1 | done 10-18: Render and Vercel at `edd95f5`; health, Home, Search, About and corpus stats checked |
 | O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik (still unset 10-18) |
 | O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
 | O-1 | Render paid plan | P2 | Nik decides (still free 10-18) |
@@ -78,14 +79,14 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Srushti (+ Codex)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft; moved onto main 10-18); waits on Srushti's visual/OAuth/model checks and the security review |
+| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft): fix the 7 security-review items posted 10-18 (1 blocking: unbounded page render) |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
 | B-14 | Unresolved target must set needs_review | P2 | probably covered by `4cbbaa8` in PR #24; check after E-7 |
 | B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | held until E-7 (extraction code) |
 | B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | held until E-7 (extraction code) |
-| W-7 | W-5 review follow-ups: non-retryable status for config/401, an `AbortSignal.throwIfAborted` fallback for old Safari, a standalone DB test, browser test against the API not literals | P3 | todo |
-| O-8 | Research page gives up on transient 429s | P3 | todo |
-| W-3 | Phone and Safari pass on the hosted site | P2 | todo (after R-5) |
+| W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
+| O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
+| W-3 | Phone and Safari pass on the hosted site | P2 | todo (R-5 deployed 10-18) |
 | W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo (labels are safe since W-6; job metadata is still trusted) |
 
 ### Tanvi (bio QA; no code)
