@@ -39,9 +39,9 @@ The facts scored are:
 |---|---|---|---|---|---|
 | 1 | PMC9283986 | Lopez-Toledo et al. 2022, *Front Aging Neurosci*: PSEN1-mutant patient fibroblasts | 23 | system fetcher (Europe PMC listed) | frozen |
 | 2 | PMC5328321 | Yang et al. 2017, *Onco Targets Ther*: β-catenin in renal cell carcinoma | 14 | system fetcher (publisher page) | frozen |
-| 3 | PMC7948984 | *J Biol Chem* 2021: PARP/caspase cleavage | n/a | fetcher failed on every source | awaiting a manual browser download (`DEVIATIONS.md` A2) |
+| 3 | PMC7948984 | *J Biol Chem* 2021: the 89-kDa PARP1 cleavage fragment and AIF-mediated apoptosis | 13 | manual browser download (the fetcher failed on every source) | frozen |
 | 4 | PMC4393234 | Bojovic et al. 2015, *PLoS ONE*: immediate-early genes in rat spinal cord | 17 | system fetcher (OpenAlex) | frozen |
-| 8 | PMC7757890 | Bortolami et al. 2020, *PLoS ONE*: mTOR and LC3 in liver tissue | 24 | system fetcher (Europe PMC listed) | frozen, provisional (replaced if rank 3 is obtained) |
+| 8 | PMC7757890 | Bortolami et al. 2020, *PLoS ONE*: mTOR and LC3 in liver tissue | 24 | system fetcher | dropped: rank 3 was obtained (`DEVIATIONS.md` A2) |
 
 Ranks 5-7 also failed automatic download. That is an access failure only, logged in
 `papers.json`.
@@ -58,8 +58,8 @@ Stage 1 is the deterministic OpenCV panel detection. It runs before any model ca
 | PMC9283986 | 23 | 85 | 6 | 8.7 s |
 | PMC5328321 | 14 | 72 | 28 | 5.4 s |
 | PMC4393234 | 17 | 49 | 3 | 5.5 s |
-| PMC7757890 | 24 | 92 | 29 | 7.5 s |
-| **Total** | 78 | 298 | 66 | 27.1 s |
+| PMC7948984 | 13 | 88 | 20 | 12.7 s |
+| **Total** | 67 | 294 | 57 | 32.3 s |
 
 Source: `PRIV/runs/<PMCID>/timing.json`.
 
@@ -73,7 +73,7 @@ PMC4393234 with 3, may turn out to have low recall. The report will show that as
 |---|---|
 | Primary annotator | Tanvi (bio QA), working from `ANNOTATOR_GUIDE.md`, blind to all system output. Due Mon 10-20 12:00 PT. |
 | Second annotator | Optional. Paper 1 only, for an agreement figure. |
-| Crop mapper | Yashvi. Maps the 66 crops to figure and panel from images and page numbers only. Due Sun 10-19. |
+| Crop mapper | Yashvi. Maps the 57 crops to figure and panel from images and page numbers only. Due Sun 10-19. |
 | Panels fully annotated | Up to 6 per paper, chosen by the pre-generated sampling sequence. Panel recall uses the full inventory. |
 | Manual time | Logged per paper and per task (`timelog.csv`). |
 
