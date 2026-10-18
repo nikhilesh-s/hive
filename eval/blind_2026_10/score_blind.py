@@ -102,6 +102,12 @@ def sys_sample(rec: dict):
     return (val, ok) if ok else sys_field(rec, ["sample", "sample"])
 
 
+def symbols_match(system_value, annotated_cell) -> bool:
+    """'MAPK1/MAPK3' vs 'MAPK3|MAPK1': every system symbol must be one the annotator listed (A3)."""
+    got = {norm(s) for s in re.split(r"[/,;|]", str(system_value or "")) if norm(s)}
+    return bool(got) and got <= alts(annotated_cell)
+
+
 # ---------- scoring one aligned pair ----------
 def judge(asserted: bool, correct: bool, annotated_silent: bool) -> str:
     if annotated_silent:
@@ -115,7 +121,7 @@ def score_row(row: dict, rec: dict) -> dict[str, tuple[str, str, str]]:
     """field -> (category, annotated value, system value)."""
     out = {}
     canon, ok = sys_field(rec, ["target", "canonical_target"])
-    out["protein_identity"] = (judge(ok, norm(canon) in alts(row["gene_symbol"]), silent(row["gene_symbol"])),
+    out["protein_identity"] = (judge(ok, symbols_match(canon, row["gene_symbol"]), silent(row["gene_symbol"])),
                                row["gene_symbol"], str(canon))
     a_kind, a_sites = annotated_mod(row["modification"])
     s_kind, s_site = sys_mod(rec)
@@ -194,7 +200,7 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
     inv_ids = [p["panel_id"] for p in inventory]
     sampled = {t["panel_id"] for t in targets}
     cmap = crop_panels(cmap_rows, inventory)
-    groups: dict[tuple, list[dict]] = defaultdict(list)
+    placed: list[tuple[dict, set]] = []   # (record, inventory panel ids its crop covers)
     counts = Counter()
     for rec in records:
         crop = Path(str((rec.get("figure") or {}).get("image_crop_ref") or "")).name
@@ -206,8 +212,8 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
         elif m == "WB_NOT_IN_INVENTORY":
             counts["records_on_panels_missing_from_inventory"] += 1
         else:
-            groups[tuple(m)].append(rec)
-    found = {pid for g in groups for pid in g}
+            placed.append((rec, set(m)))
+    found = {pid for _, ps in placed for pid in ps}
     fields = {f: Counter() for f in FIELDS}
     cells = []
     lanes_by_row = defaultdict(list)
@@ -224,17 +230,35 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
                           "target_printed": row["target_printed"], "field": field,
                           "lane_index": lane, "annotated": a, "system": s, "verdict": ""})
 
+    def printed(r, row):
+        return norm(r["target"].get("raw_target_name")) == norm(row["target_printed"])
+
+    def symbol(r, row):
+        return symbols_match(sys_field(r, ["target", "canonical_target"])[0], row["gene_symbol"])
+
+    def same_mod(r, row):
+        kind, sites = annotated_mod(row["modification"])
+        s_kind, s_site = sys_mod(r)
+        return s_kind == kind and (not sites or s_site in sites)
+
     used: set[int] = set()
     for pid in sorted(sampled, key=lambda x: int(x)):
-        group = next((g for g in groups if pid in g), None)
-        pool = groups.get(group, [])
+        pool = [r for r, ps in placed if pid in ps]   # every crop that covers this panel (A3)
+        aligned = {}
+        # pass 1: printed label for every row; pass 2: gene symbol, preferring the same modification (A3)
         for row in rows_by_panel[pid]:
-            rec = None
-            for match in (lambda r: norm(r["target"].get("raw_target_name")) == norm(row["target_printed"]),
-                          lambda r: norm(sys_field(r, ["target", "canonical_target"])[0]) in alts(row["gene_symbol"])):
-                rec = next((r for r in pool if id(r) not in used and match(r)), None)
-                if rec is not None:
-                    break
+            r = next((r for r in pool if id(r) not in used and printed(r, row)), None)
+            if r is not None:
+                used.add(id(r)); aligned[row["row_order"]] = r
+        for row in rows_by_panel[pid]:
+            if row["row_order"] in aligned:
+                continue
+            cands = [r for r in pool if id(r) not in used and symbol(r, row)]
+            r = next((c for c in cands if same_mod(c, row)), cands[0] if cands else None)
+            if r is not None:
+                used.add(id(r)); aligned[row["row_order"]] = r
+        for row in rows_by_panel[pid]:
+            rec = aligned.get(row["row_order"])
             if rec is None:
                 for field in FIELDS[:-1]:
                     if field == "phospho_site" and not annotated_mod(row["modification"])[1]:
@@ -248,14 +272,18 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
                         continue
                     fields[field]["NOT_FOUND"] += 1
             else:
-                used.add(id(rec))
-                for field, (cat, a, s) in score_row(row, rec).items():
-                    note(field, cat, row, a, s)
-            for idx, cat, a, s in score_lanes(lanes_by_row[(pid, row["row_order"])], rec):
-                note("band_call", cat, row, a, s, lane=str(idx))
-    for group, pool in groups.items():
-        if set(group) <= sampled:
-            counts["spurious_records_unaligned"] += sum(1 for r in pool if id(r) not in used)
+                for field, (cat, a, s_) in score_row(row, rec).items():
+                    note(field, cat, row, a, s_)
+            for idx, cat, a, s_ in score_lanes(lanes_by_row[(pid, row["row_order"])], rec):
+                note("band_call", cat, row, a, s_, lane=str(idx))
+    for r, ps in placed:   # leftovers on fully annotated panels
+        if id(r) in used or not ps <= sampled:
+            continue
+        rows = [row for pid in ps for row in rows_by_panel[pid]]
+        if any(printed(r, row) or symbol(r, row) for row in rows):
+            counts["duplicate_records"] += 1   # same target again from an overlapping crop (A3)
+        else:
+            counts["spurious_records_unaligned"] += 1
     wrong = sum(fields[f]["INCORRECT"] + fields[f]["UNSUPPORTED"] for f in FIELDS)
     return {
         "panels_inventoried": len(inv_ids),
@@ -331,7 +359,7 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
     ann = HERE / "annotations" / annotator
     inv, tg, ln, tl = (read_csv(ann / f"{n}.csv") for n in ("panels", "targets", "lanes", "timelog"))
     cmap = read_csv(HERE / "annotations" / "crop_map.csv")
-    verdicts = {(r["panel_id"], r["row_order"], r["field"], r["lane_index"]): r["verdict"].strip().upper()
+    verdicts = {(r["paper_pmcid"], r["panel_id"], r["row_order"], r["field"], r["lane_index"]): r["verdict"].strip().upper()
                 for r in read_csv(adjudications)} if adjudications else {}
     papers, pooled_raw, pooled_adj, cells = {}, defaultdict(Counter), defaultdict(Counter), []
     totals = Counter()
@@ -340,7 +368,8 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
         rec_path = private / "runs" / p["pmcid"] / "evidence_records.json"
         records = json.loads(rec_path.read_text()) if rec_path.exists() else []
         rep = score_paper(pick(inv), pick(tg), pick(ln), pick(cmap), records)
-        adj = apply_adjudication(rep, {k[0:4]: v for k, v in verdicts.items()}) if verdicts else rep["fields"]
+        mine = {k[1:]: v for k, v in verdicts.items() if k[0] == p["pmcid"]}   # panel ids restart per paper
+        adj = apply_adjudication(rep, mine) if mine else rep["fields"]
         timing = json.loads((private / "runs" / p["pmcid"] / "timing.json").read_text())
         manual = Counter()
         for r in pick(tl):
@@ -355,7 +384,7 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
             pooled_adj[f].update(adj[f])
         for k in ("panels_inventoried", "panels_found", "panels_fully_annotated", "target_rows_annotated",
                   "records", "incorrect_assertions", "spurious_records_not_wb", "spurious_records_unaligned",
-                  "records_on_panels_missing_from_inventory", "records_unmapped"):
+                  "records_on_panels_missing_from_inventory", "records_unmapped", "duplicate_records"):
             totals[k] += rep.get(k, 0)
         totals["automated_seconds"] += rep["timing"]["automated_seconds"]
         totals["panels_sent_to_model"] += rep["timing"]["panels_sent_to_model"] or 0
@@ -393,7 +422,8 @@ def render(r: dict) -> str:
              f"- Incorrect assertions (wrong values + unsupported values + spurious records): {t['incorrect_assertions']}"
              f" (spurious: {t['spurious_records_not_wb']} on non-Western crops, {t['spurious_records_unaligned']} unaligned).",
              f"- Records on panels missing from the inventory (not counted against the system): "
-             f"{t['records_on_panels_missing_from_inventory']}. Unmapped records: {t['records_unmapped']}.",
+             f"{t['records_on_panels_missing_from_inventory']}. Unmapped records: {t['records_unmapped']}. "
+             f"Duplicate records from overlapping crops (not scored, not counted as errors): {t['duplicate_records']}.",
              f"- Automated time: {t['automated_seconds'] / 60:.1f} min for {t['panels_sent_to_model']} panels sent to the model."
              f" Manual full annotation: {t['manual_full_minutes']:.0f} min for {t['panels_fully_annotated']} panels.",
              "", "This is 4 papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.", ""]
@@ -467,19 +497,32 @@ def self_test() -> None:
                 bands=("absent", "absent", "present")),
             rec("GAPDH", "GAPDH", "HepG2", None),
             rec("Ki67", "MKI67", None, "IL-6", crop="c9.png")]
+    tg.append({"panel_id": "2", "row_order": "1", "target_printed": "P-ERK 1/2", "gene_symbol": "MAPK3|MAPK1",
+               "modification": "phospho", "cell_line_or_sample": "Hep3B", "treatments": "IL-6"})
+    cmap.append({"crop_file": "c2.png", "figure": "1", "panel_letters": "B", "mapping": ""})
+    cmap.append({"crop_file": "c3.png", "figure": "1", "panel_letters": "B", "mapping": ""})
+    recs.append(rec("P-ERK 1/2", "MAPK1/MAPK3", "Hep3B", "IL-6", "phosphorylation", crop="c2.png"))   # 2nd crop of panel 2
+    recs.append(rec("P-ERK 1/2", "MAPK1/MAPK3", "Hep3B", "IL-6", "phosphorylation", crop="c3.png"))   # overlapping duplicate
+    # misread label on panel 3: two STAT3 records, the Ser727 one listed first; the Y705 row must take the Y705 record
+    tg.append({"panel_id": "3", "row_order": "2", "target_printed": "pSTAT3 Y705", "gene_symbol": "STAT3",
+               "modification": "phospho:Y705", "cell_line_or_sample": "HCT116", "treatments": "none"})
+    cmap.append({"crop_file": "c4.png", "figure": "2", "panel_letters": "A", "mapping": ""})
+    recs.append(rec("p-STAT3 S727", "STAT3", "HCT116", None, "phosphorylation", "Ser", 727, crop="c4.png"))
+    recs.append(rec("p-STAT3 Y-705", "STAT3", "HCT116", None, "phosphorylation", "Tyr", 705, crop="c4.png"))
     r = score_paper(inv, tg, ln, cmap, recs)
     f = r["fields"]
-    assert (r["panels_inventoried"], r["panels_found"]) == (3, 2), r          # panel 3 never detected
-    assert f["protein_identity"] == {"CORRECT": 2, "NOT_FOUND": 1}, f
-    assert f["phospho_site"] == {"CORRECT": 1}, f
-    assert f["modification_type"] == {"CORRECT": 2, "NOT_FOUND": 1}, f
-    assert f["cell_line"] == {"CORRECT": 1, "INCORRECT": 1, "NOT_FOUND": 1}, f    # 'Hep3B cells' == 'Hep3B'
-    assert f["treatment"] == {"CORRECT": 1, "ABSTAINED": 1}, f                    # Bax: NOT_STATED, not found -> unscored
+    assert (r["panels_inventoried"], r["panels_found"]) == (3, 3), r          # c4 covers panel 3
+    assert f["protein_identity"] == {"CORRECT": 4, "NOT_FOUND": 1}, f            # MAPK1/MAPK3 == MAPK3|MAPK1
+    assert r["duplicate_records"] == 2 and r.get("spurious_records_unaligned", 0) == 0, r   # + leftover S727
+    assert f["phospho_site"] == {"CORRECT": 2}, f                                  # Y705 row got the Y705 record
+    assert f["modification_type"] == {"CORRECT": 4, "NOT_FOUND": 1}, f
+    assert f["cell_line"] == {"CORRECT": 3, "INCORRECT": 1, "NOT_FOUND": 1}, f    # 'Hep3B cells' == 'Hep3B'
+    assert f["treatment"] == {"CORRECT": 2, "ABSTAINED": 1, "CORRECT_SILENCE": 1}, f                    # Bax: NOT_STATED, not found -> unscored
     assert f["band_call"] == {"CORRECT": 1, "INCORRECT": 1}, f                    # lane 3 annotator-uncertain: unscored
     assert r["spurious_records_not_wb"] == 1 and r["incorrect_assertions"] == 3, r
     adj = apply_adjudication(r, {("1", "2", "cell_line", ""): "EQUIVALENT_NOTATION"})
-    assert adj["cell_line"] == {"CORRECT": 2, "INCORRECT": 0, "NOT_FOUND": 1}, adj
-    assert metrics(f["protein_identity"])["accuracy"] == "2/3 (67%)"
+    assert adj["cell_line"] == {"CORRECT": 4, "INCORRECT": 0, "NOT_FOUND": 1}, adj
+    assert metrics(f["protein_identity"])["accuracy"] == "4/5 (80%)"
     print("self-test passed")
 
 

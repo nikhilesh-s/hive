@@ -61,3 +61,30 @@ replaces rank 8 (PMC7757890), which is dropped from the frozen list:
 - Its model stage was never run.
 
 Final papers: ranks 1, 2, 3 and 4.
+
+## A3. 2026-10-18: scorer fixes from a dry run (before any benchmark output was viewed)
+
+The full scorer was dry-run on a paper that is **not** in the benchmark: the reviewed STAT3
+paper, 10.3892/br.2026.2108. The annotations for it were synthetic, and the benchmark's sealed
+outputs were not opened. These are general bookkeeping fixes, not tuning:
+1. **Multi-symbol targets.**
+   - The system writes ERK1/2 as `MAPK1/MAPK3`, while annotators write `MAPK3|MAPK1`.
+   - Protein identity is now correct when every system symbol is one the annotator listed.
+2. **Crops.**
+   - **Every crop counts.** A panel's records now come from every crop mapped to it. Before,
+     only the first crop group was used.
+   - **Overlapping crops.** Extra records for an already-aligned target are counted as
+     `duplicate_records`. They are reported and are neither scored nor counted as incorrect
+     assertions.
+   - **Spurious records.** A record counts as spurious only if its target matches no annotated
+     row in its fully annotated panel(s).
+3. **Alignment order.**
+   1. Every annotated row is matched by printed label first.
+   2. Remaining rows are matched by gene symbol, preferring a record with the same modification
+      and site. This stops a Ser727 record from taking a Tyr705 row.
+4. **Adjudication verdicts** are keyed by paper as well as panel. Panel IDs restart in every
+   paper, so the old key let one paper's verdict apply to another.
+
+Self-test cases were added for 1-3. The dry run exercised the seal check, the crop-map join,
+panel recall, the report and adjudication (raw 3/4 → adjudicated 4/4 on an injected notation
+mismatch).
