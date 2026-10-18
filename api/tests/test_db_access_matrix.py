@@ -39,6 +39,7 @@ CHAIN = [
     "migrations/006_feedback_contact.sql",           # F-5 opt-in contact column
     "migrations/007_search_history.sql",
     "migrations/008_saved_results.sql",
+    "migrations/011_ingest_jobs_paper_access_relevance.sql",
 ]
 LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
             "VALUES ('live-paper', 'STAT3', 'job1')")
@@ -299,6 +300,51 @@ def test_live_loader_stores_real_jsonb(conn, monkeypatch):
     n = run(conn, appdb.replace_live_rows("10.1000/live", "jsonjob", rows, {"c.png": b"\x89PNG2"}, {"experiment_flags", "provenance"}))
     assert n == 1 and run(conn, conn.fetchval("SELECT count(*) FROM western_blot_records_live WHERE doi='10.1000/live'")) == 1
     run(conn, appdb.close_ingest_pool())
+
+
+def test_stored_doi_lookup_reads_exact_completed_paper_without_search_cap(conn, monkeypatch):
+    import asyncpg
+    from app import db as appdb
+
+    async def exercise():
+        async def readonly(connection):
+            await appdb._decode_json(connection)
+            await connection.execute("SET ROLE hive_readonly")
+
+        pool = await asyncpg.create_pool(DB_URL, min_size=1, max_size=1, init=readonly)
+        async def get_pool(): return pool
+        monkeypatch.setattr(appdb, "get_readonly_pool", get_pool)
+        try:
+            await conn.execute("INSERT INTO ingest_jobs (job_id, doi, status, discovery_query) VALUES "
+                               "('w1-done', '10.1000/w1', 'done', 'original query'), "
+                               "('w1-pending', '10.1000/pending', 'extracting', NULL)")
+            await conn.execute("INSERT INTO ingest_jobs (job_id, doi, status, updated_at) VALUES "
+                               "('w1-stale', '10.1000/stale', 'extracting', now() - interval '2 hours')")
+            await conn.execute("INSERT INTO western_blot_records_live "
+                               "(paper_id, doi, target, job_id, stable_row_key) "
+                               "SELECT '10.1000/w1', '10.1000/W1', 'STAT3', 'w1-done', 'w1:' || n "
+                               "FROM generate_series(1, 501) n")
+            # A prefix match is not the requested DOI; live rows without a job row are still found.
+            await conn.execute("INSERT INTO western_blot_records_live (paper_id, doi, target, job_id) VALUES "
+                               "('neighbor', '10.1000/w1-other', 'GAPDH', 'w1-done'), "
+                               "('orphan', '10.1000/orphan', 'STAT3', 'w1-gone')")
+            result = await appdb.lookup_live_paper('10.1000/w1')
+            assert result['status'] == 'found'
+            assert len(result['results']) == 501
+            assert result['paper']['experiments'] == 1
+            assert result['paper']['discovery_query'] == 'original query'
+            assert all(r['doi'] == '10.1000/W1' for r in result['results'])
+            assert (await appdb.lookup_live_paper('10.1000/pending'))['status'] == 'pending'
+            assert (await appdb.lookup_live_paper('10.1000/stale'))['status'] == 'not_extracted'
+            orphan = await appdb.lookup_live_paper('10.1000/orphan')
+            assert orphan['status'] == 'found' and orphan['paper']['discovery_query'] is None
+            assert (await appdb.lookup_live_paper('10.1000/missing'))['status'] == 'not_extracted'
+        finally:
+            await pool.close()
+            await conn.execute("DELETE FROM western_blot_records_live WHERE job_id IN ('w1-done', 'w1-pending', 'w1-gone')")
+            await conn.execute("DELETE FROM ingest_jobs WHERE job_id IN ('w1-done', 'w1-pending', 'w1-stale')")
+
+    run(conn, exercise())
 
 
 def test_hive_roles_are_not_privileged(conn):
