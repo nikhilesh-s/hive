@@ -7,6 +7,33 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Later on 2026-10-18: deploy, rotation, Drive
+
+- **R-5 deployed.**
+  - Render deploy `dep-dbah16k9v7es738g2kng` is live at `edd95f5`, and `/health` reports
+    `edd95f5fb422`.
+  - Vercel production `dpl_EhVoMe34LcD3Qj25EVFaTJDhL2ix` is at main `edd95f5`.
+  - Smoke test: Home, Search, About and `/api/corpus-stats` all return 200, with counts 3/93/475.
+    The hosted search for "phospho STAT3 Tyr705" shows 3 experiments and 18 lanes with the
+    "Access unknown" label.
+  - Extraction code is unchanged from `f77d311`, so production is still the benchmarked version.
+- **O-9 done.** The `hive_ingest` password was rotated:
+  - `ALTER ROLE` run, and the new login verified as `hive_ingest`.
+  - Render `DB_INGEST_URL`, `api/.env` and `~/hive_ingest_dsn.txt` updated.
+- **O-10 open.** The gswitch JWT signing key was also printed in the session. Rotating it means
+  re-authorizing the ChatGPT connector. Nik decides.
+- **Also merged today:** O-8 (#28, `6ea1855`) and W-7 (#29, `edd95f5`).
+- **Benchmark.**
+  - Rank 3 (PMC7948984) was downloaded by Nik and frozen; it replaces rank 8.
+  - Model stage results so far:
+    - PMC9283986: 6 panels, 25 records, 396 s
+    - PMC5328321: 28 panels, 33 records, 386 s
+    - PMC4393234: 3 panels, 1 record, 40 s
+    - PMC7948984: running
+  - Drive folders were created in niksuravarjjala@gmail.com and shared:
+    - Tanvi: PDFs, guide and annotation Sheet, no crops.
+    - Yashvi: PDFs, 57 crops and the crop-map Sheet.
+
 ## Blind benchmark and PR merges (2026-10-18)
 
 ### Main
