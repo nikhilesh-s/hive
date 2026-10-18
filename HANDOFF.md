@@ -15,7 +15,7 @@ Core implementation commit: `ab23dd7`; PR metadata follow-up: `3fda112`.
 Draft PR: https://github.com/nikhilesh-s/hive/pull/19 (opened 2026-10-14).
 
 Research links with `?doi=` normalize DOI URLs, prefixes, whitespace and case,
-then open stored completed live evidence with the original discovery query
+then open stored live evidence with the original discovery query
 when recorded. The existing research input also accepts DOIs without invoking
 paper discovery or extraction. Missing papers retain the DOI and show the
 existing explicit extraction button; pending jobs and lookup errors are
@@ -26,7 +26,7 @@ successful and failed access verification, refresh and encoded DOI suffixes.
 Added read-only GET `/experimental/live/paper?doi=...` behind the existing
 internal-key boundary and `/api/experimental/stored-paper` behind the server
 beta-access gate. Uses the existing readonly PostgreSQL pool, configured live
-table and `ingest_jobs`; exact bound DOI lookup joins completed runs and avoids
+table and `ingest_jobs`; exact bound DOI lookup LEFT JOINs job rows (found = live rows exist; pending only if the job updated within 30 min) and avoids
 the recent-50-paper list and search's 500-row truncation. Response shaping uses
 `WesternBlotRecord`. No migrations, extraction-pipeline or quota changes.
 Live evidence remains shared within beta access, not account-owned. Lab tags
@@ -34,7 +34,7 @@ are attribution only. Reviewed-only papers are outside this live-tier ticket.
 
 Verification: API 257 passed / 16 skipped (DB tests checked separately);
 local PostgreSQL permission matrix 14 passed / 1 skipped, including exact DOI,
-completed-only matching and all 501 lanes; miner pytest 133 passed / 2 skipped;
+job-less rows, stale pending jobs and all 501 lanes; miner pytest 133 passed / 2 skipped;
 biology 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
 pipeline 13/13; seed benchmark 34/34; web unit tests 11 passed; browser 13
 scenarios passed at desktop/mobile with no extraction/discovery POSTs.
