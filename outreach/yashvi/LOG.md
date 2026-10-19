@@ -15,7 +15,7 @@ real date and outcome before relying on them. Ledger statuses live in `../prospe
 - [x] G-4 stale share-pack line: merged to `main` by Nik 10-18 (PR #26, `b83da54`)
 - [x] G-1 branch `yashvi-outreach` created from `outreach/oct20`, log and grants file started 10-18
 - [ ] G-2 email v2: drafted in `emails_v2.md` 10-18; still needs mail-tester scores and Nik's approval
-- [ ] Grants: searched 10-18; no grant due 10-31 that clearly fits; none submitted (see `../grants.md`)
+- [ ] Grants: 5 candidates listed in `../grants.md` (Foresight due 10-31 is the only one inside October); none submitted yet
 - [ ] G-3 batch 2 (after G-2 approved) and G-5 (after O-2): not started
 
 ## 2026-10-18
@@ -25,7 +25,7 @@ real date and outcome before relying on them. Ledger statuses live in `../prospe
 - Seiji: closed out. He has no Stanford contacts yet and will reach out if anything comes up.
 - G-2: drafted `emails_v2.md` (own-paper and generic variants plus two follow-ups). Next step:
   mail-tester from each sending account, then Nik's approval.
-- Grants: searched for 10-31 deadlines; nothing confirmed that fits. See `grants.md`.
+- Grants: searched through end of November for US high school + grad teams. Candidates and rulings in `grants.md`; Foresight Institute (due 10-31) is the nearest. None submitted.
 - Ledger: all 13 wave-1 rows now `fu2 10-14`. No replies recorded.
 
 - Branch `yashvi-outreach` created from `outreach/oct20` per G-1.
