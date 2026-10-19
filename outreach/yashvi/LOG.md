@@ -6,19 +6,27 @@ real date and outcome before relying on them. Ledger statuses live in `../prospe
 
 ## Checklist (ticket G-1 / delegated list)
 
-- [x] 13 wave-1 emails sent 09-30, logged in `prospects.csv` (`08a0fb9`)
+- [x] 13 wave-1 emails sent 09-30, logged in `prospects.csv`
+- [x] Follow-up 1 (wave 1) sent 10-08
+- [x] Follow-up 2 (wave 1) sent 10-14
+- [x] UCSF Tally follow-up sent 10-18
+- [x] Gina (journal access): followed up 10-18; waiting on her reply
+- [x] Seiji: done. No contacts yet; he'll reach out if anything comes up
 - [x] G-4 stale share-pack line: merged to `main` by Nik 10-18 (PR #26, `b83da54`)
 - [x] G-1 branch `yashvi-outreach` created from `outreach/oct20`, log and grants file started 10-18
-- [ ] Follow-up 1 (wave 1): team log 10-11 says sent, date not given. Confirm date, then set `fu1 <date>` in the ledger
-- [ ] Follow-up 2 (wave 1): due about 10-13 to 10-16, not reported sent
-- [ ] UCSF Tally follow-up: scheduled Mon 10-12 08:00, send not confirmed
-- [ ] Gina (journal access): waiting on her reply
-- [ ] Seiji (Stanford referrals, internships): waiting on his reply
-- [ ] G-2 email v2 and spam check: `outreach/emails_v2.md` does not exist yet; was due 10-13
-- [ ] Grants: list every grant being considered in `../grants.md`
+- [ ] G-2 email v2: drafted in `emails_v2.md` 10-18; still needs mail-tester scores and Nik's approval
+- [ ] Grants: searched 10-18; no grant due 10-31 that clearly fits; none submitted (see `../grants.md`)
 - [ ] G-3 batch 2 (after G-2 approved) and G-5 (after O-2): not started
 
 ## 2026-10-18
+
+- UCSF Tally follow-up sent (it was scheduled for 10-12).
+- Gina: followed up on journal access; waiting for her reply. Next step: log her answer.
+- Seiji: closed out. He has no Stanford contacts yet and will reach out if anything comes up.
+- G-2: drafted `emails_v2.md` (own-paper and generic variants plus two follow-ups). Next step:
+  mail-tester from each sending account, then Nik's approval.
+- Grants: searched for 10-31 deadlines; nothing confirmed that fits. See `grants.md`.
+- Ledger: all 13 wave-1 rows now `fu2 10-14`. No replies recorded.
 
 - Branch `yashvi-outreach` created from `outreach/oct20` per G-1.
 - Open items above are all unconfirmed or not started; no sends or replies since the 10-11
