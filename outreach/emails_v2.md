@@ -24,7 +24,7 @@ Subject: `lane {lane_number} in your {topic} paper`
 > {one_concrete_extraction}.
 >
 > Did we read {panel_or_lane} right? A one-word yes/no is plenty. Nobody has checked this
-> record yet, and the paper's own quote sits behind every field:
+> record yet; fields taken from your text show the sentence they came from:
 > https://hiveblot-beta.vercel.app/experimental/research?doi={doi}&lab={lab_tag}&access=ACCESS_CODE
 >
 > {sender_name}
@@ -42,11 +42,11 @@ Subject: `westerns for {target}`
 > Hi {first_name},
 >
 > I'm on a small student team building HiveBlot, which turns published western blots into
-> searchable records (antibody, dilution, cell line, lane readout), each with the paper's
-> own quote behind it. I read your {year} paper on {topic}.
+> searchable records (antibody, dilution, cell line, lane readout), showing the source
+> sentence wherever the paper states it. I read your {year} paper on {topic}.
 >
-> Would you reply with one protein and cell line you're blotting next? I'll send back every
-> published western we can find for it, usually within a day. A "yes" and a target is
+> Would you reply with one protein and cell line you're blotting next? I'll send back what
+> HiveBlot finds for it in open-access papers, usually within a day. A "yes" and a target is
 > enough.
 >
 > Or look around yourself: https://hiveblot-beta.vercel.app/experimental/research?lab={lab_tag}&access=ACCESS_CODE
