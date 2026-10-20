@@ -7,6 +7,26 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## 2026-10-19: W-3 phone and Safari pass
+
+- **Branch** `w-3-phone-safari-pass` (from `e8cc2c7`), one PR to main. Findings:
+  `tickets/w3-phone-safari-2026-10-19.md`.
+- **Method.** Playwright WebKit with iPhone 14, iPhone SE, iPad and Desktop Safari emulation
+  against the hosted site at `edd95f5`. No real device was available.
+- **Result before fixes:** 12 FAIL (every phone cell: 175 px sticky nav; Home headline clipped;
+  feedback panels off-screen at 320 px), 8 PASS*, 4 PASS.
+- **Fixed (CSS/layout only):** compact phone nav, Home headline and hero padding, 16 px search,
+  filter and access-code fields, 32 px nav and theme tap targets, 36 px Save, feedback panel
+  max width, SVG attribute console errors, light-theme "Try:" chip contrast. `tsc`, `lint` and
+  `build` pass; WebKit re-run on a local build shows no overflow and all phone cells PASS*.
+- **Open (W-13 to W-18, W-20):** text under 12 px, iPad nav wrap, desktop headline width, filter
+  drawer polish, remaining small tap targets and floating feedback pills, light-theme hero
+  contrast. Each needs a decision.
+- **Not verified:** real-device Safari, Google sign-in, Save/Unsave, the research page via an
+  access link (gate only).
+- **Next:** Nik or Srushti runs the same pass on a real iPhone, then decides the open items.
+  The board row for W-3 in `tickets/README.md` is not updated.
+
 ## Later on 2026-10-18: deploy, rotation, Drive
 
 - **R-5 deployed.**
