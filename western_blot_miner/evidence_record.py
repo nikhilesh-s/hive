@@ -19,6 +19,10 @@ from pydantic import BaseModel
 SUPPORTED = "SUPPORTED"
 AMBIGUOUS = "AMBIGUOUS"
 CONFLICTING = "CONFLICTING"
+NOT_STATED = "NOT_STATED"
+NOT_RECOVERED = "NOT_RECOVERED"
+# Legacy/unknown-reason absence. New extraction code should prefer one of the
+# explicit states above when it can defend the distinction.
 MISSING = "MISSING"
 
 # --- evidence-hierarchy ranks (lower = stronger) ----------------------------
@@ -62,7 +66,22 @@ class EvidenceField(BaseModel):
 
     @classmethod
     def missing(cls) -> "EvidenceField":
+        """Legacy/unknown-reason absence.
+
+        Do not reinterpret this as "the paper did not report it": historical
+        MISSING records do not encode enough information to make that claim.
+        """
         return cls(value=None, confidence=0.0, status=MISSING)
+
+    @classmethod
+    def not_stated(cls, sources: Optional[list[Source]] = None) -> "EvidenceField":
+        """The available, relevant paper text was examined and did not state the value."""
+        return cls(value=None, confidence=0.0, status=NOT_STATED, sources=sources or [])
+
+    @classmethod
+    def not_recovered(cls, sources: Optional[list[Source]] = None) -> "EvidenceField":
+        """HiveBlot could not reliably recover the value from the available source."""
+        return cls(value=None, confidence=0.0, status=NOT_RECOVERED, sources=sources or [])
 
     @classmethod
     def ambiguous(cls, candidates: list[Candidate], sources: Optional[list[Source]] = None) -> "EvidenceField":
@@ -229,8 +248,9 @@ class EvidenceRecord(BaseModel):
     # -- projection to the flat Supabase row (migration 001) -----------------
     def to_supabase_rows(self) -> list[dict[str, Any]]:
         """One flat row per band. Scalar columns take the SETTLED value only:
-        CONFLICTING/MISSING fields become NULL so filters never match a disputed
-        value. The full field envelopes live in the provenance/validation JSONB.
+        CONFLICTING and all unavailable states become NULL so filters never
+        match a disputed or absent value. The full field envelopes live in the
+        provenance/validation JSONB.
         """
         det = self.antibodies[0] if self.antibodies else None
         base = {
@@ -308,6 +328,6 @@ def _v(field: EvidenceField) -> Any:
     """Settled scalar value, or None if the field is unsettled/absent."""
     if field is None:
         return None
-    if field.status in (CONFLICTING, MISSING):
+    if field.status in (CONFLICTING, MISSING, NOT_STATED, NOT_RECOVERED):
         return None
     return field.value

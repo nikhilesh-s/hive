@@ -3,9 +3,9 @@
 // "Why HiveBlot says this" — full provenance for one Evidence Record, plus the
 // researcher feedback controls. Feedback is stored BESIDE the AI extraction
 // (separate table, insert-only role); a correction never mutates the record.
-// Uncertainty rendering rule: silence = settled. Only AMBIGUOUS (?),
-// CONFLICTING (⚠) and MISSING (—) get glyphs; disagreement is always shown,
-// never silently resolved.
+// Uncertainty rendering rule: silence = settled. AMBIGUOUS/CONFLICTING and
+// unavailable states carry restrained markers; source disagreement is always
+// shown and never silently resolved.
 
 import { useEffect, useState } from 'react';
 
@@ -62,8 +62,11 @@ interface RecordDetailData {
   organism?: string | null;
   fields: Record<string, FieldEvidence>;
   antibodies: {
-    target?: string | null; vendor?: string | null; catalog_number?: string | null;
-    clone?: string | null; dilution?: string | null; role?: string | null;
+    target?: string | null; target_status?: string | null;
+    vendor?: string | null; vendor_status?: string | null;
+    catalog_number?: string | null; catalog_number_status?: string | null;
+    clone?: string | null; clone_status?: string | null;
+    dilution?: string | null; dilution_status?: string | null; role?: string | null;
     phospho_specific?: boolean | null; association_confidence?: number | null;
     source_text?: string | null;
   }[];
@@ -103,8 +106,21 @@ const SOURCE_NAMES: Record<string, string> = {
 function statusGlyph(status?: string | null): { g: string; color: string; title: string } | null {
   if (status === 'AMBIGUOUS') return { g: '?', color: GOLD, title: 'Ambiguous — unsettled best guess' };
   if (status === 'CONFLICTING') return { g: '⚠', color: RED, title: 'Sources disagree — no settled value' };
-  if (status === 'MISSING') return { g: '—', color: LABEL, title: 'Not reported' };
+  if (status === 'NOT_STATED') return { g: '—', color: LABEL, title: 'The available paper text did not state this information.' };
+  if (status === 'NOT_RECOVERED') return { g: '—', color: GOLD, title: 'HiveBlot could not reliably recover this information from the available source.' };
+  if (status === 'MISSING') return { g: '—', color: LABEL, title: 'The reason this value is unavailable is not recorded for this extraction.' };
   return null; // SUPPORTED: silence = settled
+}
+
+function unavailableLabel(status?: string | null): string {
+  if (status === 'NOT_STATED') return 'Not reported in the paper';
+  if (status === 'NOT_RECOVERED') return 'Not recovered from the source';
+  return 'Unavailable';
+}
+
+function UnavailableText({ status }: { status?: string | null }) {
+  const marker = statusGlyph(status);
+  return <span title={marker?.title}>{unavailableLabel(status)}</span>;
 }
 
 function fmtValue(name: string, fe: FieldEvidence, all: Record<string, FieldEvidence>): string {
@@ -278,7 +294,7 @@ function FieldRow({ name, label, fe, all, recordId, paperId, prior, stableRowKey
           {label.toUpperCase()}
         </span>
         <span style={{ fontFamily: SERIF, fontSize: '13px', color: value || seriesText ? TEXT : LABEL }}>
-          {seriesText || value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : 'not reported')}
+          {seriesText || value || (fe.status === 'CONFLICTING' ? 'unsettled — sources disagree' : unavailableLabel(fe.status))}
         </span>
         {shownGlyph && (
           <span title={shownGlyph.title} style={{ fontFamily: MONO, fontSize: '11px', color: shownGlyph.color, fontWeight: 600 }}>
@@ -488,10 +504,13 @@ export default function EvidencePanel({ recordId, apiBase = '/api/record', readO
               <span style={{ fontFamily: MONO, fontSize: '10px', color: ab.role === 'immunoprecipitation' ? GOLD : LABEL }}>
                 [{ab.role === 'immunoprecipitation' ? 'IP bait' : 'detection'}]
               </span>{' '}
-              {ab.target}
-              {ab.vendor ? ` — ${ab.vendor}` : ''}
-              {ab.catalog_number ? ` · #${ab.catalog_number}` : ''}
-              {ab.dilution ? ` · ${ab.dilution}` : ''}
+              {ab.target || <UnavailableText status={ab.target_status} />}
+              <span style={{ color: DIM }}>
+                {' · vendor: '}{ab.vendor || <UnavailableText status={ab.vendor_status} />}
+                {' · catalog: '}{ab.catalog_number ? `#${ab.catalog_number}` : <UnavailableText status={ab.catalog_number_status} />}
+                {' · clone: '}{ab.clone || <UnavailableText status={ab.clone_status} />}
+                {' · dilution: '}{ab.dilution || <UnavailableText status={ab.dilution_status} />}
+              </span>
               {ab.phospho_specific ? <span style={{ color: TEAL }}> · phospho-specific</span> : ''}
               {ab.association_confidence != null && ab.association_confidence < 0.8 && (
                 <span style={{ fontFamily: MONO, fontSize: '9px', color: GOLD }}>

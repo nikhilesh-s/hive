@@ -23,6 +23,8 @@ from .evidence_record import (
     AMBIGUOUS,
     CONFLICTING,
     MISSING,
+    NOT_RECOVERED,
+    NOT_STATED,
     SUPPORTED,
     AntibodyInfo,
     AnomalyFlag,
@@ -199,8 +201,10 @@ def _target_info(raw_target, core, res, mc) -> TargetInfo:
         ) if res.canonical else EvidenceField.ambiguous(cands)
         uniprot = EvidenceField.ambiguous(cands)   # accession NOT chosen
     else:
-        canonical = EvidenceField.missing()
-        uniprot = EvidenceField.missing()
+        # A resolver miss is an extraction/normalization limitation, not evidence
+        # that the paper failed to name the protein.
+        canonical = EvidenceField.not_recovered()
+        uniprot = EvidenceField.not_recovered()
     return TargetInfo(raw_target_name=raw_target, canonical_target=canonical, uniprot_id=uniprot,
                       aliases_used_in_paper=aliases)
 
@@ -276,12 +280,12 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
         primary, conf, status = "standard_western", 0.55, SUPPORTED
         flags.append("standard_western")
     else:
-        primary, conf, status = None, 0.2, MISSING
+        primary, conf, status = None, 0.0, NOT_RECOVERED
 
     exp_type = EvidenceField(value=primary, confidence=conf, status=status, sources=sources)
     exp_flags = EvidenceField.supported(sorted(set(flags)), conf, sources) if flags else EvidenceField.missing()
 
-    ip_bait = EvidenceField.missing()
+    ip_bait = EvidenceField.not_recovered() if "co_ip" in flags else EvidenceField.missing()
     if "co_ip" in flags:
         bait = None
         bait_src = None
@@ -316,8 +320,9 @@ def _sample_info(mc, caption) -> SampleInfo:
         if caption and str(v).lower() in caption.lower():
             return [Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, str(v)))]
         return [Source(type="model_target", rank=RANK_MODEL_TARGET, text=str(v))]
-    sample_f = EvidenceField.supported(sample_val, 0.9, src_for(sample_val)) if sample_val else EvidenceField.missing()
-    cell_f = EvidenceField.supported(cell_line, 0.9, src_for(cell_line)) if cell_line else EvidenceField.missing()
+    # A null model field cannot establish that the authors omitted the value.
+    sample_f = EvidenceField.supported(sample_val, 0.9, src_for(sample_val)) if sample_val else EvidenceField.not_recovered()
+    cell_f = EvidenceField.supported(cell_line, 0.9, src_for(cell_line)) if cell_line else EvidenceField.not_recovered()
     if not org and cell_line:
         org = CELL_LINE_ORGANISM.get(str(cell_line).lower())
         if org:
@@ -325,17 +330,25 @@ def _sample_info(mc, caption) -> SampleInfo:
                 org, 0.8, [Source(type="deterministic", rank=RANK_DETERMINISTIC,
                                   text=f"{cell_line} -> {org} (cell-line table)")])
         else:
-            organism_f = EvidenceField.missing()
+            organism_f = EvidenceField.not_recovered()
     elif org:
         organism_f = EvidenceField.supported(org, 0.85, src_for(org))
     else:
-        organism_f = EvidenceField.missing()
-    return SampleInfo(sample=sample_f, cell_line=cell_f, organism=organism_f,
-                      tissue=EvidenceField.missing(), genotype=EvidenceField.missing())
+        organism_f = EvidenceField.not_recovered()
+    return SampleInfo(
+        sample=sample_f,
+        cell_line=cell_f,
+        organism=organism_f,
+        # These fields are currently stubs: the pipeline does not yet perform a
+        # reliable field-specific extraction for them, so NOT_STATED would be
+        # scientifically unjustified.
+        tissue=EvidenceField.not_recovered(),
+        genotype=EvidenceField.not_recovered(),
+    )
 
 
 def _series_fields(values: list[dict], ctx: str, det: list[Source],
-                   multi_marker: bool) -> tuple[EvidenceField, EvidenceField]:
+                   multi_marker: bool, source_examined: bool = False) -> tuple[EvidenceField, EvidenceField]:
     """(value_field, unit_field) for a dose or duration series.
 
     ONE stated value -> SUPPORTED scalar, as before.
@@ -348,7 +361,10 @@ def _series_fields(values: list[dict], ctx: str, det: list[Source],
     rather than asserting a wrong one (null > misleading value).
     """
     if not values:
-        return EvidenceField.missing(), EvidenceField.missing()
+        # A deterministic field-specific scan over verified paper text may
+        # support NOT_STATED. A null/empty model paraphrase may not.
+        absent = EvidenceField.not_stated(det) if source_examined else EvidenceField.not_recovered()
+        return absent, EvidenceField.not_stated(det) if source_examined else EvidenceField.not_recovered()
     distinct = {(v["value"], v["unit"].lower()) for v in values}
     if len(distinct) == 1 and not multi_marker:
         return (EvidenceField.supported(values[0]["value"], 0.85, det),
@@ -392,16 +408,16 @@ def _treatment_info(mc, caption: str = "", methods: str = "") -> TreatmentInfo:
     # model's own treatment wording it is still the model's reading.
     det = ([Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if verbatim else src) if ctx else []
     dose_f, dose_unit_f = _series_fields(
-        doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)))
+        doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)), source_examined=verbatim)
     dur_f, dur_unit_f = _series_fields(
-        durs, ctx, det, bool(biology._INDICATED_TIME.search(ctx)))
+        durs, ctx, det, bool(biology._INDICATED_TIME.search(ctx)), source_examined=verbatim)
     return TreatmentInfo(
-        treatment_name=EvidenceField.supported(name, 0.8, src) if name else EvidenceField.missing(),
+        treatment_name=EvidenceField.supported(name, 0.8, src) if name else EvidenceField.not_recovered(),
         dose=dose_f,
         dose_unit=dose_unit_f,
         duration=dur_f,
         duration_unit=dur_unit_f,
-        treatment_context=EvidenceField.supported(ctx, 0.8, src) if ctx else EvidenceField.missing(),
+        treatment_context=EvidenceField.supported(ctx, 0.8, src) if ctx else EvidenceField.not_recovered(),
     )
 
 
@@ -541,7 +557,12 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
             return field
         if det_v:
             return EvidenceField.supported(det_v, 0.6, det_src)
-        return EvidenceField.missing()
+        # Only call an antibody attribute NOT_STATED when a target-scoped,
+        # verbatim paper snippet was actually examined by the deterministic
+        # backstop. Otherwise the extractor simply failed to recover it.
+        if det.get("_quote"):
+            return EvidenceField.not_stated(det_src)
+        return EvidenceField.not_recovered()
     ab_mod = biology.antibody_modification(ab.get("target", ""))
     phospho_specific = ab.get("phospho_specific")
     if phospho_specific is None:
@@ -554,7 +575,7 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
         clone=mk(ab.get("clone"), det_v=det.get("clone")),
         dilution=mk(ab.get("dilution"), det_v=det.get("dilution")),
         phospho_specific=EvidenceField.supported(bool(phospho_specific), 0.85, src)
-        if ab.get("target") else EvidenceField.missing(),
+        if ab.get("target") else EvidenceField.not_recovered(),
         detection_confidence=round(detection_conf, 2),
         association_confidence=round(assoc, 2),
     )
@@ -613,14 +634,29 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
         hit, src_type, src_rank = _kda_hit(caption), "figure_caption", RANK_CAPTION
     reported = hit[0] if hit else None
     # Source text is the verbatim matched window, typed by the channel it came from.
+    # A NOT_STATED claim must cite the relevant source channel that actually
+    # contains this target; never attach an unrelated caption merely because a
+    # caption exists while the target only appears in methods.
+    missing_reported_sources: list[Source] = []
+    if core and core.lower() in (caption or "").lower():
+        missing_reported_sources = [
+            Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, core))
+        ]
+    elif core and core.lower() in (methods or "").lower():
+        missing_reported_sources = [
+            Source(type="methods", rank=RANK_METHODS, text=_snippet(methods, core))
+        ]
     reported_f = EvidenceField.supported(
         reported, 0.8, [Source(type=src_type, rank=src_rank, text=hit[1])]) \
-        if hit else EvidenceField.missing()
+        if hit else (
+            EvidenceField.not_stated(missing_reported_sources)
+            if missing_reported_sources else EvidenceField.not_recovered()
+        )
     expected = res.expected_mass_kda
     expected_f = EvidenceField.supported(
         expected, 0.9, [Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                text=f"{res.uniprot_id} {expected} kDa (expected)")]) \
-        if expected is not None else EvidenceField.missing()
+        if expected is not None else EvidenceField.not_recovered()
     recon = "not_comparable"
     if reported is not None and expected is not None:
         recon = "match" if abs(reported - expected) / expected <= 0.2 else "discrepancy"
@@ -789,6 +825,11 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
     if record.target.canonical_target.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="PROTEIN_AMBIGUOUS", severity="med",
                                  detail="Protein name maps to more than one reviewed UniProt entry."))
+    elif record.target.canonical_target.status in (MISSING, NOT_RECOVERED, NOT_STATED):
+        flags.append(AnomalyFlag(
+            code="PROTEIN_NOT_RECOVERED", severity="med",
+            detail="HiveBlot could not reliably normalize this printed target to a reviewed protein entry.",
+        ))
     if record.molecular_weight.reconciliation == "discrepancy":
         flags.append(AnomalyFlag(code="MW_DISCREPANCY", severity="med",
                                  detail="Reported migration differs from the expected (UniProt) mass."))
