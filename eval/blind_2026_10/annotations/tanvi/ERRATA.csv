@@ -1,0 +1,13 @@
+date,annotator,file,row,before,after,reason
+2026-10-20,tanvi,panels.csv,PMC7948984 fig 1G,5,1,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC7948984 fig 2A,6,2,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC7948984 fig 2D,7,3,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC7948984 fig 2E,8,4,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC7948984 fig 4B,9,5,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC4393234 fig 3B,10,1,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,panels.csv,PMC4393234 fig 3C,11,2,per-paper panel numbering; mapping confirmed by Tanvi 2026-10-20
+2026-10-20,tanvi,targets.csv,"PMC4393234 panel 1, 2nd target row",1,2,duplicate row_order typo; Tanvi asked us to fix it 2026-10-20
+2026-10-20,tanvi,lanes.csv,PMC7948984 panel 3 row 4,6 lane calls,set aside (unscored),"no matching target row (protein/cell line/treatment never entered); not filled by anyone else, to keep labels human-only"
+2026-10-20,tanvi,lanes.csv,PMC7948984 panel 4 row 1,6 lane calls,set aside (unscored),"no matching target row (protein/cell line/treatment never entered); not filled by anyone else, to keep labels human-only"
+2026-10-20,tanvi,lanes.csv,PMC7948984 panel 4 row 2,6 lane calls,set aside (unscored),"no matching target row (protein/cell line/treatment never entered); not filled by anyone else, to keep labels human-only"
+2026-10-20,tanvi,lanes.csv,PMC7948984 panel 4 row 3,6 lane calls,set aside (unscored),"no matching target row (protein/cell line/treatment never entered); not filled by anyone else, to keep labels human-only"

@@ -1,3 +1,4 @@
+eval/blind_2026_10/**/*.csv -whitespace
 # Files below stay in the (private) repo but are left out of `git archive`
 # release zips (scripts/make_release_archive.sh). Patterns are root-anchored.
 # Third-party figure images (see THIRD_PARTY_NOTICE.md)
