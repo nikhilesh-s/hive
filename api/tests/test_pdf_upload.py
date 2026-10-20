@@ -31,6 +31,7 @@ def client(monkeypatch, tmp_path):
     monkeypatch.setattr(router, "_spent", {})
     monkeypatch.setattr(uploads, "_lock", asyncio.Lock())
     monkeypatch.setattr(uploads, "_UPLOAD_SLOTS", asyncio.Semaphore(2))
+    monkeypatch.setattr(uploads, "_ACTIVE_USERS", set())
     monkeypatch.setattr(ingest, "backend_ready", lambda: (True, "mock test only"))
     stored = []
     async def missing(doi):
@@ -57,9 +58,10 @@ def client(monkeypatch, tmp_path):
 
 def pdf(text="Upload validation fixture; not scientific evidence. https://doi.org/10.1000/upload",
         pages=1, size=(612, 792), metadata=None):
+    """`text` is printed on every page, or pass one string per page."""
     with fitz.open() as document:
-        for _ in range(pages):
-            document.new_page(width=size[0], height=size[1]).insert_text((30, 30), text)
+        for page_text in (text if isinstance(text, list) else [text] * pages):
+            document.new_page(width=size[0], height=size[1]).insert_text((30, 30), page_text)
         if metadata:
             document.set_metadata(metadata)
         return document.tobytes()
@@ -208,9 +210,16 @@ def test_page_count_and_page_area_are_capped_before_rendering(client, monkeypatc
 
 
 def test_largest_supported_page_is_accepted(client):
-    response = client.post("/experimental/uploads", headers=headers(ticket(client)),
-                           content=pdf(pages=uploads.MAX_PAGES, size=(1191, 1684)))
+    response = client.post("/experimental/uploads", headers=headers(ticket(client)), content=pdf(size=(1191, 1684)))
     assert response.status_code == 200, response.text
+
+
+@pytest.mark.parametrize("pages,code", [(52, 200), (53, 413)])  # letter pages: 11.45 Mpx each at 350 DPI
+def test_total_render_pixels_are_capped(client, pages, code):
+    response = client.post("/experimental/uploads", headers=headers(ticket(client)), content=pdf(pages=pages))
+    assert response.status_code == code, response.text
+    if code == 413:
+        assert "megapixels" in response.json()["detail"] and no_job_or_extraction_quota()
 
 
 # --- 2: legacy WBM_UPLOAD guard uses the pipeline's parser ------------------
@@ -237,7 +246,7 @@ def test_pdf_is_parsed_in_a_limited_child_without_credentials(monkeypatch, tmp_p
     path = tmp_path / "probe.pdf"
     path.write_bytes(pdf())
     monkeypatch.setenv("INTERNAL_API_KEY", "must-not-reach-child")
-    probe = ("import os\nprint(json.dumps({'pages': 1, 'max_area': 1, 'text': json.dumps("
+    probe = ("import os\nprint(json.dumps({'pages': 1, 'max_area': 1, 'total_area': 1, 'text': json.dumps("
              "[sorted(os.environ), resource.getrlimit(resource.RLIMIT_CPU), resource.getrlimit(resource.RLIMIT_AS)])}))\n"
              "sys.exit(0)\nimport fitz")
     monkeypatch.setattr(uploads, "_INSPECT", uploads._INSPECT.replace("import fitz", probe, 1))
@@ -316,6 +325,7 @@ def test_ticket_minting_is_rate_limited_per_user(client):
 @pytest.mark.parametrize("document", [
     pdf(text="A paper without any identifier."),
     pdf(text="A different paper. https://doi.org/10.1000/other"),
+    pdf(text=["Title page without identifiers.", "https://doi.org/10.1000/upload"]),  # page 2 is too late
     pdf(text="DOI only in metadata.", metadata={"subject": "doi:10.1000/upload", "keywords": "10.1000/upload"}),
 ])
 def test_doi_must_match_page_text_or_no_job_exists(client, document):
@@ -350,6 +360,59 @@ def test_upload_audit_is_persisted_on_the_job_but_not_returned(client):
 
 # --- 7: derivatives and crops -----------------------------------------------
 
+def test_page_one_doi_is_accepted_after_a_related_article_doi(client):
+    page_one = "Related article: https://doi.org/10.1000/related. This article: doi:10.1000/upload."
+    response = client.post("/experimental/uploads", headers=headers(ticket(client)), content=pdf(text=page_one))
+    assert response.status_code == 200, response.text
+
+
+# --- review round 2: one in-flight upload per user, startup sweep ------------
+
+def test_one_in_flight_upload_per_user(client, monkeypatch):
+    monkeypatch.setattr(uploads, "_ACTIVE_USERS", {AUTH["X-Hive-User-Id"]})
+    response = client.post("/experimental/uploads", headers=headers(ticket(client)), content=pdf())
+    assert response.status_code == 429 and "still being received" in response.json()["detail"]
+    assert not router._spent and no_job_or_extraction_quota()
+    other = ticket(client, user=str(uuid4()))
+    assert client.post("/experimental/uploads", headers=headers(other), content=pdf()).status_code == 200
+    assert uploads._ACTIVE_USERS == {AUTH["X-Hive-User-Id"]}  # the finished upload released its own slot
+
+
+def test_startup_sweeps_orphaned_uploads(monkeypatch, tmp_path):
+    monkeypatch.setattr(ingest, "PDF_DIR", tmp_path)
+    (tmp_path / "uploads" / "deadjob" / "rendered_pages").mkdir(parents=True)
+    (tmp_path / "uploads" / "orphan.pdf").write_bytes(b"%PDF-")
+    (tmp_path / "other.pdf").write_bytes(b"%PDF-")  # open-access cache outside uploads/ is kept
+    with TestClient(app):
+        assert not (tmp_path / "uploads").exists()
+    assert (tmp_path / "other.pdf").exists()
+
+
+# --- review round 2: upload render runs in the limited child -----------------
+
+def test_upload_preprocessing_runs_in_child_and_writes_the_run(tmp_path):
+    path = tmp_path / "paper.pdf"
+    path.write_bytes(pdf())
+    summary = ingest.preprocess_upload(path, "10.1000/upload", tmp_path / "run")
+    assert summary["pages"] == 1 and summary["paper_id"] == "10.1000/upload"
+    assert (tmp_path / "run" / "rendered_pages" / "page_001.png").exists()
+
+
+def test_upload_preprocessing_file_size_limit_fails_the_job(monkeypatch, tmp_path):
+    path = tmp_path / "paper.pdf"
+    path.write_bytes(pdf())
+    monkeypatch.setattr(ingest, "UPLOAD_MAX_FILE_BYTES", 1000)  # a 350 DPI page PNG is larger
+    with pytest.raises(RuntimeError, match="limits"):
+        ingest.preprocess_upload(path, "10.1000/upload", tmp_path / "run")
+
+
+def test_upload_preprocessing_wall_clock(monkeypatch, tmp_path):
+    monkeypatch.setattr(ingest, "_PREPROCESS", "import time; time.sleep(30)")
+    monkeypatch.setattr(ingest, "UPLOAD_PREPROCESS_SECONDS", 1)
+    with pytest.raises(RuntimeError, match="limits"):
+        ingest.preprocess_upload(tmp_path / "paper.pdf", "10.1000/upload", tmp_path / "run")
+
+
 def upload_job(monkeypatch, tmp_path):
     monkeypatch.setattr(ingest, "JOBS", {})
     monkeypatch.setattr(ingest, "PDF_DIR", tmp_path)
@@ -363,12 +426,13 @@ def upload_job(monkeypatch, tmp_path):
     path.write_bytes(pdf())
     run_dir = tmp_path / "uploads" / job.job_id
     def preprocess(pdf_path, paper_id, out_dir):
-        assert out_dir == run_dir  # per-job, never the DOI's shared pdf_runs dir
+        assert pdf_path == path and out_dir == run_dir  # per-job, never the DOI's shared pdf_runs dir
         (out_dir / "rendered_pages").mkdir(parents=True)
         (out_dir / "rendered_pages" / "page_001.png").write_bytes(b"png")
         (out_dir / "rows.json").write_text("[]")
         return {"out_dir": str(out_dir), "paper_id": paper_id, "llm_candidate_count": 0}
-    monkeypatch.setattr(ingest.pdf_preprocess, "preprocess_pdf", preprocess)
+    monkeypatch.setattr(ingest, "preprocess_upload", preprocess)
+    monkeypatch.setattr(ingest.pdf_preprocess, "preprocess_pdf", lambda *a, **k: pytest.fail("in-process render"))
     return job, path, run_dir
 
 

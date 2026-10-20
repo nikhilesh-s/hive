@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import shutil
 import hashlib
 import hmac
 import json
@@ -12,6 +13,7 @@ import re
 import subprocess
 import sys
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -33,6 +35,8 @@ MAX_PAGES = 60
 # A2 (0.25 m^2) in PDF points^2: about 47 Mpx / 140 MB per page at 350 DPI.
 # Journal pages are letter/A4, tabloid at most.
 MAX_PAGE_AREA_PT2 = 1191 * 1684
+# Whole document at the render DPI (about 52 letter pages); bounds render time and disk.
+MAX_RENDER_PIXELS = 600_000_000
 # Untrusted parsing happens in a child process under these limits.
 CHECK_WALL_SECONDS = 30
 CHECK_CPU_SECONDS = 20
@@ -41,10 +45,21 @@ UPLOAD_READ_SECONDS = 180          # whole body; bounds slow-loris uploads
 MAX_UPLOADS_PER_USER_PER_DAY = 10  # attempts that stream a body, accepted or not
 # ponytail: in-process semaphore and counters (single Render instance); move to the DB with a second instance.
 _UPLOAD_SLOTS = asyncio.Semaphore(2)
+_ACTIVE_USERS: set[str] = set()  # one in-flight upload per user
 _lock = asyncio.Lock()
 UNREADABLE = "Select a readable, unencrypted PDF with at least one page."
+
+
+@asynccontextmanager
+async def _sweep_orphans(app):
+    # Jobs run in-process, so anything here at startup was left by a crash or
+    # redeploy: uploaded PDFs and per-job render dirs of possibly paywalled copies.
+    shutil.rmtree(ingest.PDF_DIR / "uploads", ignore_errors=True)
+    yield
+
+
 ticket_router = APIRouter(prefix="/experimental", dependencies=[Depends(require_internal_key)])
-router = APIRouter(prefix="/experimental")
+router = APIRouter(prefix="/experimental", lifespan=_sweep_orphans)
 
 
 def normalize_doi(value: str) -> str:
@@ -138,7 +153,7 @@ async def existing(doi: str) -> dict | None:
 
 
 # Runs as `python -I -c` with an empty environment: no credentials, no repo on
-# sys.path. Prints page count, largest page area and early page text as JSON.
+# sys.path. Prints page count, largest and total page area and page-1 text as JSON.
 _INSPECT = r"""
 import json, resource, sys
 path, cpu, memory = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
@@ -155,8 +170,8 @@ with fitz.open(path) as doc:
         sys.exit(2)
     out = {"pages": doc.page_count}
     if doc.page_count <= max_pages:
-        out["max_area"] = max(max(p.rect.get_area(), p.mediabox.get_area()) for p in doc)
-        out["text"] = "\n".join(doc[i].get_text() for i in range(min(3, doc.page_count)))[:200000]
+        areas = [max(p.rect.get_area(), p.mediabox.get_area()) for p in doc]
+        out.update(max_area=max(areas), total_area=sum(areas), text=doc[0].get_text()[:200000])
 print(json.dumps(out))
 """
 
@@ -164,8 +179,8 @@ print(json.dumps(out))
 def inspect_pdf(path: Path) -> str:
     """Validate an untrusted PDF without parsing it in the API process.
 
-    Bounds the work a later 350 DPI render can cause (pages, page area) and
-    returns the text of the first three pages for DOI binding.
+    Bounds the work the later render can cause (pages, page area, total
+    pixels at the render DPI) and returns page-1 text for DOI binding.
     """
     with path.open("rb") as source:
         if not source.read(1024).lstrip().startswith(b"%PDF-"):
@@ -187,21 +202,23 @@ def inspect_pdf(path: Path) -> str:
         raise HTTPException(413, f"PDF must have at most {MAX_PAGES} pages; upload the main paper without supplements.")
     if not 0 < facts["max_area"] <= MAX_PAGE_AREA_PT2:
         raise HTTPException(413, "PDF page size is outside the supported range (up to A2).")
+    pixels = facts["total_area"] * (ingest.pdf_preprocess.DEFAULT_DPI / 72) ** 2
+    if pixels > MAX_RENDER_PIXELS:
+        raise HTTPException(413, f"PDF is too large to process ({pixels / 1e6:.0f} megapixels at "
+                                 f"{ingest.pdf_preprocess.DEFAULT_DPI} DPI; limit {MAX_RENDER_PIXELS // 1_000_000}). "
+                                 "Upload the main paper without supplements.")
     return facts["text"]
 
 
 def check_doi(text: str, doi: str) -> None:
-    """The supplied DOI must be the first DOI printed on the PDF's first pages.
-
-    Page text only: PDF metadata is trivially editable and often stale.
-    """
-    found = ingest.pdf_preprocess._extract_dois(text)
-    if not found:
-        raise HTTPException(422, "No DOI was found in the text of the PDF's first pages, so it cannot be "
-                                 "matched to this paper. Upload the publisher's version.")
-    first = ingest.fulltext.normalize_doi(found[0])
-    if first != doi:
-        raise HTTPException(422, f"This PDF shows DOI {first[:200]}, not {doi}. Check the paper and DOI.")
+    """The supplied DOI must be printed on page 1 (page text, never metadata,
+    which is trivially editable and often stale). Other DOIs there, such as a
+    related article, are fine. A forged page 1 still passes: the operator path
+    for removing such an upload is in tickets/o2-pdf-upload-verification.md."""
+    found = {ingest.fulltext.normalize_doi(d) for d in ingest.pdf_preprocess._extract_dois(text)}
+    if doi not in found:
+        raise HTTPException(422, f"DOI {doi} was not found in the text of the PDF's first page, so it cannot be "
+                                 "matched to this paper. Check the DOI, or upload the publisher's version.")
 
 
 @router.post("/uploads")
@@ -236,11 +253,17 @@ async def upload(request: Request, background: BackgroundTasks,
     if _daily_used("upload:" + user) >= MAX_UPLOADS_PER_USER_PER_DAY:
         raise HTTPException(429, f"You have reached today's upload limit ({MAX_UPLOADS_PER_USER_PER_DAY}). "
                                  "It resets at 00:00 UTC.")
+    if user in _ACTIVE_USERS:
+        raise HTTPException(429, "Your previous upload is still being received. Wait for it to finish.")
     if _UPLOAD_SLOTS.locked():
         raise HTTPException(503, "Other uploads are being processed. Retry in a minute.")
     async with _UPLOAD_SLOTS:
-        _spend_daily("upload:" + user, MAX_UPLOADS_PER_USER_PER_DAY)
-        return await _receive(request, background, doi, user)
+        _ACTIVE_USERS.add(user)
+        try:
+            _spend_daily("upload:" + user, MAX_UPLOADS_PER_USER_PER_DAY)
+            return await _receive(request, background, doi, user)
+        finally:
+            _ACTIVE_USERS.discard(user)
 
 
 async def _receive(request: Request, background: BackgroundTasks, doi: str, user: str) -> dict:
