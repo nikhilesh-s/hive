@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
+import { jobFinished, POLL_LIMIT_MS, pollBackoffMs, transientPoll } from '@/lib/ingestJob';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -57,6 +58,8 @@ export default function LivePage() {
   // with; a newer one bumps it, so a late search response never overwrites newer rows.
   const seq = useRef(0);
   const pollFails = useRef(0);
+  const throttles = useRef(0); // consecutive 429/503 polls; these never count toward pollFails
+  const waitUntil = useRef(0);
 
   useEffect(() => {
     fetch('/api/experimental/status').then((r) => r.json()).then(setStatus).catch(() => setStatus(null));
@@ -64,17 +67,27 @@ export default function LivePage() {
 
   // Poll the running job every 2 s; stop on a terminal state or when the job can no longer be read.
   useEffect(() => {
-    if (!job || job.status === 'done' || job.status === 'failed') return;
+    if (!job || jobFinished(job.status)) return;
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       setElapsed(Math.round((Date.now() - started) / 1000));
+      if (Date.now() < waitUntil.current) return; // backing off after a 429/503
       let j: Job | null = null;
       let fail = 'backend unreachable';
+      let wait: number | null = null;
       try {
         const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
         if (r.ok) j = await r.json();
+        else if (transientPoll(r.status)) wait = pollBackoffMs(throttles.current, r.headers.get('Retry-After'));
         else fail = r.status === 404 ? 'the job no longer exists (the API may have restarted)' : `backend returned ${r.status}`;
       } catch { /* fail stays 'backend unreachable' */ }
+      if (wait !== null) {
+        if (Date.now() - started > POLL_LIMIT_MS) setJob((cur) => cur && { ...cur, status: 'failed', error: 'Lost track of this job: the backend kept asking us to slow down for 20 minutes.' });
+        else { throttles.current++; waitUntil.current = Date.now() + wait; }
+        return;
+      }
+      throttles.current = 0;
+      waitUntil.current = 0;
       if (!j) {
         // a 404 is final; ride out a transient 502 / network blip for ~10 s before giving up
         if (fail.startsWith('backend') && ++pollFails.current < 5) return;
@@ -188,7 +201,7 @@ export default function LivePage() {
                 <span className="hb-result-chip" style={{ marginLeft: 8 }}>{p.source}</span>
               </div>
               {p.abstract && <p className="hb-live-abstract">{p.abstract.slice(0, 280)}{p.abstract.length > 280 ? '…' : ''}</p>}
-              <button type="button" className="hb-evidence-toggle" disabled={!p.doi || !!(job && job.status !== 'done' && job.status !== 'failed')} onClick={() => p.doi && startIngest(p.doi)}>
+              <button type="button" className="hb-evidence-toggle" disabled={!p.doi || !!(job && !jobFinished(job.status))} onClick={() => p.doi && startIngest(p.doi)}>
                 Extract this paper
               </button>
             </li>
@@ -196,7 +209,7 @@ export default function LivePage() {
         </ul>
         <div className="hb-live-form" style={{ marginTop: 18 }}>
           <input value={doi} onChange={(e) => setDoi(e.target.value)} placeholder="…or paste a DOI: 10.3892/br.2026.2108" aria-label="DOI" />
-          <button type="button" disabled={!doi.trim() || !!(job && job.status !== 'done' && job.status !== 'failed')} onClick={() => startIngest(doi.trim())}>Extract DOI</button>
+          <button type="button" disabled={!doi.trim() || !!(job && !jobFinished(job.status))} onClick={() => startIngest(doi.trim())}>Extract DOI</button>
         </div>
         {startErr && <p className="hb-live-error">{startErr}</p>}
       </section>

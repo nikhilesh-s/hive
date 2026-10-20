@@ -139,6 +139,229 @@ def resolve_ids(identifier: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
     return resolve_ids_batch([identifier], timeout).get(identifier.lower(), {})
 
 
+
+def _abstract_from_inverted_index(index: dict | None) -> Optional[str]:
+    """Reconstruct OpenAlex's abstract_inverted_index into plain text."""
+    if not isinstance(index, dict) or not index:
+        return None
+    pairs = []
+    for word, positions in index.items():
+        if not isinstance(positions, list):
+            continue
+        for pos in positions:
+            if isinstance(pos, int):
+                pairs.append((pos, str(word)))
+    if not pairs:
+        return None
+    return " ".join(word for _, word in sorted(pairs))
+
+
+def openalex_metadata(doi: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """Best-effort bibliographic metadata for a DOI from OpenAlex.
+
+    This is metadata only; it is never treated as extracted scientific evidence.
+    """
+    doi = normalize_doi(doi)
+    if not doi:
+        return {}
+    try:
+        resp = requests.get(
+            OPENALEX.format(doi=doi),
+            timeout=timeout,
+            headers=_headers(),
+            params={"select": "display_name,publication_year,authorships,primary_location,abstract_inverted_index,ids"},
+        )
+        data = (resp.json() or {}) if resp.status_code == 200 else {}
+    except (requests.RequestException, ValueError) as error:
+        logger.debug("openalex metadata failed for %s: %s", doi, error)
+        data = {}
+    if not data:
+        return {}
+
+    authors = []
+    for a in data.get("authorships") or []:
+        name = ((a or {}).get("author") or {}).get("display_name")
+        if name:
+            authors.append(str(name))
+    location = data.get("primary_location") or {}
+    source = location.get("source") or {}
+    ids = data.get("ids") or {}
+    pmid_url = ids.get("pmid")
+    pmid = str(pmid_url).rsplit("/", 1)[-1] if pmid_url else None
+    return {
+        "title": data.get("display_name"),
+        "abstract": _abstract_from_inverted_index(data.get("abstract_inverted_index")),
+        "authors": authors[:20],
+        "journal": source.get("display_name"),
+        "publication_year": data.get("publication_year"),
+        "pmid": pmid,
+        "metadata_source": "openalex",
+    }
+
+
+def paper_metadata(doi: str, timeout: int = DEFAULT_TIMEOUT, seed: dict | None = None) -> dict:
+    """Return normalized bibliographic metadata for ingestion.
+
+    Seed metadata from discovery is preserved and OpenAlex/NCBI fill gaps.
+    """
+    doi = normalize_doi(doi)
+    seed = dict(seed or {})
+    meta = {
+        "doi": doi,
+        "title": seed.get("title"),
+        "abstract": seed.get("abstract"),
+        "authors": seed.get("authors"),
+        "journal": seed.get("journal") or seed.get("venue"),
+        "publication_year": seed.get("publication_year") or seed.get("year"),
+        "pmid": seed.get("pmid"),
+        "pmcid": seed.get("pmcid"),
+        "metadata_source": seed.get("metadata_source") or seed.get("source"),
+    }
+    oa = openalex_metadata(doi, timeout) if doi else {}
+    for key in ("title", "abstract", "authors", "journal", "publication_year", "pmid"):
+        if not meta.get(key) and oa.get(key):
+            meta[key] = oa[key]
+    ids = resolve_ids(doi, timeout) if doi else {}
+    meta["pmid"] = meta.get("pmid") or ids.get("pmid")
+    meta["pmcid"] = meta.get("pmcid") or ids.get("pmcid")
+    sources = [s for s in (meta.get("metadata_source"), oa.get("metadata_source"), "ncbi" if ids else None) if s]
+    meta["metadata_source"] = "+".join(dict.fromkeys(str(s) for s in sources)) or None
+    try:
+        meta["publication_year"] = int(str(meta["publication_year"])[:4]) if meta.get("publication_year") else None
+    except (TypeError, ValueError):
+        meta["publication_year"] = None
+    return meta
+
+
+def unpaywall_record(doi: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
+    """Unpaywall metadata for a DOI when a real contact email is configured."""
+    doi = normalize_doi(doi)
+    if not doi or not _has_real_email():
+        return {}
+    try:
+        resp = requests.get(UNPAYWALL.format(doi=doi), params={"email": _email()}, timeout=timeout, headers=_headers())
+        return (resp.json() or {}) if resp.status_code == 200 else {}
+    except (requests.RequestException, ValueError) as error:
+        logger.debug("unpaywall metadata failed for %s: %s", doi, error)
+        return {}
+
+
+def check_access(doi: str, timeout: int = DEFAULT_TIMEOUT, pmcid: str | None = None) -> dict:
+    """Classify paper access without claiming institutional entitlement.
+
+    access_status is intentionally conservative:
+      open_access | no_open_copy_found | unknown
+    """
+    doi = normalize_doi(doi)
+    ids = resolve_ids(doi, timeout) if doi and not pmcid else {}
+    pmcid = pmcid or ids.get("pmcid")
+    doi_url = f"https://doi.org/{doi}" if doi else None
+
+    if pmcid:
+        info = europepmc_fulltext([pmcid], timeout).get(pmcid) or {}
+        if info.get("is_oa") or info.get("pdf_url"):
+            return {
+                "access_status": "open_access",
+                "access_url": info.get("pdf_url") or f"https://europepmc.org/articles/{pmcid}",
+                "access_source": "europepmc",
+                "oa_pdf": bool(info.get("pdf_url") or info.get("is_oa")),
+            }
+
+    oa = openalex_record(doi, timeout) if doi else {}
+    oa_state = (oa.get("open_access") or {}).get("is_oa") if oa else None
+    if oa_state is True:
+        best = oa.get("best_oa_location") or {}
+        url = best.get("pdf_url") or best.get("landing_page_url") or doi_url
+        return {
+            "access_status": "open_access",
+            "access_url": url,
+            "access_source": "openalex",
+            "oa_pdf": bool(best.get("pdf_url") or openalex_pdf_urls(doi, timeout, oa)),
+        }
+
+    up = unpaywall_record(doi, timeout) if doi else {}
+    if up.get("is_oa") is True:
+        best = up.get("best_oa_location") or {}
+        return {
+            "access_status": "open_access",
+            "access_url": best.get("url_for_pdf") or best.get("url") or doi_url,
+            "access_source": "unpaywall",
+            "oa_pdf": bool(best.get("url_for_pdf")),
+        }
+
+    if oa_state is False or up.get("is_oa") is False:
+        return {
+            "access_status": "no_open_copy_found",
+            "access_url": doi_url,
+            "access_source": "openalex" if oa_state is False else "unpaywall",
+            "oa_pdf": False,
+        }
+
+    return {
+        "access_status": "unknown",
+        "access_url": doi_url,
+        "access_source": None,
+        "oa_pdf": False,
+    }
+
+
+_RELEVANCE_STOPWORDS = {
+    "the", "and", "for", "with", "from", "into", "this", "that", "paper", "study",
+    "western", "blot", "blots", "analysis", "using", "between", "effect", "effects",
+}
+
+
+def assess_relevance(query: str | None, metadata: dict) -> dict:
+    """Deterministic metadata-only relevance signal for the discovery query."""
+    q = (query or "").strip().lower()
+    if not q:
+        return {"relevance_status": "unknown", "relevance_score": None,
+                "relevance_reason": "No discovery query was provided."}
+    tokens = [t for t in re.findall(r"[a-z0-9][a-z0-9_-]{2,}", q) if t not in _RELEVANCE_STOPWORDS]
+    if not tokens:
+        return {"relevance_status": "unknown", "relevance_score": None,
+                "relevance_reason": "The discovery query did not contain enough specific terms to score."}
+    hay = " ".join(str(metadata.get(k) or "") for k in ("title", "abstract", "journal", "venue")).lower()
+    if not hay.strip():
+        return {"relevance_status": "unknown", "relevance_score": None,
+                "relevance_reason": "No title/abstract metadata was available to score relevance."}
+    matched = sorted({t for t in tokens if t in hay})
+    overlap = len(matched) / max(1, len(set(tokens)))
+    blot_cue = any(cue in hay for cue in ("western blot", "western blotting", "immunoblot", "immunoblotting"))
+    score = round(min(1.0, 0.8 * overlap + (0.2 if blot_cue else 0.0)), 3)
+    status = "likely_relevant" if score >= 0.65 else "possibly_relevant" if score >= 0.30 else "low_relevance"
+    reason_parts = []
+    if matched:
+        reason_parts.append("Metadata matches: " + ", ".join(matched[:8]))
+    if blot_cue:
+        reason_parts.append("metadata explicitly mentions western blot/immunoblot")
+    reason = "; ".join(reason_parts) or "Little metadata overlap with the discovery query."
+    return {"relevance_status": status, "relevance_score": score, "relevance_reason": reason}
+
+
+def annotate_paper_signals(papers: list[dict], query: str, timeout: int = DEFAULT_TIMEOUT) -> list[dict]:
+    """Attach metadata-only relevance and conservative access flags for UI discovery."""
+    out = []
+    for paper in papers:
+        p = dict(paper)
+        doi = normalize_doi(p.get("doi") or "")
+        metadata = paper_metadata(doi, timeout, p) if doi else {
+            "title": p.get("title"), "abstract": p.get("abstract"),
+            "journal": p.get("venue"), "authors": p.get("authors"),
+            "publication_year": p.get("year"), "metadata_source": p.get("source"),
+            "pmcid": p.get("pmcid"), "pmid": p.get("pmid"),
+        }
+        p.update({k: v for k, v in metadata.items() if v is not None})
+        access = check_access(doi, timeout, p.get("pmcid")) if doi else {
+            "access_status": "unknown", "access_url": p.get("url"),
+            "access_source": None, "oa_pdf": False,
+        }
+        p.update(access)
+        p.update(assess_relevance(query, p))
+        out.append(p)
+    return out
+
+
 def openalex_record(doi: str, timeout: int = DEFAULT_TIMEOUT) -> dict:
     """OpenAlex's open-access view of a DOI ({} on any failure). Keyless."""
     try:

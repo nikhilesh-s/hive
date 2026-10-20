@@ -1,78 +1,69 @@
-# HiveBlot team handoff (2026-09-24)
+# HiveBlot team handoff (2026-10-11)
 
-For Nik, Srushti, Tanvi, Yashvi. Short version of `HANDOFF.md` plus the outreach plan.
+This file is for Nik, Srushti, Tanvi and Yashvi. It is the short version of `HANDOFF.md`.
+**Open work lives on the ticket board, [`tickets/README.md`](tickets/README.md).** Dated
+team updates go in [`tickets/team-log.md`](tickets/team-log.md).
 
 ## 1. Status
 
 HiveBlot is a search engine for published Western blots. It turns each blot in a paper into a
-structured record (target, antibody, dilution, cell line, what each lane shows) with the quote
-from the paper behind every field. It is live at https://hiveblot-beta.vercel.app (API on Render
-free tier). The live site has reviewed search (3 papers, 475 rows), a research page that finds
-and extracts new papers (about 4.5 min each), paper Q&A, and a band-reading tool. The feedback
-work (F-1..F-6) is merged to `main` but **not deployed**. Work has been paused since 2026-09-20.
-The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent**.
+structured record: target, antibody, dilution, cell line, and what each lane shows. Every field
+carries the quote from the paper behind it. It is live at https://hiveblot-beta.vercel.app,
+with the API on Render's free tier.
+
+On 2026-10-11 Srushti's Oct 1-3 work and PR #11 went live. Render and `release/hosted` are at
+`3839ee3`; the Vercel web build is at `ffc54a0`, and there have been no web changes since.
+Nik checked Google sign-in and Save on the live site.
+
+Outreach: wave 1 was 27 emails (Yashvi 13 on 09-30, Tanvi 14 on 10-05). There have been
+0 replies and almost no outside visits since 09-28.
 
 ## 2. Features
 
-**Done**
-- Reviewed search: evidence panel, figure crops, per-field ✓/✗ feedback (live).
-- Research page: Valency search, PMC fallback, live extraction proven on the hosted site (live).
-- Paper Q&A with citations (live).
-- Band reading v0.3.0: drawn lanes, saturation refusal, ranges instead of decimals,
-  loading-control pairing, export (live).
-- Feedback upgrades F-1..F-6: export script, zero-result capture, useful / not relevant,
-  3-question survey, opt-in contact, separate rate limit, honest failures (merged, not deployed).
-- CI now runs on `main` and `release/**` (commit `273412b`, passing).
+**Live**
+- Reviewed search (3 papers, 475 rows, live counts), with an evidence panel, figure crops and
+  per-field ✓/✗ feedback.
+- Saved Results for anonymous visitors and Google accounts; Google sign-in; search history.
+- Outreach attribution: `?lab=` and `?utm_source=` are stored on searches and feedback.
+- Paper access badges on search results (from stored, verified checks only): "Open access", "No open copy found / Check institutional access", or "Access unknown".
+- The research page finds papers and checks metadata, relevance and access first. Paywalled or
+  unretrievable papers end as "awaiting full text", with an institutional-access link.
+  Downloadable papers extract (PLOS ONE test: 25 experiments, 158 lanes).
+- Paper Q&A with citations. Band reading v0.3.0.
+- Feedback F-1 to F-6.
+- Guards: a beta access code on `/experimental/*`, daily caps, per-researcher limits, and
+  hidden API docs.
 
 **Not done**
-- Deploy of F-1..F-6 (needs migration 006 first).
-- Daily cap or any auth on paid endpoints.
-- `?doi=` deep link on `/experimental/research` (search already supports `?q=`).
-- Journal-access flag promised at the UCSF meeting.
-- Accuracy numbers on papers we have not seen. None exist yet.
-- Calibrated densitometry. There is no ladder calibration; intensity columns stay empty.
+- `?doi=` deep link (W-1).
+- Upload-your-own-PDF (O-2).
+- B-3 "not stated" vs "not recovered": built, but no PR yet (W-2).
+- Accuracy numbers on unseen papers.
+- Calibrated densitometry.
 
 ## 3. Bugs and risks (worst first)
 
-- **No auth on paid endpoints.** Anyone with the link can start model jobs. `/experimental/ingest`
-  is limited to 6/minute but has no daily cap.
-- **Deploying the API before migration 006 breaks every feedback submit** (500 error).
-- **Paper access is fragile.** Europe PMC and PMC block scripted downloads. We depend on OpenAlex
-  finding a publisher PDF. `UNPAYWALL_EMAIL` is not set, so Unpaywall is skipped.
-- **Free Render kills jobs.** 30-60 s cold start; a 15-minute idle spin-down kills extractions in
-  progress. Jobs run inside the API process. Two people extracting at once is untested.
-- **One shared rate-limit bucket.** All Vercel traffic reaches Render from one IP, so every user
-  shares search 20/min, feedback 120/min, band reading 60/min. A lab session can hit 429.
-- **Live rows cannot be corrected.** Feedback on the live (unreviewed) tier is read-only by design.
-  The outreach hook asks authors to click ✗ on their own extracted paper, so this must change or
-  the email must say "reply to this email" instead.
-- **Stale copy.** The docs pack at repo root (`UCSF_BETA_*.md`, `BETA_EMAIL_*.md`,
-  `HOSTING_STATUS.md` and others) still says live search is "not yet in this link". Corpus counts
-  are hardcoded in `web/app/about/page.tsx` and `web/app/search/page.tsx`.
-- **B-9 closed on `feature/saved-results`:** the stale `api/app/nlp.py` OpenAI NL-to-SQL path was deleted.
-  Normal search now always uses deterministic `api/app/bio_query.py` plus `sql_guard.py`.
-- Smaller: record 1189 shows internal feedback to testers; API `/docs` is public; reviewed crops
-  are baked into the Docker image. Not tested hosted: per-field ✓/✗ after F-6, mobile, other browsers.
+- **Most open-access papers can't be downloaded automatically.** Publisher bot checks and
+  PMC/Europe PMC block scripts, so these papers end as "awaiting full text". Upload (O-2) fixes it.
+- **Free Render.** A 30-60 s cold start means the first request can return 503. A restart kills
+  running extractions (O-1).
+- **The research page gives up on a job after a few 429s.** It shows "Lost track of this job"
+  while the job keeps running (O-8).
+- **Extraction quality.** Target-name misses (B-12), Northern blots stored as westerns (B-13),
+  and unresolved targets not flagged for review (B-14).
+- **Browser-sent paper metadata is trusted too far** on `/experimental/ingest` (W-4).
+- Live rows can't be corrected on the site; corrections come by email reply.
+- `UNPAYWALL_EMAIL` is unset (O-7). There is a stale share-pack line (G-4). Record 1189 shows
+  internal feedback (O-6, Nik decides).
 
-## 4. Tickets left
+## 4. Tickets
 
-| ID | What | Owner | Blocker / next step |
-|---|---|---|---|
-| F-8 | Deploy F-1..F-6 and smoke test hosted | Nik | Migration 006 first, then Render, then Vercel. Steps in `HANDOFF.md` |
-| F-7 | Weekly feedback triage | Tanvi | Needs F-8 so new feedback lands |
-| W-0.2 | Daily cap on ingest and ask | Nik | None. Do before any outreach |
-| W-0.4 | `/experimental/research?doi=` deep link | Srushti | None |
-| J-1 | Journal-access flag (OA / no OA / may need institution) | Srushti | Deferred ticket `tickets/journal-access-later.md` |
-| D-7 | Real ground truth: dilution series, Source Data survey | Yashvi + Tanvi | Needs one lab to agree |
-| D-name | Name of the densitometry page | Nik | Decision only |
-| B-3 | `not_stated` vs `not_recovered` for empty fields | Nik + Srushti + Tanvi | None |
-| B-4 | Recall/precision script (inventory part done) | Tanvi + Nik | Tanvi fills the panel inventories |
-| B-5 | `compare_records.py`, 3 repeats per paper | Nik | None; needed before B-7 |
-| B-7 | Escalation that merges instead of replaces | Nik | After B-5 |
-| B-8 | Sample normalization and tissue routing | Nik + Tanvi | `record_id` must not change |
-| B-9 | Delete OpenAI NL-to-SQL | Srushti | Done on `feature/saved-results`; search uses `bio_query.py` |
-| B-10 | External adjudicators | Yashvi + Tanvi | Outreach replies can supply them |
-| B-11 | Band pattern and lane dose as columns | Nik | Stretch |
+Everything is on [`tickets/README.md`](tickets/README.md), with owners, priorities, statuses and
+the rules for agents. P1 this week:
+- Srushti: W-1, O-2, W-2
+- Tanvi: Q-1, Q-2
+- Yashvi: G-1, G-2
+- Nik: O-7
 
 ## 5. Ideas still on the table
 
@@ -83,22 +74,20 @@ The UCSF follow-up email and Tally form promised for 2026-09-16 were **not sent*
 - Reseed the hosted 475 rows once B-5 has measured the new pipeline (founder decision D-2).
 - Escalating ambiguous panels to a stronger model, only if B-5 shows it helps (D-3).
 
+
 ## 6. Outreach to Oct 20
 
-- The hook: **"We extracted the westerns from your paper. Tell us what we got wrong."** Replies,
-  evaluation labels and corpus growth all come from one email.
-- Fallback for people who will not review: "send a protein and cell line, we send back every
-  published western we can find." Done by hand.
-- Week 0 (09-24 to 09-27) blocks everything: deploy, daily cap, Render Starter, deep link, stale
-  copy, `UNPAYWALL_EMAIL`, UCSF follow-up.
-- Before sending, extract one paper per 70+ prospect. Tanvi checks each one. Never link an
-  extraction nobody has checked.
-- Waves: 0 = UCSF testers (09-28); 1 = score 80+, ~20 (09-29 to 10-01); 2 = 65-79, ~30
-  (10-06 to 10-08); 3 = the rest, ~30 (10-13 to 10-15); readout 10-19 to 10-20.
-- Targets: 80 sent, 20 replies, 12 users, 8 papers corrected by authors, 150 field labels,
-  3 design partners, 1 dilution-series commitment.
-- Max ~20 new emails a day, three touches then stop, opt-outs removed the same day.
-  **Nothing has been sent. Every email is sent by hand, one at a time, from Nik's mailbox.**
+- The hook: **"We extracted the westerns from your paper. Tell us what we got wrong."**
+- **What happened:**
+  - Yashvi sent 13 on 09-30, plus follow-up 1.
+  - Tanvi sent 14 on 10-05; her follow-up 1 was due 10-09 and follow-up 2 is due 10-16.
+  - 0 replies, and almost no visits.
+- **Changes:**
+  - Batch 2 waits for email v2 (G-2): plain text, sent to the first author, opening with their
+    own paper, one link, after a spam check.
+  - Warm channels: lab-meeting demos through UCSF and Seiji (Stanford), and core facilities.
+  - `?lab=` tracking is now live, so clicks count.
+- **Rules:** at most ~20 new emails a day, three touches then stop, opt-outs removed the same day.
 
 Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 `git show outreach/oct20:outreach/prospects.csv`.
@@ -116,32 +105,32 @@ Top 10 of 84 prospects (43 schools, 70 with a public email). Full sheet:
 | Jennifer M. Spangle | Emory | Early-career PI | 85 | Uses LI-COR and ChemiDoc quantification |
 | Kevin Janes | UVA | Rigor advocate | 85 | Wrote the reference paper on immunoblot quantification |
 
+
 ## 7. Who does what this week
 
-- **Nik:** deploy (migration 006, Render, Vercel, F-8 smoke test). Daily cap on ingest and ask.
-  Move Render to Starter. Set `UNPAYWALL_EMAIL`. Pre-extract papers Mon-Tue, then all sending and replies.
-- **Srushti:** `?doi=` deep link on the research page. Journal-access flag. Any bug a tester reports.
-- **Tanvi:** fix stale copy in the docs pack and hardcoded corpus counts. Spot-check every extracted
-  paper before it goes in an email. Weekly F-7 triage (extraction bugs become B tickets).
-- **Yashvi:** send the overdue UCSF follow-up (Tally form + research page). Own the prospect sheet
-  (status per row). Handle concierge requests.
+- **Nik:** decisions (section 9), approving email v2, Monday and Thursday check-ins, merges.
+- **Srushti + Codex:** W-1, O-2 and W-2, then B-14, B-12, B-13, O-8, W-3 and W-4.
+- **Tanvi:** follow-up 1 now and follow-up 2 on 10-16. Q-1 by 10-14, Q-2 (ImageJ) by 10-16,
+  then Q-3 and Q-4. Review the B-3 wording.
+- **Yashvi + Claude:** UCSF Tally email 10-12 08:00, follow-up 2, Gina and Seiji, G-1 to G-5,
+  and O-3.
+- Everyone posts done, open and blocked in the chat on Thursday and Sunday.
 
 ## 8. Branches
 
-- `main`: source of truth. All work lands here. CI runs on it.
-- `release/hosted` (`0aa5fdf`): exactly what Vercel and Render run today.
-- `outreach/oct20`: outreach plan and prospect sheet.
-- `archive/*` tags: 7 old branches, fully merged into `main`, then deleted (2026-09-24).
+- `main`: source of truth. PRs only, CI must be green, and Nik merges.
+- `release/hosted` (`3839ee3`): what Render runs. The Vercel web build is `ffc54a0`.
+- `outreach/oct20`: outreach plan, prospect sheet and `PREEXTRACT_CHECK.md`. Yashvi's
+  `yashvi-outreach` branches from it.
+- `feature/saved-results`: the B-3 work; W-2 turns it into a PR.
+- `archive/*` tags: old branches, already merged.
 
 ## 9. Nik's decisions needed
 
-1. Pay for Render Starter ($7/mo)?
-2. Which real mailbox for `UNPAYWALL_EMAIL` and for sending outreach?
-3. Let authors correct live rows, or ask for corrections by email reply?
-4. Daily cap only, or also a shared beta key, before strangers get the link?
-5. Densitometry page name. Recommendation: "Band reading (experimental)".
-6. B-9 is closed on `feature/saved-results`; normal search no longer depends on `OPENAI_KEY`.
-7. Delete the internal feedback on record 1189?
-8. Hide API `/docs` (`docs_url=None`)?
-9. Close Copilot PR nikhilesh-s/hive#2.
-10. Approve the outreach plan and the wave 1 send date (09-29).
+1. Move Render to a paid plan (O-1)?
+2. Which mailbox for `UNPAYWALL_EMAIL` (O-7)?
+3. Record 1189 feedback: keep (recommended) or delete (O-6)?
+4. Densitometry page name. Recommendation: "Band reading (experimental)".
+5. What lab number to announce on Oct 20. Recommendation: no public number, internal goal of 5.
+6. Approve email v2 before batch 2 (G-2).
+7. Close Copilot PR nikhilesh-s/hive#2.

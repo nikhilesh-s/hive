@@ -26,7 +26,7 @@ export default async function AccessPage({
           <input type="hidden" name="next" value={safeNext(next)} />
           <input id="code" name="code" type="password" autoComplete="off" required autoFocus
                  aria-label="Access code"
-                 placeholder="Access code" style={{ padding: '8px 10px', minWidth: 220 }} />
+                 placeholder="Access code" style={{ padding: '8px 10px', minWidth: 220, fontSize: 16 }} />
           <button type="submit" className="hb-history-clear">CONTINUE</button>
         </form>
       </div>
