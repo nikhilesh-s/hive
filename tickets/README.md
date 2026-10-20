@@ -87,7 +87,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 | W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
 | O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
 | W-3 | Phone and Safari pass on the hosted site | P2 | todo (R-5 deployed 10-18) |
-| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo (labels are safe since W-6; job metadata is still trusted) |
+| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | PR #35 (server derives all paper metadata; browser fields ignored) |
 
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |

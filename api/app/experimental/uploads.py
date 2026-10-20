@@ -294,7 +294,7 @@ async def _receive(request: Request, background: BackgroundTasks, doi: str, user
             from .router import _spent
             _spend_daily("extraction", settings.daily_ingest_cap)
             charged_day = _spent["extraction"][0]
-            job = ingest.start_job(doi, metadata={"source": "upload"})
+            job = ingest.start_job(doi, source="upload")
             job.doi = doi  # Keep the validated identifier, not citation punctuation heuristics.
             audit = {"uploaded_by": UUID(user), "uploaded_at": ingest._now(), "pdf_sha256": digest.hexdigest()}
             try:
