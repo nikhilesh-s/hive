@@ -103,6 +103,33 @@ PROTEIN_ALIASES: dict[str, tuple[str, Optional[str]]] = {
     "egfr": ("EGFR", "P00533"),
     "parp": ("PARP1", "P09874"),
     "parp1": ("PARP1", "P09874"),
+    # B-12: the gene symbols that the name rules in normalize_target() map TO,
+    # keyed by lowercase symbol. Accessions are UniProtKB reviewed HUMAN entries
+    # checked against rest.uniprot.org on 2026-10-19 (the offline fallback is
+    # human-only like every entry above; the live resolver is organism-scoped).
+    "vcl": ("VCL", "P18206"),
+    "bcl2l1": ("BCL2L1", "Q07817"),
+    "kras": ("KRAS", "P01116"),
+    "map1lc3a": ("MAP1LC3A", "Q9H492"),
+    "map1lc3b": ("MAP1LC3B", "Q9GZQ8"),
+    "map1lc3c": ("MAP1LC3C", "Q9BXW4"),
+    "il18": ("IL18", "Q14116"),
+    "casp1": ("CASP1", "P29466"),
+    "casp3": ("CASP3", "P42574"),
+    "casp7": ("CASP7", "P55210"),
+    "gsdmd": ("GSDMD", "P57764"),
+    "gsdme": ("GSDME", "O60443"),
+    "ctnnb1": ("CTNNB1", "P35222"),
+    "eif2s1": ("EIF2S1", "P05198"),
+    "eif4ebp1": ("EIF4EBP1", "Q13541"),
+    "mcl1": ("MCL1", "Q07820"),
+    "bcl2": ("BCL2", "P10415"),
+    "becn1": ("BECN1", "Q14457"),
+    "ptpn6": ("PTPN6", "P29350"),
+    "ptpn11": ("PTPN11", "Q06124"),
+    "birc5": ("BIRC5", "O15392"),
+    "myc": ("MYC", "P01106"),
+    "ccnd1": ("CCND1", "P24385"),
 }
 
 # Organism wording -> NCBI taxonomy id, for scoping the UniProt query. Only
@@ -162,7 +189,10 @@ _PHOSPHO_AB = re.compile(r"phospho[-\s]?specific|anti[-\s]?phospho|phospho[-\s]?
 
 # Other modifications -- only asserted on explicit words.
 _MOD_WORDS = {
-    "cleavage": re.compile(r"\bcleav(ed|age)\b", re.IGNORECASE),
+    # "cl." is the explicit abbreviation of "cleaved" ("α-CASP3 cl."). Anchored to the
+    # END of the label / a following parenthetical so an antibody clone written
+    # "(cl. 4G10)" is never read as cleavage. Bare "CL" (cell lysate) is NOT matched.
+    "cleavage": re.compile(r"\bcleav(ed|age)\b|\bcl\.(?=\s*(?:\(|$))", re.IGNORECASE),
     "ubiquitination": re.compile(r"\bubiquitin|poly[-\s]?ub\b|\bK\d{1,3}[-\s]?linked", re.IGNORECASE),
     "acetylation": re.compile(r"\bacetyl|\bac-K\d", re.IGNORECASE),
     "methylation": re.compile(r"\bmethylat|\btri[-\s]?methyl|\bme3\b", re.IGNORECASE),
@@ -445,6 +475,36 @@ def _one_letter_site_in_context(*texts: str) -> Optional[dict]:
 # Modification detection  (the phospho-heuristic replacement)
 # --------------------------------------------------------------------------- #
 
+def _greek(s: str) -> str:
+    """Greek letters -> spelled-out forms so "β-actin" reaches the alias map /
+    UniProt as "beta-actin" (raw wording is preserved elsewhere). A Greek word
+    followed by a SPACE is glued with a hyphen ("β actin" -> "beta-actin"):
+    the first-token split would otherwise cut the label down to "beta"."""
+    s = s.replace("β", "beta").replace("α", "alpha")
+    return re.sub(r"(?i)\b(alpha|beta)\s+(?=[A-Za-z])", r"\1-", s)
+
+
+# Leading modification/expression markers that are NOT part of the protein name
+# (stripped for IDENTITY only; the modification layer decides what they mean):
+#   non-phos[pho]-  antibody to the NON-phosphorylated form (4E-BP1)
+#   phospho-/p-/t-  phospho / total (separator REQUIRED, so p53, p38, PARP keep their p)
+#   total-          total-protein marker ("Total-eIF2α"); "Total protein" is a loading control
+#   Ph-             case-sensitive abbreviation of phospho ("Ph-eIF2α")
+_MOD_PREFIX = re.compile(
+    r"^(?:non[-\s]?phos(?:pho)?[-\s]?|phospho[-\s]?|total[-\s](?!protein\b)|(?-i:Ph)-(?=[A-Za-z])|[pt][-\s])",
+    re.IGNORECASE)
+
+
+def _strip_mod_prefix(s: str) -> str:
+    """Drop a leading phospho/total/non-phospho marker, never a letter that is
+    part of the protein's own name (P-cadherin, t-PA, p53, PARP)."""
+    if re.split(r"[\s(]+", s.strip())[0].lower() in NAME_PREFIX_PROTEINS:  # P-cadherin, t-PA keep their prefix
+        return s
+    s = _MOD_PREFIX.sub("", s, count=1)
+    # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
+    return re.sub(r"^p([A-Z]{2,})", r"\1", s)
+
+
 def _core_symbol(target: str) -> str:
     """Gene symbol with a leading phospho/total marker and any site stripped.
 
@@ -460,15 +520,8 @@ def _core_symbol(target: str) -> str:
     so a family label does not collapse to a bare-symbol false-friend (UniProt
     ``gene:ERK`` resolves to EPHB2, whose gene synonym is literally "ERK").
     """
-    s = _norm(target)
-    # Greek letters -> spelled-out forms so "β-actin" reaches the alias map /
-    # UniProt as "beta-actin" (raw wording is preserved elsewhere).
-    s = s.replace("β", "beta").replace("α", "alpha")
-    if re.split(r"[\s(]+", s.strip())[0].lower() not in NAME_PREFIX_PROTEINS:  # P-cadherin, t-PA keep their prefix
-        # phospho word, or a p-/t- prefix with a REQUIRED separator.
-        s = re.sub(r"^(phospho[-\s]?|[pt][-\s])", "", s, flags=re.IGNORECASE)
-        # glued lowercase-p phospho prefix on an uppercase symbol: pSTAT3, pERK.
-        s = re.sub(r"^p([A-Z]{2,})", r"\1", s)
+    s = _greek(_norm(target))
+    s = _strip_mod_prefix(s)
     tokens = re.split(r"[\s(]+", s.strip())
     core = tokens[0] if tokens else ""
     # Glue a trailing pure-isoform token (digits / slashes): "ERK 1/2" -> "ERK1/2".
@@ -485,6 +538,10 @@ def _target_has_phospho_marker(target: str) -> bool:
     comes from the per-row target label, not the shared caption.
     """
     low = target.lower()
+    # "non-phospho-4EBP1" / "Non-Phos-4EBP1" is an antibody to the NON-phosphorylated
+    # form: the word "phospho" inside it must not read as a phospho marker.
+    if re.match(r"non[-\s]?phos", low.strip()):
+        return False
     # Guard on the UN-stripped first token: bare p38/p53 are never phospho by
     # name, but an explicit marker on them ("p-p38", "phospho-p38") still is.
     first = re.split(r"[\s(]+", low.strip())[0]
@@ -495,6 +552,8 @@ def _target_has_phospho_marker(target: str) -> bool:
     if "phospho" in low:
         return True
     if re.search(r"\bp-\s?[A-Za-z]", target):  # p-STAT3, p-AKT
+        return True
+    if re.match(r"Ph-[A-Za-z]", target.strip()):  # Ph-eIF2α: explicit, case-sensitive abbreviation
         return True
     if re.match(r"^p([A-Z]{2,}[A-Za-z0-9/]*)$", target):  # pSTAT3, pAKT, pERK (not pRb, not p53)
         return True
@@ -579,6 +638,8 @@ def detect_modification(
             if not re.search(r"[A-Za-z]{2}", rest):
                 continue
             label = m.group(0).lower() if mod_type == "cleavage" else mod_type
+            if label == "cl.":
+                label = "cleaved"
             return {
                 "modification_type": mod_type,
                 "residue": None,
@@ -933,6 +994,203 @@ def core_symbol(target: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Target-name normalization (B-12)
+# --------------------------------------------------------------------------- #
+# Every rule below is an explicit rewrite of the label AS PRINTED; the full table
+# with rationale is tickets/b12-expected-mappings.md. Nothing is inferred from
+# letters alone: a label that cannot be settled stays unresolved or AMBIGUOUS,
+# and the caller always keeps the raw wording. Rule ids (the `rules` list) are the
+# same ids the tests and the table use.
+
+_FOLD = re.compile(r"[\s_\-]+")
+
+
+def _fold(s: str) -> str:
+    """Lowercase with spaces/hyphens removed: "Bcl-xL", "bcl xl" -> "bclxl"."""
+    return _FOLD.sub("", s.lower())
+
+
+# Epitope / fusion tags name the construct, not a protein.
+_TAG_NAMES = r"FLAG|HA|V5|GFP|EGFP|mCherry|6xHis|His|GST"
+_TAG_PREFIX = re.compile(rf"(?i)^({_TAG_NAMES})-(?=\S{{3,}})")
+# "-myc" only as a SUFFIX: a bare "Myc" / "c-Myc" is the MYC protein, never a tag.
+_TAG_SUFFIX = re.compile(rf"(?i)(?<=\S{{3}})-({_TAG_NAMES}|myc)$")
+_BARE_TAGS = {"flag", "dykddddk", "ha", "v5", "gfp", "egfp", "mcherry", "his", "6xhis",
+              "gst", "myctag", "hatag", "flagtag", "histag"}
+
+# Viral proteins whose NAME is specific to primate lentiviruses (HIV/SIV). Tat and
+# Rev are excluded (TAT is also a human gene) as are p55/p24/p17 (host proteins
+# share the p-number names): those need paper context, so they are left alone.
+_VIRAL = {"vpr", "vif", "nef", "vpu", "gp120", "gp41", "gp160"}
+
+# Families whose isoform the label does not state. folded name -> (label, genes, note).
+# A label is given only when the gene list is complete and short; otherwise None.
+_RAS = ("HRAS/KRAS/NRAS", ("HRAS", "KRAS", "NRAS"), "Ras isoform not stated")
+_JNK = ("MAPK8/MAPK9/MAPK10", ("MAPK8", "MAPK9", "MAPK10"), "JNK1/2/3 not stated")
+_FAMILIES: dict[str, tuple[Optional[str], tuple[str, ...], str]] = {
+    "ras": _RAS, "panras": _RAS,
+    "jnk": _JNK, "sapk/jnk": _JNK,      # "/" survives _fold()
+    "alphaactinin": ("ACTN1/ACTN2/ACTN3/ACTN4", ("ACTN1", "ACTN2", "ACTN3", "ACTN4"),
+                     "alpha-actinin isoform not stated"),
+    "alphatubulin": (None, (), "alpha-tubulin is a multi-gene family (TUBA*); isoform not stated"),
+    "betatubulin": (None, (), "beta-tubulin is a multi-gene family (TUBB*); isoform not stated"),
+    "myhc": (None, (), "myosin heavy chain is a multi-gene family (MYH*); isoform not stated"),
+    "myosinheavychain": (None, (), "myosin heavy chain is a multi-gene family (MYH*); isoform not stated"),
+}
+
+# Common names that are not the gene symbol (UniProt `gene:` never matches them).
+# Keys are _fold()ed. Each maps to exactly ONE gene; anything shared stays out.
+NAME_TO_SYMBOL: dict[str, str] = {
+    "vinculin": "VCL",
+    "bclxl": "BCL2L1",            # the long isoform of BCL2L1
+    "il18": "IL18",
+    "betacatenin": "CTNNB1", "bcatenin": "CTNNB1",
+    "eif2alpha": "EIF2S1",        # NOT "eif2a": EIF2A is a different gene
+    "4ebp1": "EIF4EBP1",          # 4E-BP1, 4EBP1
+    "mcl1": "MCL1", "bcl2": "BCL2", "beclin1": "BECN1",
+    "shp1": "PTPN6", "shp2": "PTPN11",
+    "survivin": "BIRC5", "cmyc": "MYC", "cyclind1": "CCND1",
+}
+_CASPASE = re.compile(r"caspase(\d{1,2})$")
+_CASPASE_NUMBERS = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14}   # human CASP genes with that number
+
+_LC3_MENTION = re.compile(r"(?i)\blc-?3([abc])?(?![a-z0-9])")
+
+
+def _lc3(s: str):
+    """(stated isoform letters, form numerals) when ``s`` is ONLY LC3 mentions and
+    I/II form numerals ("LC3-I/LC3-II", "LC3B I / II"), else None."""
+    mentions = _LC3_MENTION.findall(s)
+    if not mentions:
+        return None
+    rest = _LC3_MENTION.sub("", s)
+    forms = [f.upper() for f in re.findall(r"(?i)\b(i{1,2})\b", rest)]
+    if re.sub(r"(?i)\bi{1,2}\b|[\s/\-,]", "", rest):
+        return None
+    return {m.upper() for m in mentions if m}, forms
+
+
+def normalize_target(raw_target: str) -> dict:
+    """Rewrite a printed target label into what can be LOOKED UP, or say why not.
+
+    Returns::
+
+        {"raw": str,
+         "lookup": "VCL" | None,      # name/symbol to send to the resolver; None = no
+                                      # rule fired, callers use core_symbol(raw)
+         "kind": None | "family" | "viral" | "tag",
+         "family_label": "MAPK8/MAPK9/MAPK10" | None,   # kind == "family"
+         "candidates": ["MAPK8", ...],                  # kind == "family"
+         "notes": [str],              # tag / form / viral / family facts to keep
+         "rules": [str]}              # ids of the rules that fired
+
+    ``kind`` "family" means AMBIGUOUS (never a single guessed gene); "viral" and
+    "tag" mean deliberately unresolved against human UniProt.
+    """
+    raw = _norm(raw_target)
+    out: dict = {"raw": raw, "lookup": None, "kind": None, "family_label": None,
+                 "candidates": [], "notes": [], "rules": []}
+    rules, notes = out["rules"], out["notes"]
+
+    def fire(rule: str, note: Optional[str] = None) -> None:
+        rules.append(rule)
+        if note:
+            notes.append(note)
+
+    # Parenthetical qualifiers ("(long exposure)", "(CASP3 p19 / CASP3 p17)") never
+    # change identity; the raw label keeps them.
+    s = _greek(re.split(r"\s*\(", raw)[0].strip())
+    stripped = _strip_mod_prefix(s)
+    if re.match(r"(?i)non[-\s]?phos", s):
+        fire("non_phospho_prefix", "label is a NON-phospho-specific antibody: it reads the "
+             "unphosphorylated form, not total protein (modification not asserted)")
+    s = stripped
+
+    # --- qualifiers describing the FORM, not the protein ----------------------
+    m = re.match(r"(?i)(cleaved|active|activated)[-\s]+(?=\S)", s)
+    if m:
+        fire("form_qualifier", f"'{m.group(1)}' qualifier dropped for protein identity only; "
+             "the modification layer decides what it means")
+        s = s[m.end():]
+    m = re.search(r"(?i)\s+cl\.$", s)           # "cl." with the dot; bare "CL" is cell lysate
+    if m:
+        fire("cleaved_abbreviation", "'cl.' (cleaved) dropped for protein identity only")
+        s = s[:m.start()]
+
+    # --- antibody "α-" (anti-) vs alpha as part of the name -------------------
+    # Only when the rest is a caspase / gasdermin / interleukin symbol; alpha-tubulin,
+    # alpha-actinin, alpha-SMA, alpha-catenin keep their alpha.
+    m = re.match(r"(?i:alpha)-(?=(?:CASP\d+|GSDM[A-E]|IL-?\d+)\b)", s)
+    if m:
+        fire("anti_alpha_prefix", "leading 'alpha-' read as 'anti-' (antibody label)")
+        s = s[m.end():]
+
+    # --- epitope / fusion tags ------------------------------------------------
+    for pat, side in ((_TAG_PREFIX, "prefix"), (_TAG_SUFFIX, "suffix")):
+        m = pat.match(s) if side == "prefix" else pat.search(s)
+        if m:
+            fire("epitope_tag", f"{m.group(1)} tag stripped; the tagged protein is the target")
+            s = s[m.end():] if side == "prefix" else s[:m.start()]
+
+    # --- caspase / gasdermin fragment suffix ("CASP1p10") ---------------------
+    m = re.fullmatch(r"(?i)(CASP\d+|GSDM[A-E])\s*p\d{1,3}(?:/\d{1,3})?", s)
+    if m:
+        fire("cleavage_fragment_suffix", f"fragment notation '{s[len(m.group(1)):].strip()}' dropped "
+             "for protein identity; cleavage is NOT asserted from a size suffix")
+        s = m.group(1)
+
+    f = _fold(s)
+
+    # --- things that are not (human) proteins ---------------------------------
+    if f in _VIRAL:
+        out["kind"] = "viral"
+        fire("viral_protein", "viral protein (primate lentivirus, HIV/SIV): non-human, "
+             "deliberately not resolved against human UniProt")
+        return out
+    if f in _BARE_TAGS:
+        out["kind"] = "tag"
+        fire("bare_tag", f"'{s}' is an epitope/fusion tag, not a protein; the tagged protein "
+             "is not named in this label")
+        return out
+
+    # --- LC3 ------------------------------------------------------------------
+    lc3 = _lc3(s)
+    if lc3:
+        letters, forms = lc3
+        if forms:
+            notes.append("LC3-I / LC3-II are forms of one protein (cytosolic / lipidated); "
+                         "kept as a form note, not a modification")
+        if len(letters) == 1:
+            fire("lc3_isoform_stated")
+            out["lookup"] = "MAP1LC3" + next(iter(letters))
+        else:
+            fire("lc3_isoform_unstated", "LC3 isoform (A/B/C) not stated")
+            out.update(kind="family", family_label="MAP1LC3A/MAP1LC3B/MAP1LC3C",
+                       candidates=["MAP1LC3A", "MAP1LC3B", "MAP1LC3C"])
+        return out
+
+    # --- ambiguous families ---------------------------------------------------
+    if f in _FAMILIES:
+        label, genes, note = _FAMILIES[f]
+        fire("ambiguous_family", note)
+        out.update(kind="family", family_label=label, candidates=list(genes))
+        return out
+
+    # --- single-gene name aliases ---------------------------------------------
+    sym = NAME_TO_SYMBOL.get(f) or NAME_TO_SYMBOL.get(_fold(_core_symbol(s)))
+    if not sym:
+        m = _CASPASE.fullmatch(f)
+        if m and int(m.group(1)) in _CASPASE_NUMBERS:
+            sym = f"CASP{int(m.group(1))}"
+    if sym:
+        fire("name_alias")
+        out["lookup"] = sym
+    elif rules:
+        out["lookup"] = _core_symbol(s)
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Protein normalization (conservative, explicit ambiguity)
 # --------------------------------------------------------------------------- #
 
@@ -947,18 +1205,26 @@ def normalize_protein(raw_target: str) -> dict:
           "canonical": "STAT3" | None,
           "uniprot_id": "P40763" | None,
           "status": "SUPPORTED" | "AMBIGUOUS" | "MISSING",
+          "notes": [...],            # tag / form / viral facts (normalize_target)
         }
     """
     raw = _norm(raw_target)
-    token = _token(raw)
+    norm = normalize_target(raw)
+    base = {"raw": raw, "canonical": None, "uniprot_id": None, "notes": norm["notes"]}
+    if norm["kind"] in ("viral", "tag"):
+        return {**base, "status": "MISSING"}
+    if norm["kind"] == "family":
+        return {**base, "canonical": norm["family_label"], "status": "AMBIGUOUS"}
+
+    token = (norm["lookup"] or _token(raw)).lower()
     if not token:
-        return {"raw": raw, "canonical": None, "uniprot_id": None, "status": "MISSING"}
+        return {**base, "status": "MISSING"}
 
     if token in PROTEIN_ALIASES:
         canonical, uniprot = PROTEIN_ALIASES[token]
         # A resolved canonical name with no single UniProt (e.g. ERK1/2) is ambiguous.
         status = "AMBIGUOUS" if uniprot is None else "SUPPORTED"
-        return {"raw": raw, "canonical": canonical, "uniprot_id": uniprot, "status": status}
+        return {**base, "canonical": canonical, "uniprot_id": uniprot, "status": status}
 
     # Unknown to our offline map -> keep raw, flag for resolution. Not guessed.
-    return {"raw": raw, "canonical": None, "uniprot_id": None, "status": "MISSING"}
+    return {**base, "status": "MISSING"}
