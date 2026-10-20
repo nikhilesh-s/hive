@@ -79,7 +79,7 @@ migration 012, then merges.
 - **Next:** Nik or Srushti runs the same pass on a real iPhone, then decides the open items.
   The board row for W-3 in `tickets/README.md` is not updated.
 
-## B-13: Northern and other non-western panels 
+## B-13: Northern and other non-western panels
 
 - **Branch `b-13-non-western-panels`.** The blind benchmark is scored, so it may merge. It changes extraction code (`biology.py`, `record_builder.py`), and the
   benchmark runs on the frozen `f77d311` code.
