@@ -4,12 +4,13 @@ paper-QA endpoint shares with /search."""
 from __future__ import annotations
 
 import logging
+import unicodedata
 from datetime import datetime, timezone
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Query, Request
 from fastapi.responses import Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from ..auth import require_internal_key
 from ..config import settings
@@ -68,24 +69,20 @@ class AskRequest(BaseModel):
 
 
 class IngestRequest(BaseModel):
+    """Everything about the paper (title, authors, ids, access, relevance) is
+    derived server-side from the DOI. Extra fields a browser sends are ignored;
+    only a bounded discovery query is accepted, as plain text."""
     doi: str = Field(min_length=6, max_length=200)
     force: bool = False
     reuse: bool = False   # load this DOI's previous extraction run without calling the model
     query: str | None = Field(default=None, max_length=300)
-    title: str | None = None
-    abstract: str | None = None
-    authors: list[str] | None = None
-    journal: str | None = None
-    year: str | int | None = None
-    pmid: str | None = None
-    pmcid: str | None = None
-    source: str | None = None
-    access_status: str | None = None
-    access_url: str | None = None
-    access_source: str | None = None
-    relevance_status: str | None = None
-    relevance_score: float | None = None
-    relevance_reason: str | None = None
+
+    @field_validator("query")
+    @classmethod
+    def _plain_query(cls, v: str | None) -> str | None:
+        # Control/format characters (newlines, NUL, bidi overrides) become spaces, then whitespace collapses.
+        v = "".join(" " if unicodedata.category(c) in ("Cc", "Cf") else c for c in v or "")
+        return " ".join(v.split()) or None
 
 
 class StoredPaper(BaseModel):
@@ -172,24 +169,8 @@ async def ingest_start(request: Request, body: IngestRequest, background: Backgr
     reuse = body.reuse and has_prior
     if not reuse:  # metadata/access checks are cheap; the existing cap still bounds requested extraction jobs
         _spend_daily("extraction", settings.daily_ingest_cap)
-    metadata = {
-        "title": body.title,
-        "abstract": body.abstract,
-        "authors": body.authors,
-        "journal": body.journal,
-        "year": body.year,
-        "pmid": body.pmid,
-        "pmcid": body.pmcid,
-        "source": body.source,
-        "access_status": body.access_status,
-        "access_url": body.access_url,
-        "access_source": body.access_source,
-        "relevance_status": body.relevance_status,
-        "relevance_score": body.relevance_score,
-        "relevance_reason": body.relevance_reason,
-    }
     try:
-        job = ingest.start_job(body.doi, reuse=reuse, discovery_query=body.query, metadata=metadata)
+        job = ingest.start_job(body.doi, reuse=reuse, discovery_query=body.query)
     except ValueError:
         raise HTTPException(400, "Not a DOI")
     background.add_task(ingest.run_job, job.job_id)

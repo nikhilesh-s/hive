@@ -143,39 +143,15 @@ def run_dir_for(doi: str) -> Path:
 
 
 def start_job(doi: str, reuse: bool = False, *, discovery_query: str | None = None,
-              metadata: dict | None = None) -> Job:
+              source: str | None = None) -> Job:
+    """Create a job from the DOI alone. Title, authors, ids, access and relevance
+    are derived in run_job from OpenAlex/NCBI/Europe PMC, never from the caller;
+    `source` is a server-set marker ("upload"), not browser input."""
     doi = fulltext.normalize_doi(doi)
     if not doi:
         raise ValueError("not a DOI")
-    metadata = metadata or {}
-    authors = metadata.get("authors")
-    if isinstance(authors, list):
-        authors = ", ".join(str(a) for a in authors if a)
-    year = metadata.get("publication_year") or metadata.get("year")
-    try:
-        year = int(str(year)[:4]) if year else None
-    except (TypeError, ValueError):
-        year = None
-    job = Job(
-        job_id=uuid.uuid4().hex[:12],
-        doi=doi,
-        reuse=reuse,
-        discovery_query=discovery_query,
-        pmcid=metadata.get("pmcid"),
-        pmid=metadata.get("pmid"),
-        title=metadata.get("title"),
-        abstract=metadata.get("abstract"),
-        authors=authors,
-        journal=metadata.get("journal") or metadata.get("venue"),
-        publication_year=year,
-        metadata_source=metadata.get("metadata_source") or metadata.get("source"),
-        access_status=metadata.get("access_status"),
-        access_url=metadata.get("access_url"),
-        access_source=metadata.get("access_source"),
-        relevance_status=metadata.get("relevance_status"),
-        relevance_score=metadata.get("relevance_score"),
-        relevance_reason=metadata.get("relevance_reason"),
-    )
+    job = Job(job_id=uuid.uuid4().hex[:12], doi=doi, reuse=reuse,
+              discovery_query=discovery_query, metadata_source=source)
     JOBS[job.job_id] = job
     return job
 
@@ -217,13 +193,8 @@ async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
             # Metadata, relevance, and access are useful even when full text is
             # unavailable, so they deliberately run before any model work.
             await _set(job, status="metadata", message="Using the supplied PDF…" if uploaded_pdf else "Fetching paper metadata…")
-            seed = {
-                "title": job.title, "abstract": job.abstract, "authors": job.authors,
-                "journal": job.journal, "publication_year": job.publication_year,
-                "pmid": job.pmid, "pmcid": job.pmcid, "metadata_source": job.metadata_source,
-            }
-            meta = seed if uploaded_pdf else await loop.run_in_executor(
-                None, lambda: fulltext.paper_metadata(job.doi, seed=seed))
+            meta = {"metadata_source": job.metadata_source} if uploaded_pdf else await loop.run_in_executor(
+                None, fulltext.paper_metadata, job.doi)
             meta_authors = meta.get("authors")
             if isinstance(meta_authors, list):
                 meta_authors = ", ".join(str(a) for a in meta_authors if a)

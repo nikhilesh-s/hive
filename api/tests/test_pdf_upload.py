@@ -421,7 +421,7 @@ def upload_job(monkeypatch, tmp_path):
     async def persist(*args):
         pass
     monkeypatch.setattr(db, "upsert_ingest_job", persist)
-    job = ingest.start_job("10.1000/upload", metadata={"source": "upload"})
+    job = ingest.start_job("10.1000/upload", source="upload")
     path = tmp_path / "test.pdf"
     path.write_bytes(pdf())
     run_dir = tmp_path / "uploads" / job.job_id
