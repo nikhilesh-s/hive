@@ -151,3 +151,70 @@ The pre-registered scorer's output is kept unchanged in `report/raw_preregistere
 shows both. Gene-symbol notation (SOSTMI, LC31, CatD), cell-line notation, and the treatment labels
 on PMC7948984 (a staurosporine study labeled `none`) go to Tanvi's confirmation sheet; they are
 not fixed in the scorer.
+
+## A8. 2026-10-20: annotator confirmation applied; three reported tiers (after unsealing)
+
+Tanvi answered the auditor's 29-row confirmation sheet (`annotations/tanvi/confirmation.csv`): 26 `yes`,
+1 `no` (HSP70 vs HSPA9), 1 `present (faint)` (AIF nuclear lanes 1, 3, 4) and 1 blank (Fig 4A lanes 13-24,
+already `LANE_COUNT_MISMATCH`). Each row is classified in `annotations/tanvi/confirmation_classification.csv`:
+- **A, NOTATION** (her label and the system's are the same thing written differently): rows 1-7, 9, 10,
+  12-15, 26.
+- **B, LABEL_CORRECTION** (after seeing system output she agrees her label was wrong): rows 16-18, 21,
+  22, 24, 25, 27, 29.
+- **C, SYSTEM_WRONG** (label stands): rows 8, 11, 23.
+- **D, N/A** (no scoring action): rows 19, 20, 28.
+
+The locked label files (`targets.csv`, `lanes.csv`, `crop_map.csv`) are not edited. Three inputs are
+read by `score_blind.py` and applied to in-memory copies:
+1. **`annotations/tanvi/aliases.csv`** (notation, tiers ii and iii; 13 rows). New mechanism, because
+   the pre-registered `EQUIVALENT_NOTATION` verdict can only rescue an INCORRECT/UNSUPPORTED cell, not a
+   row that never aligned:
+   - `alias_label`: a second spelling of the printed label, used **only for alignment** (SOSTMI ->
+     SQSTM1, LC31 -> LC3I, PSMBS -> PSMB5, a/B -> alpha/beta for two GSK3 rows, and the two ERK rows whose
+     system label ends in "42/44 kDa", which the A7 rule does not strip). The fields are still scored
+     against the locked label.
+   - `alias_modification`: the phospho site written out from her own printed label (7 rows,
+     confirmation row 14). This adds `phospho_site` cells, which could score either way.
+   - `alias_panel_id`: the PMC4393234 GAPDH row (and its 4 lanes) belongs to Fig 3C, inventory panel 2,
+     not Fig 3B (row 26). Panel 2 therefore counts as a labeled panel in tiers ii and iii (9 panels).
+2. **`annotations/tanvi/adjudications.csv`** (notation, tiers ii and iii): 19 `EQUIVALENT_NOTATION`
+   verdicts, keyed to `report/adjudication_sheet.csv` from a fresh score with the aliases in place.
+   - A verdict is applied only to cells whose (annotated, system) pair is exactly the pair she confirmed:
+     AIF vs AIFM1 (1 cell), and the PMC9283986 sample text vs "fibroblast protein extracts from control (6)
+     and FAD (6) individuals" (18 cells in panels 2-4; panel 2 has the identical pair although the sheet
+     listed panels 3-4).
+   - The scorer stops if any verdict matches no cell.
+3. **`annotations/tanvi/corrections.csv`** (label corrections, tier iii only; 62 rows):
+   - treatments for PMC7948984 (staurosporine) and PMC4393234 (sciatic nerve conditioning stimulation);
+   - PMC4393234 sample (spinal cord dorsal horn);
+   - AIF lanes 1, 3, 4 (present);
+   - the re-filed Fig 2A and Fig 2D strips, one call per lane;
+   - `n_lanes` (not scored);
+   - the Fig 6G crop (`NOT_WB` -> `WB_NOT_IN_INVENTORY`).
+
+**Scorer bug fixed:** `apply_adjudication` chose INCORRECT or UNSUPPORTED from the field's counter rather
+than from the cell's own category (`AUDIT.md` §5.3). It now uses the cell's category. No applied verdict
+falls in a field that has both categories, so no number changed.
+
+**Not applied (pending; disclosed in the report):**
+- **PMC9283986 panel 1 sample cells (7).** The system text there ("Fibroblast ... (NA1-NA6, AD1-AD6)")
+  is not the pair she was shown. They stay INCORRECT.
+- **AKT1 against printed "PAKT (Ser473)" / "AKT total" (2 cells).** The question confirmed "AKT", not
+  the isoform AKT1. They stay INCORRECT.
+- **PMC4393234 GAPDH treatment in tier iii.** Her corrected text is "sciatic nerve conditioning
+  stimulation"; the system wrote "CS (conditioning stimulation of the sciatic nerve)". No verdict exists
+  for this pair, so it scores INCORRECT.
+- **Fig 2A cleaved-PARP1 strip.** It has no target row and stays unscored.
+- **Fig 2D GAPDH lane calls.** They were in the set-aside row, which is not in the locked `lanes.csv`,
+  so they stay unscored in tier iii.
+- **Duplicate lane keys.** In tiers (i) and (ii), PMC7948984 Fig 2A row 3 still holds duplicate lane keys
+  (24 entries for 12 lanes), as locked.
+
+**Reported tiers** (`report/RESULTS.md`, generated):
+- (i) Pre-registered raw, unchanged in `report/raw_preregistered/`.
+- (ii) Adjudicated, the headline: A7 matching plus notation (aliases and `EQUIVALENT_NOTATION`).
+- (iii) Tier (ii) plus label corrections. This tier is post hoc: the annotator saw system output.
+
+The A7-only intermediate is also shown, for transparency. Nothing under `western_blot_miner/` or `api/`
+changed. Self-test cases cover alias alignment, alias panel re-filing, corrections, duplicate-lane
+removal and the crop-map correction.

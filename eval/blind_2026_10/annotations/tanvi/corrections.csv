@@ -1,0 +1,63 @@
+paper_pmcid,panel_id,row_order,field,lane_index,crop_file,original,corrected,confirmation_row,note
+PMC7948984,1,1,treatments,,,none,staurosporine; zVAD-fmk; PJ34,16,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,1,2,treatments,,,none,staurosporine; zVAD-fmk; PJ34,16,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,1,3,treatments,,,none,staurosporine; zVAD-fmk; PJ34,16,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,2,1,treatments,,,none,staurosporine; zVAD-fmk; PJ34,17,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,2,2,treatments,,,none,staurosporine; zVAD-fmk; PJ34,17,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,2,3,treatments,,,none,staurosporine; zVAD-fmk; PJ34,17,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,2,4,treatments,,,none,staurosporine; zVAD-fmk; PJ34,17,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,3,1,treatments,,,none,staurosporine,18,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,3,2,treatments,,,none,staurosporine,18,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,3,3,treatments,,,none,staurosporine,18,treatment labelled none; the panel is a staurosporine experiment
+PMC7948984,1,1,band_call,1,,absent,present,21,AIF nuclear lane: present (faint)
+PMC7948984,1,1,band_call,3,,absent,present,21,AIF nuclear lane: present (faint)
+PMC7948984,1,1,band_call,4,,absent,present,21,AIF nuclear lane: present (faint)
+PMC7948984,2,1,band_call,12,,(filed at start of row 2),present,22,PARP1 full-length lane 12 was entered as the first entry of row 2
+PMC7948984,2,2,band_call,1,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,2,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,3,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,4,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,5,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,6,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,7,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,8,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,9,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,10,,absent,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,11,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,2,band_call,12,,present,present,22,"casp3 strip = first 12 entries of row 3 (row 2 held the cleaved-PARP1 strip, which has no target row and is not scored)"
+PMC7948984,2,3,band_call,1,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,2,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,3,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,4,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,5,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,6,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,7,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,8,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,9,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,10,,(duplicate lane key),absent,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,11,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,2,3,band_call,12,,(duplicate lane key),present,22,c-casp3 strip = entries 13-24 of row 3
+PMC7948984,3,2,band_call,1,,absent,present,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,2,band_call,2,,present,present,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,2,band_call,3,,absent,present,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,2,band_call,4,,present,present,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,2,band_call,5,,absent,absent,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,2,band_call,6,,present,absent,24,Histone H3 strip = the calls entered under row 3
+PMC7948984,3,3,band_call,1,,present,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC7948984,3,3,band_call,2,,present,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC7948984,3,3,band_call,3,,present,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC7948984,3,3,band_call,4,,present,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC7948984,3,3,band_call,5,,absent,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC7948984,3,3,band_call,6,,absent,set_aside,24,"GAPDH calls were entered in row 4, which was set aside before locking and is not in lanes.csv; left unscored"
+PMC4393234,1,1,cell_line_or_sample,,,Unknown,spinal cord dorsal horn,27,paper states dorsal horn spinal cord
+PMC4393234,1,1,treatments,,,none,sciatic nerve conditioning stimulation,27,SD/NSD = stimulated/non-stimulated side
+PMC4393234,1,2,cell_line_or_sample,,,Unknown,spinal cord dorsal horn,27,paper states dorsal horn spinal cord
+PMC4393234,1,2,treatments,,,none,sciatic nerve conditioning stimulation,27,SD/NSD = stimulated/non-stimulated side
+PMC7948984,1,1,n_lanes,,,6,8,25,lane count; not used in scoring
+PMC7948984,1,2,n_lanes,,,6,8,25,lane count; not used in scoring
+PMC7948984,1,3,n_lanes,,,6,8,25,lane count; not used in scoring
+PMC7948984,2,1,n_lanes,,,6,12,25,lane count; not used in scoring
+PMC7948984,2,2,n_lanes,,,6,12,25,lane count; not used in scoring
+PMC7948984,2,3,n_lanes,,,6,12,25,lane count; not used in scoring
+PMC7948984,2,4,n_lanes,,,6,12,25,lane count; not used in scoring
+PMC7948984,,,crop_mapping,,page_008_cand_0052.png,NOT_WB,WB_NOT_IN_INVENTORY,29,Fig 6G is a Western panel (not in the inventory)

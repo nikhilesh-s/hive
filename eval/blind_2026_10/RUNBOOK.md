@@ -104,14 +104,20 @@ $PY eval/blind_2026_10/score_blind.py score $PRIV --annotator tanvi
 This writes `report/RESULTS.md`, `report/results.json` and `report/adjudication_sheet.csv`. It
 refuses to run if any sealed file changed.
 
-## 7. Adjudicate and re-score
+## 7. Adjudicate and re-score (three tiers, DEVIATIONS A8)
 
-1. Tanvi fills the `verdict` column of `report/adjudication_sheet.csv`.
-2. Save it as `annotations/tanvi/adjudications.csv`.
-3. Then run:
+The annotator's answers live in `annotations/tanvi/`:
+- `confirmation.csv` holds her answers, and `confirmation_classification.csv` classifies each one.
+- `aliases.csv` holds notation, used for alignment.
+- `adjudications.csv` holds the `EQUIVALENT_NOTATION` verdicts, keyed to `report/adjudication_sheet.csv`.
+- `corrections.csv` holds label corrections, applied in tier iii only.
+
+The locked label files are never edited.
 
 ```bash
-$PY eval/blind_2026_10/score_blind.py score $PRIV --annotator tanvi --adjudications eval/blind_2026_10/annotations/tanvi/adjudications.csv
+T=eval/blind_2026_10/annotations/tanvi
+$PY eval/blind_2026_10/score_blind.py score $PRIV --annotator tanvi \
+  --aliases $T/aliases.csv --adjudications $T/adjudications.csv --corrections $T/corrections.csv
 ```
 
 Optionally, if there is a second annotator, compute agreement:
