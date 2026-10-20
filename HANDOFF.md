@@ -33,6 +33,8 @@ retracted paper was excluded). Labels by Tanvi Bharadwaj; crop map by Yashvi Jal
 prints 93%), coverage 512/895 (57%). Raw pre-registered precision was 78%. Deviations A1-A8 are
 logged. **Approved wording and caveats: `eval/blind_2026_10/report/CLAIMS.md`.** Use only that
 wording in public. Full numbers: `report/RESULTS.md`; audit: `report/AUDIT.md`.
+Speed (claims v2, `report/SPEED.md` from `speed.py`): whole-paper run 19.8 min vs 123.5 min manual for
+the same 3 papers (~6x, before review); per-panel ~20x is an estimate (no per-crop timestamps).
 
 **Open items, in order**
 1. Publish both Zenodo records (Nik does this; Claude never uploads to Zenodo or any archive).
