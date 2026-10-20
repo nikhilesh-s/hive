@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use HiveBlot, please cite it using the metadata in this file."
+type: software
+title: "HiveBlot: structured, provenance-tracked extraction of Western blot evidence from published figures"
+version: 0.5.0
+date-released: 2026-10-19
+license: MIT
+url: "https://hiveblot-beta.vercel.app"
+# doi: "10.5281/zenodo.XXXXXXX"  # add after Zenodo mints the DOI
+# repository-code: ""            # add once the repository is public
+authors:
+  - family-names: Suravarjjala
+    given-names: Nikhilesh
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
+    # affiliation: ""                                  # TODO
+  - family-names: Madhure
+    given-names: Srushti
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
+    # affiliation: ""                                  # TODO
+  - family-names: Bharadwaj
+    given-names: Tanvi
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
+    # affiliation: ""                                  # TODO
+  - family-names: Jaladi
+    given-names: Yashvi
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
+    # affiliation: ""                                  # TODO
+keywords:
+  - western blot
+  - biomedical literature mining
+  - evidence extraction
+  - provenance
+  - multimodal
+abstract: >-
+  HiveBlot reads Western blot figures together with their captions and methods
+  text and turns each blot into lane-level evidence records. Every field in a
+  record carries a status (supported, ambiguous, conflicting or missing) and
+  the source wording it was drawn from; when a figure and its text disagree,
+  the field is flagged as conflicting and left empty instead of guessed. The
+  software combines OpenCV panel detection, a vision-language model, and
+  deterministic biology and UniProt reconciliation rules, and includes a
+  search API and a web interface. This is a beta release: the reviewed corpus
+  covers three papers, and a pre-registered blind benchmark on unseen papers
+  is in progress, so no accuracy figures are reported here.

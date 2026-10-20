@@ -33,3 +33,6 @@ research/papers/*.pdf
 
 # Serena MCP local state
 .serena/
+
+# Release archives (scripts/make_release_archive.sh)
+dist/
