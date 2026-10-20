@@ -74,7 +74,8 @@ Rules:
 - Do not estimate intensity or fold change.
 - band_pattern is DESCRIPTIVE only: report it when the panel/text clearly shows or
   states multiple bands, a doublet, a smear, or a ladder. Omit it when in doubt --
-  omission means "not reported", which is correct and preferred. NEVER derive it
+  omission is preferable to guessing; downstream provenance decides whether the
+  field is NOT_STATED, NOT_RECOVERED, or legacy MISSING. NEVER derive it
   from what the protein is known to do (e.g. do not call LC3B a doublet, or
   ubiquitin a ladder, unless THIS blot shows/says so). Do not interpret bands as
   isoforms, cleavage products, dimers or degradation products.
