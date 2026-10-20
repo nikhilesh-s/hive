@@ -1,5 +1,7 @@
 'use client';
 
+import { PdfUpload } from '@/components/PdfUpload';
+
 // EXPERIMENTAL — the one-page UCSF research flow:
 //   topic → find papers (Valency / PMC, source shown) → choose an open-access
 //   paper → extract live or open an already-ingested copy → progress →
@@ -268,20 +270,6 @@ export default function ResearchPage() {
       const r = await post('/api/experimental/ingest', {
         doi,
         query: topic,
-        title: selected?.title,
-        abstract: selected?.abstract,
-        authors: selected?.authors,
-        journal: selected?.journal || selected?.venue,
-        year: selected?.year,
-        pmid: selected?.pmid,
-        pmcid: selected?.pmcid,
-        source: selected?.source,
-        access_status: selected?.access_status,
-        access_url: selected?.access_url,
-        access_source: selected?.access_source,
-        relevance_status: selected?.relevance_status,
-        relevance_score: selected?.relevance_score,
-        relevance_reason: selected?.relevance_reason,
       });
       const d = await r.json();
       if (my !== seq.current) return; // another paper was chosen meanwhile
@@ -339,6 +327,7 @@ export default function ResearchPage() {
 
       <section className="hb-page-section">
         <h2 className="hb-page-h2">1. Find papers</h2>
+        <PdfUpload initialDoi={topic} />
         <form onSubmit={findPapers} className="hb-live-form" role="search">
           <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic or DOI" aria-label="Research topic or DOI" />
           <button type="submit" disabled={searching || lookupLoading || busy || !topic.trim()}>{searching || lookupLoading ? 'Searching…' : 'Find papers'}</button>

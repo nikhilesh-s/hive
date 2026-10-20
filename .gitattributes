@@ -1,0 +1,43 @@
+# Files below stay in the (private) repo but are left out of `git archive`
+# release zips (scripts/make_release_archive.sh). Patterns are root-anchored.
+# Third-party figure images (see THIRD_PARTY_NOTICE.md)
+/api/crops export-ignore
+# Internal project management, handoffs, meeting notes, outreach
+/tickets export-ignore
+/meeting_notes export-ignore
+/outreach export-ignore
+/research/team_delegation export-ignore
+/research/overnight export-ignore
+/research/UCSF_* export-ignore
+/research/ucsf_* export-ignore
+/research/OVERNIGHT_* export-ignore
+/research/PROFESSOR_ORCHESTRATION_BRIEF.md export-ignore
+/research/TEAM_BETA_HANDOFF.md export-ignore
+/research/DEMO_DAY_ARCHITECTURE.md export-ignore
+/research/HACKATHON_DEMO_FLOW.md export-ignore
+/research/supabase_beta_table_plan.md export-ignore
+/research/supabase_legacy_audit.md export-ignore
+/research/W5_* export-ignore
+/research/W6_* export-ignore
+/HANDOFF.md export-ignore
+/TEAM_HANDOFF.md export-ignore
+/CLAUDE.md export-ignore
+/CLAUDE_RUN_*.md export-ignore
+/.claude export-ignore
+# Deployment, hosting and demo operations (infrastructure identifiers)
+/DEPLOYMENT.md export-ignore
+/HOSTING_STATUS.md export-ignore
+/SMOKE_TEST_REPORT.md export-ignore
+/PAPER_ACCESS_AUDIT.md export-ignore
+/EXECUTION_PLAN.md export-ignore
+/DEMO.md export-ignore
+/TanviQuestions.md export-ignore
+/SUN_SEP_26_MEETING_ACTION_ITEMS.md export-ignore
+/super-based-ticket.md export-ignore
+/BETA_EMAIL_WITH_TALLY_AND_BRIEF.md export-ignore
+/UCSF_BETA_*.md export-ignore
+/README_CASE_STUDY.md export-ignore
+/render.yaml export-ignore
+/.github export-ignore
+/web/AUTH.md export-ignore
+.consent/ export-ignore
