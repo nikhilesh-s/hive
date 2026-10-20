@@ -191,6 +191,10 @@ per-paper notes in `outreach/PREEXTRACT_CHECK.md` (branch `outreach/oct20`).
   keeps them out of `western_blot_records_live`; a regression fixture from this paper's
   Northern panel. Tanvi confirms on the paper which panels are which.
 - Owner: Nik (pipeline) + Tanvi. Estimate: 1.
+- Status: draft PR `b-13-non-western-panels`, held until the blind benchmark is scored (10-20).
+  Rows are flagged `non_western` (Northern, Southern, gel stain, zymography, EMSA) and withheld
+  from the western rows; dot blots are not distinguished. Open: the probe label "1-O1" in
+  gkag499 is not recognized, so Tanvi confirms it.
 
 ### B-14 · An unresolved target does not set needs_review
 - What: Serra-Moreno (10.1371/journal.ppat.1014020) has 1206 live rows with no canonical
