@@ -4,9 +4,10 @@
 - Integrity: all sealed files match SEALED_OUTPUTS.sha256. System code diff vs f77d311: none.
 - Panel recall (all inventoried Western-blot panels): 10/11 (91%).
 - Fully annotated: 8 panels, 47 target rows.
-- Incorrect assertions (wrong values + unsupported values + spurious records): 82 (spurious: 5 on non-Western crops, 14 unaligned).
+- Incorrect assertions (wrong values + unsupported values + spurious records): 63 (spurious: 5 on non-Western crops, 7 unaligned).
 - Records on panels missing from the inventory (not counted against the system): 27. Unmapped records: 0. Duplicate records from overlapping crops (not scored, not counted as errors): 0.
 - Automated time: 19.8 min for 29 panels sent to the model. Manual full annotation: 123 min for 8 panels.
+- Lane calls unscored because annotator and system counted lanes differently (A7): 104.
 
 This is 3 papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.
 
@@ -14,49 +15,49 @@ This is 3 papers drawn from a deliberately diverse candidate pool. It is not a l
 
 | Field | Accuracy | Precision of assertions | Abstained | Not found | Unsupported |
 |---|---|---|---|---|---|
-| protein_identity | 9/47 (19%) | 9/11 (82%) | 10/47 (21%) | 26/47 (55%) | 0 |
-| modification_type | 4/47 (9%) | 4/21 (19%) | 0/47 (0%) | 26/47 (55%) | 0 |
+| protein_identity | 9/47 (19%) | 9/13 (69%) | 15/47 (32%) | 19/47 (40%) | 0 |
+| modification_type | 26/47 (55%) | 26/27 (96%) | 1/47 (2%) | 19/47 (40%) | 0 |
 | phospho_site | n/a (0) | n/a (0) | n/a (0) | n/a (0) | 0 |
-| cell_line | 10/47 (21%) | 10/21 (48%) | 0/47 (0%) | 26/47 (55%) | 0 |
+| cell_line | 10/47 (21%) | 10/28 (36%) | 0/47 (0%) | 19/47 (40%) | 0 |
 | treatment | n/a (0) | 0/10 (0%) | n/a (0) | n/a (0) | 10 |
-| band_call | 199/851 (23%) | 199/222 (90%) | 22/851 (3%) | 607/851 (71%) | 0 |
-| ALL FIELDS | 222/992 (22%) | 222/285 (78%) | 32/992 (3%) | 685/992 (69%) | 10 |
+| band_call | 291/747 (39%) | 291/309 (94%) | 46/747 (6%) | 392/747 (52%) | 0 |
+| ALL FIELDS | 336/888 (38%) | 336/387 (87%) | 62/888 (7%) | 449/888 (51%) | 10 |
 
 ## Pooled, adjudicated
 
 | Field | Accuracy | Precision of assertions | Abstained | Not found | Unsupported |
 |---|---|---|---|---|---|
-| protein_identity | 9/47 (19%) | 9/11 (82%) | 10/47 (21%) | 26/47 (55%) | 0 |
-| modification_type | 4/47 (9%) | 4/21 (19%) | 0/47 (0%) | 26/47 (55%) | 0 |
+| protein_identity | 9/47 (19%) | 9/13 (69%) | 15/47 (32%) | 19/47 (40%) | 0 |
+| modification_type | 26/47 (55%) | 26/27 (96%) | 1/47 (2%) | 19/47 (40%) | 0 |
 | phospho_site | n/a (0) | n/a (0) | n/a (0) | n/a (0) | 0 |
-| cell_line | 10/47 (21%) | 10/21 (48%) | 0/47 (0%) | 26/47 (55%) | 0 |
+| cell_line | 10/47 (21%) | 10/28 (36%) | 0/47 (0%) | 19/47 (40%) | 0 |
 | treatment | n/a (0) | 0/10 (0%) | n/a (0) | n/a (0) | 10 |
-| band_call | 199/851 (23%) | 199/222 (90%) | 22/851 (3%) | 607/851 (71%) | 0 |
-| ALL FIELDS | 222/992 (22%) | 222/285 (78%) | 32/992 (3%) | 685/992 (69%) | 10 |
+| band_call | 291/747 (39%) | 291/309 (94%) | 46/747 (6%) | 392/747 (52%) | 0 |
+| ALL FIELDS | 336/888 (38%) | 336/387 (87%) | 62/888 (7%) | 449/888 (51%) | 10 |
 
 ## Per paper (raw)
 
-### PMC9283986: panel recall 4/4 (100%), 25 records, 38 incorrect assertions, automated 404.6 s, manual {'paper 1': 92}
+### PMC9283986: panel recall 4/4 (100%), 25 records, 28 incorrect assertions, automated 404.6 s, manual {'paper 1': 92}
 
 | Field | Accuracy | Precision | Abstained | Not found |
 |---|---|---|---|---|
-| protein_identity | 3/35 (9%) | 3/4 (75%) | 7/35 (20%) | 24/35 (69%) |
-| modification_type | 4/35 (11%) | 4/11 (36%) | 0/35 (0%) | 24/35 (69%) |
+| protein_identity | 3/35 (9%) | 3/6 (50%) | 12/35 (34%) | 17/35 (49%) |
+| modification_type | 17/35 (49%) | 17/17 (100%) | 1/35 (3%) | 17/35 (49%) |
 | phospho_site | n/a (0) | n/a (0) | n/a (0) | n/a (0) |
-| cell_line | 0/35 (0%) | 0/11 (0%) | 0/35 (0%) | 24/35 (69%) |
+| cell_line | 0/35 (0%) | 0/18 (0%) | 0/35 (0%) | 17/35 (49%) |
 | treatment | n/a (0) | n/a (0) | n/a (0) | n/a (0) |
-| band_call | 126/741 (17%) | 126/131 (96%) | 11/741 (1%) | 599/741 (81%) |
+| band_call | 229/648 (35%) | 229/229 (100%) | 35/648 (5%) | 384/648 (59%) |
 
-### PMC7948984: panel recall 5/5 (100%), 54 records, 44 incorrect assertions, automated 734.5 s, manual {}
+### PMC7948984: panel recall 5/5 (100%), 54 records, 35 incorrect assertions, automated 734.5 s, manual {}
 
 | Field | Accuracy | Precision | Abstained | Not found |
 |---|---|---|---|---|
 | protein_identity | 6/10 (60%) | 6/7 (86%) | 3/10 (30%) | 0/10 (0%) |
-| modification_type | 0/10 (0%) | 0/10 (0%) | 0/10 (0%) | 0/10 (0%) |
+| modification_type | 9/10 (90%) | 9/10 (90%) | 0/10 (0%) | 0/10 (0%) |
 | phospho_site | n/a (0) | n/a (0) | n/a (0) | n/a (0) |
 | cell_line | 10/10 (100%) | 10/10 (100%) | 0/10 (0%) | 0/10 (0%) |
 | treatment | n/a (0) | 0/10 (0%) | n/a (0) | n/a (0) |
-| band_call | 73/102 (72%) | 73/91 (80%) | 11/102 (11%) | 0/102 (0%) |
+| band_call | 62/91 (68%) | 62/80 (78%) | 11/91 (12%) | 0/91 (0%) |
 
 ### PMC4393234: panel recall 1/2 (50%), 1 records, 0 incorrect assertions, automated 45.9 s, manual {'paper 3+4': 31.49}
 

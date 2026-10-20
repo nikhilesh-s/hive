@@ -135,3 +135,19 @@ That gets settled only through Tanvi's adjudication and confirmation sheet, neve
 scorer to fit the results. The inventory lists only the panels she labeled, not every Western
 panel, so panel recall is not a valid literature-level number and will be reported only with that
 caveat.
+
+## A7. 2026-10-20: matching corrections from the independent audit (after unsealing)
+
+The auditor (`report/AUDIT.md`) found that most non-CORRECT outcomes came from joining labels to
+records, not from wrong system values. Three mechanical corrections follow from its diagnosis and
+are applied symmetrically:
+1. Printed labels are compared without molecular-weight tags ("LC3B (14 kDa)" equals "LC3B").
+2. An annotated modification of `none` means total protein, which is what the guide's `total` means.
+3. When the annotator and the system counted a strip's lanes differently (for example 24 physical
+   lanes against 12 samples), its lane calls are reported as `LANE_COUNT_MISMATCH` and left
+   unscored, instead of being counted as misses. 104 lane calls are affected.
+
+The pre-registered scorer's output is kept unchanged in `report/raw_preregistered/`. Every report
+shows both. Gene-symbol notation (SOSTMI, LC31, CatD), cell-line notation, and the treatment labels
+on PMC7948984 (a staurosporine study labeled `none`) go to Tanvi's confirmation sheet; they are
+not fixed in the scorer.
