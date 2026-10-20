@@ -1,0 +1,35 @@
+{
+  "title": "HiveBlot: structured, provenance-tracked extraction of Western blot evidence from published figures",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "mit",
+  "version": "0.5.0",
+  "publication_date": "2026-10-19",
+  "creators": [
+    {
+      "name": "Suravarjjala, Nikhilesh",
+      "orcid": "0009-0004-7227-2213"
+    },
+    {
+      "name": "Madhure, Srushti",
+      "orcid": "0009-0001-5066-4679"
+    },
+    {
+      "name": "Bharadwaj, Tanvi",
+      "orcid": "0009-0000-1524-7688"
+    },
+    {
+      "name": "Jaladi, Yashvi",
+      "orcid": "0009-0001-0082-518X"
+    }
+  ],
+  "description": "<p>HiveBlot reads Western blot figures together with their captions and methods text and turns each blot into lane-level evidence records. Every field in a record carries a status (supported, ambiguous, conflicting or missing) and the source wording it was drawn from; when a figure and its text disagree, the field is flagged as conflicting and left empty instead of guessed.</p><p>The software combines OpenCV panel detection, a vision-language model, and deterministic biology and UniProt reconciliation rules, and includes a search API and a web interface. This is a beta release: the reviewed corpus covers three papers, and a pre-registered blind benchmark on unseen papers is in progress, so no accuracy figures are reported here.</p><p>Figure crops from the source papers are not part of this archive and are not covered by the MIT license; see THIRD_PARTY_NOTICE.md.</p>",
+  "keywords": [
+    "western blot",
+    "biomedical literature mining",
+    "evidence extraction",
+    "provenance",
+    "multimodal"
+  ],
+  "doi": "10.5281/zenodo.23491677"
+}

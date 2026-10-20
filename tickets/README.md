@@ -44,7 +44,7 @@ tickets/README.md."* The agent follows these rules:
 **Accountability:** owners post in the team chat every Thursday and Sunday:
 tickets closed, PRs open, anything blocked.
 
-## Board (updated 2026-10-18)
+## Board (updated 2026-10-19)
 
 P0 = before anything else, P1 = this week, P2 = next, P3 = when free. Track files:
 [oct-push](oct-push.md) (R, W, Q, G), [bio-qa](bio-qa.md) (B),
@@ -79,15 +79,15 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Srushti (+ Codex)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft): fix the 7 security-review items posted 10-18 (1 blocking: unbounded page render) |
+| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | done 10-19 (#22, `3a63c23`; 7 review items and 4 re-review items fixed; migration 012 applied; deployed) |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
-| B-14 | Unresolved target must set needs_review | P2 | probably covered by `4cbbaa8` in PR #24; check after E-7 |
-| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | held until E-7 (extraction code) |
-| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | held until E-7 (extraction code) |
+| B-14 | Unresolved target must set needs_review | P2 | covered by PR #24 (`4cbbaa8`); merge after E-7 |
+| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | draft PR #33 (17 rules, 175 tests); merge after E-7; Tanvi reviews tickets/b12-expected-mappings.md |
+| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | draft PR #32 (Northern/rRNA/stain classifier); merge after E-7, then re-extract gkag499 |
 | W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
 | O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
-| W-3 | Phone and Safari pass on the hosted site | P2 | todo (R-5 deployed 10-18) |
-| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo (labels are safe since W-6; job metadata is still trusted) |
+| W-3 | Phone and Safari pass on the hosted site | P2 | done 10-19 (#34; WebKit phone/iPad/desktop pass, CSS fixes deployed; real-device Safari not tested) |
+| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | done 10-19 (#35, `363f19e`; server derives metadata, browser fields ignored; deployed) |
 
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |

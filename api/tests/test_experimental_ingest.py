@@ -394,6 +394,68 @@ def test_ingest_can_start_access_check_without_model_backend(client, monkeypatch
     assert r.json()["doi"] == "10.3892/br.2026.2108"
 
 
+def test_ingest_ignores_browser_sent_paper_metadata(client, monkeypatch):
+    """A browser cannot plant title/authors/ids/access/relevance on a job: the job
+    carries only what the server derives from the DOI (OpenAlex/NCBI/check_access)."""
+    real_run = ingest.run_job
+
+    async def noop(job_id):
+        return ingest.JOBS[job_id]
+
+    monkeypatch.setattr(ingest, "run_job", noop)
+    seen = {}
+
+    def meta(doi, seed=None):
+        seen["seed"] = seed
+        return {"title": "Server title", "abstract": "STAT3 western blot", "authors": ["Real A", "Real B"],
+                "journal": "Real Journal", "publication_year": 2024, "pmid": "111", "pmcid": "PMC111",
+                "metadata_source": "openalex+ncbi"}
+
+    def access(doi, pmcid=None):
+        seen["pmcid"] = pmcid
+        return {"access_status": "no_open_copy_found", "access_url": f"https://doi.org/{doi}",
+                "access_source": "openalex"}
+
+    monkeypatch.setattr(ingest.fulltext, "paper_metadata", meta)
+    monkeypatch.setattr(ingest.fulltext, "check_access", access)
+    r = client.post("/experimental/ingest", headers=AUTH, json={
+        "doi": "10.1000/forged", "query": "STAT3",
+        "title": "Planted <b>title</b>", "abstract": "planted", "authors": ["Mallory"],
+        "journal": "Planted J", "year": 1999, "pmid": "666", "pmcid": "PMC666", "source": "valency:x",
+        "access_status": "open_access", "access_url": "https://evil.example/x", "access_source": "evil",
+        "relevance_status": "likely_relevant", "relevance_score": 1.0, "relevance_reason": "planted"})
+    assert r.status_code == 200
+    started = r.json()
+    for field in ("title", "abstract", "authors", "journal", "publication_year", "pmid", "pmcid",
+                  "metadata_source", "access_status", "access_url", "access_source",
+                  "relevance_status", "relevance_score", "relevance_reason"):
+        assert started[field] is None, field
+    assert started["discovery_query"] == "STAT3"
+
+    job = ingest.JOBS[started["job_id"]]
+    _run(real_run(job.job_id))
+    assert seen == {"seed": None, "pmcid": "PMC111"}  # the planted pmcid never reached check_access
+    assert (job.title, job.authors, job.journal, job.pmid, job.pmcid) == ("Server title", "Real A, Real B", "Real Journal", "111", "PMC111")
+    assert job.access_status == "no_open_copy_found" and job.access_url == "https://doi.org/10.1000/forged"
+    assert job.access_source == "openalex" and job.relevance_reason != "planted"
+    assert job.relevance_status == "likely_relevant" and job.relevance_reason.startswith("Metadata matches")
+    assert job.status == "awaiting_full_text"
+
+
+def test_ingest_query_is_bounded_plain_text(client, monkeypatch):
+    async def noop(job_id):
+        return ingest.JOBS[job_id]
+
+    monkeypatch.setattr(ingest, "run_job", noop)
+    r = client.post("/experimental/ingest", headers=AUTH,
+                    json={"doi": "10.1000/q", "query": "  STAT3\x00\x07 western\r\nblot\u202e  "})
+    assert r.status_code == 200 and r.json()["discovery_query"] == "STAT3 western blot"
+    assert client.post("/experimental/ingest", headers=AUTH,
+                       json={"doi": "10.1000/q", "query": "x" * 301}).status_code == 422
+    r = client.post("/experimental/ingest", headers=AUTH, json={"doi": "10.1000/q", "query": "\x00\n "})
+    assert r.status_code == 200 and r.json()["discovery_query"] is None
+
+
 def test_ingest_rejects_non_doi(client, monkeypatch):
     monkeypatch.setenv("WBM_LLM_BACKEND", "mock")
     r = client.post("/experimental/ingest", json={"doi": "not-a-doi"}, headers=AUTH)

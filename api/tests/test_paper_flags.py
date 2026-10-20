@@ -117,7 +117,7 @@ def test_lookup_failure_or_absent_doi_does_not_imply_restricted_access(monkeypat
 
 
 def test_unverified_job_cannot_set_access_or_relevance_label(monkeypatch):
-    # /experimental/ingest stores caller-supplied access/relevance with checked_at NULL.
+    # Jobs stored before W-4 may carry caller-supplied access/relevance with checked_at NULL.
     jobs = [
         {"job_id": "a", "doi": "10.1/example", "access_status": "open_access",
          "access_url": "https://evil.example/x", "access_checked_at": None,
