@@ -1,0 +1,83 @@
+paper_pmcid,panel_id,row_order,target_printed,gene_symbol,modification,cell_line_or_sample,treatments,n_lanes,notes
+PMC9283986,1,1,SOSTMI,SOSTMI,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,2,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,3,LC31,LC31,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,4,LC3II,LC3II,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,5,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,6,Lamp2,Lamp2,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,7,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,8,CatD •,CatD •,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,9,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,10,PSMBS,PSMBS,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,1,11,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,1,PAKT (Ser473),PAKT (Ser473),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,2,AKT total,AKT total,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,3,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,4,pGSK3a/B(Ser21/Ser9),pGSK3a/B(Ser21/Ser9),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,5,total GSK3a/B.,total GSK3a/B.,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,6,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,7,pERK1/2(Thr202/Tyr204),pERK1/2(Thr202/Tyr204),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,8,total ERK1/2 —,total ERK1/2 —,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,2,9,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,1,ptau (Thr231),ptau (Thr231),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,2,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,3,ptau (Thr181),ptau (Thr181),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,4,ptau (Ser396-Ser404),ptau (Ser396-Ser404),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,5,ptau (Ser202-Ser205),ptau (Ser202-Ser205),phosphorylation,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,6,total tau,total tau,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,7,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,8,APP,APP,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,3,9,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,1,HSP90,HSP90,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,2,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,3,HSP70,HSP70,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,4,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,5,HSP60,HSP60,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC9283986,4,6,GAPDH,GAPDH,none,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",none,24,
+PMC7948984,1,1,AIF,AIF,none,HeLa cells,none,6,
+PMC7948984,1,2,Histone H3,Histone H3,none,HeLa cells,none,6,
+PMC7948984,1,3,GAPDH,GAPDH,none,HeLa cells,none,6,
+PMC7948984,2,1,PARP1,PARP1,none,HeLa cells,none,6,
+PMC7948984,2,2,casp3,casp3,none,HeLa cells,none,6,
+PMC7948984,2,3,c-casp3,c-casp3,proteolytic cleavage,HeLa cells,none,6,
+PMC7948984,2,4,GAPDH,GAPDH,none,HeLa cells,none,6,
+PMC7948984,3,1,PARP1,PARP1,none,HeLa cells,none,6,
+PMC7948984,3,2,Histone H3,Histone H3,none,HeLa cells,none,6,
+PMC7948984,3,3,GAPDH,GAPDH,none,HeLa cells,none,6,
+PMC4393234,1,1,Arc protein,Arc protein,none,Unknown,none,1,
+PMC4393234,1,2,GAPDH,GAPDH,none,Unknown,none,1,
