@@ -1,6 +1,6 @@
 'use client';
 
-// Teaches what HiveBlot actually reports: the four evidence statuses,
+// Teaches what HiveBlot actually reports: field-level evidence statuses,
 // categorical band presence (no densitometry), expected vs reported MW, and
 // the terms a result card uses. Generic blot theory is kept to the minimum a
 // non-blot user needs to read a card.
@@ -21,8 +21,16 @@ const STATUSES: { name: string; color: string; badge: string; text: string }[] =
     text: 'Credible sources actively disagree. HiveBlot records no value at all, shows every competing claim with where it came from, and explains why it did not pick one. This is a feature: it is what makes the Supported badge mean something.',
   },
   {
-    name: 'MISSING', color: 'var(--text-subtle)', badge: 'not reported',
-    text: 'The paper does not state the value. It is shown as "not reported", never as a plausible guess. A missing value is a finding about the paper, not a gap in HiveBlot.',
+    name: 'NOT_STATED', color: 'var(--text-subtle)', badge: 'Not reported',
+    text: 'HiveBlot examined the relevant available paper text for this field and found no stated value. This is a claim about what the available source says, so it is only used when source coverage supports that conclusion.',
+  },
+  {
+    name: 'NOT_RECOVERED', color: 'var(--warning)', badge: 'Not recovered',
+    text: 'HiveBlot could not reliably recover or associate the value from the available source. This is an extraction limitation, not a claim that the authors omitted the information.',
+  },
+  {
+    name: 'MISSING', color: 'var(--text-subtle)', badge: 'Unavailable',
+    text: 'Legacy records may use MISSING when the reason for an unavailable value was not recorded. HiveBlot does not reinterpret those historical nulls as "not reported".',
   },
 ];
 
@@ -73,7 +81,7 @@ export default function Learn() {
         </p>
       </Section>
 
-      <Section title="The four evidence statuses">
+      <Section title="Evidence statuses">
         <p className="hb-page-p">
           Every important field carries a status. The card badge summarizes the record;
           the evidence panel shows the status per field.

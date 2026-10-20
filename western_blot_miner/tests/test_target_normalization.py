@@ -342,7 +342,7 @@ def test_record_family_keeps_candidates_as_gene_symbols():
 def test_record_viral_target_is_labeled_non_human():
     rec = _record("Vpr-myc")
     t = rec.target
-    assert t.canonical_target.status == "MISSING" and t.canonical_target.value is None
+    assert t.canonical_target.status == "NOT_RECOVERED" and t.canonical_target.value is None
     assert t.target_kind == "viral"
     assert any("non-human" in s.text for s in t.canonical_target.sources)
     flags = {f.code: f for f in rec.validation.anomaly_flags}
