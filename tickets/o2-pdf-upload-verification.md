@@ -97,3 +97,25 @@ Dependency audit: `npm audit --omit=dev` reports five inherited affected package
 in this one-ticket PR. Resolve those advisories separately before production.
 The default development Turbopack font resolver failed locally; the dev preview
 uses `next dev --webpack`. The normal production build passed with network access.
+
+## Operator: removing a fake or wrong upload
+
+An upload passes when the claimed DOI is printed anywhere in page-1 text, so a
+forged page 1 can still attach someone else's PDF to a DOI. To remove it:
+
+1. Find the job and keep its audit (the delete also removes the job row):
+   ```sql
+   SELECT job_id, doi, status, rows, uploaded_by, uploaded_at, pdf_sha256
+   FROM ingest_jobs WHERE metadata_source = 'upload' AND lower(doi) = '<doi>'
+   ORDER BY created_at DESC;
+   ```
+2. Delete its live rows, crops and job row with the existing internal-key-only
+   endpoint (409 while the job is still running):
+   ```bash
+   curl -X DELETE -H "Authorization: Bearer $INTERNAL_API_KEY" \
+     "$API_BASE_URL/experimental/ingest/<job_id>"
+   ```
+3. The DOI is now free for a real upload or an open-access ingest. An
+   open-access `/experimental/ingest` run of the DOI also replaces its live rows.
+
+Never touches the reviewed corpus (`hive_ingest` has no rights on it).

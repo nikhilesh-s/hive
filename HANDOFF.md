@@ -15,12 +15,19 @@ approved finishing it. `western_blot_miner/` is untouched (frozen benchmark).
 
 - Uploads are validated in a `python -I` child with an empty env, a 30 s wall
   clock and RLIMIT_CPU 20 s / RLIMIT_AS 1 GiB (AS is not enforceable on macOS).
-  Max 60 pages, max page A2 (0.25 m^2); rejected before any job or render.
-- The supplied DOI must be the first DOI in the page text of pages 1-3
-  (metadata ignored). Mismatch or none: 422, no job. Upload-made empty jobs and
-  stale (>30 min) pending jobs no longer block a later upload of the DOI.
+  Limits: 60 pages, A2 per page, and 600 megapixels in total at 350 DPI
+  (about 52 letter pages). Over a limit: rejected before any job or render.
+- Upload render and OpenCV run in a second `python -I` child: empty env, 900 s
+  wall clock and CPU, and RLIMIT_FSIZE 512 MiB per file. Non-upload jobs still
+  call `pdf_preprocess` in-process, unchanged. At API startup,
+  `PDF_DIR/uploads` is swept (orphans from crashes or redeploys).
+- The supplied DOI must appear somewhere in the page-1 text (metadata is
+  ignored; other DOIs there are fine). If it is absent: 422 and no job. An
+  upload-made empty job or a pending job older than 30 minutes no longer blocks
+  a later upload. To remove a fake upload, see
+  `tickets/o2-pdf-upload-verification.md`.
 - Quota: daily cap and per-user limit (10 streamed attempts/day) checked before
-  reading the body; 2 concurrent uploads; 180 s body timeout; writes via
+  reading the body; 2 concurrent uploads, one per user; 180 s body timeout; writes via
   `to_thread`; tickets 10/minute and 60/day per user. All in-process counters.
 - Audit: `uploaded_by`, `uploaded_at`, `pdf_sha256` on `ingest_jobs` via new
   **migration 012 (NOT applied)**. Until Nik applies it, uploads fail closed
@@ -30,11 +37,11 @@ approved finishing it. `western_blot_miner/` is untouched (frozen benchmark).
   never served: both crop routes return 403 "Crop hidden for uploaded copy"
   (the web falls back to its no-crop note). This also hides them from the uploader.
 
-Tests: API 330 passed / 19 skipped (57 upload tests); web tsc, lint, 31 node
+Tests: API 339 passed / 19 skipped (66 upload tests); web tsc, lint, 31 node
 tests and the build pass. The DB matrix test (migration 012, audit, crop gate) runs
-only in CI (no local Postgres). Not done: the 350 DPI render still runs in the
-API process (bounded by the caps, not sandboxed); real OAuth/model checks and
-Srushti's visual check are still pending. Next: Nik reviews PR #22, applies
+only in CI (no local Postgres). Not done: RLIMIT_AS on the render child
+(OpenCV's virtual memory was not measured on Linux); real OAuth/model checks
+and Srushti's visual check. Next: Nik reviews PR #22, applies
 migration 012, then merges.
 
 ## Later on 2026-10-18: deploy, rotation, Drive

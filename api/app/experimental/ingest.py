@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import shutil
+import subprocess
 import sys
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -102,6 +103,36 @@ def backend_ready() -> tuple[bool, str]:
     """Is a live model backend configured? One source of truth for extraction
     and paper QA: western_blot_miner.llm_client.backend_status."""
     return llm_client.backend_status()
+
+
+# Uploaded PDFs are untrusted: render + OpenCV run in a child process with no
+# credentials in its environment, a CPU and wall-clock budget, and a per-file
+# size cap. Validation already capped pages and total pixels.
+UPLOAD_PREPROCESS_SECONDS = 900
+UPLOAD_MAX_FILE_BYTES = 512 * 1024 ** 2
+_PREPROCESS = r"""
+import resource, sys
+repo, pdf, doi, out_dir, cpu, fsize = sys.argv[1:7]
+resource.setrlimit(resource.RLIMIT_CPU, (int(cpu), int(cpu)))
+resource.setrlimit(resource.RLIMIT_FSIZE, (int(fsize), int(fsize)))
+sys.path.insert(0, repo)
+from western_blot_miner import pdf_preprocess
+pdf_preprocess.preprocess_pdf(pdf, paper_id=doi, out_dir=out_dir)
+"""
+
+
+def preprocess_upload(pdf_path: Path, doi: str, out_dir: Path) -> dict:
+    """pdf_preprocess.preprocess_pdf for an uploaded PDF, in a limited child.
+    The miner code and its behaviour for non-upload jobs are unchanged."""
+    try:
+        subprocess.run(
+            [sys.executable, "-I", "-c", _PREPROCESS, str(REPO), str(pdf_path), doi, str(out_dir),
+             str(UPLOAD_PREPROCESS_SECONDS), str(UPLOAD_MAX_FILE_BYTES)],
+            capture_output=True, check=True, timeout=UPLOAD_PREPROCESS_SECONDS,
+            env={"PATH": os.environ.get("PATH", "")})
+        return json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+    except (subprocess.SubprocessError, OSError, ValueError):
+        raise RuntimeError("Rendering the uploaded PDF failed or exceeded its time or size limits.") from None
 
 
 def run_dir_for(doi: str) -> Path:
@@ -266,9 +297,9 @@ async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
             # Uploads get a per-job run dir (deleted below) so a user's copy never
             # mixes with, or outlives, the DOI's shared pdf_runs directory. The
             # DOI was already matched to the PDF's page text before the job existed.
-            run_dir = {"out_dir": upload_run_dir} if uploaded_pdf else {}
             summary = await loop.run_in_executor(
-                None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi, **run_dir))
+                None, lambda: preprocess_upload(uploaded_pdf, job.doi, upload_run_dir) if uploaded_pdf
+                else pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
             n = summary.get("llm_candidate_count", 0)
             await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
                        message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
