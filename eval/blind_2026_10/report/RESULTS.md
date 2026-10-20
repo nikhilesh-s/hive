@@ -139,4 +139,3 @@ Fully annotated panels: 9, target rows: 47. EQUIVALENT_NOTATION verdicts applied
 | treatment | 0/2 (0%) | 0/1 (0%) | 0/2 (0%) | 1/2 (50%) | 0 |
 | band_call | 0/8 (0%) | n/a (0) | 4/8 (50%) | 4/8 (50%) | 0 |
 | ALL FIELDS | 3/16 (19%) | 3/4 (75%) | 4/16 (25%) | 8/16 (50%) | 0 |
-
