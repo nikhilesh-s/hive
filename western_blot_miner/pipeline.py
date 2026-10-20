@@ -230,6 +230,7 @@ def run_records_stage(summary: dict, use_cache: bool = True, client=None, resolv
     (run_dir / "evidence_records.json").write_text(
         json.dumps([r.model_dump(mode="json") for r in all_records], indent=2), encoding="utf-8")
     rows = extract_records.records_to_supabase_rows(all_records)
+    withheld = sum(1 for r in all_records if extract_records.is_non_western(r))
     (run_dir / "supabase_rows.json").write_text(json.dumps(rows, indent=2, default=str), encoding="utf-8")
 
     uploaded = 0
@@ -242,13 +243,15 @@ def run_records_stage(summary: dict, use_cache: bool = True, client=None, resolv
 
     print(
         f"Evidence Records: {len(all_records)} ({queried} queried, {failures} failed); "
-        f"{len(rows)} supabase rows; {uploaded} uploaded."
+        f"{len(rows)} supabase rows; {uploaded} uploaded; "
+        f"{withheld} non-western record(s) withheld from the western rows."
     )
     return {
         "records": len(all_records),
         "queried": queried,
         "failures": failures,
         "rows": len(rows),
+        "non_western_withheld": withheld,
         "uploaded": uploaded,
         "records_path": str(run_dir / "evidence_records.json"),
         "rows_path": str(run_dir / "supabase_rows.json"),
