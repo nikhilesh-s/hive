@@ -3,6 +3,20 @@
 Dated updates from the team, newest first. Facts only: who did what, when, and what is open.
 Tickets live in [`README.md`](README.md).
 
+## 2026-10-20
+
+- **Paused**: HiveBlot development is paused after today. See the top of `HANDOFF.md`.
+- **Benchmark done**: merged as #43 (`d3fb82c`). Precision of assertions 512/553 (92%), coverage
+  512/895 (57%), raw pre-registered 78%. Claims wording: `eval/blind_2026_10/report/CLAIMS.md`.
+- **Tanvi**: blind labels for the benchmark (8 panels, 47 target rows, 950 lane calls) and her
+  confirmation of the adjudications (A8). Thank you.
+- **Yashvi**: the crop map (57/57 crops: 30 mapped to figure panels, 27 not Western blots).
+- **Srushti**: groundwork for O-2, W-1, W-5 and W-6, finished by agents and deployed (O-2, W-3, W-4
+  10-19; B-3, B-12, B-13 10-20).
+- **Deployed**: Render and Vercel at `7e26710`. Zenodo DOI `10.5281/zenodo.23491677` is reserved
+  (unpublished draft). `UNPAYWALL_EMAIL` is set.
+- **Feedback**: 2 Tally responses (one internal test, one UCSF postdoc, 10-3).
+
 ## 2026-10-19
 
 - **Srushti**: no response since 10-14. Her tickets were taken over by agents, with Nik's OK:

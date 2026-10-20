@@ -7,6 +7,51 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## PAUSED 2026-10-20 — close-out
+
+HiveBlot development is paused after 2026-10-20. Everything below this section is history.
+
+**Deployed:** Render and Vercel at `7e26710` (merge of #33). `main` is now `d3fb82c`, which adds
+only the benchmark folder `eval/blind_2026_10/` and docs on top of the deployed code.
+
+**What is live**
+- Merged and deployed 10-20: B-3 saved results / "not stated" vs "not recovered" (#24), B-13
+  non-western panel classifier (#32), B-12 target normalization (#33). Earlier: O-2 upload,
+  W-3, W-4, Band reading.
+- Release prep done: MIT license, `CITATION.cff` (4 authors with ORCIDs), consent records in
+  `.consent/`. Zenodo DOI `10.5281/zenodo.23491677` is reserved; the record is an unpublished draft.
+- `UNPAYWALL_EMAIL` is set on Render (hiveblotprod@gmail.com).
+- Live tier: paper `10.1093/nar/gkag499` was reloaded with B-13 (506 to 171 rows; Northern rows
+  withheld). The other live papers were NOT re-extracted (a model-free rebuild is only approximate);
+  they pick up B-12 and B-13 on their next real extraction.
+- Outreach is paused (batch 2 on hold). Tally feedback: 2 responses (one internal test, one from a
+  UCSF postdoc, Oct 3).
+
+**Blind benchmark** (PR #43, `d3fb82c`; `eval/blind_2026_10/`). Three papers scored (a fourth,
+retracted paper was excluded). Labels by Tanvi Bharadwaj; crop map by Yashvi Jaladi. Headline
+(tier ii, notation-adjudicated): precision of assertions 512/553 (92%, rounded down; the report
+prints 93%), coverage 512/895 (57%). Raw pre-registered precision was 78%. Deviations A1-A8 are
+logged. **Approved wording and caveats: `eval/blind_2026_10/report/CLAIMS.md`.** Use only that
+wording in public. Full numbers: `report/RESULTS.md`; audit: `report/AUDIT.md`.
+
+**Open items, in order**
+1. Publish both Zenodo records (Nik does this; Claude never uploads to Zenodo or any archive).
+2. Re-extract the live papers with current code so they get B-12 and B-13.
+3. Retraction check: HiveBlot extracted a retracted paper; add a retraction-status feature.
+4. Export, and an explanation of what "conflicting" means (user feedback).
+5. Protein-identity coverage: the system often declines canonical symbols.
+6. Densitometry validation study (the UCSF postdoc is open to it).
+7. Scorer lane alignment for physical lanes vs sample lanes.
+
+**Exact resume steps**
+1. `git checkout main && git pull`; read this section, then `tickets/README.md` ("When work resumes").
+2. Check `gh pr list` for open PRs and confirm Render and Vercel still serve `7e26710` or later.
+3. Do item 1 (Nik), then pick from items 2-7. Benchmark data in `eval/blind_2026_10/` is locked;
+   do not edit it.
+4. Update this file and push after each block of work.
+
+# History (before the pause)
+
 ## Srushti's tickets finished by agents; deploy at 363f19e (2026-10-19)
 
 - **Merged and deployed** (Render and Vercel at `363f19e`):
