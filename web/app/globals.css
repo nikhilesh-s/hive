@@ -1358,6 +1358,10 @@ a.hb-paper-flag {
   background: var(--input-background);
 }
 
+:root[data-theme='light'] .hb-search-examples button {
+  color: var(--text-secondary);
+}
+
 :root[data-theme='light'] .hb-search-submit {
   background: var(--accent);
   border-color: var(--accent);
@@ -1415,12 +1419,31 @@ a.hb-paper-flag {
     margin-right: 14px;
   }
 
+  .hb-navigation-links a {
+    align-items: center;
+    display: inline-flex;
+    min-height: 32px;
+  }
+
   .hb-theme-toggle button span {
     display: none;
   }
 
   .hb-theme-toggle button {
+    justify-content: center;
+    min-height: 32px;
+    min-width: 32px;
     padding: 0 7px;
+  }
+
+  /* iOS Safari zooms the page when a focused field is under 16px. */
+  .hb-search-input,
+  .hb-filter-input {
+    font-size: 16px;
+  }
+
+  .hb-save-check {
+    min-height: 36px;
   }
 
   .hb-search-workspace-header {
@@ -1596,13 +1619,34 @@ a.hb-paper-flag {
 }
 
 @media (max-width: 520px) {
+  .hb-navigation {
+    column-gap: 8px;
+    padding: 10px 16px;
+    row-gap: 6px;
+  }
+
   .hb-navigation-wordmark {
     display: none;
   }
 
+  /* Links drop to one scrollable row under the logo, theme and sign-in
+     controls: the sticky bar was 175px tall (a quarter of the screen). */
   .hb-navigation-links {
-    gap: 12px;
-    margin-right: 10px;
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    gap: 16px;
+    margin-right: 0;
+    order: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .hb-navigation-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hb-navigation-links a {
+    flex: 0 0 auto;
   }
 
   .hb-search-field,
@@ -1615,7 +1659,7 @@ a.hb-paper-flag {
   }
 
   .hb-search-input {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
