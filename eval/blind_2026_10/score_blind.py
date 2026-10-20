@@ -159,6 +159,19 @@ def score_lanes(lanes: list[dict], rec: dict | None) -> list[tuple[int, str, str
     return out
 
 
+
+def minutes(text) -> float:
+    """'92', '1:32 hour', '31.49 minutes', '1.5 h' -> minutes."""
+    t = str(text or "").strip().lower()
+    m = re.match(r"^(\d+):(\d{1,2})", t)
+    if m:
+        return int(m.group(1)) * 60 + int(m.group(2))
+    m = re.match(r"^([\d.]+)\s*(h|hr|hour|hours)\b", t)
+    if m:
+        return float(m.group(1)) * 60
+    m = re.match(r"^([\d.]+)", t)
+    return float(m.group(1)) if m else 0.0
+
 # ---------- data loading ----------
 def read_csv(path: Path) -> list[dict]:
     if not path.exists():
@@ -172,8 +185,9 @@ def frozen_papers() -> list[dict]:
 
 
 def fig_key(figure, letter) -> tuple[str, str]:
-    num = re.search(r"\d+", str(figure or ""))
-    return (num.group(0) if num else norm(figure), norm(letter))
+    """'Fig 2' -> '2'; supplementary 'S1' / 'Fig. S1' -> 's1' (never collapsed onto Figure 1, A6)."""
+    m = re.search(r"(s?)\s*(\d+)", str(figure or "").strip().lower().replace("fig.", "").replace("figure", "").replace("fig", ""))
+    return ((m.group(1) + m.group(2)) if m else norm(figure), norm(letter))
 
 
 def crop_panels(cmap_rows: list[dict], inventory: list[dict]) -> dict[str, list[str] | str]:
@@ -373,7 +387,7 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
         timing = json.loads((private / "runs" / p["pmcid"] / "timing.json").read_text())
         manual = Counter()
         for r in pick(tl):
-            manual[r["task"]] += float(r["minutes"] or 0)
+            manual[r["task"] or "logged"] += minutes(r["minutes"])
         rep["timing"] = {"automated_seconds": round(timing.get("preprocess_seconds", 0) + timing.get("extract_seconds", 0), 1),
                          "panels_sent_to_model": timing.get("panels_queried"),
                          "manual_minutes": dict(manual)}
@@ -388,7 +402,7 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
             totals[k] += rep.get(k, 0)
         totals["automated_seconds"] += rep["timing"]["automated_seconds"]
         totals["panels_sent_to_model"] += rep["timing"]["panels_sent_to_model"] or 0
-        totals["manual_full_minutes"] += manual.get("full", 0)
+        totals["manual_full_minutes"] += sum(manual.values())
         rep["metrics_raw"] = {f: metrics(rep["fields"][f]) for f in FIELDS}
         rep["metrics_adjudicated"] = {f: metrics(adj[f]) for f in FIELDS}
         papers[p["pmcid"]] = rep
@@ -428,7 +442,7 @@ def render(r: dict) -> str:
              f"Duplicate records from overlapping crops (not scored, not counted as errors): {t['duplicate_records']}.",
              f"- Automated time: {t['automated_seconds'] / 60:.1f} min for {t['panels_sent_to_model']} panels sent to the model."
              f" Manual full annotation: {t['manual_full_minutes']:.0f} min for {t['panels_fully_annotated']} panels.",
-             "", "This is 4 papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.", ""]
+             "", f"This is {len(r['papers'])} papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.", ""]
     for label, key in (("Raw", "pooled_metrics_raw"), ("Adjudicated", "pooled_metrics_adjudicated")):
         lines += [f"## Pooled, {label.lower()}", "",
                   "| Field | Accuracy | Precision of assertions | Abstained | Not found | Unsupported |",
@@ -525,6 +539,8 @@ def self_test() -> None:
     adj = apply_adjudication(r, {("1", "2", "cell_line", ""): "EQUIVALENT_NOTATION"})
     assert adj["cell_line"] == {"CORRECT": 4, "INCORRECT": 0, "NOT_FOUND": 1}, adj
     assert metrics(f["protein_identity"])["accuracy"] == "4/5 (80%)"
+    assert fig_key("S1", "A") == ("s1", "a") and fig_key("Fig 1", "A") == ("1", "a") and fig_key("Figure S3", "b") == ("s3", "b")
+    assert minutes("1:32 hour") == 92 and minutes("31.49 minutes") == 31.49 and minutes("1.5 h") == 90
     print("self-test passed")
 
 
