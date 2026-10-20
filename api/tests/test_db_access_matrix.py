@@ -318,14 +318,16 @@ def test_stored_doi_lookup_reads_exact_completed_paper_without_search_cap(conn, 
             await conn.execute("INSERT INTO ingest_jobs (job_id, doi, status, discovery_query) VALUES "
                                "('w1-done', '10.1000/w1', 'done', 'original query'), "
                                "('w1-pending', '10.1000/pending', 'extracting', NULL)")
+            await conn.execute("INSERT INTO ingest_jobs (job_id, doi, status, updated_at) VALUES "
+                               "('w1-stale', '10.1000/stale', 'extracting', now() - interval '2 hours')")
             await conn.execute("INSERT INTO western_blot_records_live "
                                "(paper_id, doi, target, job_id, stable_row_key) "
                                "SELECT '10.1000/w1', '10.1000/W1', 'STAT3', 'w1-done', 'w1:' || n "
                                "FROM generate_series(1, 501) n")
-            # A prefix match is not the requested DOI; loading rows are not complete.
+            # A prefix match is not the requested DOI; live rows without a job row are still found.
             await conn.execute("INSERT INTO western_blot_records_live (paper_id, doi, target, job_id) VALUES "
                                "('neighbor', '10.1000/w1-other', 'GAPDH', 'w1-done'), "
-                               "('pending', '10.1000/pending', 'STAT3', 'w1-pending')")
+                               "('orphan', '10.1000/orphan', 'STAT3', 'w1-gone')")
             result = await appdb.lookup_live_paper('10.1000/w1')
             assert result['status'] == 'found'
             assert len(result['results']) == 501
@@ -333,11 +335,14 @@ def test_stored_doi_lookup_reads_exact_completed_paper_without_search_cap(conn, 
             assert result['paper']['discovery_query'] == 'original query'
             assert all(r['doi'] == '10.1000/W1' for r in result['results'])
             assert (await appdb.lookup_live_paper('10.1000/pending'))['status'] == 'pending'
+            assert (await appdb.lookup_live_paper('10.1000/stale'))['status'] == 'not_extracted'
+            orphan = await appdb.lookup_live_paper('10.1000/orphan')
+            assert orphan['status'] == 'found' and orphan['paper']['discovery_query'] is None
             assert (await appdb.lookup_live_paper('10.1000/missing'))['status'] == 'not_extracted'
         finally:
             await pool.close()
-            await conn.execute("DELETE FROM western_blot_records_live WHERE job_id IN ('w1-done', 'w1-pending')")
-            await conn.execute("DELETE FROM ingest_jobs WHERE job_id IN ('w1-done', 'w1-pending')")
+            await conn.execute("DELETE FROM western_blot_records_live WHERE job_id IN ('w1-done', 'w1-pending', 'w1-gone')")
+            await conn.execute("DELETE FROM ingest_jobs WHERE job_id IN ('w1-done', 'w1-pending', 'w1-stale')")
 
     run(conn, exercise())
 

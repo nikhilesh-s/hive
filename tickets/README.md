@@ -44,62 +44,84 @@ tickets/README.md."* The agent follows these rules:
 **Accountability:** owners post in the team chat every Thursday and Sunday:
 tickets closed, PRs open, anything blocked.
 
-## Board (updated 2026-10-11, end of day)
+## Board (updated 2026-10-18)
 
-P1 = this week, P2 = next, P3 = when free. Track files:
+P0 = before anything else, P1 = this week, P2 = next, P3 = when free. Track files:
 [oct-push](oct-push.md) (R, W, Q, G), [bio-qa](bio-qa.md) (B),
 [ops](ops-2026-09-27.md) (O), [feedback](feedback.md) (F),
 [densitometry](densitometry.md) (D).
 
+### P0: blind extraction benchmark (due Tue 10-20)
+Branch `eval/blind-benchmark-2026-10`, folder `eval/blind_2026_10/`. Read `TEAM_TASKS.md` there.
+Until it is scored, **do not merge or deploy anything under `western_blot_miner/`**. The
+benchmark measures commit `f77d311`, which is what production runs.
+
+| Ticket | What | Owner | Status |
+|---|---|---|---|
+| E-1 | Pre-register, draw 4 papers, freeze PDFs, Stage 1 | Nik + Claude | done 10-18 (`38bf0a6`, `5ba7945`) |
+| E-2 | Model stage on the frozen papers, then seal outputs | Nik + Claude | papers 1, 2 and 4 done 10-18; paper 3 running |
+| E-3 | Browser download of PMC7948984 (or log the skip) | Nik | done 10-18 (rank 3 replaces rank 8) |
+| E-4 | Blind annotation of 4 papers (`ANNOTATOR_GUIDE.md`) | Tanvi | shared 10-18 (Drive folder + Sheet); due Mon 10-20 12:00 PT |
+| E-5 | Map 57 crops to figure and panel (`TEAM_TASKS.md`) | Yashvi | shared 10-18 (Drive folder + Sheet); due Sun 10-19 21:00 PT |
+| E-6 | Second annotator on paper 1 (optional) | Nik picks | todo |
+| E-7 | Score, adjudicate, report (`RUNBOOK.md` steps 5-7) | Nik + Claude | after E-4, E-5 |
+
 ### Release (Nik + Nik's Claude; these need credentials)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| R-1 | Merge PR #12 (red-CI fix) and push pending Supabase migrations | P1 | done 10-11 (36569fa) |
-| R-2 | Supabase keys in Vercel, prod auth callback, Google sign-in test | P1 | done 10-11 (Nik verified sign-in + Save) |
-| R-3 | Deploy web, hosted smoke test | P1 | done 10-11 (web ac85a6e, smoke passed) |
-| R-4 | Review and merge PR #11 (metadata-first ingestion), deploy API | P1 | done 10-11 (3839ee3) |
-| O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik |
+| O-9 | Rotate the `hive_ingest` DB password (it was printed in an agent session on 10-18) | P0 | done 10-18 (role, Render, `api/.env`, DSN file; new login verified) |
+| O-10 | Rotate the gswitch `FASTMCP_SERVER_AUTH_GOOGLE_JWT_SIGNING_KEY` (also printed 10-18); re-authorize the ChatGPT connector afterwards | P1 | Nik decides |
+| R-5 | Deploy W-1, W-5, W-6, O-3, O-8, W-7 (API first, then web), then a hosted smoke test | P1 | done 10-18: Render and Vercel at `edd95f5`; health, Home, Search, About and corpus stats checked |
+| O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik (still unset 10-18) |
 | O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
-| O-1 | Render paid plan | P2 | Nik decides |
+| O-1 | Render paid plan | P2 | Nik decides (still free 10-18) |
 
 ### Srushti (+ Codex)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| W-1 | `?doi=` deep link opens an extracted paper | P1 | PR #19 |
-| O-2 | Upload PDF for a DOI on Search and Research (API + web) | P1 | draft PR #22; visual/auth/model acceptance pending; see `o2-pdf-upload-verification.md` |
-| W-2 | Open the B-3 PR from `feature/saved-results` | P1 | todo |
-| B-14 | Unresolved target must set needs_review | P2 | todo |
-| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | todo |
-| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | todo |
-| O-8 | Research page gives up on transient 429s | P3 | todo |
-| W-3 | Phone and Safari pass on the hosted site | P2 | todo (site is deployed) |
-| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo |
+| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft): fix the 7 security-review items posted 10-18 (1 blocking: unbounded page render) |
+| W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
+| B-14 | Unresolved target must set needs_review | P2 | probably covered by `4cbbaa8` in PR #24; check after E-7 |
+| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | held until E-7 (extraction code) |
+| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | held until E-7 (extraction code) |
+| W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
+| O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
+| W-3 | Phone and Safari pass on the hosted site | P2 | todo (R-5 deployed 10-18) |
+| W-4 | Stop trusting browser-sent paper metadata on `/ingest` (from PR #11 review) | P2 | todo (labels are safe since W-6; job metadata is still trusted) |
 
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| Q-1 | Sign off the 9 wave-1 pre-extracted papers | P1 | todo, by Wed 10/14 |
-| Q-2 | ImageJ spot-check of lane readouts, 10 panels | P1 | todo, by Fri 10/16 |
-| Q-3 | 30 expected target names for B-12 | P2 | todo |
-| Q-4 | 5+ non-western panel examples for B-13 | P2 | todo |
-| B-3 | Review "not stated" vs "not recovered" wording on the W-2 PR | P1 | waits on W-2 |
+| E-4 | Blind benchmark annotation (see P0) | P0 | todo, due Mon 10-20 12:00 PT |
+| B-3 | Review "not stated" vs "not recovered" wording on PR #24 | P1 | after E-4 |
+| Q-1 | Sign off the 9 wave-1 pre-extracted papers | P1 | paused for E-4 (was due 10/14; no sign-off recorded) |
+| Q-2 | ImageJ spot-check of lane readouts, 10 panels | P2 | paused for E-4 (was due 10/16; nothing recorded) |
+| Q-3 | 30 expected target names for B-12 | P2 | paused |
+| Q-4 | 5+ non-western panel examples for B-13 | P2 | paused |
 | F-7 | Weekly feedback triage | P3 | ongoing (no new rows since 9-16) |
 
 ### Yashvi (+ Claude)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| G-1 | Outreach and grants log on `yashvi-outreach` | P1 | todo |
-| G-2 | Email v2 plus spam check, for Nik's approval | P1 | todo, by Tue 10/13 |
+| E-5 | Crop mapping for the benchmark (see P0) | P0 | todo, due Sun 10-19 21:00 PT |
+| G-1 | Outreach and grants log on `yashvi-outreach` | P1 | todo (branch not pushed as of 10-18) |
+| G-2 | Email v2 plus spam check, for Nik's approval | P1 | no update since 10-11 (was due 10/13) |
 | G-3 | Batch 2: about 100 first authors, papers pre-extracted | P2 | after G-2 approved |
-| G-4 | Fix the stale "live search isn't hosted" line | P3 | todo |
 | G-5 | Upload the 8 blocked wave-1 PDFs | P2 | after O-2 |
-| O-3 | `export_feedback.py --since` drops same-day rows | P3 | todo |
 
 ### Done (recent)
-B-1, B-2, B-6, B-9 (bdd5410), F-0 to F-6, F-8 (release of 2026-09-27), Ticket C saved
-results (on main; ships with R-3), `?lab=` attribution (47d4071), live corpus
-counts (b9e9c04), reviewed-results access flags (2a7d0b8). O-4 and O-5 are accepted
-as-is.
+- 10-18:
+  - W-1 `?doi=` deep link (#19, `d01f08d`)
+  - W-5 dynamic corpus counts (#20, `69c3737`)
+  - W-6 honest access labels (#21, `1319f9a`; review fixes: unverified jobs can't set labels,
+    PostgREST quoting, http(s)-only links)
+  - O-3 `--since` same-day rows (#25)
+  - G-4 share-pack line (#26)
+  - Copilot PR #2 closed (obsolete)
+- 10-11: R-1 to R-4.
+- Earlier: B-1, B-2, B-6, B-9 (bdd5410), F-0 to F-6, F-8 (release of 2026-09-27), Ticket C saved
+  results, `?lab=` attribution (47d4071), live corpus counts (b9e9c04), reviewed-results access
+  flags (2a7d0b8). O-4 and O-5 are accepted as-is.
 
 ### Parked (not this push)
 B-4 (scaffold landed, review pending), B-5, B-7, B-8, B-10, B-11, all of D-1 to D-7

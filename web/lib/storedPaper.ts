@@ -15,12 +15,15 @@ export interface StoredPaperLookup<Row> {
 }
 
 export function normalizeDoi(value: string): string {
-  const doi = value.trim().replace(/^(?:https?:\/\/(?:dx\.)?doi\.org\/|doi:\s*)/i, '').trim().toLowerCase();
-  return /^10\.\d{4,9}\/\S+$/.test(doi) && doi.length <= 200 ? doi : '';
+  // Mirrors western_blot_miner.fulltext.normalize_doi: first DOI inside the text,
+  // trailing ".,;)" dropped, lowercased. Keep the two in step.
+  const m = /10\.\d{4,9}\/\S+/i.exec(value.trim());
+  const doi = m ? m[0].replace(/[.,;)]+$/, '').toLowerCase() : '';
+  return doi.length <= 200 ? doi : '';
 }
 
 export function isDoiQuery(value: string): boolean {
-  return /^(?:10\.|https?:\/\/(?:dx\.)?doi\.org\/|doi:)/i.test(value.trim());
+  return normalizeDoi(value) !== '';
 }
 
 // Share only in-flight reads (including React's development effect replay).

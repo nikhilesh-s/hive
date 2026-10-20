@@ -33,7 +33,8 @@ def test_lookup_requires_server_key_before_reading(client, monkeypatch):
 
 
 @pytest.mark.parametrize("doi", ["10.1000/ABC", " https://doi.org/10.1000/ABC ",
-                                 "doi:10.1000/ABC", "http://dx.doi.org/10.1000/ABC"])
+                                 "doi:10.1000/ABC", "http://dx.doi.org/10.1000/ABC",
+                                 "10.1000/ABC).", "see https://doi.org/10.1000/ABC;"])
 def test_lookup_normalizes_and_refresh_is_readonly(client, monkeypatch, doi):
     seen = []
 
@@ -66,7 +67,7 @@ def test_missing_and_pending_are_not_extracted(client, monkeypatch, status):
     assert response.json()["results"] == []
 
 
-@pytest.mark.parametrize("doi", ["garbage", "10.1/a", "10.1000/has space", "x10.1000/a", "10.1000/" + "a" * 200])
+@pytest.mark.parametrize("doi", ["garbage", "10.1/a", "10.5 mM STAT3", "10.1000/" + "a" * 200])
 def test_invalid_doi(client, doi):
     assert client.get("/experimental/live/paper", params={"doi": doi}, headers=AUTH).status_code == 422
 
@@ -80,20 +81,18 @@ def test_database_failure_is_not_reported_as_missing(client, monkeypatch):
     assert "temporarily unavailable" in response.json()["detail"]
 
 
-@pytest.mark.parametrize("job_status,expected", [("extracting", "pending"), ("loading", "pending"),
-                                               ("failed", "not_extracted"), ("done", "not_extracted"),
-                                               ("awaiting_full_text", "not_extracted"), (None, "not_extracted")])
-def test_database_lookup_uses_bound_exact_doi_and_complete_rows(monkeypatch, job_status, expected):
+def _pool(monkeypatch, rows, job):
     class Conn:
         async def fetch(self, sql, doi):
-            assert "lower(r.doi) = $1" in sql and "j.status = 'done'" in sql
+            assert "LEFT JOIN ingest_jobs" in sql and "j.status" not in sql
+            assert "lower(r.doi) = $1" in sql  # row DOIs keep the extractor's case
             assert "LIMIT" not in sql and "ILIKE" not in sql
             assert doi == "10.1000/a"
-            return []
+            return rows
 
         async def fetchrow(self, sql, doi):
-            assert "lower(doi) = $1" in sql and doi == "10.1000/a"
-            return {"status": job_status} if job_status else None
+            assert "lower(doi) = $1" in sql and "interval '30 minutes'" in sql and doi == "10.1000/a"
+            return job
 
     class Acquire:
         async def __aenter__(self): return Conn()
@@ -104,5 +103,27 @@ def test_database_lookup_uses_bound_exact_doi_and_complete_rows(monkeypatch, job
 
     async def pool(): return Pool()
     monkeypatch.setattr(db, "get_readonly_pool", pool)
+
+
+@pytest.mark.parametrize("job_status,fresh,expected", [
+    ("extracting", True, "pending"), ("loading", True, "pending"),
+    ("extracting", False, "not_extracted"),  # a restart left the job stuck
+    ("failed", True, "not_extracted"), ("done", True, "not_extracted"),
+    ("awaiting_full_text", True, "not_extracted"), (None, None, "not_extracted")])
+def test_database_lookup_uses_bound_exact_doi_and_complete_rows(monkeypatch, job_status, fresh, expected):
+    _pool(monkeypatch, [], {"status": job_status, "fresh": fresh} if job_status else None)
     result = asyncio.run(db.lookup_live_paper("10.1000/a"))
     assert result["status"] == expected and not result["results"]
+
+
+def test_live_rows_are_found_without_a_done_job_row(monkeypatch):
+    rows = [{"id": 2, "doi": "10.1000/A", "title": "Row title", "stable_row_key": "k1:a",
+             "job_id": "j1", "original_query": None, "stored_title": None},
+            {"id": 3, "doi": "10.1000/A", "title": None, "stable_row_key": "k1:b",
+             "job_id": "j1", "original_query": None, "stored_title": None}]
+    _pool(monkeypatch, rows, None)  # no ingest_jobs row at all
+    result = asyncio.run(db.lookup_live_paper("10.1000/a"))
+    assert result["status"] == "found"
+    assert result["paper"]["title"] == "Row title" and result["paper"]["discovery_query"] is None
+    assert result["paper"]["rows"] == 2 and result["paper"]["experiments"] == 1
+    assert all("original_query" not in r and "stored_title" not in r for r in result["results"])
