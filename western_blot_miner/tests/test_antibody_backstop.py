@@ -1,5 +1,5 @@
 """B-2: deterministic antibody backstop in record_builder._antibody_info."""
-from western_blot_miner.evidence_record import MISSING, SUPPORTED, RANK_METHODS
+from western_blot_miner.evidence_record import NOT_RECOVERED, NOT_STATED, SUPPORTED, RANK_METHODS
 from western_blot_miner.record_builder import build_evidence_record
 
 TEXT = "anti-β-actin (Cell Signaling, #4967, 1:1000)"
@@ -42,7 +42,7 @@ def test_model_catalog_not_overwritten_when_text_disagrees():
 def test_no_text_leaves_fields_missing():
     ab = _record({}, text="").antibodies[0]
     for f in (ab.vendor, ab.catalog_number, ab.dilution, ab.clone):
-        assert f.status == MISSING and f.value is None
+        assert f.status in (NOT_STATED, NOT_RECOVERED) and f.value is None
 
 
 def test_deterministic_confidence_never_above_model_default():
@@ -68,4 +68,4 @@ def test_multi_antibody_sentence_without_this_target_abstains():
     text = "anti-p-STAT3 (Cell Signaling, #9145, 1:1000) and anti-GAPDH (Abcam, ab8245, 1:2000)."
     ab = _record({}, text=text).antibodies[0]      # record target is beta-actin: not in the sentence
     for f in (ab.vendor, ab.catalog_number, ab.dilution):
-        assert f.status == MISSING
+        assert f.status in (NOT_STATED, NOT_RECOVERED)

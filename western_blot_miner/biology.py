@@ -710,19 +710,120 @@ def is_loading_control(target: str) -> bool:
     return any(token == lc or token.startswith(lc) or lc in token for lc in LOADING_CONTROLS)
 
 
+# --------------------------------------------------------------------------- #
+# Non-western panels: Northern / Southern / gel stain / zymography / EMSA
+# --------------------------------------------------------------------------- #
+# A panel is non-western only when BOTH hold:
+#   1. the PANEL says so: its row target is a nucleic-acid species (18S, 47S, U6,
+#      tRNA-Met, ...) or a gel-stain subject (Coomassie, Ponceau S), or its target /
+#      lane labels name the assay (zymography, EMSA, free probe); and
+#   2. the paper's caption/methods names the matching technique.
+# Neither alone is enough. The caption/methods channel is page-level text (a
+# Northern paragraph sits on the same page as the westerns, so "Northern blot" in
+# it says nothing about one row), and the model's row target is a claim, not
+# ground truth. "RNA was extracted" in a methods section matches nothing here.
+
+_RNA_SPECIES = re.compile(
+    r"^(?:(?:5|5\.8|12|18|21|26|28|30|32|34|35|41|43|45|46|47)s(?:-[a-z])?\*?"  # rRNA / pre-rRNA S-values: 18S, 47S-C
+    r"|[53]'?ets|its[12]"                                                       # transcribed spacers
+    r"|(?:pre-?)?(?:[rtm]|sn|sno|sca|mi|lnc)rna(?:[-_]\w+)?"                    # rRNA, tRNA-Met, snoRNA, mRNA
+    r"|u[1-7](?:atac)?|7sk|snord\d+\w*|mir-?\d+\w*|let-?7\w*)$",
+    re.IGNORECASE,
+)
+# ponytail: 26S/30S also name the proteasome / bacterial ribosome; accepted because
+# the caption/methods must ALSO name a Northern/RNA blot. Add a deny-list if it bites.
+_DNA_SPECIES = re.compile(
+    r"^(?:[gmc]?t?dna|genomic|plasmid|telomeric|restriction|fragments?|trfs?)$", re.IGNORECASE)
+_STAIN_SUBJECT = re.compile(
+    r"^(?:coomassie(?:[-\s]+(?:brilliant[-\s]+)?blue)?|cbb|silver|ponceau(?:\s*s)?|amido[-\s]+black|"
+    r"sypro(?:[-\s]+ruby)?|stain[-\s]?free|total[-\s]+protein)(?:[-\s]+(?:stain(?:ed|ing)?|gel))*$",
+    re.IGNORECASE,
+)
+# (panel label regex over target + lane text, caption/methods technique regex)
+_NORTHERN_LABEL = re.compile(r"\bnorthern\b|\bRNA[-\s]?blot", re.IGNORECASE)
+_NORTHERN_CTX = re.compile(
+    r"\bnorthern[-\s]+(?:blot|blotting|analys[ie]s|hybridi[sz]ation)|\bRNA[-\s]?blot|"
+    r"\bpre-?rRNA\b|\brRNA\b|ribosomal\s+RNA", re.IGNORECASE)
+_SOUTHERN_LABEL = re.compile(r"\bsouthern\b|\bDNA[-\s]?blot", re.IGNORECASE)
+_SOUTHERN_CTX = re.compile(
+    r"\bsouthern[-\s]+(?:blot|blotting|analys[ie]s|hybridi[sz]ation)|\bDNA[-\s]?blot", re.IGNORECASE)
+_ZYMO_LABEL = re.compile(r"zymogra(?:m|phy)|gelatinolytic|caseinolytic", re.IGNORECASE)
+_ZYMO_CTX = re.compile(r"zymogra(?:m|phy)", re.IGNORECASE)
+_EMSA_LABEL = re.compile(
+    r"\bEMSA\b|gel[-\s]?shift|mobility[-\s]?shift|super-?shift|free\s+probe", re.IGNORECASE)
+_EMSA_CTX = re.compile(
+    r"\bEMSAs?\b|electrophoretic\s+mobility[-\s]?shift|gel[-\s]?shift", re.IGNORECASE)
+_STAIN_CTX = re.compile(
+    r"coomassie|\bCBB\b|silver[-\s]?stain|ponceau|amido[-\s]?black|sypro|stain[-\s]?free|"
+    r"(?:total\s+)?protein\s+stain", re.IGNORECASE)
+
+
+def _na_tokens(target: str) -> list[str]:
+    """Target label -> tokens for the nucleic-acid lexicon ("30S (34S*)" -> ["30S"])."""
+    t = re.sub(r"\([^)]*\)", " ", target or "")
+    t = re.sub(r"(?<=\d)\s*['′’´]\s*(?=ets\b)", "'", t, flags=re.IGNORECASE)
+    return [x for x in re.split(r"[\s/,;+&]+", t) if x]
+
+
+def _is_stain_subject(target: str) -> bool:
+    return bool(_STAIN_SUBJECT.match(re.sub(r"\([^)]*\)", " ", target or "").strip()))
+
+
+def classify_non_western(
+    raw_target: str,
+    caption: str = "",
+    methods: str = "",
+    lane_text: str = "",
+    panel_targets: Optional[Iterable[str]] = None,
+) -> Optional[dict]:
+    """Is this panel row a non-western assay (see the block comment above)?
+
+    ``panel_targets`` = every row target the model reported for the SAME panel.
+    A stain row (Coomassie, Ponceau S, total protein) is the panel's subject only
+    when every row of the panel is a stain; next to a protein row it is a loading
+    control, and None (unknown) never flags it.
+
+    Returns {"kind": northern_blot | southern_blot | zymography | emsa | gel_stain,
+    "evidence": [{type, text}, ...]} or None.
+    """
+    toks = _na_tokens(raw_target)
+    panel = f"{raw_target}\n{lane_text}"
+    rna = bool(toks) and all(_RNA_SPECIES.match(t) for t in toks)
+    dna = bool(toks) and all(_DNA_SPECIES.match(t) for t in toks)
+    siblings = list(panel_targets) if panel_targets is not None else []
+    stain = (_is_stain_subject(raw_target) and bool(siblings)
+             and all(_is_stain_subject(t) for t in siblings))
+    for kind, on_panel, ctx_rx in (
+        ("northern_blot", rna or bool(_NORTHERN_LABEL.search(panel)), _NORTHERN_CTX),
+        ("southern_blot", dna or bool(_SOUTHERN_LABEL.search(panel)), _SOUTHERN_CTX),
+        ("zymography", bool(_ZYMO_LABEL.search(panel)), _ZYMO_CTX),
+        ("emsa", bool(_EMSA_LABEL.search(panel)), _EMSA_CTX),
+        ("gel_stain", stain, _STAIN_CTX),
+    ):
+        if not on_panel:
+            continue
+        ctx = _first_snippet(ctx_rx, ("figure_caption", caption), ("methods", methods))
+        if ctx:
+            return {"kind": kind, "evidence": [_ev("target", raw_target), ctx]}
+    return None
+
+
 def classify_experiment(
     raw_target: str,
     caption: str = "",
     methods: str = "",
     modification: Optional[dict] = None,
     is_loading_control_flag: bool = False,
+    lane_text: str = "",
+    panel_targets: Optional[Iterable[str]] = None,
 ) -> dict:
     """Classify assay design from TEXT evidence (never the image alone).
 
     Returns:
         {
           "experiment_type": "co_ip" | "phospho_western" | "standard_western"
-                             | "purified_protein" | "loading_control" | "unknown",
+                             | "purified_protein" | "loading_control"
+                             | "non_western" | "unknown",
           "experiment_flags": [...],     # non-exclusive; co_ip + phospho can coexist
           "confidence": float,
           "evidence": [ {type, text}, ... ],
@@ -730,6 +831,11 @@ def classify_experiment(
     """
     flags: list[str] = []
     evidence: list[dict] = []
+
+    non_western = classify_non_western(raw_target, caption, methods, lane_text, panel_targets)
+    if non_western:
+        flags.extend(["non_western", non_western["kind"]])
+        evidence.extend(non_western["evidence"])
 
     loading = is_loading_control_flag or is_loading_control(raw_target)
     if loading:
@@ -751,7 +857,9 @@ def classify_experiment(
         evidence.extend(modification.get("evidence", [])[:1])
 
     # Primary label precedence: assay design beats modification label.
-    if "co_ip" in flags:
+    if "non_western" in flags:
+        primary, conf = "non_western", 0.9
+    elif "co_ip" in flags:
         primary, conf = "co_ip", 0.9
     elif "purified_protein" in flags:
         primary, conf = "purified_protein", 0.85
