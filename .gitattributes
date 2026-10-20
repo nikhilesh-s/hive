@@ -40,3 +40,4 @@
 /render.yaml export-ignore
 /.github export-ignore
 /web/AUTH.md export-ignore
+.consent/ export-ignore
