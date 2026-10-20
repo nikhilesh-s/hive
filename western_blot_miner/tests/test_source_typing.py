@@ -1,5 +1,5 @@
 """A Source's type must match where its text actually comes from."""
-from western_blot_miner.evidence_record import MISSING, RANK_METHODS, RANK_MODEL_TARGET
+from western_blot_miner.evidence_record import NOT_RECOVERED, NOT_STATED, RANK_METHODS, RANK_MODEL_TARGET
 from western_blot_miner.record_builder import build_evidence_record
 
 
@@ -39,7 +39,7 @@ def test_antibody_verbatim_in_caption_is_caption():
 def test_backstop_does_not_fill_from_paraphrase():
     ab = _ab_rec("anti-STAT3 (Cell Signaling, #9139, 1:1000)", "Antibodies are listed in Table S1.")
     for f in (ab.vendor, ab.catalog_number, ab.dilution):
-        assert f.status == MISSING
+        assert f.status in (NOT_STATED, NOT_RECOVERED)
     # same text verbatim in methods -> backstop fills
     assert _ab_rec("anti-STAT3 (Cell Signaling, #9139, 1:1000)", METHODS).catalog_number.value == "9139"
 
