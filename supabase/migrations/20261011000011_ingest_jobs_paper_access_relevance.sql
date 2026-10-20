@@ -15,7 +15,7 @@ ALTER TABLE public.ingest_jobs
   ADD COLUMN IF NOT EXISTS access_source TEXT,
   ADD COLUMN IF NOT EXISTS access_checked_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS relevance_status TEXT,
-  ADD COLUMN IF NOT EXISTS relevance_score DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS relevance_score REAL,
   ADD COLUMN IF NOT EXISTS relevance_reason TEXT,
   ADD COLUMN IF NOT EXISTS relevance_checked_at TIMESTAMPTZ;
 

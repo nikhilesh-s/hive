@@ -41,7 +41,7 @@ def test_daily_question_cap_returns_429(monkeypatch):
 
 def test_daily_extraction_cap_skips_reused_runs(monkeypatch):
     monkeypatch.setattr(ingest, "backend_ready", lambda: (True, ""))
-    monkeypatch.setattr(ingest, "start_job", lambda doi, reuse=False: SimpleNamespace(
+    monkeypatch.setattr(ingest, "start_job", lambda doi, reuse=False, **kwargs: SimpleNamespace(
         job_id="j", to_dict=lambda: {"job_id": "j", "reuse": reuse}))
     monkeypatch.setattr(ingest, "run_job", lambda job_id: None)
     monkeypatch.setattr(settings, "daily_ingest_cap", 1)
@@ -77,13 +77,19 @@ def test_extractions_run_one_at_a_time(monkeypatch):
 
     monkeypatch.setattr(settings, "db_ingest_url", "")
     monkeypatch.setattr(ingest, "backend_ready", lambda: (True, "stub"))
+    monkeypatch.setattr(ingest.fulltext, "paper_metadata",
+                        lambda doi, seed=None: {"title": "T", "metadata_source": "test"})
+    monkeypatch.setattr(ingest.fulltext, "check_access",
+                        lambda doi, pmcid=None: {"access_status": "open_access",
+                                                 "access_url": "https://example.org/p.pdf",
+                                                 "access_source": "test", "oa_pdf": True})
     monkeypatch.setattr(ingest.fulltext, "fetch_pdf", slow_fetch)
     a, b = ingest.start_job("10.1000/a"), ingest.start_job("10.1000/b")
 
     async def both():
         await asyncio.gather(ingest.run_job(a.job_id), ingest.run_job(b.job_id))
     asyncio.run(both())
-    assert peak[0] == 1 and a.status == b.status == "failed"
+    assert peak[0] == 1 and a.status == b.status == "awaiting_full_text"
 
 
 def test_job_orphaned_by_a_restart_reads_as_failed(monkeypatch):

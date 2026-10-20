@@ -33,7 +33,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
     allow_methods=["GET", "POST"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", "X-Pdf-Rights"],
 )
 
 app.include_router(internal.router)
@@ -46,6 +46,9 @@ if settings.experimental_enabled:
 
     app.include_router(experimental_router)
     app.include_router(densitometry_router)
+    from .experimental.uploads import router as upload_router, ticket_router
+    app.include_router(ticket_router)
+    app.include_router(upload_router)
 
     # Local-runner bridge: hosted HiveBlot can ask the researcher's own machine
     # to run model jobs, so no Claude credential ever lives in the cloud. These

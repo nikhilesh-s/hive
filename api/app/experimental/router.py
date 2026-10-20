@@ -4,25 +4,29 @@ paper-QA endpoint shares with /search."""
 from __future__ import annotations
 
 import logging
+import unicodedata
 from datetime import datetime, timezone
+from typing import Literal
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Query, Request
 from fastapi.responses import Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from ..auth import require_internal_key
 from ..config import settings
 from ..db import (
+    UploadCropHidden,
     count_live_rows,
     delete_live_job,
     fetch_live_crop,
     fetch_live_record,
     list_ingest_jobs,
     list_live_papers,
+    lookup_live_paper,
 )
 from ..limiter import limiter
 from ..record_detail import build_record_detail
-from ..schemas import RecordDetail, SearchRequest, SearchResponse
+from ..schemas import RecordDetail, SearchRequest, SearchResponse, WesternBlotRecord
 from ..search_service import execute_search
 from ..valency import ValencyClient, ValencyError
 from . import ingest
@@ -36,16 +40,20 @@ router = APIRouter(prefix="/experimental", dependencies=[Depends(require_interna
 _spent: dict[str, tuple[str, int]] = {}
 
 
+def _daily_used(kind: str) -> int:
+    """Read-only: how much of `kind` was spent today (UTC)."""
+    today = datetime.now(timezone.utc).date().isoformat()
+    day, used = _spent.get(kind, (today, 0))
+    return used if day == today else 0
+
+
 def _spend_daily(kind: str, cap: int) -> None:
     """Global per-UTC-day ceiling on paid model work (429 once reached)."""
     # ponytail: in-process counter, resets on restart/deploy; count rows in the DB if restarts get frequent.
-    today = datetime.now(timezone.utc).date().isoformat()
-    day, used = _spent.get(kind, (today, 0))
-    if day != today:
-        used = 0
+    used = _daily_used(kind)
     if used >= cap:
         raise HTTPException(429, f"The beta's daily {kind} limit ({cap}) is reached. It resets at 00:00 UTC.")
-    _spent[kind] = (today, used + 1)
+    _spent[kind] = (datetime.now(timezone.utc).date().isoformat(), used + 1)
 
 
 class PaperSearchRequest(BaseModel):
@@ -61,9 +69,36 @@ class AskRequest(BaseModel):
 
 
 class IngestRequest(BaseModel):
+    """Everything about the paper (title, authors, ids, access, relevance) is
+    derived server-side from the DOI. Extra fields a browser sends are ignored;
+    only a bounded discovery query is accepted, as plain text."""
     doi: str = Field(min_length=6, max_length=200)
     force: bool = False
     reuse: bool = False   # load this DOI's previous extraction run without calling the model
+    query: str | None = Field(default=None, max_length=300)
+
+    @field_validator("query")
+    @classmethod
+    def _plain_query(cls, v: str | None) -> str | None:
+        # Control/format characters (newlines, NUL, bidi overrides) become spaces, then whitespace collapses.
+        v = "".join(" " if unicodedata.category(c) in ("Cc", "Cf") else c for c in v or "")
+        return " ".join(v.split()) or None
+
+
+class StoredPaper(BaseModel):
+    doi: str
+    title: str | None = None
+    job_id: str | None = None
+    discovery_query: str | None = None
+    rows: int
+    experiments: int
+
+
+class StoredPaperResponse(BaseModel):
+    status: Literal["found", "not_extracted", "pending"]
+    doi: str
+    paper: StoredPaper | None = None
+    results: list[WesternBlotRecord] = []
 
 
 @router.get("/status")
@@ -119,21 +154,23 @@ async def papers_search(body: PaperSearchRequest):
             continue
         seen.add(key)
         deduped.append(r)
-    return {"query": body.query, "results": deduped[: body.limit], "sources_used": used, "errors": errors}
+    try:
+        deduped = ingest.fulltext.annotate_paper_signals(deduped[: body.limit], body.query)
+    except Exception as e:
+        errors["paper_signals"] = f"{type(e).__name__}: {e}"[:200]
+        deduped = deduped[: body.limit]
+    return {"query": body.query, "results": deduped, "sources_used": used, "errors": errors}
 
 
 @router.post("/ingest")
 @limiter.limit("6/minute")
 async def ingest_start(request: Request, body: IngestRequest, background: BackgroundTasks):
-    ok, why = ingest.backend_ready()
     has_prior = (ingest.run_dir_for(ingest.fulltext.normalize_doi(body.doi)) / "supabase_rows.json").exists()
     reuse = body.reuse and has_prior
-    if not ok and not reuse:
-        raise HTTPException(503, why)
-    if not reuse:  # re-opening a finished run costs nothing
+    if not reuse:  # metadata/access checks are cheap; the existing cap still bounds requested extraction jobs
         _spend_daily("extraction", settings.daily_ingest_cap)
     try:
-        job = ingest.start_job(body.doi, reuse=reuse)
+        job = ingest.start_job(body.doi, reuse=reuse, discovery_query=body.query)
     except ValueError:
         raise HTTPException(400, "Not a DOI")
     background.add_task(ingest.run_job, job.job_id)
@@ -161,6 +198,23 @@ async def live_papers():
     except Exception as e:
         logger.warning("live papers listing failed: %s", e)
         return {"papers": [], "error": "live tier unavailable"}
+
+
+@router.get("/live/paper", response_model=StoredPaperResponse)
+async def stored_paper(doi: str = Query(min_length=1, max_length=200)):
+    """Read existing evidence only; the router requires the internal BFF key.
+
+    Live evidence is shared within the beta access context, not account-owned.
+    The lab tag is attribution and must never grant access to data.
+    """
+    normalized = ingest.fulltext.normalize_doi(doi)  # same normalizer ingest stores with
+    if not normalized:
+        raise HTTPException(422, "Not a DOI")
+    try:
+        return await lookup_live_paper(normalized)
+    except Exception as e:
+        logger.warning("stored paper lookup failed: %s", e)
+        raise HTTPException(503, "Stored evidence is temporarily unavailable") from e
 
 
 @router.get("/ingest/{job_id}")
@@ -218,7 +272,10 @@ async def live_crop(record_id: int = _RECORD_ID):
     row = await fetch_live_record(record_id)
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")
-    png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+    try:
+        png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+    except UploadCropHidden as e:
+        raise HTTPException(403, str(e)) from None
     if not png:
         raise HTTPException(404, "Crop not available")
     return Response(content=png, media_type="image/png")
