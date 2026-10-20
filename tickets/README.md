@@ -44,14 +44,16 @@ tickets/README.md."* The agent follows these rules:
 **Accountability:** owners post in the team chat every Thursday and Sunday:
 tickets closed, PRs open, anything blocked.
 
-## Board (updated 2026-10-19)
+## Board: PAUSED 2026-10-20
+
+HiveBlot development is paused. See "When work resumes" at the bottom of this file.
 
 P0 = before anything else, P1 = this week, P2 = next, P3 = when free. Track files:
 [oct-push](oct-push.md) (R, W, Q, G), [bio-qa](bio-qa.md) (B),
 [ops](ops-2026-09-27.md) (O), [feedback](feedback.md) (F),
 [densitometry](densitometry.md) (D).
 
-### P0: blind extraction benchmark (due Tue 10-20)
+### P0: blind extraction benchmark (done 10-20, merged as #43 `d3fb82c`)
 Branch `eval/blind-benchmark-2026-10`, folder `eval/blind_2026_10/`. Read `TEAM_TASKS.md` there.
 Until it is scored, **do not merge or deploy anything under `western_blot_miner/`**. The
 benchmark measures commit `f77d311`, which is what production runs.
@@ -59,12 +61,12 @@ benchmark measures commit `f77d311`, which is what production runs.
 | Ticket | What | Owner | Status |
 |---|---|---|---|
 | E-1 | Pre-register, draw 4 papers, freeze PDFs, Stage 1 | Nik + Claude | done 10-18 (`38bf0a6`, `5ba7945`) |
-| E-2 | Model stage on the frozen papers, then seal outputs | Nik + Claude | papers 1, 2 and 4 done 10-18; paper 3 running |
+| E-2 | Model stage on the frozen papers, then seal outputs | Nik + Claude | done 10-18 (sealed `b0174f7`) |
 | E-3 | Browser download of PMC7948984 (or log the skip) | Nik | done 10-18 (rank 3 replaces rank 8) |
-| E-4 | Blind annotation of 4 papers (`ANNOTATOR_GUIDE.md`) | Tanvi | shared 10-18 (Drive folder + Sheet); due Mon 10-20 12:00 PT |
-| E-5 | Map 57 crops to figure and panel (`TEAM_TASKS.md`) | Yashvi | shared 10-18 (Drive folder + Sheet); due Sun 10-19 21:00 PT |
-| E-6 | Second annotator on paper 1 (optional) | Nik picks | todo |
-| E-7 | Score, adjudicate, report (`RUNBOOK.md` steps 5-7) | Nik + Claude | after E-4, E-5 |
+| E-4 | Blind annotation of 4 papers (`ANNOTATOR_GUIDE.md`) | Tanvi | done 10-20 (labels locked `974f927`; confirmation A8 `59c1074`) |
+| E-5 | Map 57 crops to figure and panel (`TEAM_TASKS.md`) | Yashvi | done 10-19 (crop map locked `8f02963`) |
+| E-6 | Second annotator on paper 1 (optional) | Nik picks | done 10-20 (replaced by annotator confirmation of adjudications, A8, `59c1074`) |
+| E-7 | Score, adjudicate, report (`RUNBOOK.md` steps 5-7) | Nik + Claude | done 10-20 (`326a8b8`, `59c1074`, `fefd544`; merged #43 `d3fb82c`; claims: `eval/blind_2026_10/report/CLAIMS.md`) |
 
 ### Release (Nik + Nik's Claude; these need credentials)
 | Ticket | What | Pri | Status |
@@ -72,7 +74,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 | O-9 | Rotate the `hive_ingest` DB password (it was printed in an agent session on 10-18) | P0 | done 10-18 (role, Render, `api/.env`, DSN file; new login verified) |
 | O-10 | Rotate the gswitch `FASTMCP_SERVER_AUTH_GOOGLE_JWT_SIGNING_KEY` (also printed 10-18); re-authorize the ChatGPT connector afterwards | P1 | Nik decides |
 | R-5 | Deploy W-1, W-5, W-6, O-3, O-8, W-7 (API first, then web), then a hosted smoke test | P1 | done 10-18: Render and Vercel at `edd95f5`; health, Home, Search, About and corpus stats checked |
-| O-7 | `UNPAYWALL_EMAIL` on Render | P1 | needs a team mailbox from Nik (still unset 10-18) |
+| O-7 | `UNPAYWALL_EMAIL` on Render | P1 | done 10-20 (set; hiveblotprod@gmail.com) |
 | O-6 | Record 1189 feedback: keep or delete | P2 | Nik decides (recommend keep) |
 | O-1 | Render paid plan | P2 | Nik decides (still free 10-18) |
 
@@ -80,10 +82,10 @@ benchmark measures commit `f77d311`, which is what production runs.
 | Ticket | What | Pri | Status |
 |---|---|---|---|
 | O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | done 10-19 (#22, `3a63c23`; 7 review items and 4 re-review items fixed; migration 012 applied; deployed) |
-| W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
-| B-14 | Unresolved target must set needs_review | P2 | covered by PR #24 (`4cbbaa8`); merge after E-7 |
-| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | draft PR #33 (17 rules, 175 tests); merge after E-7; Tanvi reviews tickets/b12-expected-mappings.md |
-| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | draft PR #32 (Northern/rRNA/stain classifier); merge after E-7, then re-extract gkag499 |
+| W-2 | Open the B-3 PR from `feature/saved-results` | P1 | done 10-20 (#24 merged; deployed `7e26710`) |
+| B-14 | Unresolved target must set needs_review | P2 | done 10-20 (in #24, `4cbbaa8`; deployed `7e26710`) |
+| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | done 10-20 (#33, 17 rules, 175 tests; deployed `7e26710`) |
+| B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | done 10-20 (#32; deployed `7e26710`; gkag499 reloaded, 506 to 171 rows) |
 | W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
 | O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
 | W-3 | Phone and Safari pass on the hosted site | P2 | done 10-19 (#34; WebKit phone/iPad/desktop pass, CSS fixes deployed; real-device Safari not tested) |
@@ -92,7 +94,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Tanvi (bio QA; no code)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| E-4 | Blind benchmark annotation (see P0) | P0 | todo, due Mon 10-20 12:00 PT |
+| E-4 | Blind benchmark annotation (see P0) | P0 | done 10-20 |
 | B-3 | Review "not stated" vs "not recovered" wording on PR #24 | P1 | after E-4 |
 | Q-1 | Sign off the 9 wave-1 pre-extracted papers | P1 | paused for E-4 (was due 10/14; no sign-off recorded) |
 | Q-2 | ImageJ spot-check of lane readouts, 10 panels | P2 | paused for E-4 (was due 10/16; nothing recorded) |
@@ -103,7 +105,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Yashvi (+ Claude)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| E-5 | Crop mapping for the benchmark (see P0) | P0 | todo, due Sun 10-19 21:00 PT |
+| E-5 | Crop mapping for the benchmark (see P0) | P0 | done 10-19 |
 | G-1 | Outreach and grants log on `yashvi-outreach` | P1 | todo (branch not pushed as of 10-18) |
 | G-2 | Email v2 plus spam check, for Nik's approval | P1 | no update since 10-11 (was due 10/13) |
 | G-3 | Batch 2: about 100 first authors, papers pre-extracted | P2 | after G-2 approved |
@@ -126,3 +128,13 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Parked (not this push)
 B-4 (scaffold landed, review pending), B-5, B-7, B-8, B-10, B-11, all of D-1 to D-7
 (see the status block in `densitometry.md`), and `journal-access-later.md`.
+
+### When work resumes
+1. Publish both Zenodo records (Nik).
+2. Re-extract the live papers with current code (B-12, B-13); only gkag499 is current.
+3. Retraction-check feature (HiveBlot extracted a retracted paper).
+4. Export, and explain "conflicting" (user feedback).
+5. Protein-identity coverage (canonical symbols often declined).
+6. Densitometry validation study (UCSF postdoc is open to it).
+7. Scorer lane alignment, physical vs sample lanes.
+8. Outreach batch 2 (G-2 to G-3) is on hold. Public claims use `eval/blind_2026_10/report/CLAIMS.md` only.
