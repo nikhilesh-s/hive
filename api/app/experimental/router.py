@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from ..auth import require_internal_key
 from ..config import settings
 from ..db import (
+    UploadCropHidden,
     count_live_rows,
     delete_live_job,
     fetch_live_crop,
@@ -38,16 +39,20 @@ router = APIRouter(prefix="/experimental", dependencies=[Depends(require_interna
 _spent: dict[str, tuple[str, int]] = {}
 
 
+def _daily_used(kind: str) -> int:
+    """Read-only: how much of `kind` was spent today (UTC)."""
+    today = datetime.now(timezone.utc).date().isoformat()
+    day, used = _spent.get(kind, (today, 0))
+    return used if day == today else 0
+
+
 def _spend_daily(kind: str, cap: int) -> None:
     """Global per-UTC-day ceiling on paid model work (429 once reached)."""
     # ponytail: in-process counter, resets on restart/deploy; count rows in the DB if restarts get frequent.
-    today = datetime.now(timezone.utc).date().isoformat()
-    day, used = _spent.get(kind, (today, 0))
-    if day != today:
-        used = 0
+    used = _daily_used(kind)
     if used >= cap:
         raise HTTPException(429, f"The beta's daily {kind} limit ({cap}) is reached. It resets at 00:00 UTC.")
-    _spent[kind] = (today, used + 1)
+    _spent[kind] = (datetime.now(timezone.utc).date().isoformat(), used + 1)
 
 
 class PaperSearchRequest(BaseModel):
@@ -286,7 +291,10 @@ async def live_crop(record_id: int = _RECORD_ID):
     row = await fetch_live_record(record_id)
     if row is None or not row.get("image_crop_ref"):
         raise HTTPException(404, "No figure crop for this record")
-    png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+    try:
+        png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+    except UploadCropHidden as e:
+        raise HTTPException(403, str(e)) from None
     if not png:
         raise HTTPException(404, "Crop not available")
     return Response(content=png, media_type="image/png")

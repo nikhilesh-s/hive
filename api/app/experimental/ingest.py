@@ -16,6 +16,8 @@ import asyncio
 import json
 import logging
 import os
+import shutil
+import subprocess
 import sys
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -103,6 +105,36 @@ def backend_ready() -> tuple[bool, str]:
     return llm_client.backend_status()
 
 
+# Uploaded PDFs are untrusted: render + OpenCV run in a child process with no
+# credentials in its environment, a CPU and wall-clock budget, and a per-file
+# size cap. Validation already capped pages and total pixels.
+UPLOAD_PREPROCESS_SECONDS = 900
+UPLOAD_MAX_FILE_BYTES = 512 * 1024 ** 2
+_PREPROCESS = r"""
+import resource, sys
+repo, pdf, doi, out_dir, cpu, fsize = sys.argv[1:7]
+resource.setrlimit(resource.RLIMIT_CPU, (int(cpu), int(cpu)))
+resource.setrlimit(resource.RLIMIT_FSIZE, (int(fsize), int(fsize)))
+sys.path.insert(0, repo)
+from western_blot_miner import pdf_preprocess
+pdf_preprocess.preprocess_pdf(pdf, paper_id=doi, out_dir=out_dir)
+"""
+
+
+def preprocess_upload(pdf_path: Path, doi: str, out_dir: Path) -> dict:
+    """pdf_preprocess.preprocess_pdf for an uploaded PDF, in a limited child.
+    The miner code and its behaviour for non-upload jobs are unchanged."""
+    try:
+        subprocess.run(
+            [sys.executable, "-I", "-c", _PREPROCESS, str(REPO), str(pdf_path), doi, str(out_dir),
+             str(UPLOAD_PREPROCESS_SECONDS), str(UPLOAD_MAX_FILE_BYTES)],
+            capture_output=True, check=True, timeout=UPLOAD_PREPROCESS_SECONDS,
+            env={"PATH": os.environ.get("PATH", "")})
+        return json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+    except (subprocess.SubprocessError, OSError, ValueError):
+        raise RuntimeError("Rendering the uploaded PDF failed or exceeded its time or size limits.") from None
+
+
 def run_dir_for(doi: str) -> Path:
     """Where pdf_preprocess writes this DOI's run (mirrors _safe_path_segment)."""
     import re
@@ -164,9 +196,10 @@ async def _set(job: Job, **fields) -> None:
     await _persist(job)
 
 
-async def run_job(job_id: str) -> Job:
+async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
     job = JOBS[job_id]
     loop = asyncio.get_running_loop()
+    upload_run_dir = PDF_DIR / "uploads" / job_id if uploaded_pdf else None
     try:
         prior = run_dir_for(job.doi) / "supabase_rows.json"
         if job.reuse and prior.exists():
@@ -183,13 +216,13 @@ async def run_job(job_id: str) -> Job:
         async with _SLOTS:
             # Metadata, relevance, and access are useful even when full text is
             # unavailable, so they deliberately run before any model work.
-            await _set(job, status="metadata", message="Fetching paper metadata…")
+            await _set(job, status="metadata", message="Using the supplied PDF…" if uploaded_pdf else "Fetching paper metadata…")
             seed = {
                 "title": job.title, "abstract": job.abstract, "authors": job.authors,
                 "journal": job.journal, "publication_year": job.publication_year,
                 "pmid": job.pmid, "pmcid": job.pmcid, "metadata_source": job.metadata_source,
             }
-            meta = await loop.run_in_executor(
+            meta = seed if uploaded_pdf else await loop.run_in_executor(
                 None, lambda: fulltext.paper_metadata(job.doi, seed=seed))
             meta_authors = meta.get("authors")
             if isinstance(meta_authors, list):
@@ -214,17 +247,17 @@ async def run_job(job_id: str) -> Job:
                 relevance_reason=relevance.get("relevance_reason"),
                 relevance_checked_at=_now(),
                 status="checking_access",
-                message="Checking open-access availability…",
+                message="Using supplied full text; access status is unverified." if uploaded_pdf else "Checking open-access availability…",
             )
 
-            access = await loop.run_in_executor(
+            access = {} if uploaded_pdf else await loop.run_in_executor(
                 None, lambda: fulltext.check_access(job.doi, pmcid=job.pmcid))
             await _set(
                 job,
                 access_status=access.get("access_status"),
                 access_url=access.get("access_url"),
                 access_source=access.get("access_source"),
-                access_checked_at=_now(),
+                access_checked_at=None if uploaded_pdf else _now(),
             )
 
             if job.access_status == "no_open_copy_found":
@@ -235,8 +268,8 @@ async def run_job(job_id: str) -> Job:
                 )
                 return job
 
-            await _set(job, status="fetching", message="Retrieving usable open-access full text…")
-            got = await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
+            await _set(job, status="fetching", message="Reading supplied full text…" if uploaded_pdf else "Retrieving usable open-access full text…")
+            got = {"pdf_path": str(uploaded_pdf)} if uploaded_pdf else await loop.run_in_executor(None, fulltext.fetch_pdf, job.doi, PDF_DIR)
             if not got.get("pdf_path"):
                 await _set(
                     job,
@@ -256,17 +289,23 @@ async def run_job(job_id: str) -> Job:
                 raise RuntimeError(why)
             job.backend = why
             await _set(job, pmcid=got.get("pmcid") or job.pmcid, pmid=got.get("pmid") or job.pmid,
-                       access_status="open_access",
+                       access_status=job.access_status if uploaded_pdf else "open_access",
                        access_source=job.access_source or got.get("source"),
-                       access_url=job.access_url or f"https://doi.org/{job.doi}",
+                       access_url=job.access_url if uploaded_pdf else job.access_url or f"https://doi.org/{job.doi}",
                        status="preprocessing",
                        message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
+            # Uploads get a per-job run dir (deleted below) so a user's copy never
+            # mixes with, or outlives, the DOI's shared pdf_runs directory. The
+            # DOI was already matched to the PDF's page text before the job existed.
             summary = await loop.run_in_executor(
-                None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
+                None, lambda: preprocess_upload(uploaded_pdf, job.doi, upload_run_dir) if uploaded_pdf
+                else pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
             n = summary.get("llm_candidate_count", 0)
             await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
                        message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
             rec = await loop.run_in_executor(None, lambda: pipeline.run_records_stage(summary, use_cache=False))
+            if uploaded_pdf and rec.get("failures"):
+                raise RuntimeError("One or more panel extractions failed. No partial upload results were stored; retry after checking the model service.")
             rows = json.loads(Path(rec["rows_path"]).read_text(encoding="utf-8"))
             await _set(job, records=rec.get("records"), rows=len(rows), status="loading",
                        message="Storing live rows and crops…")
@@ -276,6 +315,12 @@ async def run_job(job_id: str) -> Job:
     except Exception as exc:
         logger.exception("ingest job %s failed", job_id)
         await _set(job, status="failed", error=str(exc)[:500], message="Extraction failed")
+    finally:
+        if uploaded_pdf:
+            uploaded_pdf.unlink(missing_ok=True)
+            # Rendered pages, crops and page text are derivatives of a possibly
+            # paywalled copy: rows and crops are already in the DB by now.
+            shutil.rmtree(upload_run_dir, ignore_errors=True)
     return job
 
 
