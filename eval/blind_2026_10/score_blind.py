@@ -4,7 +4,7 @@
     # crops for the human mapper: images and page numbers only, no extracted values
     score_blind.py mapper-pack PRIVATE_DIR OUT_DIR
     # score the sealed outputs against the primary annotator (optionally with adjudications)
-    score_blind.py score PRIVATE_DIR --annotator tanvi [--adjudications FILE]
+    score_blind.py score PRIVATE_DIR --annotator tanvi [--adjudications FILE] [--aliases FILE] [--corrections FILE]
     # agreement between two annotators on the panels both fully annotated
     score_blind.py agreement --annotator tanvi --second NAME
     # synthetic self-check of the scoring logic (no data needed)
@@ -255,10 +255,11 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
         if cat in ("INCORRECT", "UNSUPPORTED"):
             cells.append({"panel_id": row["panel_id"], "row_order": row["row_order"],
                           "target_printed": row["target_printed"], "field": field,
-                          "lane_index": lane, "annotated": a, "system": s, "verdict": ""})
+                          "lane_index": lane, "annotated": a, "system": s, "category": cat, "verdict": ""})
 
-    def printed(r, row):
-        return label_key(r["target"].get("raw_target_name")) == label_key(row["target_printed"])
+    def printed(r, row):   # alias_label: annotator-confirmed second spelling of the printed label (A8)
+        keys = {label_key(row["target_printed"])} | ({label_key(row["alias_label"])} if row.get("alias_label") else set())
+        return label_key(r["target"].get("raw_target_name")) in keys
 
     def symbol(r, row):
         return symbols_match(sys_field(r, ["target", "canonical_target"])[0], row["gene_symbol"])
@@ -331,10 +332,67 @@ def apply_adjudication(rep: dict, verdicts: dict) -> dict:
     for c in rep["cells_to_adjudicate"]:
         key = (c["panel_id"], c["row_order"], c["field"], c["lane_index"])
         if verdicts.get(key) == "EQUIVALENT_NOTATION":
-            was = "INCORRECT" if adj[c["field"]]["INCORRECT"] and c["annotated"] and not silent(c["annotated"]) else "UNSUPPORTED"
+            was = c["category"]   # the cell's own category, not the field counter (A8)
             adj[c["field"]][was] -= 1
             adj[c["field"]]["CORRECT" if was == "INCORRECT" else "CORRECT_SILENCE"] += 1
     return {f: dict(c) for f, c in adj.items()}
+
+
+def _tkey(r: dict) -> tuple:
+    return r["paper_pmcid"], r["panel_id"], r["row_order"]
+
+
+def apply_aliases(targets: list[dict], lanes: list[dict], aliases: list[dict]) -> tuple[list, list]:
+    """Notation tier (A8), on copies of the locked labels. Per annotator-confirmed row:
+    alias_label = a second spelling of the printed label, used for alignment only;
+    alias_modification = the modification with the sites printed in the label written out;
+    alias_panel_id = the panel the row (and its lanes) belongs to (row filed under the wrong panel)."""
+    targets, lanes = [dict(t) for t in targets], [dict(l) for l in lanes]
+    for a in aliases:
+        hit = [r for r in targets if _tkey(r) == _tkey(a)]
+        if not hit:
+            raise SystemExit(f"alias matches no target row: {_tkey(a)}")
+        for t in hit:
+            t["alias_label"] = a.get("alias_label", "")
+            t["modification"] = a.get("alias_modification") or t["modification"]
+        if a.get("alias_panel_id"):
+            for r in hit + [l for l in lanes if _tkey(l) == _tkey(a)]:
+                r["panel_id"] = a["alias_panel_id"]
+    return targets, lanes
+
+
+def apply_corrections(targets, lanes, cmap_rows, corrections) -> tuple[list, list, list]:
+    """Label-correction tier (A8), on copies: values the annotator agreed were wrong after seeing system
+    output. field = a targets.csv column, 'band_call' (one lane; a corrected strip keeps one call per lane,
+    and 'set_aside' leaves a lane unscored) or 'crop_mapping' (crop_file -> mapping)."""
+    targets, cmap_rows = [dict(t) for t in targets], [dict(c) for c in cmap_rows]
+    lane_fix = {}
+    for c in corrections:
+        if c["field"] == "crop_mapping":
+            hit = [m for m in cmap_rows if (m["paper_pmcid"], m["crop_file"]) == (c["paper_pmcid"], c["crop_file"])]
+        elif c["field"] == "band_call":
+            lane_fix[_tkey(c) + (c["lane_index"],)] = c["corrected"]
+            continue
+        else:
+            hit = [t for t in targets if _tkey(t) == _tkey(c)]
+        if not hit:
+            raise SystemExit(f"correction matches nothing: {c}")
+        for h in hit:
+            h["mapping" if c["field"] == "crop_mapping" else c["field"]] = c["corrected"]
+    fixed_rows = {k[:3] for k in lane_fix}
+    out, seen = [], set()
+    for l in lanes:
+        k = _tkey(l) + (l["lane_index"],)
+        if k[:3] not in fixed_rows:
+            out.append(l)
+        elif k not in seen:
+            seen.add(k)
+            out.append({**l, "band_call": lane_fix.get(k, l["band_call"])})
+    for k, v in lane_fix.items():   # a lane the strip lacked (e.g. filed at the start of the next row)
+        if k not in seen:
+            out.append({"paper_pmcid": k[0], "panel_id": k[1], "row_order": k[2], "lane_index": k[3],
+                        "lane_label_printed": "", "band_call": v})
+    return targets, out, cmap_rows
 
 
 def metrics(c: dict) -> dict:
@@ -379,7 +437,18 @@ def verify_seal(private: Path) -> str:
     return "all sealed files match SEALED_OUTPUTS.sha256"
 
 
-def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None:
+TIERS = {
+    "a7_matching": "A7 matching only, no annotator verdicts (intermediate, for transparency)",
+    "adjudicated": "(ii) ADJUDICATED, HEADLINE: A7 matching + annotator-confirmed notation (aliases + EQUIVALENT_NOTATION)",
+    "label_corrected": "(iii) POST-HOC: (ii) + label corrections the annotator accepted after seeing system output",
+}
+COUNT_KEYS = ("panels_inventoried", "panels_found", "panels_fully_annotated", "target_rows_annotated", "records",
+              "incorrect_assertions", "spurious_records_not_wb", "spurious_records_unaligned",
+              "records_on_panels_missing_from_inventory", "records_unmapped", "duplicate_records", "verdicts_applied")
+
+
+def cmd_score(private: Path, annotator: str, adjudications: Path | None, aliases: Path | None,
+              corrections: Path | None) -> None:
     seal = verify_seal(private)
     code = subprocess.run(["git", "diff", "--stat", "f77d311", "--", "western_blot_miner", "api"],
                           cwd=HERE.parents[1], capture_output=True, text=True).stdout.strip()
@@ -388,95 +457,136 @@ def cmd_score(private: Path, annotator: str, adjudications: Path | None) -> None
     cmap = read_csv(HERE / "annotations" / "crop_map.csv")
     verdicts = {(r["paper_pmcid"], r["panel_id"], r["row_order"], r["field"], r["lane_index"]): r["verdict"].strip().upper()
                 for r in read_csv(adjudications)} if adjudications else {}
-    papers, pooled_raw, pooled_adj, cells = {}, defaultdict(Counter), defaultdict(Counter), []
-    totals = Counter()
+    al = read_csv(aliases) if aliases else []
+    co = read_csv(corrections) if corrections else []
+    tg2, ln2 = apply_aliases(tg, ln, al)
+    tg3, ln3, cmap3 = apply_corrections(tg, ln, cmap, co)   # corrections are keyed on the locked rows
+    tg3, ln3 = apply_aliases(tg3, ln3, al)
+    inputs = {"a7_matching": (tg, ln, cmap, {}), "adjudicated": (tg2, ln2, cmap, verdicts),
+              "label_corrected": (tg3, ln3, cmap3, verdicts)}
+    tiers = {k: {"label": TIERS[k], "papers": {}, "pooled": Counter(), "fields": defaultdict(Counter)} for k in inputs}
+    sheet, timing, matched = [], {}, set()
     for p in frozen_papers():
-        pick = lambda rows: [r for r in rows if r["paper_pmcid"] == p["pmcid"]]
-        rec_path = private / "runs" / p["pmcid"] / "evidence_records.json"
+        pmcid = p["pmcid"]
+        pick = lambda rows: [r for r in rows if r["paper_pmcid"] == pmcid]
+        rec_path = private / "runs" / pmcid / "evidence_records.json"
         records = json.loads(rec_path.read_text()) if rec_path.exists() else []
-        rep = score_paper(pick(inv), pick(tg), pick(ln), pick(cmap), records)
-        mine = {k[1:]: v for k, v in verdicts.items() if k[0] == p["pmcid"]}   # panel ids restart per paper
-        adj = apply_adjudication(rep, mine) if mine else rep["fields"]
-        timing = json.loads((private / "runs" / p["pmcid"] / "timing.json").read_text())
+        t = json.loads((private / "runs" / pmcid / "timing.json").read_text())
         manual = Counter()
         for r in pick(tl):
             manual[r["task"] or "logged"] += minutes(r["minutes"])
-        rep["timing"] = {"automated_seconds": round(timing.get("preprocess_seconds", 0) + timing.get("extract_seconds", 0), 1),
-                         "panels_sent_to_model": timing.get("panels_queried"),
-                         "manual_minutes": dict(manual)}
-        for c in rep.pop("cells_to_adjudicate"):
-            cells.append({"paper_pmcid": p["pmcid"], **c})
-        for f in FIELDS:
-            pooled_raw[f].update(rep["fields"][f])
-            pooled_adj[f].update(adj[f])
-        for k in ("panels_inventoried", "panels_found", "panels_fully_annotated", "target_rows_annotated",
-                  "records", "incorrect_assertions", "spurious_records_not_wb", "spurious_records_unaligned",
-                  "records_on_panels_missing_from_inventory", "records_unmapped", "duplicate_records"):
-            totals[k] += rep.get(k, 0)
-        totals["automated_seconds"] += rep["timing"]["automated_seconds"]
-        totals["panels_sent_to_model"] += rep["timing"]["panels_sent_to_model"] or 0
-        totals["manual_full_minutes"] += sum(manual.values())
-        rep["metrics_raw"] = {f: metrics(rep["fields"][f]) for f in FIELDS}
-        rep["metrics_adjudicated"] = {f: metrics(adj[f]) for f in FIELDS}
-        papers[p["pmcid"]] = rep
+        timing[pmcid] = {"automated_seconds": round(t.get("preprocess_seconds", 0) + t.get("extract_seconds", 0), 1),
+                         "panels_sent_to_model": t.get("panels_queried") or 0, "manual_minutes": dict(manual)}
+        for name, (T, L, C, V) in inputs.items():
+            rep = score_paper(pick(inv), pick(T), pick(L), pick(C), records)
+            cells = rep["cells_to_adjudicate"]
+            mine = {k[1:]: v for k, v in V.items() if k[0] == pmcid}   # panel ids restart per paper
+            hits = [c for c in cells if mine.get((c["panel_id"], c["row_order"], c["field"], c["lane_index"])) == "EQUIVALENT_NOTATION"]
+            if name == "adjudicated":
+                sheet += [{"paper_pmcid": pmcid, **c} for c in cells]
+                matched |= {(pmcid, c["panel_id"], c["row_order"], c["field"], c["lane_index"]) for c in hits}
+            fields = apply_adjudication(rep, mine) if mine else rep["fields"]
+            rep.pop("cells_to_adjudicate")
+            rep["fields_before_verdicts"], rep["fields"] = rep["fields"], fields
+            rep["verdicts_applied"] = len(hits)
+            rep["incorrect_assertions"] = (sum(fields[f].get("INCORRECT", 0) + fields[f].get("UNSUPPORTED", 0) for f in FIELDS)
+                                           + rep.get("spurious_records_not_wb", 0) + rep.get("spurious_records_unaligned", 0))
+            rep["metrics"] = {**{f: metrics(fields[f]) for f in FIELDS},
+                              "ALL FIELDS": metrics(sum((Counter(fields[f]) for f in FIELDS), Counter()))}
+            tiers[name]["papers"][pmcid] = rep
+            for k in COUNT_KEYS:
+                tiers[name]["pooled"][k] += rep.get(k, 0)
+            for f in FIELDS:
+                tiers[name]["fields"][f].update(fields[f])
+    unmatched = [k for k, v in verdicts.items() if v == "EQUIVALENT_NOTATION" and k not in matched]
+    if unmatched:
+        raise SystemExit(f"adjudication verdicts that match no INCORRECT/UNSUPPORTED cell: {unmatched[:5]}")
+    for tier in tiers.values():
+        f = tier.pop("fields")
+        tier["pooled"] = dict(tier["pooled"])
+        tier["metrics"] = {**{k: metrics(f[k]) for k in FIELDS}, "ALL FIELDS": metrics(sum(f.values(), Counter()))}
+    auto = sum(t["automated_seconds"] for t in timing.values())
+    sent = sum(t["panels_sent_to_model"] for t in timing.values())
+    manual_total = sum(sum(t["manual_minutes"].values()) for t in timing.values())
+    labeled = tiers["a7_matching"]["pooled"]["panels_fully_annotated"]   # panels in the locked labels
+    raw = json.loads((HERE / "report" / "raw_preregistered" / "results.json").read_text())
+    result = {"annotator": annotator, "seal_check": seal, "frozen_code_diff_vs_f77d311": code or "none",
+              "inputs": {"adjudications": adjudications.name if adjudications else None,
+                         "equivalent_notation_verdicts": sum(v == "EQUIVALENT_NOTATION" for v in verdicts.values()),
+                         "aliases": len(al), "corrections": len(co)},
+              "timing": {"papers": timing, "automated_seconds": round(auto, 1), "panels_sent_to_model": sent,
+                         "automated_seconds_per_panel_sent": round(auto / sent, 1) if sent else None,
+                         "manual_minutes": round(manual_total, 2), "panels_labeled": labeled,
+                         "manual_minutes_per_labeled_panel": round(manual_total / labeled, 1) if labeled else None},
+              "raw_preregistered": {"source": "report/raw_preregistered/results.json", "pooled": raw["pooled"],
+                                    "metrics": raw["pooled_metrics_raw"]},
+              "tiers": tiers}
     out = HERE / "report"
-    out.mkdir(exist_ok=True)
-    result = {"annotator": annotator, "seal_check": seal,
-              "frozen_code_diff_vs_f77d311": code or "none",
-              "papers": papers, "pooled": dict(totals),
-              "pooled_metrics_raw": {**{f: metrics(pooled_raw[f]) for f in FIELDS},
-                                     "ALL FIELDS": metrics(sum(pooled_raw.values(), Counter()))},
-              "pooled_metrics_adjudicated": {**{f: metrics(pooled_adj[f]) for f in FIELDS},
-                                             "ALL FIELDS": metrics(sum(pooled_adj.values(), Counter()))},
-              "adjudicated": bool(verdicts)}
     (out / "results.json").write_text(json.dumps(result, indent=2) + "\n")
-    with (out / "adjudication_sheet.csv").open("w", newline="") as f:
+    with (out / "adjudication_sheet.csv").open("w", newline="") as fh:
         cols = ["paper_pmcid", "panel_id", "row_order", "target_printed", "field", "lane_index",
-                "annotated", "system", "verdict"]
-        w = csv.DictWriter(f, fieldnames=cols)
+                "annotated", "system", "category", "verdict"]
+        w = csv.DictWriter(fh, fieldnames=cols)
         w.writeheader()
-        w.writerows(cells)
+        w.writerows(sheet)
     (out / "RESULTS.md").write_text(render(result))
     print((out / "RESULTS.md").read_text())
 
 
+def _table(metrics_by_field: dict) -> list[str]:
+    lines = ["| Field | Accuracy (coverage) | Precision of assertions | Abstained | Not found | Unsupported |",
+             "|---|---|---|---|---|---|"]
+    for f, m in metrics_by_field.items():
+        lines.append(f"| {f} | {m['accuracy']} | {m['precision_of_assertions']} | {m['abstained']} | "
+                     f"{m['not_found']} | {m['unsupported_assertions']} |")
+    return lines + [""]
+
+
 def render(r: dict) -> str:
-    t = r["pooled"]
     pr = lambda a, b: f"{a}/{b} ({a / b:.0%})" if b else "n/a"
+    tm, tiers, raw = r["timing"], r["tiers"], r["raw_preregistered"]
+    head = tiers["adjudicated"]
+    n = len(head["papers"])
     lines = ["# Blind benchmark results (generated by score_blind.py; do not edit by hand)", "",
-             f"- Papers: {len(r['papers'])}. Annotator: {r['annotator']}. Adjudicated: {r['adjudicated']}.",
+             f"- Papers: {n}. Annotator: {r['annotator']}.",
              f"- Integrity: {r['seal_check']}. System code diff vs f77d311: {r['frozen_code_diff_vs_f77d311']}.",
-             f"- Panel recall (all inventoried Western-blot panels): {pr(t['panels_found'], t['panels_inventoried'])}.",
-             f"- Fully annotated: {t['panels_fully_annotated']} panels, {t['target_rows_annotated']} target rows.",
-             f"- Incorrect assertions (wrong values + unsupported values + spurious records): {t['incorrect_assertions']}"
-             f" (spurious: {t['spurious_records_not_wb']} on non-Western crops, {t['spurious_records_unaligned']} unaligned).",
-             f"- Records on panels missing from the inventory (not counted against the system): "
-             f"{t['records_on_panels_missing_from_inventory']}. Unmapped records: {t['records_unmapped']}. "
-             f"Duplicate records from overlapping crops (not scored, not counted as errors): {t['duplicate_records']}.",
-             f"- Automated time: {t['automated_seconds'] / 60:.1f} min for {t['panels_sent_to_model']} panels sent to the model."
-             f" Manual full annotation: {t['manual_full_minutes']:.0f} min for {t['panels_fully_annotated']} panels.",
-             f"- Lane calls unscored because annotator and system counted lanes differently (A7): "
-             f"{r['pooled_metrics_raw'].get('band_call', {}).get('LANE_COUNT_MISMATCH', 0)}.",
-             "", f"This is {len(r['papers'])} papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.", ""]
-    for label, key in (("Raw", "pooled_metrics_raw"), ("Adjudicated", "pooled_metrics_adjudicated")):
-        lines += [f"## Pooled, {label.lower()}", "",
-                  "| Field | Accuracy | Precision of assertions | Abstained | Not found | Unsupported |",
-                  "|---|---|---|---|---|---|"]
-        for f, m in r[key].items():
-            lines.append(f"| {f} | {m['accuracy']} | {m['precision_of_assertions']} | {m['abstained']} | "
-                         f"{m['not_found']} | {m['unsupported_assertions']} |")
-        lines.append("")
-    lines += ["## Per paper (raw)", ""]
-    for pmcid, p in r["papers"].items():
-        lines.append(f"### {pmcid}: panel recall {pr(p['panels_found'], p['panels_inventoried'])}, "
-                     f"{p['records']} records, {p['incorrect_assertions']} incorrect assertions, "
-                     f"automated {p['timing']['automated_seconds']} s, manual {p['timing']['manual_minutes']}")
-        lines.append("")
-        lines.append("| Field | Accuracy | Precision | Abstained | Not found |")
-        lines.append("|---|---|---|---|---|")
-        for f, m in p["metrics_raw"].items():
-            lines.append(f"| {f} | {m['accuracy']} | {m['precision_of_assertions']} | {m['abstained']} | {m['not_found']} |")
-        lines.append("")
+             f"- Inputs: {r['inputs']['equivalent_notation_verdicts']} EQUIVALENT_NOTATION verdicts "
+             f"({r['inputs']['adjudications']}), {r['inputs']['aliases']} notation aliases, "
+             f"{r['inputs']['corrections']} label corrections (tier iii only). Locked label files are not edited.",
+             f"- Panel recall: {pr(head['pooled']['panels_found'], head['pooled']['panels_inventoried'])} of the panels "
+             "the annotator chose to inventory had a crop sent to the model. The inventory is a partial, annotator-selected "
+             "list (DEVIATIONS A5/A6), so this is not literature-level recall and not a sample estimate.",
+             f"- Timing (different tasks, different units): manual labeling {tm['manual_minutes']:.0f} min for "
+             f"{tm['panels_labeled']} labeled panels = {tm['manual_minutes_per_labeled_panel']} min per labeled panel "
+             "(time log does not separate inventory from full annotation). Automated: "
+             f"{tm['automated_seconds'] / 60:.1f} min wall-clock (Stage 1 + model) for {tm['panels_sent_to_model']} "
+             f"panels sent to the model = {tm['automated_seconds_per_panel_sent']} s per panel sent. A human labels a panel "
+             "the human chose; the system processes every crop it detects, including non-target ones.",
+             "", f"This is {n} papers and {tm['panels_labeled']} labeled panels from a deliberately diverse candidate "
+             "pool, against one annotator. It is not a literature-wide accuracy figure.", "",
+             "## (i) Pre-registered raw (frozen in report/raw_preregistered/, not re-run)", "",
+             f"Incorrect assertions: {raw['pooled']['incorrect_assertions']} (spurious: "
+             f"{raw['pooled']['spurious_records_not_wb']} on non-Western crops, {raw['pooled']['spurious_records_unaligned']} unaligned).", ""]
+    lines += _table(raw["metrics"])
+    for key in ("a7_matching", "adjudicated", "label_corrected"):
+        t = tiers[key]
+        c = t["pooled"]
+        lines += [f"## {t['label']}", "",
+                  f"Fully annotated panels: {c['panels_fully_annotated']}, target rows: {c['target_rows_annotated']}. "
+                  f"EQUIVALENT_NOTATION verdicts applied: {c['verdicts_applied']}. Incorrect assertions: "
+                  f"{c['incorrect_assertions']} (spurious: {c['spurious_records_not_wb']} on non-Western crops, "
+                  f"{c['spurious_records_unaligned']} unaligned). Lane calls unscored for a lane-count mismatch (A7): "
+                  f"{t['metrics']['band_call']['LANE_COUNT_MISMATCH']}. Records on panels missing from the inventory "
+                  f"(not scored): {c['records_on_panels_missing_from_inventory']}.", ""]
+        lines += _table(t["metrics"])
+    for key in ("adjudicated", "label_corrected"):
+        lines += [f"## Per paper, {key.replace('_', ' ')}", ""]
+        for pmcid, p in tiers[key]["papers"].items():
+            tp = tm["papers"][pmcid]
+            lines += [f"### {pmcid}: panel recall {pr(p['panels_found'], p['panels_inventoried'])}, {p['records']} records, "
+                      f"{p['incorrect_assertions']} incorrect assertions, automated {tp['automated_seconds']} s for "
+                      f"{tp['panels_sent_to_model']} panels, manual {tp['manual_minutes'] or 'logged under another paper'}", ""]
+            lines += _table(p["metrics"])
     return "\n".join(lines) + "\n"
 
 
@@ -558,6 +668,43 @@ def self_test() -> None:
     assert minutes("1:32 hour") == 92 and minutes("31.49 minutes") == 31.49 and minutes("1.5 h") == 90
     assert label_key("LC3B (14 kDa)") == label_key("LC3B") and label_key("GAPDH 37kD") == "gapdh"
     assert annotated_mod("none")[0] == "total"
+    # A8: a misread label (SOSTMI) and a row filed under the wrong panel stay NOT_FOUND until an annotator-confirmed
+    # alias aligns them; the field is still scored against the locked label (verdicts are separate); corrections are separate
+    P = lambda **k: {"paper_pmcid": "P", **k}
+    inv8 = [{"panel_id": "1", "figure": "1", "panel_letter": "A"}, {"panel_id": "2", "figure": "1", "panel_letter": "B"}]
+    tg8 = [P(panel_id="1", row_order="1", target_printed="SOSTMI", gene_symbol="SOSTMI", modification="phosphorylation",
+             cell_line_or_sample="HeLa", treatments="none"),
+           P(panel_id="1", row_order="2", target_printed="GAPDH", gene_symbol="GAPDH", modification="total",
+             cell_line_or_sample="HeLa", treatments="none")]
+    ln8 = [P(panel_id="1", row_order="1", lane_index="1", band_call="absent"),
+           P(panel_id="1", row_order="1", lane_index="1", band_call="absent"),   # same lane entered twice
+           P(panel_id="1", row_order="2", lane_index="1", band_call="present")]
+    cm8 = [P(crop_file="a.png", figure="1", panel_letters="A", mapping=""),
+           P(crop_file="b.png", figure="1", panel_letters="B", mapping=""),
+           P(crop_file="z.png", figure="", panel_letters="", mapping="NOT_WB")]
+    recs8 = [rec("SQSTM1 62 kDa", "SQSTM1", "HeLa", "staurosporine", "phosphorylation", "Ser", 403, crop="a.png", bands=("present",)),
+             rec("GAPDH", "GAPDH", "HeLa", None, crop="b.png", bands=("present",)),
+             rec("GAPDH", "GAPDH", "HeLa", None, crop="z.png")]
+    al8 = [P(panel_id="1", row_order="1", alias_label="SQSTM1", alias_modification="phospho:Ser403"),
+           P(panel_id="1", row_order="2", alias_panel_id="2")]
+    base = score_paper(inv8, tg8, ln8, cm8, recs8)
+    assert base["fields"]["protein_identity"] == {"NOT_FOUND": 2}, base
+    t8, l8 = apply_aliases(tg8, ln8, al8)
+    assert tg8[0]["modification"] == "phosphorylation" and ln8[2]["panel_id"] == "1"   # locked labels untouched
+    ali = score_paper(inv8, t8, l8, cm8, recs8)
+    f = ali["fields"]
+    assert f["protein_identity"] == {"INCORRECT": 1, "CORRECT": 1} and f["phospho_site"] == {"CORRECT": 1}, f
+    assert f["treatment"] == {"UNSUPPORTED": 1, "CORRECT_SILENCE": 1} and f["band_call"] == {"INCORRECT": 2, "CORRECT": 1}, f
+    assert apply_adjudication(ali, {("1", "1", "protein_identity", ""): "EQUIVALENT_NOTATION"})["protein_identity"]["CORRECT"] == 2
+    co8 = [P(panel_id="1", row_order="1", field="treatments", lane_index="", corrected="staurosporine"),
+           P(panel_id="1", row_order="1", field="band_call", lane_index="1", corrected="present"),
+           P(panel_id="", row_order="", field="crop_mapping", lane_index="", crop_file="z.png", corrected="WB_NOT_IN_INVENTORY")]
+    t9, l9, c9 = apply_corrections(tg8, ln8, cm8, co8)
+    t9, l9 = apply_aliases(t9, l9, al8)
+    cor = score_paper(inv8, t9, l9, c9, recs8)
+    assert cor["fields"]["treatment"] == {"CORRECT": 1, "CORRECT_SILENCE": 1}, cor
+    assert cor["fields"]["band_call"] == {"CORRECT": 2}, cor                      # duplicate lane kept once
+    assert (base["spurious_records_not_wb"], cor.get("spurious_records_not_wb", 0), cor["records_on_panels_missing_from_inventory"]) == (1, 0, 1)
     print("self-test passed")
 
 
@@ -567,13 +714,14 @@ if __name__ == "__main__":
     m = sub.add_parser("mapper-pack"); m.add_argument("private", type=Path); m.add_argument("out", type=Path)
     s = sub.add_parser("score"); s.add_argument("private", type=Path); s.add_argument("--annotator", required=True)
     s.add_argument("--adjudications", type=Path)
+    s.add_argument("--aliases", type=Path); s.add_argument("--corrections", type=Path)
     g = sub.add_parser("agreement"); g.add_argument("--annotator", required=True); g.add_argument("--second", required=True)
     sub.add_parser("self-test")
     a = ap.parse_args()
     if a.cmd == "mapper-pack":
         cmd_mapper_pack(a.private, a.out)
     elif a.cmd == "score":
-        cmd_score(a.private, a.annotator, a.adjudications)
+        cmd_score(a.private, a.annotator, a.adjudications, a.aliases, a.corrections)
     elif a.cmd == "agreement":
         cmd_agreement(a.annotator, a.second)
     else:

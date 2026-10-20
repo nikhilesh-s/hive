@@ -1,0 +1,38 @@
+paper_pmcid,panel_id,row_order,field,lane_index,target_printed,annotated,system,verdict,confirmation_row
+PMC9283986,2,1,cell_line,,PAKT (Ser473),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,2,cell_line,,AKT total,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,3,cell_line,,GAPDH,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,4,cell_line,,pGSK3a/B(Ser21/Ser9),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,5,cell_line,,total GSK3a/B.,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,7,cell_line,,pERK1/2(Thr202/Tyr204),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,2,8,cell_line,,total ERK1/2 —,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,1,cell_line,,ptau (Thr231),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,2,cell_line,,GAPDH,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,3,cell_line,,ptau (Thr181),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,4,cell_line,,ptau (Ser396-Ser404),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,5,cell_line,,ptau (Ser202-Ser205),"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,6,cell_line,,total tau,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,3,8,cell_line,,APP,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,4,1,cell_line,,HSP90,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,4,2,cell_line,,GAPDH,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,4,3,cell_line,,HSP70,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC9283986,4,5,cell_line,,HSP60,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,EQUIVALENT_NOTATION,15
+PMC7948984,1,1,protein_identity,,AIF,AIF,AIFM1,EQUIVALENT_NOTATION,9
