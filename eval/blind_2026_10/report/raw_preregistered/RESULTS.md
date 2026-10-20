@@ -68,4 +68,3 @@ This is 3 papers drawn from a deliberately diverse candidate pool. It is not a l
 | cell_line | 0/2 (0%) | n/a (0) | 0/2 (0%) | 2/2 (100%) |
 | treatment | n/a (0) | n/a (0) | n/a (0) | n/a (0) |
 | band_call | 0/8 (0%) | n/a (0) | 0/8 (0%) | 8/8 (100%) |
-

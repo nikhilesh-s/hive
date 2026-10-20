@@ -587,7 +587,7 @@ def render(r: dict) -> str:
                       f"{p['incorrect_assertions']} incorrect assertions, automated {tp['automated_seconds']} s for "
                       f"{tp['panels_sent_to_model']} panels, manual {tp['manual_minutes'] or 'logged under another paper'}", ""]
             lines += _table(p["metrics"])
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines).rstrip("\n") + "\n"
 
 
 def cmd_agreement(a: str, b: str) -> None:
