@@ -7,6 +7,22 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Srushti's tickets finished by agents; deploy at 363f19e (2026-10-19)
+
+- **Merged and deployed** (Render and Vercel at `363f19e`):
+  - O-2 upload (#22, migration 012 applied). Security fixes: page, area and pixel caps; parsing
+    and rendering in a limited child process; quotas; DOI must appear on page 1; audit columns;
+    cleanup; crops of unverified uploads hidden.
+  - W-3 phone/WebKit CSS pass (#34).
+  - W-4: ingest derives metadata server-side (#35).
+  - Smoke test: pages 200, upload/ingest without access 401, counts 3/93/475.
+- **Held until the benchmark is scored (E-7):** B-3 #24, B-13 #32, B-12 #33. All three touch the
+  biology code, so merge them one at a time.
+- **Release prep:** PR #31 (draft): MIT license, CITATION.cff, public README, Zenodo archive
+  script. It needs the author list and the teammates' MIT consent. Nik uploads to Zenodo.
+- **Benchmark:** outputs sealed (`b0174f7`); scorer hardened (A3, `e79417a`). Waiting on Yashvi's
+  crop map (Mon 21:00) and Tanvi's labels (Tue 12:00).
+
 ## O-2 security review fixed (2026-10-19)
 
 Branch `o-2-pdf-upload` (PR #22), merged with main, review items 1-7 fixed; latest

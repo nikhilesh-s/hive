@@ -3,6 +3,21 @@
 Dated updates from the team, newest first. Facts only: who did what, when, and what is open.
 Tickets live in [`README.md`](README.md).
 
+## 2026-10-19
+
+- **Srushti**: no response since 10-14. Her tickets were taken over by agents, with Nik's OK:
+  - O-2: the security review fixes were re-reviewed, then merged and deployed.
+  - W-3 and W-4: merged and deployed.
+  - B-12 and B-13: draft PRs on hold until the benchmark is scored.
+- **Yashvi**: on 10-18 she pushed G-1 (outreach log and grants list) and G-2 (email v2 draft) to
+  `yashvi-outreach`. Claude made two honesty fixes to v2; mail-tester scores and Nik's approval
+  are next. Crop map due Mon 10-19 21:00.
+- **Tanvi**: benchmark labels tonight per Nik (due Tue 10-20 12:00).
+- **Release prep**: PR #31 (draft) adds the MIT license, CITATION.cff, a public README and a
+  Zenodo archive script. Before it merges, Nik needs to confirm the author list and get each
+  teammate's OK to release under MIT.
+- **Deploys**: Render and Vercel are at `363f19e`. Migration 012 is applied.
+
 ## 2026-10-18
 
 - **Priority change**: the blind extraction benchmark (P0, E-1 to E-7) comes before every other
