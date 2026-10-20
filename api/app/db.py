@@ -3,7 +3,7 @@ import asyncio
 import json
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 from urllib.parse import urlencode
 from urllib.error import HTTPError
@@ -80,7 +80,9 @@ def _supabase_write(
 
 
 def _pg_in(values: list[object]) -> str:
-    return f"in.({','.join(str(v) for v in values)})"
+    # Double-quote each value so commas/parentheses in DOIs or keys stay literal.
+    quoted = (str(v).replace("\\", "\\\\").replace('"', '\\"') for v in values)
+    return "in.(" + ",".join(f'"{v}"' for v in quoted) + ")"
 
 
 def _norm_doi(value: object) -> str | None:
@@ -90,6 +92,19 @@ def _norm_doi(value: object) -> str | None:
 
 def _norm_query(value: object) -> str:
     return " ".join(str(value or "").strip().lower().split())
+
+
+def _ts(value: object) -> datetime:
+    """Parse a datetime or ISO string to an aware UTC datetime (None/garbage sorts oldest)."""
+    oldest = datetime.min.replace(tzinfo=timezone.utc)
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return oldest
+    if not isinstance(value, datetime):
+        return oldest
+    return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
 def _iso(value: object) -> str | None:
@@ -155,6 +170,7 @@ async def run_readonly_query(sql: str) -> list[dict]:
 
 
 INGEST_PAPER_FLAG_COLUMNS = (
+    "job_id",
     "doi",
     "access_status",
     "access_url",
@@ -194,21 +210,15 @@ def _paper_flags_from_job(job: dict, query: str) -> dict | None:
     return flags or None
 
 
-def _job_sort_key(job: dict) -> tuple[bool, str, str]:
-    return (
-        bool(job.get("access_status") or job.get("relevance_status")),
-        str(job.get("updated_at") or ""),
-        str(job.get("created_at") or ""),
-    )
-
-
 async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
-    """Attach DOI-level ingest_jobs access/relevance metadata to reviewed rows.
+    """Attach DOI-level ingest_jobs access/relevance metadata to evidence rows.
 
     Access is paper-level and can be shown for any DOI match. Relevance is
     query-dependent and is only shown when the ingest job's discovery_query
     matches the current search query after simple whitespace/case normalization.
     """
+    for row in rows:
+        row["paper_flags"] = {"access_status": "unknown"}
     original_dois = sorted({str(row.get("doi")).strip() for row in rows if str(row.get("doi") or "").strip()})
     dois = sorted({_norm_doi(doi) for doi in original_dois if _norm_doi(doi)})
     if not dois:
@@ -230,7 +240,7 @@ async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
             async with pool.acquire() as conn:
                 fetched = await conn.fetch(
                     f"SELECT {', '.join(INGEST_PAPER_FLAG_COLUMNS)} "
-                    "FROM ingest_jobs WHERE lower(doi) = ANY($1::text[])",
+                    "FROM ingest_jobs WHERE lower(trim(doi)) = ANY($1::text[])",
                     dois,
                 )
             jobs = [dict(row) for row in fetched]
@@ -244,18 +254,27 @@ async def attach_paper_flags(rows: list[dict], query: str) -> list[dict]:
         if doi:
             by_doi.setdefault(doi, []).append(job)
 
-    for matches in by_doi.values():
-        matches.sort(key=_job_sort_key, reverse=True)
-
     for row in rows:
         doi = _norm_doi(row.get("doi"))
         if not doi:
             continue
-        for job in by_doi.get(doi, []):
-            flags = _paper_flags_from_job(job, query)
-            if flags:
-                row["paper_flags"] = flags
-                break
+        matches = by_doi.get(doi, [])
+        # Access and relevance can be recorded by different runs. A newer
+        # relevance-only job must not hide a previously recorded access check.
+        # Only a job whose check actually ran (checked_at set) may supply a
+        # label; unverified caller-supplied values stay "Access unknown".
+        for kind in ("access", "relevance"):
+            eligible = [job for job in matches if job.get(f"{kind}_status") and job.get(f"{kind}_checked_at") and (
+                kind == "access" or _norm_query(job.get("discovery_query")) == _norm_query(query))]
+            if not eligible:
+                continue
+            latest = max(eligible, key=lambda job: (
+                _ts(job.get(f"{kind}_checked_at")), str(job.get("job_id") or "")))
+            flags = _paper_flags_from_job(latest, query) or {}
+            row["paper_flags"].update({k: v for k, v in flags.items() if k.startswith(f"{kind}_")})
+        if row["paper_flags"].get("access_status") not in {"open_access", "no_open_copy_found", "unknown"}:
+            row["paper_flags"] = {k: v for k, v in row["paper_flags"].items() if not k.startswith("access_")}
+            row["paper_flags"]["access_status"] = "unknown"
     return rows
 
 
@@ -631,15 +650,16 @@ async def fetch_live_record(record_id: int) -> dict | None:
 async def lookup_live_paper(doi: str) -> dict:
     """Exact DOI read through the existing beta-wide readonly role.
 
-    A completed run, rather than a discovery hit or an in-progress job, is
-    required. Do not use the capped search path: it can drop partial experiments.
+    Found means live rows exist for the DOI; the job row only adds the original
+    query and may be missing (manual loads, failed best-effort persist). Do not
+    use the capped search path: it can drop partial experiments.
     """
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             f"SELECT r.*, j.discovery_query AS original_query, j.title AS stored_title "
-            f"FROM {settings.live_table_name} r JOIN ingest_jobs j ON j.job_id = r.job_id "
-            "WHERE lower(r.doi) = $1 AND j.status = 'done' ORDER BY r.id", doi)
+            f"FROM {settings.live_table_name} r LEFT JOIN ingest_jobs j ON j.job_id = r.job_id "
+            "WHERE lower(r.doi) = $1 ORDER BY r.id", doi)
         if rows:
             results = [dict(row) for row in rows]
             original_query = results[0].pop("original_query", None)
@@ -655,9 +675,10 @@ async def lookup_live_paper(doi: str) -> dict:
                     for r in results}),
             }, "results": results}
         job = await conn.fetchrow(
-            "SELECT status FROM ingest_jobs WHERE lower(doi) = $1 "
-            "ORDER BY created_at DESC LIMIT 1", doi)
-    pending = job and job["status"] not in {"done", "failed", "awaiting_full_text"}
+            "SELECT status, updated_at > now() - interval '30 minutes' AS fresh "
+            "FROM ingest_jobs WHERE lower(doi) = $1 ORDER BY created_at DESC LIMIT 1", doi)
+    # A restart leaves `extracting` forever (jobs run in-process); old ones are not pending.
+    pending = job and job["fresh"] and job["status"] not in {"done", "failed", "awaiting_full_text"}
     return {"status": "pending" if pending else "not_extracted", "doi": doi,
             "paper": None, "results": []}
 

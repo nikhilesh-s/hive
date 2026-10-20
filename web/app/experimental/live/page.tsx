@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
-import { jobFinished } from '@/lib/ingestJob';
+import { jobFinished, POLL_LIMIT_MS, pollBackoffMs, transientPoll } from '@/lib/ingestJob';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -58,6 +58,8 @@ export default function LivePage() {
   // with; a newer one bumps it, so a late search response never overwrites newer rows.
   const seq = useRef(0);
   const pollFails = useRef(0);
+  const throttles = useRef(0); // consecutive 429/503 polls; these never count toward pollFails
+  const waitUntil = useRef(0);
 
   useEffect(() => {
     fetch('/api/experimental/status').then((r) => r.json()).then(setStatus).catch(() => setStatus(null));
@@ -69,13 +71,23 @@ export default function LivePage() {
     const started = Date.parse(job.created_at);
     const id = window.setInterval(async () => {
       setElapsed(Math.round((Date.now() - started) / 1000));
+      if (Date.now() < waitUntil.current) return; // backing off after a 429/503
       let j: Job | null = null;
       let fail = 'backend unreachable';
+      let wait: number | null = null;
       try {
         const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
         if (r.ok) j = await r.json();
+        else if (transientPoll(r.status)) wait = pollBackoffMs(throttles.current, r.headers.get('Retry-After'));
         else fail = r.status === 404 ? 'the job no longer exists (the API may have restarted)' : `backend returned ${r.status}`;
       } catch { /* fail stays 'backend unreachable' */ }
+      if (wait !== null) {
+        if (Date.now() - started > POLL_LIMIT_MS) setJob((cur) => cur && { ...cur, status: 'failed', error: 'Lost track of this job: the backend kept asking us to slow down for 20 minutes.' });
+        else { throttles.current++; waitUntil.current = Date.now() + wait; }
+        return;
+      }
+      throttles.current = 0;
+      waitUntil.current = 0;
       if (!j) {
         // a 404 is final; ride out a transient 502 / network blip for ~10 s before giving up
         if (fail.startsWith('backend') && ++pollFails.current < 5) return;
