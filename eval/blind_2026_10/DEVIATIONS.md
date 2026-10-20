@@ -88,3 +88,16 @@ outputs were not opened. These are general bookkeeping fixes, not tuning:
 Self-test cases were added for 1-3. The dry run exercised the seal check, the crop-map join,
 panel recall, the report and adjudication (raw 3/4 → adjudicated 4/4 on an injected notation
 mismatch).
+
+## A4. 2026-10-19: retracted paper excluded; benchmark is 3 papers
+
+During annotation, Tanvi found a RETRACTED watermark on draw rank 2 (PMC5328321, Yang et al.
+2017, Onco Targets Ther). The eligibility rule in section 3 excludes retracted papers. The
+candidate file had not flagged it, so it was drawn by mistake.
+- **Exclusion.** It is excluded on that rule. The decision was made before any scoring; its
+  sealed outputs were never opened and are not scored.
+- **No replacement.** Section 4 would take the next paper in draw order (rank 5, PMC12022650).
+  It was not added, because of annotator time before the deadline. The benchmark therefore has
+  **3 papers** (ranks 1, 3 and 4) instead of 4.
+- **What this changes.** The sample is smaller and the denominators will show it. Neither
+  decision depended on any result.

@@ -113,7 +113,7 @@
         "publisher_landing"
       ],
       "acquired_by": "system fetcher (publisher_landing)",
-      "status": "frozen",
+      "status": "excluded_retracted",
       "pdf_sha256": "51fda4be9f0107d0dbb465d1372d6869b373c40c43d7695d275f4e6e5fb5a8bf",
       "pages": 14,
       "panel_sampling_sequence": [
@@ -198,7 +198,8 @@
         3,
         76
       ],
-      "frozen_at": "2026-10-18T18:01:10+00:00"
+      "frozen_at": "2026-10-18T18:01:10+00:00",
+      "note": "Annotator found a RETRACTED watermark on the frozen PDF (2026-10-19). Ineligible under PREREGISTRATION \u00a73 (not retracted). Excluded before any scoring; its sealed outputs stay sealed and unscored."
     },
     {
       "draw_rank": 3,
