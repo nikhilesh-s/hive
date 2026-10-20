@@ -16,6 +16,7 @@ import asyncio
 import json
 import logging
 import os
+import shutil
 import sys
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -167,6 +168,7 @@ async def _set(job: Job, **fields) -> None:
 async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
     job = JOBS[job_id]
     loop = asyncio.get_running_loop()
+    upload_run_dir = PDF_DIR / "uploads" / job_id if uploaded_pdf else None
     try:
         prior = run_dir_for(job.doi) / "supabase_rows.json"
         if job.reuse and prior.exists():
@@ -261,13 +263,12 @@ async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
                        access_url=job.access_url if uploaded_pdf else job.access_url or f"https://doi.org/{job.doi}",
                        status="preprocessing",
                        message="Rendering pages and scoring blot-panel candidates (OpenCV)…")
+            # Uploads get a per-job run dir (deleted below) so a user's copy never
+            # mixes with, or outlives, the DOI's shared pdf_runs directory. The
+            # DOI was already matched to the PDF's page text before the job existed.
+            run_dir = {"out_dir": upload_run_dir} if uploaded_pdf else {}
             summary = await loop.run_in_executor(
-                None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi))
-            if uploaded_pdf and summary.get("extracted_doi") and fulltext.normalize_doi(summary["extracted_doi"]) != job.doi:
-                raise RuntimeError("The DOI detected in this PDF differs from the supplied DOI. Check the paper and DOI before retrying.")
-            if uploaded_pdf:
-                (Path(summary["out_dir"]) / "upload_metadata.json").write_text(
-                    json.dumps({"source": "upload", "doi": job.doi, "job_id": job.job_id}), encoding="utf-8")
+                None, lambda: pdf_preprocess.preprocess_pdf(got["pdf_path"], paper_id=job.doi, **run_dir))
             n = summary.get("llm_candidate_count", 0)
             await _set(job, paper_id=summary.get("paper_id"), candidates=n, status="extracting",
                        message=f"Reading {n} candidate panel{'s' if n != 1 else ''} with the model, then reconciling biology…")
@@ -286,6 +287,9 @@ async def run_job(job_id: str, uploaded_pdf: Path | None = None) -> Job:
     finally:
         if uploaded_pdf:
             uploaded_pdf.unlink(missing_ok=True)
+            # Rendered pages, crops and page text are derivatives of a possibly
+            # paywalled copy: rows and crops are already in the DB by now.
+            shutil.rmtree(upload_run_dir, ignore_errors=True)
     return job
 
 
