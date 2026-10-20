@@ -1,5 +1,7 @@
 # HiveBlot
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23491677.svg)](https://doi.org/10.5281/zenodo.23491677)
+
 
 Structured, provenance-tracked extraction of Western blot evidence from
 published figures.
