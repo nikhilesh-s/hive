@@ -7,35 +7,6 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
-<<<<<<< HEAD
-## B-13: Northern and other non-western panels (draft PR, hold until benchmark scored)
-
-- **Branch `b-13-non-western-panels`, draft PR. Do not merge before the blind benchmark is
-  scored (Tue 10-20).** It changes extraction code (`biology.py`, `record_builder.py`), and the
-  benchmark runs on the frozen `f77d311` code.
-- **Rule** (`biology.classify_non_western`, deterministic, no model guess alone): the PANEL must
-  say so, and the caption/methods must name the technique. Panel evidence is the row target
-  (nucleic-acid species such as 18S/28S/47S/ITS2/U6/tRNA-x, or a stain subject such as
-  Coomassie/Ponceau S), the lane labels (zymography, EMSA, free probe), or the sibling rows of
-  the same panel (a stain is the subject only when every row of the panel is a stain; next to a
-  protein row it stays a loading control). Technique wording is Northern/RNA blot/rRNA,
-  Southern/DNA blot, zymography, EMSA/gel shift, Coomassie/silver/Ponceau. Wording alone never
-  flags a row, and "RNA was extracted" matches nothing. Dot blots are not distinguished.
-- **Outcome:** `experiment_type = non_western`, flags `non_western` + the kind, anomaly flag
-  `NON_WESTERN_PANEL` (high), `record_status` AMBIGUOUS, `needs_review` true. No new columns, no
-  migration. `records_to_supabase_rows` withholds these records from the rows that load into
-  `western_blot_records_live` (`include_non_western=True` keeps them); the records stay in
-  `evidence_records.json`, and `run_records_stage` returns `non_western_withheld`. `record_id` is
-  unchanged by the flag.
-- **gkag499 offline rebuild** (cached records, no model/network/DB): 51 of 94 records, 335 of 506
-  rows flagged non_western (20 pre-rRNA names); 171 rows stay (155 protein rows plus 16 rows of
-  the probe label "1-O1", which no rule recognizes). Tanvi to confirm "1-O1".
-- **Tests:** miner pytest 146 passed / 2 skipped (13 new in `test_non_western.py`); biology 165,
-  reconcile 21, enrichment 18, extract 10, pipeline 13; `eval/score.py` 34/34; api pytest 273
-  passed / 18 skipped.
-- **Next:** after the benchmark is scored, merge, re-extract gkag499 (a re-run is needed;
-  `reuse` would reload the old rows), and have Tanvi confirm which panels are Northern.
-=======
 ## Srushti's tickets finished by agents; deploy at 363f19e (2026-10-19)
 
 - **Merged and deployed** (Render and Vercel at `363f19e`):
@@ -107,7 +78,33 @@ migration 012, then merges.
   access link (gate only).
 - **Next:** Nik or Srushti runs the same pass on a real iPhone, then decides the open items.
   The board row for W-3 in `tickets/README.md` is not updated.
->>>>>>> origin/main
+
+## B-13: Northern and other non-western panels 
+
+- **Branch `b-13-non-western-panels`.** The blind benchmark is scored, so it may merge. It changes extraction code (`biology.py`, `record_builder.py`), and the
+  benchmark runs on the frozen `f77d311` code.
+- **Rule** (`biology.classify_non_western`, deterministic, no model guess alone): the PANEL must
+  say so, and the caption/methods must name the technique. Panel evidence is the row target
+  (nucleic-acid species such as 18S/28S/47S/ITS2/U6/tRNA-x, or a stain subject such as
+  Coomassie/Ponceau S), the lane labels (zymography, EMSA, free probe), or the sibling rows of
+  the same panel (a stain is the subject only when every row of the panel is a stain; next to a
+  protein row it stays a loading control). Technique wording is Northern/RNA blot/rRNA,
+  Southern/DNA blot, zymography, EMSA/gel shift, Coomassie/silver/Ponceau. Wording alone never
+  flags a row, and "RNA was extracted" matches nothing. Dot blots are not distinguished.
+- **Outcome:** `experiment_type = non_western`, flags `non_western` + the kind, anomaly flag
+  `NON_WESTERN_PANEL` (high), `record_status` AMBIGUOUS, `needs_review` true. No new columns, no
+  migration. `records_to_supabase_rows` withholds these records from the rows that load into
+  `western_blot_records_live` (`include_non_western=True` keeps them); the records stay in
+  `evidence_records.json`, and `run_records_stage` returns `non_western_withheld`. `record_id` is
+  unchanged by the flag.
+- **gkag499 offline rebuild** (cached records, no model/network/DB): 51 of 94 records, 335 of 506
+  rows flagged non_western (20 pre-rRNA names); 171 rows stay (155 protein rows plus 16 rows of
+  the probe label "1-O1", which no rule recognizes). Tanvi to confirm "1-O1".
+- **Tests:** miner pytest 146 passed / 2 skipped (13 new in `test_non_western.py`); biology 165,
+  reconcile 21, enrichment 18, extract 10, pipeline 13; `eval/score.py` 34/34; api pytest 273
+  passed / 18 skipped.
+- **Next:** after the benchmark is scored, merge, re-extract gkag499 (a re-run is needed;
+  `reuse` would reload the old rows), and have Tanvi confirm which panels are Northern.
 
 ## Later on 2026-10-18: deploy, rotation, Drive
 
