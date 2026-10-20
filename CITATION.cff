@@ -11,20 +11,13 @@ url: "https://hiveblot-beta.vercel.app"
 authors:
   - family-names: Suravarjjala
     given-names: Nikhilesh
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
-    # affiliation: ""                                  # TODO
+    orcid: "https://orcid.org/0009-0004-7227-2213"
   - family-names: Madhure
     given-names: Srushti
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
-    # affiliation: ""                                  # TODO
   - family-names: Bharadwaj
     given-names: Tanvi
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
-    # affiliation: ""                                  # TODO
   - family-names: Jaladi
     given-names: Yashvi
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO
-    # affiliation: ""                                  # TODO
 keywords:
   - western blot
   - biomedical literature mining
