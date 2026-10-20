@@ -7,6 +7,30 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## B-12 target normalization (2026-10-19, draft PR, held)
+
+- **Branch:** `b-12-target-normalization` from `e8cc2c7`. Draft PR. **Do not merge before the blind
+  benchmark is scored (Tue 10-20)**: it changes `biology.py`, `resolve.py` and `record_builder.py`.
+- **What:** `biology.normalize_target` holds explicit, documented name rules (tag and qualifier
+  stripping, `alpha-` as anti- only before CASP/GSDM/IL symbols, LC3, Bcl-xL, vinculin, caspase-N
+  and a few common-name aliases). Ambiguous families (Ras, JNK, LC3 without B, alpha-actinin,
+  alpha/beta-tubulin, MyHC) resolve to AMBIGUOUS with candidates, never one gene. Viral names
+  (Vpr, Nef, Vif, Vpu, gp120) and bare tags stay unresolved but are labeled (`target_kind`,
+  low-severity `NON_HUMAN_TARGET` / `EPITOPE_TAG_TARGET` flags). The resolvers call it, and
+  `record_builder` now passes the raw label to the resolver.
+- **Modification layer touched in three small places:** `Ph-` is a phospho marker, `non-phospho`
+  is not, and the end-anchored abbreviation `cl.` counts as cleavage. Size suffixes (`p10`) and
+  `CL` (cell lysate) do not.
+- **Table for Tanvi:** `tickets/b12-expected-mappings.md` (8 open questions). Nothing is final
+  until she reviews it.
+- **Tests:** new `western_blot_miner/tests/test_target_normalization.py` (175 cases); pytest suite
+  308 passed, 2 skipped (was 133 plus 2); `test_biology.py` 165/165; `eval/score.py` 34/34.
+- **Local impact (16 PDF runs, offline resolver):** of 2,787 unresolved rows, about 2,000 are
+  touched: about 600 become SUPPORTED, about 870 AMBIGUOUS (so `needs_review` true), about 540
+  labeled viral or tag.
+- **Next:** Tanvi's review, then merge after the benchmark is scored; then deploy with the next
+  release. Not done on purpose: `p55`, `p62`, `pTyr-` labels, Ubiquitin (see the table, section 4).
+
 ## Later on 2026-10-18: deploy, rotation, Drive
 
 - **R-5 deployed.**

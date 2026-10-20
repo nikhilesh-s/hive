@@ -114,6 +114,9 @@ class TargetInfo(BaseModel):
     canonical_target: EvidenceField = EvidenceField.missing()
     uniprot_id: EvidenceField = EvidenceField.missing()
     aliases_used_in_paper: list[str] = []
+    # B-12: "viral" | "tag" when the label is deliberately NOT resolved because it
+    # is not a human protein (HIV Vpr, a bare FLAG tag). None for everything else.
+    target_kind: Optional[str] = None
 
 
 class ModificationInfo(BaseModel):

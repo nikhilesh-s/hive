@@ -52,7 +52,26 @@ class ProteinResolution:
     organism: Optional[str] = None
     status: str = MISSING
     candidates: list[dict] = field(default_factory=list)
-    source: str = "none"          # uniprot | cache | local_fallback | none
+    source: str = "none"          # uniprot | cache | local_fallback | normalization_rule | none
+    # B-12: facts from biology.normalize_target (tag stripped, LC3 form, viral...).
+    # Never cached (they belong to the printed label, not to the gene symbol).
+    notes: list[str] = field(default_factory=list)
+    kind: Optional[str] = None    # "viral" | "tag" for labels that are not human proteins
+
+
+def _rule_resolution(raw_name: str, norm: dict) -> Optional[ProteinResolution]:
+    """Outcomes the B-12 name rules settle WITHOUT any lookup: ambiguous families
+    (never one guessed gene) and labels that are not human proteins (viral
+    proteins, epitope tags). None means "go and look the lookup name up"."""
+    if norm["kind"] in ("viral", "tag"):
+        return ProteinResolution(raw=raw_name, status=MISSING, source="normalization_rule",
+                                 notes=norm["notes"], kind=norm["kind"])
+    if norm["kind"] == "family":
+        return ProteinResolution(
+            raw=raw_name, canonical=norm["family_label"], status=AMBIGUOUS,
+            source="normalization_rule", notes=norm["notes"],
+            candidates=[{"gene": g, "uniprot_id": None} for g in norm["candidates"]])
+    return None
 
 
 class ProteinResolver:
@@ -64,19 +83,24 @@ class LocalMapResolver(ProteinResolver):
     """Deterministic offline resolver over the curated alias map. Test/fallback."""
 
     def resolve(self, raw_name: str, organism_id: int = 9606) -> ProteinResolution:
-        core = biology.core_symbol(raw_name)
+        norm = biology.normalize_target(raw_name)
+        rule = _rule_resolution(raw_name, norm)
+        if rule:
+            return rule
+        core = norm["lookup"] or biology.core_symbol(raw_name)
         token = core.lower()
         if token in biology.PROTEIN_ALIASES:
             canonical, uniprot = biology.PROTEIN_ALIASES[token]
             if uniprot is None:  # e.g. ERK -> ambiguous, no single accession
                 return ProteinResolution(raw=raw_name, canonical=canonical, status=AMBIGUOUS,
-                                         source="local_fallback")
+                                         source="local_fallback", notes=norm["notes"])
             return ProteinResolution(
                 raw=raw_name, canonical=canonical, uniprot_id=uniprot,
                 expected_mass_kda=_LOCAL_MASS_KDA.get(uniprot), organism="human",
-                status=SUPPORTED, source="local_fallback",
+                status=SUPPORTED, source="local_fallback", notes=norm["notes"],
             )
-        return ProteinResolution(raw=raw_name, status=MISSING, source="local_fallback")
+        return ProteinResolution(raw=raw_name, status=MISSING, source="local_fallback",
+                                 notes=norm["notes"])
 
 
 class UniProtResolver(ProteinResolver):
@@ -88,7 +112,11 @@ class UniProtResolver(ProteinResolver):
     def resolve(self, raw_name: str, organism_id: int = 9606) -> ProteinResolution:
         import requests  # lazy: only when a live call actually happens
 
-        core = biology.core_symbol(raw_name)
+        norm = biology.normalize_target(raw_name)
+        rule = _rule_resolution(raw_name, norm)
+        if rule:                      # viral / tag / ambiguous family: never queried
+            return rule
+        core = norm["lookup"] or biology.core_symbol(raw_name)
         if not core:
             return ProteinResolution(raw=raw_name, status=MISSING, source="uniprot")
         query = f"(gene:{core}) AND (organism_id:{organism_id}) AND (reviewed:true)"
@@ -118,7 +146,7 @@ class UniProtResolver(ProteinResolver):
             return ProteinResolution(
                 raw=raw_name, canonical=p.get("gene") or core, uniprot_id=p["accession"],
                 expected_mass_kda=p.get("mass_kda"), organism=organism_name,
-                status=SUPPORTED, source="uniprot",
+                status=SUPPORTED, source="uniprot", notes=norm["notes"],
             )
         # Multiple reviewed hits -> ambiguous; list candidates, choose nothing.
         return ProteinResolution(
@@ -146,6 +174,9 @@ class UniProtResolver(ProteinResolver):
         }
 
 
+_UNCACHED = ("raw", "notes", "kind")    # per-label facts, not per-symbol facts
+
+
 class CachingResolver(ProteinResolver):
     """Wrap a resolver with an on-disk JSON cache and an offline fallback."""
 
@@ -170,11 +201,16 @@ class CachingResolver(ProteinResolver):
             pass
 
     def resolve(self, raw_name: str, organism_id: int = 9606) -> ProteinResolution:
-        core = biology.core_symbol(raw_name)
+        norm = biology.normalize_target(raw_name)
+        rule = _rule_resolution(raw_name, norm)
+        if rule:                      # settled by a B-12 rule: nothing to query or cache
+            return rule
+        core = norm["lookup"] or biology.core_symbol(raw_name)
         cache_key = f"{core.lower()}|{organism_id}"
         if cache_key in self._cache:
             data = dict(self._cache[cache_key])
             data["raw"] = raw_name
+            data["notes"] = norm["notes"]       # label facts are never cached with the symbol
             return ProteinResolution(**data)
 
         # Curated ambiguity is AUTHORITATIVE and short-circuits the live query.
@@ -184,7 +220,7 @@ class CachingResolver(ProteinResolver):
         # literally "ERK") as one confident hit. Trust the expert map here.
         curated = self.fallback.resolve(raw_name, organism_id)
         if curated.status == AMBIGUOUS:
-            self._cache[cache_key] = {k: v for k, v in curated.__dict__.items() if k != "raw"}
+            self._cache[cache_key] = {k: v for k, v in curated.__dict__.items() if k not in _UNCACHED}
             self._save()
             return curated
 
@@ -196,8 +232,9 @@ class CachingResolver(ProteinResolver):
             if fb.status != MISSING:
                 res = fb
         # Cache only confident/ambiguous outcomes (not transient network misses).
+        res.notes = norm["notes"]
         if res.status in (SUPPORTED, AMBIGUOUS):
-            store = {k: v for k, v in res.__dict__.items() if k != "raw"}
+            store = {k: v for k, v in res.__dict__.items() if k not in _UNCACHED}
             self._cache[cache_key] = store
             self._save()
         return res
