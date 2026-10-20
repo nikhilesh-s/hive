@@ -7,7 +7,7 @@ const TABS: [string, string][] = [
   ['/experimental/research', 'Research'],
   ['/experimental/live', 'Live extraction'],
   ['/experimental/ask', 'Ask the evidence'],
-  ['/experimental/densitometry', 'Densitometry'],
+  ['/experimental/densitometry', 'Band reading'],
 ];
 
 // Sub-navigation shared by the experimental pages. Everything under it is

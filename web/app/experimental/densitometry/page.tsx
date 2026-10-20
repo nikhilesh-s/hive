@@ -464,8 +464,7 @@ export default function DensitometryPage() {
   return (
     <div className="hb-page">
       <section className="hb-page-hero">
-        <div className="hb-live-flag">EXPERIMENTAL · UNCALIBRATED · NOT STORED</div>
-        <h1 className="hb-page-h1">Experimental densitometry</h1>
+        <h1 className="hb-page-h1">Band reading</h1>
         <p className="hb-page-lead">
           Pixel-derived, background-corrected band intensity per lane, relative to the strongest lane in the
           <strong> same image</strong>. No units, not a protein amount, not comparable across images. The optional
@@ -756,6 +755,10 @@ export default function DensitometryPage() {
           )}
         </section>
       )}
+
+      <p className="hb-live-note" style={{ fontSize: 11, marginTop: 32 }}>
+        Band reading measures relative intensity within one image. It is uncalibrated, refuses saturated or unstable bands, and stores nothing.
+      </p>
     </div>
   );
 }
