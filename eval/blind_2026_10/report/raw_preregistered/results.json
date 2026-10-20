@@ -1,0 +1,801 @@
+{
+  "annotator": "tanvi",
+  "seal_check": "all sealed files match SEALED_OUTPUTS.sha256",
+  "frozen_code_diff_vs_f77d311": "none",
+  "papers": {
+    "PMC9283986": {
+      "panels_inventoried": 4,
+      "panels_found": 4,
+      "panels_fully_annotated": 4,
+      "target_rows_annotated": 35,
+      "records": 25,
+      "spurious_records_unaligned": 14,
+      "incorrect_assertions": 38,
+      "fields": {
+        "protein_identity": {
+          "NOT_FOUND": 24,
+          "ABSTAINED": 7,
+          "CORRECT": 3,
+          "INCORRECT": 1
+        },
+        "modification_type": {
+          "NOT_FOUND": 24,
+          "CORRECT": 4,
+          "INCORRECT": 7
+        },
+        "phospho_site": {},
+        "cell_line": {
+          "NOT_FOUND": 24,
+          "INCORRECT": 11
+        },
+        "treatment": {
+          "CORRECT_SILENCE": 11
+        },
+        "band_call": {
+          "NOT_FOUND": 599,
+          "CORRECT": 126,
+          "ABSTAINED": 11,
+          "INCORRECT": 5
+        }
+      },
+      "timing": {
+        "automated_seconds": 404.6,
+        "panels_sent_to_model": 6,
+        "manual_minutes": {
+          "paper 1": 92
+        }
+      },
+      "metrics_raw": {
+        "protein_identity": {
+          "accuracy": "3/35 (9%)",
+          "precision_of_assertions": "3/4 (75%)",
+          "abstained": "7/35 (20%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 3,
+          "INCORRECT": 1,
+          "ABSTAINED": 7,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "4/35 (11%)",
+          "precision_of_assertions": "4/11 (36%)",
+          "abstained": "0/35 (0%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 4,
+          "INCORRECT": 7,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "0/35 (0%)",
+          "precision_of_assertions": "0/11 (0%)",
+          "abstained": "0/35 (0%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 11,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 11,
+          "UNSUPPORTED": 0
+        },
+        "band_call": {
+          "accuracy": "126/741 (17%)",
+          "precision_of_assertions": "126/131 (96%)",
+          "abstained": "11/741 (1%)",
+          "not_found": "599/741 (81%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 126,
+          "INCORRECT": 5,
+          "ABSTAINED": 11,
+          "NOT_FOUND": 599,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      },
+      "metrics_adjudicated": {
+        "protein_identity": {
+          "accuracy": "3/35 (9%)",
+          "precision_of_assertions": "3/4 (75%)",
+          "abstained": "7/35 (20%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 3,
+          "INCORRECT": 1,
+          "ABSTAINED": 7,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "4/35 (11%)",
+          "precision_of_assertions": "4/11 (36%)",
+          "abstained": "0/35 (0%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 4,
+          "INCORRECT": 7,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "0/35 (0%)",
+          "precision_of_assertions": "0/11 (0%)",
+          "abstained": "0/35 (0%)",
+          "not_found": "24/35 (69%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 11,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 24,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 11,
+          "UNSUPPORTED": 0
+        },
+        "band_call": {
+          "accuracy": "126/741 (17%)",
+          "precision_of_assertions": "126/131 (96%)",
+          "abstained": "11/741 (1%)",
+          "not_found": "599/741 (81%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 126,
+          "INCORRECT": 5,
+          "ABSTAINED": 11,
+          "NOT_FOUND": 599,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      }
+    },
+    "PMC7948984": {
+      "panels_inventoried": 5,
+      "panels_found": 5,
+      "panels_fully_annotated": 3,
+      "target_rows_annotated": 10,
+      "records": 54,
+      "records_on_panels_missing_from_inventory": 27,
+      "spurious_records_not_wb": 5,
+      "incorrect_assertions": 44,
+      "fields": {
+        "protein_identity": {
+          "INCORRECT": 1,
+          "ABSTAINED": 3,
+          "CORRECT": 6
+        },
+        "modification_type": {
+          "INCORRECT": 10
+        },
+        "phospho_site": {},
+        "cell_line": {
+          "CORRECT": 10
+        },
+        "treatment": {
+          "UNSUPPORTED": 10
+        },
+        "band_call": {
+          "INCORRECT": 18,
+          "CORRECT": 73,
+          "ABSTAINED": 11
+        }
+      },
+      "timing": {
+        "automated_seconds": 734.5,
+        "panels_sent_to_model": 20,
+        "manual_minutes": {}
+      },
+      "metrics_raw": {
+        "protein_identity": {
+          "accuracy": "6/10 (60%)",
+          "precision_of_assertions": "6/7 (86%)",
+          "abstained": "3/10 (30%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 6,
+          "INCORRECT": 1,
+          "ABSTAINED": 3,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "0/10 (0%)",
+          "precision_of_assertions": "0/10 (0%)",
+          "abstained": "0/10 (0%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 10,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "10/10 (100%)",
+          "precision_of_assertions": "10/10 (100%)",
+          "abstained": "0/10 (0%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 10,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "0/10 (0%)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 10,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 10
+        },
+        "band_call": {
+          "accuracy": "73/102 (72%)",
+          "precision_of_assertions": "73/91 (80%)",
+          "abstained": "11/102 (11%)",
+          "not_found": "0/102 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 73,
+          "INCORRECT": 18,
+          "ABSTAINED": 11,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      },
+      "metrics_adjudicated": {
+        "protein_identity": {
+          "accuracy": "6/10 (60%)",
+          "precision_of_assertions": "6/7 (86%)",
+          "abstained": "3/10 (30%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 6,
+          "INCORRECT": 1,
+          "ABSTAINED": 3,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "0/10 (0%)",
+          "precision_of_assertions": "0/10 (0%)",
+          "abstained": "0/10 (0%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 10,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "10/10 (100%)",
+          "precision_of_assertions": "10/10 (100%)",
+          "abstained": "0/10 (0%)",
+          "not_found": "0/10 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 10,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "0/10 (0%)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 10,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 10
+        },
+        "band_call": {
+          "accuracy": "73/102 (72%)",
+          "precision_of_assertions": "73/91 (80%)",
+          "abstained": "11/102 (11%)",
+          "not_found": "0/102 (0%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 73,
+          "INCORRECT": 18,
+          "ABSTAINED": 11,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      }
+    },
+    "PMC4393234": {
+      "panels_inventoried": 2,
+      "panels_found": 1,
+      "panels_fully_annotated": 1,
+      "target_rows_annotated": 2,
+      "records": 1,
+      "incorrect_assertions": 0,
+      "fields": {
+        "protein_identity": {
+          "NOT_FOUND": 2
+        },
+        "modification_type": {
+          "NOT_FOUND": 2
+        },
+        "phospho_site": {},
+        "cell_line": {
+          "NOT_FOUND": 2
+        },
+        "treatment": {},
+        "band_call": {
+          "NOT_FOUND": 8
+        }
+      },
+      "timing": {
+        "automated_seconds": 45.9,
+        "panels_sent_to_model": 3,
+        "manual_minutes": {
+          "paper 3+4": 31.49
+        }
+      },
+      "metrics_raw": {
+        "protein_identity": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "band_call": {
+          "accuracy": "0/8 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/8 (0%)",
+          "not_found": "8/8 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 8,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      },
+      "metrics_adjudicated": {
+        "protein_identity": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "modification_type": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "phospho_site": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "cell_line": {
+          "accuracy": "0/2 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/2 (0%)",
+          "not_found": "2/2 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 2,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "treatment": {
+          "accuracy": "n/a (0)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "n/a (0)",
+          "not_found": "n/a (0)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 0,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        },
+        "band_call": {
+          "accuracy": "0/8 (0%)",
+          "precision_of_assertions": "n/a (0)",
+          "abstained": "0/8 (0%)",
+          "not_found": "8/8 (100%)",
+          "unsupported_assertions": 0,
+          "CORRECT": 0,
+          "INCORRECT": 0,
+          "ABSTAINED": 0,
+          "NOT_FOUND": 8,
+          "CORRECT_SILENCE": 0,
+          "UNSUPPORTED": 0
+        }
+      }
+    }
+  },
+  "pooled": {
+    "panels_inventoried": 11,
+    "panels_found": 10,
+    "panels_fully_annotated": 8,
+    "target_rows_annotated": 47,
+    "records": 80,
+    "incorrect_assertions": 82,
+    "spurious_records_not_wb": 5,
+    "spurious_records_unaligned": 14,
+    "records_on_panels_missing_from_inventory": 27,
+    "records_unmapped": 0,
+    "duplicate_records": 0,
+    "automated_seconds": 1185.0,
+    "panels_sent_to_model": 29,
+    "manual_full_minutes": 123.49
+  },
+  "pooled_metrics_raw": {
+    "protein_identity": {
+      "accuracy": "9/47 (19%)",
+      "precision_of_assertions": "9/11 (82%)",
+      "abstained": "10/47 (21%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 9,
+      "INCORRECT": 2,
+      "ABSTAINED": 10,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "modification_type": {
+      "accuracy": "4/47 (9%)",
+      "precision_of_assertions": "4/21 (19%)",
+      "abstained": "0/47 (0%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 4,
+      "INCORRECT": 17,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "phospho_site": {
+      "accuracy": "n/a (0)",
+      "precision_of_assertions": "n/a (0)",
+      "abstained": "n/a (0)",
+      "not_found": "n/a (0)",
+      "unsupported_assertions": 0,
+      "CORRECT": 0,
+      "INCORRECT": 0,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 0,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "cell_line": {
+      "accuracy": "10/47 (21%)",
+      "precision_of_assertions": "10/21 (48%)",
+      "abstained": "0/47 (0%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 10,
+      "INCORRECT": 11,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "treatment": {
+      "accuracy": "n/a (0)",
+      "precision_of_assertions": "0/10 (0%)",
+      "abstained": "n/a (0)",
+      "not_found": "n/a (0)",
+      "unsupported_assertions": 10,
+      "CORRECT": 0,
+      "INCORRECT": 0,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 0,
+      "CORRECT_SILENCE": 11,
+      "UNSUPPORTED": 10
+    },
+    "band_call": {
+      "accuracy": "199/851 (23%)",
+      "precision_of_assertions": "199/222 (90%)",
+      "abstained": "22/851 (3%)",
+      "not_found": "607/851 (71%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 199,
+      "INCORRECT": 23,
+      "ABSTAINED": 22,
+      "NOT_FOUND": 607,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "ALL FIELDS": {
+      "accuracy": "222/992 (22%)",
+      "precision_of_assertions": "222/285 (78%)",
+      "abstained": "32/992 (3%)",
+      "not_found": "685/992 (69%)",
+      "unsupported_assertions": 10,
+      "CORRECT": 222,
+      "INCORRECT": 53,
+      "ABSTAINED": 32,
+      "NOT_FOUND": 685,
+      "CORRECT_SILENCE": 11,
+      "UNSUPPORTED": 10
+    }
+  },
+  "pooled_metrics_adjudicated": {
+    "protein_identity": {
+      "accuracy": "9/47 (19%)",
+      "precision_of_assertions": "9/11 (82%)",
+      "abstained": "10/47 (21%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 9,
+      "INCORRECT": 2,
+      "ABSTAINED": 10,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "modification_type": {
+      "accuracy": "4/47 (9%)",
+      "precision_of_assertions": "4/21 (19%)",
+      "abstained": "0/47 (0%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 4,
+      "INCORRECT": 17,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "phospho_site": {
+      "accuracy": "n/a (0)",
+      "precision_of_assertions": "n/a (0)",
+      "abstained": "n/a (0)",
+      "not_found": "n/a (0)",
+      "unsupported_assertions": 0,
+      "CORRECT": 0,
+      "INCORRECT": 0,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 0,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "cell_line": {
+      "accuracy": "10/47 (21%)",
+      "precision_of_assertions": "10/21 (48%)",
+      "abstained": "0/47 (0%)",
+      "not_found": "26/47 (55%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 10,
+      "INCORRECT": 11,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 26,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "treatment": {
+      "accuracy": "n/a (0)",
+      "precision_of_assertions": "0/10 (0%)",
+      "abstained": "n/a (0)",
+      "not_found": "n/a (0)",
+      "unsupported_assertions": 10,
+      "CORRECT": 0,
+      "INCORRECT": 0,
+      "ABSTAINED": 0,
+      "NOT_FOUND": 0,
+      "CORRECT_SILENCE": 11,
+      "UNSUPPORTED": 10
+    },
+    "band_call": {
+      "accuracy": "199/851 (23%)",
+      "precision_of_assertions": "199/222 (90%)",
+      "abstained": "22/851 (3%)",
+      "not_found": "607/851 (71%)",
+      "unsupported_assertions": 0,
+      "CORRECT": 199,
+      "INCORRECT": 23,
+      "ABSTAINED": 22,
+      "NOT_FOUND": 607,
+      "CORRECT_SILENCE": 0,
+      "UNSUPPORTED": 0
+    },
+    "ALL FIELDS": {
+      "accuracy": "222/992 (22%)",
+      "precision_of_assertions": "222/285 (78%)",
+      "abstained": "32/992 (3%)",
+      "not_found": "685/992 (69%)",
+      "unsupported_assertions": 10,
+      "CORRECT": 222,
+      "INCORRECT": 53,
+      "ABSTAINED": 32,
+      "NOT_FOUND": 685,
+      "CORRECT_SILENCE": 11,
+      "UNSUPPORTED": 10
+    }
+  },
+  "adjudicated": false
+}
