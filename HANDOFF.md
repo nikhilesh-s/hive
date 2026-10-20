@@ -103,7 +103,8 @@ migration 012, then merges.
 - **Next:** Tanvi's review, then merge after the benchmark is scored; then deploy with the next
   release. Not done on purpose: `p55`, `p62`, `pTyr-` labels, Ubiquitin (see the table, section 4).
 
-## B-13: Northern and other non-western panels 
+## B-13: Northern and other non-western panels
+## B-13: Northern and other non-western panels
 
 - **Branch `b-13-non-western-panels`.** The blind benchmark is scored, so it may merge. It changes extraction code (`biology.py`, `record_builder.py`), and the
   benchmark runs on the frozen `f77d311` code.
