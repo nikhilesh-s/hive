@@ -8,33 +8,11 @@ export async function POST(request: NextRequest) {
   if (!body || typeof body !== 'object') {
     return NextResponse.json({ detail: 'Invalid JSON body' }, { status: 400 });
   }
-  const {
-    doi, force, reuse, query, title, abstract, authors, journal, year, pmid, pmcid, source,
-    access_status, access_url, access_source,
-    relevance_status, relevance_score, relevance_reason,
-  } = body as Record<string, unknown>;
+  // Only the DOI, flags and discovery query go to the API; paper metadata is derived server-side.
+  const { doi, force, reuse, query } = body as Record<string, unknown>;
 
   return proxyJson('/experimental/ingest', {
     method: 'POST',
-    body: {
-      doi,
-      force: Boolean(force),
-      reuse: Boolean(reuse),
-      query,
-      title,
-      abstract,
-      authors,
-      journal,
-      year,
-      pmid,
-      pmcid,
-      source,
-      access_status,
-      access_url,
-      access_source,
-      relevance_status,
-      relevance_score,
-      relevance_reason,
-    },
+    body: { doi, force: Boolean(force), reuse: Boolean(reuse), query },
   });
 }

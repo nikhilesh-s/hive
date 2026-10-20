@@ -270,20 +270,6 @@ export default function ResearchPage() {
       const r = await post('/api/experimental/ingest', {
         doi,
         query: topic,
-        title: selected?.title,
-        abstract: selected?.abstract,
-        authors: selected?.authors,
-        journal: selected?.journal || selected?.venue,
-        year: selected?.year,
-        pmid: selected?.pmid,
-        pmcid: selected?.pmcid,
-        source: selected?.source,
-        access_status: selected?.access_status,
-        access_url: selected?.access_url,
-        access_source: selected?.access_source,
-        relevance_status: selected?.relevance_status,
-        relevance_score: selected?.relevance_score,
-        relevance_reason: selected?.relevance_reason,
       });
       const d = await r.json();
       if (my !== seq.current) return; // another paper was chosen meanwhile
