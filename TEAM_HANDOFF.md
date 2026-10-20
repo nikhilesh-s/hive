@@ -25,7 +25,7 @@ Outreach: wave 1 was 27 emails (Yashvi 13 on 09-30, Tanvi 14 on 10-05). There ha
   per-field ✓/✗ feedback.
 - Saved Results for anonymous visitors and Google accounts; Google sign-in; search history.
 - Outreach attribution: `?lab=` and `?utm_source=` are stored on searches and feedback.
-- Paper access badges (open access, paywalled, unknown) on search results and the research page.
+- Paper access badges on search results (from stored, verified checks only): "Open access", "No open copy found / Check institutional access", or "Access unknown".
 - The research page finds papers and checks metadata, relevance and access first. Paywalled or
   unretrievable papers end as "awaiting full text", with an institutional-access link.
   Downloadable papers extract (PLOS ONE test: 25 experiments, 158 lanes).

@@ -7,6 +7,380 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## Srushti's tickets finished by agents; deploy at 363f19e (2026-10-19)
+
+- **Merged and deployed** (Render and Vercel at `363f19e`):
+  - O-2 upload (#22, migration 012 applied). Security fixes: page, area and pixel caps; parsing
+    and rendering in a limited child process; quotas; DOI must appear on page 1; audit columns;
+    cleanup; crops of unverified uploads hidden.
+  - W-3 phone/WebKit CSS pass (#34).
+  - W-4: ingest derives metadata server-side (#35).
+  - Smoke test: pages 200, upload/ingest without access 401, counts 3/93/475.
+- **Held until the benchmark is scored (E-7):** B-3 #24, B-13 #32, B-12 #33. All three touch the
+  biology code, so merge them one at a time.
+- **Release prep:** PR #31 (draft): MIT license, CITATION.cff, public README, Zenodo archive
+  script. It needs the author list and the teammates' MIT consent. Nik uploads to Zenodo.
+- **Benchmark:** outputs sealed (`b0174f7`); scorer hardened (A3, `e79417a`). Waiting on Yashvi's
+  crop map (Mon 21:00) and Tanvi's labels (Tue 12:00).
+
+## O-2 security review fixed (2026-10-19)
+
+Branch `o-2-pdf-upload` (PR #22), merged with main, review items 1-7 fixed; latest
+commit: `git log -1 --format=%H origin/o-2-pdf-upload`. Srushti unavailable; Nik
+approved finishing it. `western_blot_miner/` is untouched (frozen benchmark).
+
+- Uploads are validated in a `python -I` child with an empty env, a 30 s wall
+  clock and RLIMIT_CPU 20 s / RLIMIT_AS 1 GiB (AS is not enforceable on macOS).
+  Limits: 60 pages, A2 per page, and 600 megapixels in total at 350 DPI
+  (about 52 letter pages). Over a limit: rejected before any job or render.
+- Upload render and OpenCV run in a second `python -I` child: empty env, 900 s
+  wall clock and CPU, and RLIMIT_FSIZE 512 MiB per file. Non-upload jobs still
+  call `pdf_preprocess` in-process, unchanged. At API startup,
+  `PDF_DIR/uploads` is swept (orphans from crashes or redeploys).
+- The supplied DOI must appear somewhere in the page-1 text (metadata is
+  ignored; other DOIs there are fine). If it is absent: 422 and no job. An
+  upload-made empty job or a pending job older than 30 minutes no longer blocks
+  a later upload. To remove a fake upload, see
+  `tickets/o2-pdf-upload-verification.md`.
+- Quota: daily cap and per-user limit (10 streamed attempts/day) checked before
+  reading the body; 2 concurrent uploads, one per user; 180 s body timeout; writes via
+  `to_thread`; tickets 10/minute and 60/day per user. All in-process counters.
+- Audit: `uploaded_by`, `uploaded_at`, `pdf_sha256` on `ingest_jobs` via new
+  **migration 012 (NOT applied)**. Until Nik applies it, uploads fail closed
+  with 503; normal ingest is unaffected. Job listings strip these columns.
+- Upload runs use `PDF_DIR/uploads/<job_id>`, deleted after rows and crops are
+  stored (or on failure). Crops from uploads without verified open access are
+  never served: both crop routes return 403 "Crop hidden for uploaded copy"
+  (the web falls back to its no-crop note). This also hides them from the uploader.
+
+Tests: API 339 passed / 19 skipped (66 upload tests); web tsc, lint, 31 node
+tests and the build pass. The DB matrix test (migration 012, audit, crop gate) runs
+only in CI (no local Postgres). Not done: RLIMIT_AS on the render child
+(OpenCV's virtual memory was not measured on Linux); real OAuth/model checks
+and Srushti's visual check. Next: Nik reviews PR #22, applies
+migration 012, then merges.
+## 2026-10-19: W-3 phone and Safari pass
+
+- **Branch** `w-3-phone-safari-pass` (from `e8cc2c7`), one PR to main. Findings:
+  `tickets/w3-phone-safari-2026-10-19.md`.
+- **Method.** Playwright WebKit with iPhone 14, iPhone SE, iPad and Desktop Safari emulation
+  against the hosted site at `edd95f5`. No real device was available.
+- **Result before fixes:** 12 FAIL (every phone cell: 175 px sticky nav; Home headline clipped;
+  feedback panels off-screen at 320 px), 8 PASS*, 4 PASS.
+- **Fixed (CSS/layout only):** compact phone nav, Home headline and hero padding, 16 px search,
+  filter and access-code fields, 32 px nav and theme tap targets, 36 px Save, feedback panel
+  max width, SVG attribute console errors, light-theme "Try:" chip contrast. `tsc`, `lint` and
+  `build` pass; WebKit re-run on a local build shows no overflow and all phone cells PASS*.
+- **Open (W-13 to W-18, W-20):** text under 12 px, iPad nav wrap, desktop headline width, filter
+  drawer polish, remaining small tap targets and floating feedback pills, light-theme hero
+  contrast. Each needs a decision.
+- **Not verified:** real-device Safari, Google sign-in, Save/Unsave, the research page via an
+  access link (gate only).
+- **Next:** Nik or Srushti runs the same pass on a real iPhone, then decides the open items.
+  The board row for W-3 in `tickets/README.md` is not updated.
+
+## B-12 target normalization (2026-10-19)
+
+- **Branch:** `b-12-target-normalization` from `e8cc2c7`. The blind benchmark is scored, so it may
+  merge. It changes `biology.py`, `resolve.py` and `record_builder.py`.
+- **What:** `biology.normalize_target` holds explicit, documented name rules (tag and qualifier
+  stripping, `alpha-` as anti- only before CASP/GSDM/IL symbols, LC3, Bcl-xL, vinculin, caspase-N
+  and a few common-name aliases). Ambiguous families (Ras, JNK, LC3 without B, alpha-actinin,
+  alpha/beta-tubulin, MyHC) resolve to AMBIGUOUS with candidates, never one gene. Viral names
+  (Vpr, Nef, Vif, Vpu, gp120) and bare tags stay unresolved but are labeled (`target_kind`,
+  low-severity `NON_HUMAN_TARGET` / `EPITOPE_TAG_TARGET` flags). The resolvers call it, and
+  `record_builder` now passes the raw label to the resolver.
+- **Modification layer touched in three small places:** `Ph-` is a phospho marker, `non-phospho`
+  is not, and the end-anchored abbreviation `cl.` counts as cleavage. Size suffixes (`p10`) and
+  `CL` (cell lysate) do not.
+- **Table for Tanvi:** `tickets/b12-expected-mappings.md` (8 open questions). Nothing is final
+  until she reviews it.
+- **Tests:** new `western_blot_miner/tests/test_target_normalization.py` (175 cases); pytest suite
+  308 passed, 2 skipped (was 133 plus 2); `test_biology.py` 165/165; `eval/score.py` 34/34.
+- **Local impact (16 PDF runs, offline resolver):** of 2,787 unresolved rows, about 2,000 are
+  touched: about 600 become SUPPORTED, about 870 AMBIGUOUS (so `needs_review` true), about 540
+  labeled viral or tag.
+- **Next:** Tanvi's review, then merge after the benchmark is scored; then deploy with the next
+  release. Not done on purpose: `p55`, `p62`, `pTyr-` labels, Ubiquitin (see the table, section 4).
+
+## B-13: Northern and other non-western panels
+## B-13: Northern and other non-western panels
+
+- **Branch `b-13-non-western-panels`.** The blind benchmark is scored, so it may merge. It changes extraction code (`biology.py`, `record_builder.py`), and the
+  benchmark runs on the frozen `f77d311` code.
+- **Rule** (`biology.classify_non_western`, deterministic, no model guess alone): the PANEL must
+  say so, and the caption/methods must name the technique. Panel evidence is the row target
+  (nucleic-acid species such as 18S/28S/47S/ITS2/U6/tRNA-x, or a stain subject such as
+  Coomassie/Ponceau S), the lane labels (zymography, EMSA, free probe), or the sibling rows of
+  the same panel (a stain is the subject only when every row of the panel is a stain; next to a
+  protein row it stays a loading control). Technique wording is Northern/RNA blot/rRNA,
+  Southern/DNA blot, zymography, EMSA/gel shift, Coomassie/silver/Ponceau. Wording alone never
+  flags a row, and "RNA was extracted" matches nothing. Dot blots are not distinguished.
+- **Outcome:** `experiment_type = non_western`, flags `non_western` + the kind, anomaly flag
+  `NON_WESTERN_PANEL` (high), `record_status` AMBIGUOUS, `needs_review` true. No new columns, no
+  migration. `records_to_supabase_rows` withholds these records from the rows that load into
+  `western_blot_records_live` (`include_non_western=True` keeps them); the records stay in
+  `evidence_records.json`, and `run_records_stage` returns `non_western_withheld`. `record_id` is
+  unchanged by the flag.
+- **gkag499 offline rebuild** (cached records, no model/network/DB): 51 of 94 records, 335 of 506
+  rows flagged non_western (20 pre-rRNA names); 171 rows stay (155 protein rows plus 16 rows of
+  the probe label "1-O1", which no rule recognizes). Tanvi to confirm "1-O1".
+- **Tests:** miner pytest 146 passed / 2 skipped (13 new in `test_non_western.py`); biology 165,
+  reconcile 21, enrichment 18, extract 10, pipeline 13; `eval/score.py` 34/34; api pytest 273
+  passed / 18 skipped.
+- **Next:** after the benchmark is scored, merge, re-extract gkag499 (a re-run is needed;
+  `reuse` would reload the old rows), and have Tanvi confirm which panels are Northern.
+
+## Later on 2026-10-18: deploy, rotation, Drive
+
+- **R-5 deployed.**
+  - Render deploy `dep-dbah16k9v7es738g2kng` is live at `edd95f5`, and `/health` reports
+    `edd95f5fb422`.
+  - Vercel production `dpl_EhVoMe34LcD3Qj25EVFaTJDhL2ix` is at main `edd95f5`.
+  - Smoke test: Home, Search, About and `/api/corpus-stats` all return 200, with counts 3/93/475.
+    The hosted search for "phospho STAT3 Tyr705" shows 3 experiments and 18 lanes with the
+    "Access unknown" label.
+  - Extraction code is unchanged from `f77d311`, so production is still the benchmarked version.
+- **O-9 done.** The `hive_ingest` password was rotated:
+  - `ALTER ROLE` run, and the new login verified as `hive_ingest`.
+  - Render `DB_INGEST_URL`, `api/.env` and `~/hive_ingest_dsn.txt` updated.
+- **O-10 open.** The gswitch JWT signing key was also printed in the session. Rotating it means
+  re-authorizing the ChatGPT connector. Nik decides.
+- **Also merged today:** O-8 (#28, `6ea1855`) and W-7 (#29, `edd95f5`).
+- **Benchmark.**
+  - Rank 3 (PMC7948984) was downloaded by Nik and frozen; it replaces rank 8.
+  - Model stage results so far:
+    - PMC9283986: 6 panels, 25 records, 396 s
+    - PMC5328321: 28 panels, 33 records, 386 s
+    - PMC4393234: 3 panels, 1 record, 40 s
+    - PMC7948984: running
+  - Drive folders were created in niksuravarjjala@gmail.com and shared:
+    - Tanvi: PDFs, guide and annotation Sheet, no crops.
+    - Yashvi: PDFs, 57 crops and the crop-map Sheet.
+
+## Blind benchmark and PR merges (2026-10-18)
+
+### Main
+
+Main is at `d01f08d` after these merges, all with CI green:
+- W-5 (#20)
+- W-6 (#21), with review fixes: an `access_checked_at` / `relevance_checked_at` value is required
+  before a job can set a label, PostgREST `in.()` values are quoted, and `access_url` must be
+  http(s)
+- O-3 (#25)
+- G-4 (#26)
+- W-1 (#19), with review fixes: a LEFT JOIN on live rows, a 30-minute stale-pending guard, and
+  ingest's `normalize_doi` shared with the web
+
+Other PRs:
+- Copilot #2 is closed.
+- B-3 is now draft PR #24 (`feature/saved-results`). It changes `record_builder.py`, so hold it
+  until the benchmark is scored.
+- O-2 (#22) is moved onto main and stays a draft until Srushti's checks and the security review
+  are done.
+
+Deployment:
+- **Nothing is deployed.** Render (`3839ee3`) and Vercel (`ffc54a0`) still run the 10-11
+  release. R-5 deploys the merged web/API changes, API first, then a smoke test.
+
+### Blind extraction benchmark (P0)
+
+- **Where:** branch `eval/blind-benchmark-2026-10`, worktree `/Users/niks/hive-blind-eval`,
+  folder `eval/blind_2026_10/`. Private data lives outside the repo in
+  `/Users/niks/hive-blind-eval-private`: the PDFs, the sealed model outputs and the mapper pack.
+  Never commit it, and never share `runs/` before scoring.
+- **Design:** pre-registered at `38bf0a6`, with amendments A1 and A2 in `DEVIATIONS.md`.
+  - The draw is seeded with `20261018` over 15 eligible papers from `eval/candidates.json`.
+  - Frozen papers: ranks 1, 2 and 4 (PMC9283986, PMC5328321, PMC4393234), plus rank 8
+    (PMC7757890) provisionally until Nik tries a browser download of rank 3 (PMC7948984).
+- **System under test:** `western_blot_miner/` at `f77d311`, the production default model
+  `claude-opus-5` through the local `claude_cli` backend, concurrency 1, no uploads.
+- **Stage 1:** 298 crops were found and 66 sent to the model.
+- **Model stage:** started 2026-10-18 for ranks 1, 2 and 4. The log is
+  `/Users/niks/hive-blind-eval-private/extract_run1.log`.
+- **Scorer:** `score_blind.py` (self-test passes). It aligns on figure, panel, target and lane
+  index, and it refuses to run if a sealed output changed.
+
+### Production usage (read-only, 10-18)
+
+- 16 anonymous searches in 8 sessions, no lab tags.
+- The last feedback was 9-16.
+- No confirmed lab use. See `research/ADOPTION_STATUS_2026-10-18.md` on the benchmark branch.
+
+### Security
+
+The `hive_ingest` DB password was printed in an agent session on 10-18. Rotate it (ticket O-9):
+1. `ALTER ROLE`.
+2. Update Render `DB_INGEST_URL` and `~/hive_ingest_dsn.txt`.
+3. Redeploy.
+
+### Tests run 10-18
+
+- Biology 165/165, densitometry 116/116, reconcile 21/21, extract 10/10, pipeline 13/13.
+- Seed benchmark 34/34.
+- Benchmark scorer self-test passes.
+- PR CI green on #19, #20, #21, #25 and #26.
+
+### Exact next task
+
+1. When the model stage finishes, settle rank 3 or rank 8 and run the 4th paper.
+2. Run `run_extraction.py seal`, then commit and push the seal **before** any annotation
+   arrives.
+3. When Tanvi's sheet and Yashvi's crop map arrive, follow `RUNBOOK.md` steps 5-7.
+4. Then do R-5.
+
+## W-6 Paper Access Review (2026-10-14)
+
+Branch: `w-6-paper-access-flags`; worktree `/private/tmp/hiveblot-w6`.
+Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
+Split flags-only from local audit `1e53518`. Implementation commit: `6a2de69`.
+PR: https://github.com/nikhilesh-s/hive/pull/21. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
+
+Missing/invalid metadata displays Access unknown. No open copy found no longer
+asserts Paywalled. Access and query-scoped relevance use independent checks;
+reviewed/live search attach the flags. No count-hook/Home changes, extraction,
+scientific values, quotas or production-schema changes. User authorized pushing
+this dedicated branch and requesting Nik's review; never merge or deploy it.
+
+Read-only Supabase verification: 3 reviewed papers / 93 groups / 475 rows, and
+zero reviewed papers with access metadata. Do not fabricate or backfill labels.
+API 242 passed / 16 skipped; isolated PostgreSQL matrix+access test 14 passed /
+1 skipped; frontend 9 passed; browser 12 desktop/mobile Search/Research cases;
+miner 133 passed / 2 skipped; biology/reconcile/enrich/extract/pipeline
+165/21/18/10/13; stable keys 34; densitometry 116; seed benchmark 34/34.
+TypeScript, lint and production build passed. CI includes the new regressions.
+
+Report: `research/W6_PAPER_ACCESS_VERIFICATION.md`. Local fixtures are not
+source-paper access classifications. No Supabase access metadata was modified;
+original checkout, combined audit and W-1 preserved. Next: verify PR #21 CI,
+await Nik's review and leave unmerged/undeployed. Missing metadata and
+institutional entitlement remain limitations; source-backed population and
+deployment require separate authorization.
+
+## W-5 Corpus Counts Review (2026-10-14)
+
+Branch: `w-5-dynamic-corpus-counts`; worktree `/private/tmp/hiveblot-w5`.
+Base/latest commit before task: `f77d311710603e3bea949a432094134195cbc711`.
+Split counts-only from local audit `1e53518`. Implementation commit: `2bc1f10`.
+PR: https://github.com/nikhilesh-s/hive/pull/20. Nik (`nikhilesh-s`) was requested
+as reviewer. This follow-up records the PR; it does not change implementation.
+
+Home now uses the live count hook. Transient stats/network failures retry with
+bounds and abort cleanup; invalid/auth failures are not retried. No fake totals.
+Existing backend cache is 60 seconds; no Realtime or schema changes. No
+paper-access changes in this ticket. User authorized pushing this dedicated
+branch and opening a PR for Nik; never merge or deploy it.
+
+Read-only Supabase check: 3 reviewed papers / 93 experiment groups / 475 rows.
+API 243 passed / 16 skipped; isolated PostgreSQL matrix+count test 14 passed /
+1 skipped; frontend 11 passed; browser 16 desktop/mobile scenarios; miner
+133 passed / 2 skipped; biology/reconcile/enrich/extract/pipeline 165/21/18/10/13;
+stable keys 34; densitometry 116; seed benchmark 34/34. TypeScript, lint,
+production build passed. CI runs frontend and database regressions.
+
+Report: `research/W5_CORPUS_COUNTS_VERIFICATION.md`. No Supabase writes,
+production changes or modifications to the original checkout. The combined
+audit and W-1 remain preserved. Next: verify PR #20 CI and await Nik's review;
+leave the PR unmerged and undeployed. Persistent backend failure
+still reports unavailable after bounded retries; release verification awaits
+an authorized deployment.
+
+## O-2 PDF Upload on Search and Research (2026-10-14)
+
+Branch: `o-2-pdf-upload`, worktree `/private/tmp/hiveblot-o2`.
+Base commit: `d6bc7717e459e69cdd7fda7419373f4b3f3ea000` (W-1 PR #19, unmerged).
+Implementation commit: `e84ffceb86ca5383570870cfe3f966cbc7181407`.
+CI packaging fix: `78f3423d6e914c36e860561849f1849a7291c1d1`.
+Latest handoff/browser-verification follow-up: resolve with
+`git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
+Draft PR: https://github.com/nikhilesh-s/hive/pull/22; Nik (`nikhilesh-s`) review
+requested. Base remains `w-1-doi-deep-link`; PR is open, draft and unmerged.
+
+Shared upload dialog is available on Search and Research. Explicit submission
+requires beta access plus a server-verified Supabase user. A five-minute DOI/user
+capability allows direct bounded PDF streaming to FastAPI without exposing the
+internal key or sending large files through Next.js. File validation includes
+50 MiB bounds, PDF signature/readability/encryption and rights confirmation.
+Completed/pending DOI jobs are reused; new uploads reuse existing quota, job,
+OpenCV/model/reconciliation, live-row and crop storage. Uploads never establish
+open access, carry persisted upload source metadata, and cannot write reviewed
+Search data. No new tables/migrations or model implementation. W-1 opens results.
+Access/sign-in return paths preserve DOI/lab; no redirect or refresh submits PDFs.
+
+Verification: API 288 passed / 17 skipped; disposable PostgreSQL matrix 15 passed
+/ 1 skipped; frontend 14 passed; 32 desktop/mobile browser checks; TypeScript,
+lint, production build and whitespace checks pass. Miner pytest 133 passed /
+2 skipped; biology 165, reconcile 21, enrich 18, extraction 10, pipeline 13,
+stable-row-key 34, densitometry 116; seed benchmark 34/34 (not wet-lab accuracy).
+Real upload/preprocessing/reconciliation/storage/W-1 retrieval tested against
+isolated PostgreSQL with explicit mock model and test identity. Reviewed fixture
+rows remain 475; two mock unreviewed rows are separate. No production data touched.
+
+NOT COMPLETE: Srushti must visually inspect the preview. Real Google OAuth and
+real AI extraction remain unverified: public auth variables are intentionally
+unconfigured in the preview, no model credentials are available, and the local
+Claude CLI is logged out. The dialog exposes missing sign-in configuration.
+Inherited production dependency audit reports five affected packages, including
+critical Next.js advisories; do not claim production readiness or upgrade them
+in this ticket. Existing single-process job/quota and restart limitations remain.
+
+Preview: frontend port 3022 (Webpack dev), normal API 8204, separate test-only mock
+model API 8205. Screenshots at `/private/tmp/hiveblot-o2-screenshots/`; fixture PDF
+at `/private/tmp/hiveblot-o2-sample.pdf`. See `tickets/o2-pdf-upload-verification.md`
+for flow, source files, precise test caveats and reproduction prerequisites.
+Original checkout and its five edits are unchanged (diff fingerprint verified).
+GitHub API/miner, PostgreSQL, web and hygiene checks all passed on `78f3423`.
+The initial npm 11/npm 10 optional-lock compatibility failure was corrected
+without changing the existing dependency versions; npm 10 clean-install dry-run
+also passes. Final browser coverage adds actual normal-API missing-model refusal
+(not a mocked service error), without creating a job or consuming quota.
+Next: obtain Srushti's visual acceptance, genuine OAuth/model verification and
+Nik's review of PR #22. Leave draft and unmerged while these remain outstanding.
+Retarget only after W-1 merges. Do not deploy or mutate hosted Supabase.
+
+## W-1 DOI deep links and stored-paper lookup (2026-10-13)
+
+Branch: `w-1-doi-deep-link`.
+Base: `f77d311710603e3bea949a432094134195cbc711` (origin/main).
+Core implementation commit: `ab23dd7`; PR metadata follow-up: `3fda112`.
+Draft PR: https://github.com/nikhilesh-s/hive/pull/19 (opened 2026-10-14).
+
+Research links with `?doi=` normalize DOI URLs, prefixes, whitespace and case,
+then open stored live evidence with the original discovery query
+when recorded. The existing research input also accepts DOIs without invoking
+paper discovery or extraction. Missing papers retain the DOI and show the
+existing explicit extraction button; pending jobs and lookup errors are
+distinct states. No lookup starts an ingest job, inference or quota spend.
+The access gate already preserves DOI/lab parameters; browser tests cover
+successful and failed access verification, refresh and encoded DOI suffixes.
+
+Added read-only GET `/experimental/live/paper?doi=...` behind the existing
+internal-key boundary and `/api/experimental/stored-paper` behind the server
+beta-access gate. Uses the existing readonly PostgreSQL pool, configured live
+table and `ingest_jobs`; exact bound DOI lookup LEFT JOINs job rows (found = live rows exist; pending only if the job updated within 30 min) and avoids
+the recent-50-paper list and search's 500-row truncation. Response shaping uses
+`WesternBlotRecord`. No migrations, extraction-pipeline or quota changes.
+Live evidence remains shared within beta access, not account-owned. Lab tags
+are attribution only. Reviewed-only papers are outside this live-tier ticket.
+
+Verification: API 257 passed / 16 skipped (DB tests checked separately);
+local PostgreSQL permission matrix 14 passed / 1 skipped, including exact DOI,
+job-less rows, stale pending jobs and all 501 lanes; miner pytest 133 passed / 2 skipped;
+biology 165/165, reconciliation 21/21, enrichment 18/18, extraction 10/10,
+pipeline 13/13; seed benchmark 34/34; web unit tests 11 passed; browser 13
+scenarios passed at desktop/mobile with no extraction/discovery POSTs.
+TypeScript, lint, production build and diff checks pass.
+GitHub's API/miner, PostgreSQL RLS, web build and hygiene checks passed on
+`3fda112`. The web CI job now also runs the frontend unit tests. The same 13
+browser scenarios passed against the local production build as well as dev.
+
+Not deployed; hosted Supabase, Render and Vercel were not modified. Older runs
+without a persisted discovery query cannot display that original query.
+Next: have Nik review/merge PR #19 after its CI checks, deploy API before web, then verify a real wave-1
+DOI through a fresh beta access visit. Continue with O-2 in a separate branch.
+Local preview uses an isolated test database, not the hosted corpus.
+
 ## Release of Srushti's Oct 1-3 work, PR #11, ticket board (2026-10-11)
 
 - **Released.** Main and `release/hosted` are at `ac85a6e`. Render (API) and Vercel (web) both

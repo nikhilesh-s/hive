@@ -19,7 +19,8 @@ export async function proxyJson(path: string, init?: { method?: string; body?: u
       body: init?.body === undefined ? undefined : JSON.stringify(init.body),
     });
     const data = await resp.json().catch(() => ({}));
-    return NextResponse.json(data, { status: resp.status });
+    const retryAfter = resp.headers.get('Retry-After'); // the job poll honours it
+    return NextResponse.json(data, { status: resp.status, headers: retryAfter ? { 'Retry-After': retryAfter } : undefined });
   } catch {
     return NextResponse.json({ error: 'Failed to reach backend' }, { status: 502 });
   }

@@ -138,12 +138,21 @@ def build_record_detail(row: dict) -> RecordDetail:
             srcs = tgt_env.get("sources") or []
             if srcs and isinstance(srcs[0], dict):
                 src = srcs[0].get("text")
+        def _status(name: str):
+            env = ab.get(name)
+            return env.get("status") if isinstance(env, dict) else None
+
         antibodies.append(RecordAntibody(
             target=_v(ab.get("antibody_target")),
+            target_status=_status("antibody_target"),
             vendor=_v(ab.get("vendor")),
+            vendor_status=_status("vendor"),
             catalog_number=_v(ab.get("catalog_number")),
+            catalog_number_status=_status("catalog_number"),
             clone=_v(ab.get("clone")),
+            clone_status=_status("clone"),
             dilution=_v(ab.get("dilution")),
+            dilution_status=_status("dilution"),
             role=ab.get("role"),
             phospho_specific=_v(ab.get("phospho_specific")),
             detection_confidence=ab.get("detection_confidence"),

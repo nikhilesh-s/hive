@@ -23,6 +23,8 @@ from .evidence_record import (
     AMBIGUOUS,
     CONFLICTING,
     MISSING,
+    NOT_RECOVERED,
+    NOT_STATED,
     SUPPORTED,
     AntibodyInfo,
     AnomalyFlag,
@@ -89,7 +91,9 @@ def build_evidence_record(
     # the previous unconditional behavior) so e.g. mouse Stat3 resolves to the
     # mouse accession and expected MW, not the human one.
     organism_id = biology.organism_taxon_id(mc.get("organism"))
-    res = resolver.resolve(core, organism_id=organism_id)
+    # The RAW label goes to the resolver: its name rules (biology.normalize_target)
+    # need the qualifiers/tags/prefixes that `core` (first token) already dropped.
+    res = resolver.resolve(raw_target, organism_id=organism_id)
     target_info = _target_info(raw_target, core, res, mc)
 
     # ---- modification: gather claims from every source, then reconcile -----
@@ -136,7 +140,8 @@ def build_evidence_record(
     # ---- experiment type ---------------------------------------------------
     lane_text = " | ".join(
         str(b.get("lane_condition") or "") for b in mc.get("bands", []))
-    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text=lane_text)
+    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text=lane_text,
+                                  raw_target=raw_target, panel_targets=case.get("panel_targets"))
 
     # ---- sample ------------------------------------------------------------
     sample = _sample_info(mc, caption)
@@ -179,30 +184,44 @@ def build_evidence_record(
 
 def _target_info(raw_target, core, res, mc) -> TargetInfo:
     aliases = mc.get("aliases", [])
+    # B-12 label facts (tag stripped, LC3 form, viral...) travel as a source on the
+    # canonical field so "why did HiveBlot say this?" can show them.
+    rule_src = [Source(type="normalization_rule", rank=RANK_MODEL_TARGET, text=n) for n in res.notes]
     if res.status == SUPPORTED and res.uniprot_id:
         canonical = EvidenceField.supported(
-            res.canonical, 0.96, [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)])
+            res.canonical, 0.96,
+            [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)] + rule_src)
         uniprot = EvidenceField.supported(
             res.uniprot_id, 0.96, [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)])
     elif res.status == AMBIGUOUS:
         cands = [Candidate(value=c.get("uniprot_id"), source_type="uniprot_reference", rank=RANK_REFERENCE,
                            confidence=0.5, evidence=[Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                                             text=str(c))]) for c in (res.candidates or [{}])]
+        # A family named by a rule has gene symbols, not accessions: the canonical
+        # field lists the symbols; the accession field stays empty (none chosen).
+        gene_cands = [Candidate(value=c.get("uniprot_id") or c.get("gene"), source_type="uniprot_reference",
+                                rank=RANK_REFERENCE, confidence=0.5,
+                                evidence=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text=str(c))])
+                      for c in (res.candidates or [{}])]
+        if res.source == "normalization_rule":
+            cands = [Candidate(value=None, source_type="uniprot_reference", rank=RANK_REFERENCE, confidence=0.5)]
         # An ambiguous resolution keeps a best-effort family LABEL (e.g.
         # "MAPK1/MAPK3" for ERK1/2) as the value, but MUST stay AMBIGUOUS -- a
         # multi-gene family is not a settled canonical value (invariant #3), so
         # it never renders as SUPPORTED and surfaces for review.
         canonical = EvidenceField(
             value=res.canonical, confidence=0.5, status=AMBIGUOUS,
-            sources=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous_family")],
-            candidates=cands,
-        ) if res.canonical else EvidenceField.ambiguous(cands)
+            sources=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous_family")] + rule_src,
+            candidates=gene_cands,
+        ) if res.canonical else EvidenceField.ambiguous(gene_cands, sources=rule_src or None)
         uniprot = EvidenceField.ambiguous(cands)   # accession NOT chosen
     else:
-        canonical = EvidenceField.missing()
-        uniprot = EvidenceField.missing()
+        # A resolver miss is an extraction/normalization limitation, not evidence
+        # that the paper failed to name the protein.
+        canonical = EvidenceField.not_recovered(rule_src or None)
+        uniprot = EvidenceField.not_recovered()
     return TargetInfo(raw_target_name=raw_target, canonical_target=canonical, uniprot_id=uniprot,
-                      aliases_used_in_paper=aliases)
+                      aliases_used_in_paper=aliases, target_kind=res.kind)
 
 
 def _phospho_specific_field(detection_abs, mod_fields) -> EvidenceField:
@@ -217,10 +236,21 @@ def _phospho_specific_field(detection_abs, mod_fields) -> EvidenceField:
     return EvidenceField.missing()
 
 
-def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str = "") -> ExperimentInfo:
+def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str = "",
+                     raw_target: str = "", panel_targets=None) -> ExperimentInfo:
     text_blob = f"{caption}\n{methods}"
     flags: list[str] = []
     sources: list[Source] = []
+
+    # Northern / Southern / gel stain / zymography / EMSA: panel evidence (target,
+    # lane labels, sibling rows) AND caption/methods wording; see biology.classify_non_western.
+    non_western = biology.classify_non_western(raw_target or core, caption, methods, lane_text, panel_targets)
+    if non_western:
+        flags.extend(["non_western", non_western["kind"]])
+        sources.append(Source(type="model_target", rank=RANK_MODEL_TARGET, text=raw_target or core))
+        ctx = non_western["evidence"][1]
+        sources.append(Source(type=ctx["type"], rank=RANK_CAPTION if ctx["type"] == "figure_caption" else RANK_METHODS,
+                              text=ctx["text"]))
 
     # co-IP requires PANEL evidence: an IP-role antibody claim, or co-IP /
     # IP:/IgG/input markers printed on the panel's own lanes. Page-level text
@@ -261,7 +291,9 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
         flags.append("phospho_western")
 
     # Primary label + confidence, degraded when the modification is unsettled.
-    if "co_ip" in flags:
+    if "non_western" in flags:
+        primary, conf, status = "non_western", 0.9, SUPPORTED
+    elif "co_ip" in flags:
         primary, conf, status = "co_ip", 0.9, SUPPORTED
     elif "purified_protein" in flags:
         primary, conf, status = "purified_protein", 0.85, SUPPORTED
@@ -276,12 +308,12 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
         primary, conf, status = "standard_western", 0.55, SUPPORTED
         flags.append("standard_western")
     else:
-        primary, conf, status = None, 0.2, MISSING
+        primary, conf, status = None, 0.0, NOT_RECOVERED
 
     exp_type = EvidenceField(value=primary, confidence=conf, status=status, sources=sources)
     exp_flags = EvidenceField.supported(sorted(set(flags)), conf, sources) if flags else EvidenceField.missing()
 
-    ip_bait = EvidenceField.missing()
+    ip_bait = EvidenceField.not_recovered() if "co_ip" in flags else EvidenceField.missing()
     if "co_ip" in flags:
         bait = None
         bait_src = None
@@ -316,8 +348,9 @@ def _sample_info(mc, caption) -> SampleInfo:
         if caption and str(v).lower() in caption.lower():
             return [Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, str(v)))]
         return [Source(type="model_target", rank=RANK_MODEL_TARGET, text=str(v))]
-    sample_f = EvidenceField.supported(sample_val, 0.9, src_for(sample_val)) if sample_val else EvidenceField.missing()
-    cell_f = EvidenceField.supported(cell_line, 0.9, src_for(cell_line)) if cell_line else EvidenceField.missing()
+    # A null model field cannot establish that the authors omitted the value.
+    sample_f = EvidenceField.supported(sample_val, 0.9, src_for(sample_val)) if sample_val else EvidenceField.not_recovered()
+    cell_f = EvidenceField.supported(cell_line, 0.9, src_for(cell_line)) if cell_line else EvidenceField.not_recovered()
     if not org and cell_line:
         org = CELL_LINE_ORGANISM.get(str(cell_line).lower())
         if org:
@@ -325,17 +358,25 @@ def _sample_info(mc, caption) -> SampleInfo:
                 org, 0.8, [Source(type="deterministic", rank=RANK_DETERMINISTIC,
                                   text=f"{cell_line} -> {org} (cell-line table)")])
         else:
-            organism_f = EvidenceField.missing()
+            organism_f = EvidenceField.not_recovered()
     elif org:
         organism_f = EvidenceField.supported(org, 0.85, src_for(org))
     else:
-        organism_f = EvidenceField.missing()
-    return SampleInfo(sample=sample_f, cell_line=cell_f, organism=organism_f,
-                      tissue=EvidenceField.missing(), genotype=EvidenceField.missing())
+        organism_f = EvidenceField.not_recovered()
+    return SampleInfo(
+        sample=sample_f,
+        cell_line=cell_f,
+        organism=organism_f,
+        # These fields are currently stubs: the pipeline does not yet perform a
+        # reliable field-specific extraction for them, so NOT_STATED would be
+        # scientifically unjustified.
+        tissue=EvidenceField.not_recovered(),
+        genotype=EvidenceField.not_recovered(),
+    )
 
 
 def _series_fields(values: list[dict], ctx: str, det: list[Source],
-                   multi_marker: bool) -> tuple[EvidenceField, EvidenceField]:
+                   multi_marker: bool, source_examined: bool = False) -> tuple[EvidenceField, EvidenceField]:
     """(value_field, unit_field) for a dose or duration series.
 
     ONE stated value -> SUPPORTED scalar, as before.
@@ -348,7 +389,10 @@ def _series_fields(values: list[dict], ctx: str, det: list[Source],
     rather than asserting a wrong one (null > misleading value).
     """
     if not values:
-        return EvidenceField.missing(), EvidenceField.missing()
+        # A deterministic field-specific scan over verified paper text may
+        # support NOT_STATED. A null/empty model paraphrase may not.
+        absent = EvidenceField.not_stated(det) if source_examined else EvidenceField.not_recovered()
+        return absent, EvidenceField.not_stated(det) if source_examined else EvidenceField.not_recovered()
     distinct = {(v["value"], v["unit"].lower()) for v in values}
     if len(distinct) == 1 and not multi_marker:
         return (EvidenceField.supported(values[0]["value"], 0.85, det),
@@ -392,16 +436,16 @@ def _treatment_info(mc, caption: str = "", methods: str = "") -> TreatmentInfo:
     # model's own treatment wording it is still the model's reading.
     det = ([Source(type="deterministic", rank=RANK_DETERMINISTIC, text=ctx)] if verbatim else src) if ctx else []
     dose_f, dose_unit_f = _series_fields(
-        doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)))
+        doses, ctx, det, bool(biology._INDICATED_DOSE.search(ctx)), source_examined=verbatim)
     dur_f, dur_unit_f = _series_fields(
-        durs, ctx, det, bool(biology._INDICATED_TIME.search(ctx)))
+        durs, ctx, det, bool(biology._INDICATED_TIME.search(ctx)), source_examined=verbatim)
     return TreatmentInfo(
-        treatment_name=EvidenceField.supported(name, 0.8, src) if name else EvidenceField.missing(),
+        treatment_name=EvidenceField.supported(name, 0.8, src) if name else EvidenceField.not_recovered(),
         dose=dose_f,
         dose_unit=dose_unit_f,
         duration=dur_f,
         duration_unit=dur_unit_f,
-        treatment_context=EvidenceField.supported(ctx, 0.8, src) if ctx else EvidenceField.missing(),
+        treatment_context=EvidenceField.supported(ctx, 0.8, src) if ctx else EvidenceField.not_recovered(),
     )
 
 
@@ -541,7 +585,12 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
             return field
         if det_v:
             return EvidenceField.supported(det_v, 0.6, det_src)
-        return EvidenceField.missing()
+        # Only call an antibody attribute NOT_STATED when a target-scoped,
+        # verbatim paper snippet was actually examined by the deterministic
+        # backstop. Otherwise the extractor simply failed to recover it.
+        if det.get("_quote"):
+            return EvidenceField.not_stated(det_src)
+        return EvidenceField.not_recovered()
     ab_mod = biology.antibody_modification(ab.get("target", ""))
     phospho_specific = ab.get("phospho_specific")
     if phospho_specific is None:
@@ -554,7 +603,7 @@ def _antibody_info(ab, row_core, mod_fields, caption: str = "", methods: str = "
         clone=mk(ab.get("clone"), det_v=det.get("clone")),
         dilution=mk(ab.get("dilution"), det_v=det.get("dilution")),
         phospho_specific=EvidenceField.supported(bool(phospho_specific), 0.85, src)
-        if ab.get("target") else EvidenceField.missing(),
+        if ab.get("target") else EvidenceField.not_recovered(),
         detection_confidence=round(detection_conf, 2),
         association_confidence=round(assoc, 2),
     )
@@ -613,14 +662,29 @@ def _mw_info(caption, methods, res, core: str = "") -> MolecularWeightInfo:
         hit, src_type, src_rank = _kda_hit(caption), "figure_caption", RANK_CAPTION
     reported = hit[0] if hit else None
     # Source text is the verbatim matched window, typed by the channel it came from.
+    # A NOT_STATED claim must cite the relevant source channel that actually
+    # contains this target; never attach an unrelated caption merely because a
+    # caption exists while the target only appears in methods.
+    missing_reported_sources: list[Source] = []
+    if core and core.lower() in (caption or "").lower():
+        missing_reported_sources = [
+            Source(type="figure_caption", rank=RANK_CAPTION, text=_snippet(caption, core))
+        ]
+    elif core and core.lower() in (methods or "").lower():
+        missing_reported_sources = [
+            Source(type="methods", rank=RANK_METHODS, text=_snippet(methods, core))
+        ]
     reported_f = EvidenceField.supported(
         reported, 0.8, [Source(type=src_type, rank=src_rank, text=hit[1])]) \
-        if hit else EvidenceField.missing()
+        if hit else (
+            EvidenceField.not_stated(missing_reported_sources)
+            if missing_reported_sources else EvidenceField.not_recovered()
+        )
     expected = res.expected_mass_kda
     expected_f = EvidenceField.supported(
         expected, 0.9, [Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                text=f"{res.uniprot_id} {expected} kDa (expected)")]) \
-        if expected is not None else EvidenceField.missing()
+        if expected is not None else EvidenceField.not_recovered()
     recon = "not_comparable"
     if reported is not None and expected is not None:
         recon = "match" if abs(reported - expected) / expected <= 0.2 else "discrepancy"
@@ -783,12 +847,32 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
                        f"absent yet carries band_pattern '{pat}'."))
             break
 
+    if record.experiment.experiment_type.value == "non_western":
+        flags.append(AnomalyFlag(code="NON_WESTERN_PANEL", severity="high",
+                                 detail="Panel is not an immunoblot (Northern/Southern/gel stain/zymography/EMSA); "
+                                        "its rows are not western evidence.",
+                                 evidence=list(record.experiment.experiment_type.sources)))
     if record.experiment.experiment_type.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="EXPERIMENT_TYPE_AMBIGUOUS", severity="med",
                                  detail="Experiment type is unsettled (often downstream of a modification conflict)."))
     if record.target.canonical_target.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="PROTEIN_AMBIGUOUS", severity="med",
                                  detail="Protein name maps to more than one reviewed UniProt entry."))
+    elif (record.target.canonical_target.status in (MISSING, NOT_RECOVERED, NOT_STATED)
+          and record.experiment.experiment_type.value != "non_western"      # rRNA/stain: not a protein
+          and record.target.target_kind not in ("viral", "tag")):           # labeled below instead
+        flags.append(AnomalyFlag(
+            code="PROTEIN_NOT_RECOVERED", severity="med",
+            detail="HiveBlot could not reliably normalize this printed target to a reviewed protein entry.",
+        ))
+    # B-12: an unresolved target that is NOT a human protein is labeled as such, not
+    # left as a silent NULL. "low": informational, it does not change record_status.
+    if record.target.target_kind == "viral":
+        flags.append(AnomalyFlag(code="NON_HUMAN_TARGET", severity="low",
+                                 detail="Target is a viral protein; it is not resolved against human UniProt."))
+    elif record.target.target_kind == "tag":
+        flags.append(AnomalyFlag(code="EPITOPE_TAG_TARGET", severity="low",
+                                 detail="Target is an epitope/fusion tag, not a protein; the tagged protein is not named."))
     if record.molecular_weight.reconciliation == "discrepancy":
         flags.append(AnomalyFlag(code="MW_DISCREPANCY", severity="med",
                                  detail="Reported migration differs from the expected (UniProt) mass."))
@@ -796,7 +880,8 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
     severities = {f.severity for f in flags}
     if any(f.code in ("MODIFICATION_CONFLICT", "RESIDUE_CONFLICT") for f in flags):
         status = CONFLICTING
-    elif "med" in severities or record.experiment.experiment_type.status == AMBIGUOUS:
+    elif ("med" in severities or record.experiment.experiment_type.status == AMBIGUOUS
+          or any(f.code == "NON_WESTERN_PANEL" for f in flags)):
         status = AMBIGUOUS
     else:
         status = SUPPORTED

@@ -74,7 +74,8 @@ Rules:
 - Do not estimate intensity or fold change.
 - band_pattern is DESCRIPTIVE only: report it when the panel/text clearly shows or
   states multiple bands, a doublet, a smear, or a ladder. Omit it when in doubt --
-  omission means "not reported", which is correct and preferred. NEVER derive it
+  omission is preferable to guessing; downstream provenance decides whether the
+  field is NOT_STATED, NOT_RECOVERED, or legacy MISSING. NEVER derive it
   from what the protein is known to do (e.g. do not call LC3B a doublet, or
   ubiquitin a ladder, unless THIS blot shows/says so). Do not interpret bands as
   isoforms, cleavage products, dimers or degradation products.
@@ -90,6 +91,10 @@ def extract_records_from_claims(
 ) -> list[EvidenceRecord]:
     """Turn a model's `rows` output into Evidence Records (Stage 3)."""
     records: list[EvidenceRecord] = []
+    # every row target of this panel: lets a stain row tell "the panel IS the stain"
+    # from "loading-control stain under a western" (biology.classify_non_western)
+    panel_targets = [r["raw_target"] for r in model_output.get("rows", [])
+                     if isinstance(r, dict) and r.get("raw_target")]
     for row in model_output.get("rows", []):
         if not isinstance(row, dict) or not row.get("raw_target"):
             continue
@@ -97,6 +102,7 @@ def extract_records_from_claims(
             "paper": panel_context.get("paper", {}),
             "figure": panel_context.get("figure", {}),
             "raw_target": row["raw_target"],
+            "panel_targets": panel_targets,
             "texts": panel_context.get("texts", {}),
             "model_claims": {
                 "sample": row.get("sample") or None,
@@ -153,8 +159,18 @@ def extract_panel(
     return records
 
 
-def records_to_supabase_rows(records: list[EvidenceRecord]) -> list[dict[str, Any]]:
+def is_non_western(rec: EvidenceRecord) -> bool:
+    return rec.experiment.experiment_type.value == "non_western"
+
+
+def records_to_supabase_rows(records: list[EvidenceRecord],
+                             include_non_western: bool = False) -> list[dict[str, Any]]:
+    """Flat rows for the western tier. Northern/Southern/gel-stain/zymography/EMSA
+    records (experiment_type non_western) stay in evidence_records.json with their
+    flag but are not loaded as western rows unless ``include_non_western``."""
     rows: list[dict[str, Any]] = []
     for rec in records:
+        if is_non_western(rec) and not include_non_western:
+            continue
         rows.extend(rec.to_supabase_rows())
     return rows

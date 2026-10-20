@@ -78,7 +78,7 @@ export default function BetaFeedback({ query }: { query?: string }) {
   } as const;
   const secondary = { ...primary, borderColor: 'var(--border-strong)', color: 'var(--text-subtle)' };
   const panel = {
-    position: 'fixed', bottom: '18px', right: '18px', zIndex: 50,
+    position: 'fixed', bottom: '18px', right: '18px', zIndex: 50, maxWidth: 'calc(100vw - 36px)',
     background: 'var(--input-background)', border: '1px solid var(--border-strong)',
     borderRadius: '8px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px',
   } as const;
