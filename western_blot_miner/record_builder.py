@@ -89,7 +89,9 @@ def build_evidence_record(
     # the previous unconditional behavior) so e.g. mouse Stat3 resolves to the
     # mouse accession and expected MW, not the human one.
     organism_id = biology.organism_taxon_id(mc.get("organism"))
-    res = resolver.resolve(core, organism_id=organism_id)
+    # The RAW label goes to the resolver: its name rules (biology.normalize_target)
+    # need the qualifiers/tags/prefixes that `core` (first token) already dropped.
+    res = resolver.resolve(raw_target, organism_id=organism_id)
     target_info = _target_info(raw_target, core, res, mc)
 
     # ---- modification: gather claims from every source, then reconcile -----
@@ -179,30 +181,42 @@ def build_evidence_record(
 
 def _target_info(raw_target, core, res, mc) -> TargetInfo:
     aliases = mc.get("aliases", [])
+    # B-12 label facts (tag stripped, LC3 form, viral...) travel as a source on the
+    # canonical field so "why did HiveBlot say this?" can show them.
+    rule_src = [Source(type="normalization_rule", rank=RANK_MODEL_TARGET, text=n) for n in res.notes]
     if res.status == SUPPORTED and res.uniprot_id:
         canonical = EvidenceField.supported(
-            res.canonical, 0.96, [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)])
+            res.canonical, 0.96,
+            [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)] + rule_src)
         uniprot = EvidenceField.supported(
             res.uniprot_id, 0.96, [Source(type="uniprot_reference", rank=RANK_REFERENCE, text=res.uniprot_id)])
     elif res.status == AMBIGUOUS:
         cands = [Candidate(value=c.get("uniprot_id"), source_type="uniprot_reference", rank=RANK_REFERENCE,
                            confidence=0.5, evidence=[Source(type="uniprot_reference", rank=RANK_REFERENCE,
                                                             text=str(c))]) for c in (res.candidates or [{}])]
+        # A family named by a rule has gene symbols, not accessions: the canonical
+        # field lists the symbols; the accession field stays empty (none chosen).
+        gene_cands = [Candidate(value=c.get("uniprot_id") or c.get("gene"), source_type="uniprot_reference",
+                                rank=RANK_REFERENCE, confidence=0.5,
+                                evidence=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text=str(c))])
+                      for c in (res.candidates or [{}])]
+        if res.source == "normalization_rule":
+            cands = [Candidate(value=None, source_type="uniprot_reference", rank=RANK_REFERENCE, confidence=0.5)]
         # An ambiguous resolution keeps a best-effort family LABEL (e.g.
         # "MAPK1/MAPK3" for ERK1/2) as the value, but MUST stay AMBIGUOUS -- a
         # multi-gene family is not a settled canonical value (invariant #3), so
         # it never renders as SUPPORTED and surfaces for review.
         canonical = EvidenceField(
             value=res.canonical, confidence=0.5, status=AMBIGUOUS,
-            sources=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous_family")],
-            candidates=cands,
-        ) if res.canonical else EvidenceField.ambiguous(cands)
+            sources=[Source(type="uniprot_reference", rank=RANK_REFERENCE, text="ambiguous_family")] + rule_src,
+            candidates=gene_cands,
+        ) if res.canonical else EvidenceField.ambiguous(gene_cands, sources=rule_src or None)
         uniprot = EvidenceField.ambiguous(cands)   # accession NOT chosen
     else:
-        canonical = EvidenceField.missing()
+        canonical = EvidenceField(value=None, confidence=0.0, status=MISSING, sources=rule_src)
         uniprot = EvidenceField.missing()
     return TargetInfo(raw_target_name=raw_target, canonical_target=canonical, uniprot_id=uniprot,
-                      aliases_used_in_paper=aliases)
+                      aliases_used_in_paper=aliases, target_kind=res.kind)
 
 
 def _phospho_specific_field(detection_abs, mod_fields) -> EvidenceField:
@@ -789,6 +803,14 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
     if record.target.canonical_target.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="PROTEIN_AMBIGUOUS", severity="med",
                                  detail="Protein name maps to more than one reviewed UniProt entry."))
+    # B-12: an unresolved target that is NOT a human protein is labeled as such, not
+    # left as a silent NULL. "low": informational, it does not change record_status.
+    if record.target.target_kind == "viral":
+        flags.append(AnomalyFlag(code="NON_HUMAN_TARGET", severity="low",
+                                 detail="Target is a viral protein; it is not resolved against human UniProt."))
+    elif record.target.target_kind == "tag":
+        flags.append(AnomalyFlag(code="EPITOPE_TAG_TARGET", severity="low",
+                                 detail="Target is an epitope/fusion tag, not a protein; the tagged protein is not named."))
     if record.molecular_weight.reconciliation == "discrepancy":
         flags.append(AnomalyFlag(code="MW_DISCREPANCY", severity="med",
                                  detail="Reported migration differs from the expected (UniProt) mass."))

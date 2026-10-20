@@ -82,7 +82,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 | O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft): fix the 7 security-review items posted 10-18 (1 blocking: unbounded page render) |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
 | B-14 | Unresolved target must set needs_review | P2 | probably covered by `4cbbaa8` in PR #24; check after E-7 |
-| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | held until E-7 (extraction code) |
+| B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | code in draft PR (branch `b-12-target-normalization`); do not merge before the blind benchmark is scored (Tue 10-20); Tanvi reviews `tickets/b12-expected-mappings.md` |
 | B-13 | Non-western blots stored as westerns (uses Tanvi's Q-4 list) | P2 | held until E-7 (extraction code) |
 | W-7 | W-5 review follow-ups (non-retryable config/401, old-Safari abort, standalone DB test) | P3 | done 10-18 (#29) |
 | O-8 | Research page gives up on transient 429s | P3 | done 10-18 (#28) |
