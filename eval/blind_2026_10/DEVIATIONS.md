@@ -117,3 +117,21 @@ candidate file had not flagged it, so it was drawn by mistake.
   - one duplicate `row_order` typo fixed
 - **Set aside.** 24 lane calls had no matching target row: paper 3 panel 4 (3 strips) and paper 3
   panel 3 strip 4. Nobody filled them in, to keep the labels human-only, so they are not scored.
+
+## A6. 2026-10-20: scorer fixes after unsealing (no metric changed)
+
+The first scoring run stopped on Tanvi's free-text time log ("1:32 hour"). Three mechanical fixes
+were made. Re-scoring produced identical metrics, and the pre-fix output is kept for comparison:
+1. Durations are now parsed from free text (time log only).
+2. Supplementary figure labels ("S1") are no longer read as Figure 1 in the crop-map join.
+3. The report's paper count is computed, not hard-coded.
+
+Separately, the raw numbers are strongly affected by annotation notation:
+- gene symbols written non-standardly (SOSTMI, LC31, CatD)
+- `none` written for `total`
+- free-text cell-line descriptions
+
+That gets settled only through Tanvi's adjudication and confirmation sheet, never by changing the
+scorer to fit the results. The inventory lists only the panels she labeled, not every Western
+panel, so panel recall is not a valid literature-level number and will be reported only with that
+caveat.
