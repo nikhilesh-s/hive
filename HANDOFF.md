@@ -7,6 +7,42 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## O-2 security review fixed (2026-10-19)
+
+Branch `o-2-pdf-upload` (PR #22), merged with main, review items 1-7 fixed; latest
+commit: `git log -1 --format=%H origin/o-2-pdf-upload`. Srushti unavailable; Nik
+approved finishing it. `western_blot_miner/` is untouched (frozen benchmark).
+
+- Uploads are validated in a `python -I` child with an empty env, a 30 s wall
+  clock and RLIMIT_CPU 20 s / RLIMIT_AS 1 GiB (AS is not enforceable on macOS).
+  Limits: 60 pages, A2 per page, and 600 megapixels in total at 350 DPI
+  (about 52 letter pages). Over a limit: rejected before any job or render.
+- Upload render and OpenCV run in a second `python -I` child: empty env, 900 s
+  wall clock and CPU, and RLIMIT_FSIZE 512 MiB per file. Non-upload jobs still
+  call `pdf_preprocess` in-process, unchanged. At API startup,
+  `PDF_DIR/uploads` is swept (orphans from crashes or redeploys).
+- The supplied DOI must appear somewhere in the page-1 text (metadata is
+  ignored; other DOIs there are fine). If it is absent: 422 and no job. An
+  upload-made empty job or a pending job older than 30 minutes no longer blocks
+  a later upload. To remove a fake upload, see
+  `tickets/o2-pdf-upload-verification.md`.
+- Quota: daily cap and per-user limit (10 streamed attempts/day) checked before
+  reading the body; 2 concurrent uploads, one per user; 180 s body timeout; writes via
+  `to_thread`; tickets 10/minute and 60/day per user. All in-process counters.
+- Audit: `uploaded_by`, `uploaded_at`, `pdf_sha256` on `ingest_jobs` via new
+  **migration 012 (NOT applied)**. Until Nik applies it, uploads fail closed
+  with 503; normal ingest is unaffected. Job listings strip these columns.
+- Upload runs use `PDF_DIR/uploads/<job_id>`, deleted after rows and crops are
+  stored (or on failure). Crops from uploads without verified open access are
+  never served: both crop routes return 403 "Crop hidden for uploaded copy"
+  (the web falls back to its no-crop note). This also hides them from the uploader.
+
+Tests: API 339 passed / 19 skipped (66 upload tests); web tsc, lint, 31 node
+tests and the build pass. The DB matrix test (migration 012, audit, crop gate) runs
+only in CI (no local Postgres). Not done: RLIMIT_AS on the render child
+(OpenCV's virtual memory was not measured on Linux); real OAuth/model checks
+and Srushti's visual check. Next: Nik reviews PR #22, applies
+migration 012, then merges.
 ## 2026-10-19: W-3 phone and Safari pass
 
 - **Branch** `w-3-phone-safari-pass` (from `e8cc2c7`), one PR to main. Findings:
@@ -181,6 +217,59 @@ audit and W-1 remain preserved. Next: verify PR #20 CI and await Nik's review;
 leave the PR unmerged and undeployed. Persistent backend failure
 still reports unavailable after bounded retries; release verification awaits
 an authorized deployment.
+
+## O-2 PDF Upload on Search and Research (2026-10-14)
+
+Branch: `o-2-pdf-upload`, worktree `/private/tmp/hiveblot-o2`.
+Base commit: `d6bc7717e459e69cdd7fda7419373f4b3f3ea000` (W-1 PR #19, unmerged).
+Implementation commit: `e84ffceb86ca5383570870cfe3f966cbc7181407`.
+CI packaging fix: `78f3423d6e914c36e860561849f1849a7291c1d1`.
+Latest handoff/browser-verification follow-up: resolve with
+`git log -1 --format=%H -- HANDOFF.md`. This entry supersedes the W-1 next task.
+Draft PR: https://github.com/nikhilesh-s/hive/pull/22; Nik (`nikhilesh-s`) review
+requested. Base remains `w-1-doi-deep-link`; PR is open, draft and unmerged.
+
+Shared upload dialog is available on Search and Research. Explicit submission
+requires beta access plus a server-verified Supabase user. A five-minute DOI/user
+capability allows direct bounded PDF streaming to FastAPI without exposing the
+internal key or sending large files through Next.js. File validation includes
+50 MiB bounds, PDF signature/readability/encryption and rights confirmation.
+Completed/pending DOI jobs are reused; new uploads reuse existing quota, job,
+OpenCV/model/reconciliation, live-row and crop storage. Uploads never establish
+open access, carry persisted upload source metadata, and cannot write reviewed
+Search data. No new tables/migrations or model implementation. W-1 opens results.
+Access/sign-in return paths preserve DOI/lab; no redirect or refresh submits PDFs.
+
+Verification: API 288 passed / 17 skipped; disposable PostgreSQL matrix 15 passed
+/ 1 skipped; frontend 14 passed; 32 desktop/mobile browser checks; TypeScript,
+lint, production build and whitespace checks pass. Miner pytest 133 passed /
+2 skipped; biology 165, reconcile 21, enrich 18, extraction 10, pipeline 13,
+stable-row-key 34, densitometry 116; seed benchmark 34/34 (not wet-lab accuracy).
+Real upload/preprocessing/reconciliation/storage/W-1 retrieval tested against
+isolated PostgreSQL with explicit mock model and test identity. Reviewed fixture
+rows remain 475; two mock unreviewed rows are separate. No production data touched.
+
+NOT COMPLETE: Srushti must visually inspect the preview. Real Google OAuth and
+real AI extraction remain unverified: public auth variables are intentionally
+unconfigured in the preview, no model credentials are available, and the local
+Claude CLI is logged out. The dialog exposes missing sign-in configuration.
+Inherited production dependency audit reports five affected packages, including
+critical Next.js advisories; do not claim production readiness or upgrade them
+in this ticket. Existing single-process job/quota and restart limitations remain.
+
+Preview: frontend port 3022 (Webpack dev), normal API 8204, separate test-only mock
+model API 8205. Screenshots at `/private/tmp/hiveblot-o2-screenshots/`; fixture PDF
+at `/private/tmp/hiveblot-o2-sample.pdf`. See `tickets/o2-pdf-upload-verification.md`
+for flow, source files, precise test caveats and reproduction prerequisites.
+Original checkout and its five edits are unchanged (diff fingerprint verified).
+GitHub API/miner, PostgreSQL, web and hygiene checks all passed on `78f3423`.
+The initial npm 11/npm 10 optional-lock compatibility failure was corrected
+without changing the existing dependency versions; npm 10 clean-install dry-run
+also passes. Final browser coverage adds actual normal-API missing-model refusal
+(not a mocked service error), without creating a job or consuming quota.
+Next: obtain Srushti's visual acceptance, genuine OAuth/model verification and
+Nik's review of PR #22. Leave draft and unmerged while these remain outstanding.
+Retarget only after W-1 merges. Do not deploy or mutate hosted Supabase.
 
 ## W-1 DOI deep links and stored-paper lookup (2026-10-13)
 

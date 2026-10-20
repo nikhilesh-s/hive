@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
+import uuid
 from pathlib import Path
 
 import pytest
@@ -40,6 +41,7 @@ CHAIN = [
     "migrations/007_search_history.sql",
     "migrations/008_saved_results.sql",
     "migrations/011_ingest_jobs_paper_access_relevance.sql",
+    "migrations/012_ingest_jobs_upload_audit.sql",
 ]
 LIVE_SQL = ("INSERT INTO western_blot_records_live (paper_id, target, job_id) "
             "VALUES ('live-paper', 'STAT3', 'job1')")
@@ -344,6 +346,54 @@ def test_stored_doi_lookup_reads_exact_completed_paper_without_search_cap(conn, 
             await conn.execute("DELETE FROM western_blot_records_live WHERE job_id IN ('w1-done', 'w1-pending', 'w1-gone')")
             await conn.execute("DELETE FROM ingest_jobs WHERE job_id IN ('w1-done', 'w1-pending', 'w1-stale')")
 
+    run(conn, exercise())
+
+
+def test_upload_metadata_and_latest_job_use_scoped_roles_without_reviewed_writes(conn, monkeypatch):
+    import asyncpg
+    from app import db as appdb
+
+    async def exercise():
+        async def ingest_role(connection):
+            await appdb._decode_json(connection)
+            await connection.execute("SET ROLE hive_ingest")
+        async def readonly(connection):
+            await appdb._decode_json(connection)
+            await connection.execute("SET ROLE hive_readonly")
+        writer = await asyncpg.create_pool(DB_URL, min_size=1, max_size=1, init=ingest_role)
+        reader = await asyncpg.create_pool(DB_URL, min_size=1, max_size=1, init=readonly)
+        async def get_writer(): return writer
+        async def get_reader(): return reader
+        monkeypatch.setattr(appdb, "get_ingest_pool", get_writer)
+        monkeypatch.setattr(appdb, "get_readonly_pool", get_reader)
+        before = await conn.fetchval("SELECT count(*) FROM western_blot_records")
+        try:
+            uploader = uuid.uuid4()
+            await appdb.upsert_ingest_job({"job_id": "o2-upload", "doi": "10.1000/o2", "status": "queued", "metadata_source": "upload",
+                                           "uploaded_by": uploader, "uploaded_at": "2026-10-19T00:00:00+00:00", "pdf_sha256": "ab" * 32})
+            await appdb.upsert_ingest_job({"job_id": "o2-upload", "doi": "10.1000/o2", "status": "extracting", "metadata_source": "upload"})
+            assert await appdb.latest_ingest_job("10.1000/o2") == {"job_id": "o2-upload", "status": "extracting",
+                                                                   "metadata_source": "upload", "fresh": True}
+            assert await appdb.latest_ingest_job("10.1000/o2-prefix") is None
+            assert (await appdb.lookup_live_paper("10.1000/o2"))["status"] == "pending"
+            row = await conn.fetchrow("SELECT metadata_source, access_status, uploaded_by, pdf_sha256 FROM ingest_jobs WHERE job_id='o2-upload'")
+            assert row["metadata_source"] == "upload" and row["access_status"] is None
+            assert row["uploaded_by"] == uploader and row["pdf_sha256"] == "ab" * 32  # later status upserts keep the audit
+            listed = next(j for j in await appdb.list_ingest_jobs(20) if j["job_id"] == "o2-upload")
+            assert not set(appdb.UPLOAD_AUDIT_COLS) & set(listed)
+            async with writer.acquire() as connection:
+                await connection.execute("INSERT INTO ingest_crops (job_id, filename, png) VALUES ('o2-upload', 'c.png', '\\x89'::bytea)")
+            with pytest.raises(appdb.UploadCropHidden):
+                await appdb.fetch_live_crop("o2-upload", "c.png")
+            assert await conn.fetchval("SELECT count(*) FROM western_blot_records") == before
+            async with writer.acquire() as connection:
+                with pytest.raises(asyncpg.InsufficientPrivilegeError):
+                    await connection.execute(RECORD_SQL)
+        finally:
+            await writer.close()
+            await reader.close()
+            await conn.execute("DELETE FROM ingest_jobs WHERE job_id='o2-upload'")
+            await conn.execute("DELETE FROM ingest_crops WHERE job_id='o2-upload'")
     run(conn, exercise())
 
 

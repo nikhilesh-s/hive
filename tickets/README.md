@@ -79,7 +79,7 @@ benchmark measures commit `f77d311`, which is what production runs.
 ### Srushti (+ Codex)
 | Ticket | What | Pri | Status |
 |---|---|---|---|
-| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22 (draft): fix the 7 security-review items posted 10-18 (1 blocking: unbounded page render) |
+| O-2 | Upload-your-own-PDF on the research page (API + web) | P1 | PR #22: 7 security-review items fixed 10-19 (finished for Srushti, Nik approved); apply migration 012 before uploads work; Nik reviews/merges |
 | W-2 | Open the B-3 PR from `feature/saved-results` | P1 | PR #24 (draft, opened 10-18); hold the merge until E-7 |
 | B-14 | Unresolved target must set needs_review | P2 | probably covered by `4cbbaa8` in PR #24; check after E-7 |
 | B-12 | Target normalization misses (uses Tanvi's Q-3 list) | P2 | held until E-7 (extraction code) |

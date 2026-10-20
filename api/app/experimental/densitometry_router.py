@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from ..auth import require_internal_key
 from ..config import settings
 from ..crops import resolve_reviewed_crop
-from ..db import fetch_live_crop, fetch_live_record, fetch_record_by_id
+from ..db import UploadCropHidden, fetch_live_crop, fetch_live_record, fetch_record_by_id
 from ..limiter import limiter
 
 REPO = Path(__file__).resolve().parents[3]
@@ -58,7 +58,10 @@ async def _record_png(record_id: int, live: bool) -> tuple[bytes, int | None, di
         row = await fetch_live_record(record_id)
         if row is None or not row.get("image_crop_ref"):
             raise HTTPException(404, "No crop for this live record")
-        png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+        try:
+            png = await fetch_live_crop(row.get("job_id"), str(row["image_crop_ref"]).rsplit("/", 1)[-1])
+        except UploadCropHidden as e:
+            raise HTTPException(403, str(e)) from None
         if not png:
             raise HTTPException(404, "Crop not available")
         return png, None, row
