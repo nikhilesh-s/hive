@@ -136,7 +136,8 @@ def build_evidence_record(
     # ---- experiment type ---------------------------------------------------
     lane_text = " | ".join(
         str(b.get("lane_condition") or "") for b in mc.get("bands", []))
-    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text=lane_text)
+    experiment = _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text=lane_text,
+                                  raw_target=raw_target, panel_targets=case.get("panel_targets"))
 
     # ---- sample ------------------------------------------------------------
     sample = _sample_info(mc, caption)
@@ -217,10 +218,21 @@ def _phospho_specific_field(detection_abs, mod_fields) -> EvidenceField:
     return EvidenceField.missing()
 
 
-def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str = "") -> ExperimentInfo:
+def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str = "",
+                     raw_target: str = "", panel_targets=None) -> ExperimentInfo:
     text_blob = f"{caption}\n{methods}"
     flags: list[str] = []
     sources: list[Source] = []
+
+    # Northern / Southern / gel stain / zymography / EMSA: panel evidence (target,
+    # lane labels, sibling rows) AND caption/methods wording; see biology.classify_non_western.
+    non_western = biology.classify_non_western(raw_target or core, caption, methods, lane_text, panel_targets)
+    if non_western:
+        flags.extend(["non_western", non_western["kind"]])
+        sources.append(Source(type="model_target", rank=RANK_MODEL_TARGET, text=raw_target or core))
+        ctx = non_western["evidence"][1]
+        sources.append(Source(type=ctx["type"], rank=RANK_CAPTION if ctx["type"] == "figure_caption" else RANK_METHODS,
+                              text=ctx["text"]))
 
     # co-IP requires PANEL evidence: an IP-role antibody claim, or co-IP /
     # IP:/IgG/input markers printed on the panel's own lanes. Page-level text
@@ -261,7 +273,9 @@ def _experiment_info(core, caption, methods, mod_fields, ip_abs, lane_text: str 
         flags.append("phospho_western")
 
     # Primary label + confidence, degraded when the modification is unsettled.
-    if "co_ip" in flags:
+    if "non_western" in flags:
+        primary, conf, status = "non_western", 0.9, SUPPORTED
+    elif "co_ip" in flags:
         primary, conf, status = "co_ip", 0.9, SUPPORTED
     elif "purified_protein" in flags:
         primary, conf, status = "purified_protein", 0.85, SUPPORTED
@@ -783,6 +797,11 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
                        f"absent yet carries band_pattern '{pat}'."))
             break
 
+    if record.experiment.experiment_type.value == "non_western":
+        flags.append(AnomalyFlag(code="NON_WESTERN_PANEL", severity="high",
+                                 detail="Panel is not an immunoblot (Northern/Southern/gel stain/zymography/EMSA); "
+                                        "its rows are not western evidence.",
+                                 evidence=list(record.experiment.experiment_type.sources)))
     if record.experiment.experiment_type.status == AMBIGUOUS:
         flags.append(AnomalyFlag(code="EXPERIMENT_TYPE_AMBIGUOUS", severity="med",
                                  detail="Experiment type is unsettled (often downstream of a modification conflict)."))
@@ -796,7 +815,8 @@ def _validate(record: EvidenceRecord, detection_abs, mod_fields) -> ValidationIn
     severities = {f.severity for f in flags}
     if any(f.code in ("MODIFICATION_CONFLICT", "RESIDUE_CONFLICT") for f in flags):
         status = CONFLICTING
-    elif "med" in severities or record.experiment.experiment_type.status == AMBIGUOUS:
+    elif ("med" in severities or record.experiment.experiment_type.status == AMBIGUOUS
+          or any(f.code == "NON_WESTERN_PANEL" for f in flags)):
         status = AMBIGUOUS
     else:
         status = SUPPORTED
