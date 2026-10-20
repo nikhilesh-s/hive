@@ -101,3 +101,19 @@ candidate file had not flagged it, so it was drawn by mistake.
   **3 papers** (ranks 1, 3 and 4) instead of 4.
 - **What this changes.** The sample is smaller and the denominators will show it. Neither
   decision depended on any result.
+
+## A5. 2026-10-20: annotation coverage and clerical fixes (before scoring; outputs still sealed)
+
+- **Coverage.** The guide asked for every panel to be labeled when a paper has 6 or fewer. Tanvi
+  labeled 8 of 11 inventoried panels:
+  - paper 1: 4/4
+  - paper 3: 3/5
+  - paper 4: 1/2
+
+  The panels she labeled were her own choice, made blind to all system output. Field metrics use
+  the 8 labeled panels. Panel recall uses all 11.
+- **Clerical fixes,** each logged in `annotations/tanvi/ERRATA.csv` and confirmed with Tanvi:
+  - inventory panel numbers changed to per-paper numbering
+  - one duplicate `row_order` typo fixed
+- **Set aside.** 24 lane calls had no matching target row: paper 3 panel 4 (3 strips) and paper 3
+  panel 3 strip 4. Nobody filled them in, to keep the labels human-only, so they are not scored.
