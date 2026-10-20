@@ -1,5 +1,7 @@
 'use client';
 
+import { PdfUpload } from '@/components/PdfUpload';
+
 // EXPERIMENTAL — the one-page UCSF research flow:
 //   topic → find papers (Valency / PMC, source shown) → choose an open-access
 //   paper → extract live or open an already-ingested copy → progress →
@@ -12,7 +14,9 @@ import { useEffect, useRef, useState } from 'react';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import ExperimentalNav from '@/components/ExperimentalNav';
 import { groupResults, type DatabaseResult } from '@/lib/results';
-import { jobFinished } from '@/lib/ingestJob';
+import { jobFinished, POLL_LIMIT_MS, pollBackoffMs, transientPoll } from '@/lib/ingestJob';
+import { fetchStoredPaper, isDoiQuery, normalizeDoi, type StoredPaper } from '@/lib/storedPaper';
+import { paperAccessLabel } from '@/lib/paperAccess';
 
 interface Paper {
   title?: string | null; authors?: string[]; abstract?: string | null; doi?: string | null;
@@ -52,9 +56,7 @@ function Stepper({ status }: { status: string }) {
 }
 
 function accessLabel(status?: string | null) {
-  if (status === 'open_access') return 'Open access';
-  if (status === 'no_open_copy_found') return 'Paywalled · Check institutional access';
-  return 'Access unknown';
+  return paperAccessLabel(status);
 }
 
 function relevanceLabel(status?: string | null) {
@@ -96,11 +98,16 @@ export default function ResearchPage() {
   const [askErr, setAskErr] = useState<string | null>(null);
   const [rowsErr, setRowsErr] = useState<string | null>(null);
   const [liveErr, setLiveErr] = useState<string | null>(null);
+  const [storedPaper, setStoredPaper] = useState<StoredPaper | null>(null);
+  const [doiMessage, setDoiMessage] = useState<string | null>(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
   // Every paper-scoped request (rows, extraction start, job poll, ask) records the
   // sequence number it started with; choosing a paper or starting an extraction
   // bumps it, so a late response never lands on a newer selection.
   const seq = useRef(0);
   const pollFails = useRef(0);
+  const throttles = useRef(0); // consecutive 429/503 polls; these never count toward pollFails
+  const waitUntil = useRef(0);
 
   const refreshLive = () => fetch('/api/experimental/live-papers')
     .then(async (r) => {
@@ -115,6 +122,16 @@ export default function ResearchPage() {
     refreshLive();
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    const params = new URLSearchParams(window.location.search);
+    const doi = params.get('doi');
+    // Keep lab in the URL for the existing attribution collector and access redirects.
+    if (doi !== null) void openStoredDoi(doi, () => active);
+    return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Poll a running job every 2 s; on done, load its rows and refresh the ingested list.
   // A job that can no longer be read (404 after an API restart, backend down) stops the poll with an error.
   useEffect(() => {
@@ -123,14 +140,24 @@ export default function ResearchPage() {
     const id = window.setInterval(async () => {
       const my = seq.current;
       setElapsed(Math.round((Date.now() - started) / 1000));
+      if (Date.now() < waitUntil.current) return; // backing off after a 429/503
       let j: Job | null = null;
       let fail = 'backend unreachable';
+      let wait: number | null = null;
       try {
         const r = await fetch(`/api/experimental/ingest/${job.job_id}`);
         if (r.ok) j = await r.json();
+        else if (transientPoll(r.status)) wait = pollBackoffMs(throttles.current, r.headers.get('Retry-After'));
         else fail = r.status === 404 ? 'the job no longer exists (the API may have restarted)' : `backend returned ${r.status}`;
       } catch { /* fail stays 'backend unreachable' */ }
       if (my !== seq.current) return; // another paper was chosen meanwhile
+      if (wait !== null) {
+        if (Date.now() - started > POLL_LIMIT_MS) setJob((cur) => cur && { ...cur, status: 'failed', error: 'Lost track of this job: the backend kept asking us to slow down for 20 minutes.' });
+        else { throttles.current++; waitUntil.current = Date.now() + wait; }
+        return;
+      }
+      throttles.current = 0;
+      waitUntil.current = 0;
       if (!j) {
         // a 404 is final; ride out a transient 502 / network blip for ~10 s before giving up
         if (fail.startsWith('backend') && ++pollFails.current < 5) return;
@@ -145,12 +172,45 @@ export default function ResearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job?.job_id, job?.status]);
 
-  const ingested = (doi?: string | null) => livePapers.find((p) => doi && p.doi.toLowerCase() === doi.toLowerCase());
+  const ingested = (doi?: string | null) => doi
+    ? (storedPaper?.doi === normalizeDoi(doi) ? storedPaper : livePapers.find((p) => normalizeDoi(p.doi) === normalizeDoi(doi)))
+    : undefined;
+
+  async function openStoredDoi(value: string, active = () => true) {
+    const my = invalidate();
+    const doi = normalizeDoi(value);
+    setTopic(doi || value);
+    setSelected(null); setStoredPaper(null); setJob(null);
+    setPapers([]); setSources([]); setSearchErr({});
+    setDoiMessage(null);
+    if (!doi) { setDoiMessage('Enter a valid DOI.'); return; }
+    setLookupLoading(true);
+    try {
+      const data = await fetchStoredPaper<DatabaseResult>(doi);
+      if (my !== seq.current || !active()) return;
+      if (data.status === 'found' && data.paper) {
+        setStoredPaper(data.paper);
+        setSelected({ doi, title: data.paper.title, source: 'live' });
+        setRows(data.results);
+      } else {
+        setDoiMessage(data.status === 'pending'
+          ? 'Extraction is still in progress. No completed evidence is available yet.'
+          : 'This paper has not been extracted yet.');
+        if (data.status === 'not_extracted') setSelected({ doi });
+      }
+    } catch (error) {
+      if (my === seq.current && active()) setRowsErr(`Could not look up stored evidence: ${error instanceof Error ? error.message : 'request failed'}`);
+    } finally {
+      if (my === seq.current && active()) setLookupLoading(false);
+    }
+  }
 
   async function findPapers(e?: React.FormEvent, q?: string) {
     e?.preventDefault();
     const qq = (q ?? topic).trim();
     if (!qq) return;
+    if (isDoiQuery(qq)) { await openStoredDoi(qq); return; }
+    setDoiMessage(null);
     setTopic(qq);
     setSearching(true);
     setPapers([]);
@@ -174,6 +234,7 @@ export default function ResearchPage() {
     setRows([]); setRowsLoading(false); setRowsErr(null);
     setAsk(null); setAskErr(null); setAsking(false);
     setStartErr(null);
+    setLookupLoading(false);
     return ++seq.current;
   }
 
@@ -182,10 +243,10 @@ export default function ResearchPage() {
     setRowsLoading(true);
     setRowsErr(null);
     try {
-      const r = await post('/api/experimental/search', { query: doi, limit: 500 });
-      const d = await r.json();
+      const d = await fetchStoredPaper<DatabaseResult>(doi);
       if (my !== seq.current) return; // another paper was chosen meanwhile
-      if (!r.ok) throw new Error(d.detail || d.error || `Backend returned ${r.status}`);
+      if (d.status !== 'found') throw new Error('No completed evidence is available for this paper.');
+      setStoredPaper(d.paper);
       setRows(d.results || []);
     } catch (e2) {
       if (my === seq.current) setRowsErr(`Could not load the live records: ${e2 instanceof Error ? e2.message : 'request failed'}`);
@@ -195,10 +256,12 @@ export default function ResearchPage() {
   }
 
   function choose(p: Paper) {
+    const have = ingested(p.doi);
     setSelected(p);
     invalidate();
+    setDoiMessage(null); setStoredPaper(null);
     setJob(null);
-    if (p.doi && ingested(p.doi)) loadRows(p.doi);
+    if (p.doi && have) loadRows(p.doi);
   }
 
   async function extract(doi: string) {
@@ -207,20 +270,6 @@ export default function ResearchPage() {
       const r = await post('/api/experimental/ingest', {
         doi,
         query: topic,
-        title: selected?.title,
-        abstract: selected?.abstract,
-        authors: selected?.authors,
-        journal: selected?.journal || selected?.venue,
-        year: selected?.year,
-        pmid: selected?.pmid,
-        pmcid: selected?.pmcid,
-        source: selected?.source,
-        access_status: selected?.access_status,
-        access_url: selected?.access_url,
-        access_source: selected?.access_source,
-        relevance_status: selected?.relevance_status,
-        relevance_score: selected?.relevance_score,
-        relevance_reason: selected?.relevance_reason,
       });
       const d = await r.json();
       if (my !== seq.current) return; // another paper was chosen meanwhile
@@ -278,13 +327,17 @@ export default function ResearchPage() {
 
       <section className="hb-page-section">
         <h2 className="hb-page-h2">1. Find papers</h2>
+        <PdfUpload initialDoi={topic} />
         <form onSubmit={findPapers} className="hb-live-form" role="search">
-          <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic, e.g. STAT3 phosphorylation hepatocellular carcinoma" aria-label="Research topic" />
-          <button type="submit" disabled={searching || !topic.trim()}>{searching ? 'Searching…' : 'Find papers'}</button>
+          <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic or DOI" aria-label="Research topic or DOI" />
+          <button type="submit" disabled={searching || lookupLoading || busy || !topic.trim()}>{searching || lookupLoading ? 'Searching…' : 'Find papers'}</button>
         </form>
+        {lookupLoading && <p className="hb-live-note" role="status">Loading stored evidence...</p>}
+        {doiMessage && <p className="hb-live-note" role="status">{doiMessage}</p>}
+        {!selected && rowsErr && <p className="hb-live-error" role="alert">{rowsErr}</p>}
         <div className="hb-search-examples" style={{ marginTop: 8 }}>
           <span>Try:</span>
-          {TOPICS.map((t) => <button key={t} type="button" disabled={searching} onClick={() => findPapers(undefined, t)}>{t}</button>)}
+          {TOPICS.map((t) => <button key={t} type="button" disabled={searching || lookupLoading || busy} onClick={() => findPapers(undefined, t)}>{t}</button>)}
         </div>
         {sources.length > 0 && (
           <p className="hb-live-note">
@@ -357,6 +410,7 @@ export default function ResearchPage() {
             <strong>{selected.title || selected.doi}</strong>
             {selected.doi && <> · <a href={`https://doi.org/${selected.doi}`} target="_blank" rel="noreferrer" className="hb-result-doi" style={{ fontFamily: MONO, fontSize: 12 }}>{selected.doi}</a></>}
           </p>
+          {storedPaper?.discovery_query && <p className="hb-live-note">Original search: {storedPaper.discovery_query}</p>}
           {!selectedIngested && !job && (
             <div className="hb-live-form">
               <button type="button" onClick={() => selected.doi && extract(selected.doi)} disabled={!selected.doi}>

@@ -238,7 +238,7 @@ def _needs_review(protein: dict, modification: dict, experiment: dict) -> bool:
         return True
     if modification["status"] == "AMBIGUOUS":
         return True
-    if experiment["experiment_type"] == "unknown" or experiment["confidence"] < 0.5:
+    if experiment["experiment_type"] in ("unknown", "non_western") or experiment["confidence"] < 0.5:
         return True
     return False
 

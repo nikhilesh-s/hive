@@ -1,5 +1,5 @@
 """Provenance attacks: antibody attribution scope, MW source typing, text-context split."""
-from western_blot_miner.evidence_record import MISSING
+from western_blot_miner.evidence_record import NOT_RECOVERED, NOT_STATED
 from western_blot_miner.pipeline import _split_text_context
 from western_blot_miner.record_builder import build_evidence_record
 
@@ -18,21 +18,21 @@ def _ab(target, text):
 def test_single_fragment_without_target_abstains():
     ab = _ab("STAT3", "anti-GAPDH (Abcam ab8245, 1:5000)")
     for f in (ab.vendor, ab.catalog_number, ab.dilution):
-        assert f.status == MISSING
-    assert _ab("STAT3", "GAPDH (Abcam, ab8245, 1:5000) was the loading control").dilution.status == MISSING
+        assert f.status in (NOT_STATED, NOT_RECOVERED)
+    assert _ab("STAT3", "GAPDH (Abcam, ab8245, 1:5000) was the loading control").dilution.status in (NOT_STATED, NOT_RECOVERED)
 
 
 # D2: neighbour values listed without "anti-" are not stolen.
 def test_unprefixed_neighbour_dilution_not_attached():
     ab = _ab("ACTB", "GAPDH (1:5000) and ACTB (Abcam ab8227) antibodies were used")
-    assert ab.dilution.status == MISSING
+    assert ab.dilution.status in (NOT_STATED, NOT_RECOVERED)
     assert ab.catalog_number.value == "ab8227"
 
 
 def test_antibodies_against_list_catalog_not_attached():
     ab = _ab("ACTB", "Antibodies against GAPDH (Abcam ab8245, 1:5000) and ACTB (Sigma A5441) were used")
     assert ab.catalog_number.value != "ab8245"
-    assert ab.dilution.status == MISSING
+    assert ab.dilution.status in (NOT_STATED, NOT_RECOVERED)
 
 
 def test_semicolon_inside_parentheses_does_not_split_scope():
@@ -43,14 +43,14 @@ def test_semicolon_inside_parentheses_does_not_split_scope():
 
 def test_multiple_distinct_values_in_scope_abstain():
     ab = _ab("STAT3", "anti-STAT3 (CST #9139 and #12640, 1:1000)")
-    assert ab.catalog_number.status == MISSING
+    assert ab.catalog_number.status in (NOT_STATED, NOT_RECOVERED)
     assert ab.dilution.value == "1:1000"
 
 
 # D3: alphanumeric boundaries on the target.
 def test_target_is_not_matched_as_substring():
-    assert _ab("ERK", "anti-ERK5 (CST #3372) and anti-GAPDH (CST #2118)").catalog_number.status == MISSING
-    assert _ab("actin", "anti-GAPDH (CST #2118) and anti-alpha-actinin (sc-17829)").catalog_number.status == MISSING
+    assert _ab("ERK", "anti-ERK5 (CST #3372) and anti-GAPDH (CST #2118)").catalog_number.status in (NOT_STATED, NOT_RECOVERED)
+    assert _ab("actin", "anti-GAPDH (CST #2118) and anti-alpha-actinin (sc-17829)").catalog_number.status in (NOT_STATED, NOT_RECOVERED)
 
 
 # D7: reported MW source typed by channel, text verbatim; expected MW untouched.

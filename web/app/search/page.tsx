@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useCorpusStats } from '@/lib/corpusStats';
 import { SearchInput } from '@/components/SearchInput';
+import { PdfUpload } from '@/components/PdfUpload';
 import DatabaseResultCard from '@/components/DatabaseResultCard';
 import FiltersBar, {
   activeFilterChips,
@@ -287,6 +288,7 @@ export default function SearchPage() {
       <div className="hb-search-workspace-header">
         <div className="hb-search-workspace-grid">
           <div className="hb-search-sidebar-spacer" aria-hidden="true" />
+          <div>
           <SearchInput
             heading="Search Western blot evidence"
             placeholder="Search protein, phosphosite, antibody, cell line..."
@@ -295,6 +297,8 @@ export default function SearchPage() {
             examples={['phospho STAT3 Tyr705', 'co-IP PIK3CA', 'CST 9145', 'GAPDH mouse', 'needs review']}
             loading={loading}
           />
+          <PdfUpload initialDoi={query} />
+          </div>
         </div>
       </div>
 
