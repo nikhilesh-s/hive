@@ -17,6 +17,7 @@ PAIRS = [
     ("migrations/009_saved_results_upsert_index.sql", "supabase/migrations/20261011000009_saved_results_upsert_index.sql"),
     ("migrations/010_outreach_attribution_activity_tables.sql", "supabase/migrations/20261001231317_add_outreach_attribution_to_activity_tables.sql"),
     ("migrations/011_ingest_jobs_paper_access_relevance.sql", "supabase/migrations/20261011000011_ingest_jobs_paper_access_relevance.sql"),
+    ("migrations/012_ingest_jobs_upload_audit.sql", "supabase/migrations/20261019000012_ingest_jobs_upload_audit.sql"),
 ]
 
 

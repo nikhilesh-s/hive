@@ -5,9 +5,9 @@ name: experimental-ci
 
 on:
   push:
-    branches: ["main", "release/**", "experimental/**"]
+    branches: ["main", "release/**", "experimental/**", "o-2-pdf-upload"]
   pull_request:
-    branches: ["main", "release/**", "experimental/**"]
+    branches: ["main", "release/**", "experimental/**", "w-1-doi-deep-link"]
   workflow_dispatch:
     inputs:
       run_live_valency:
