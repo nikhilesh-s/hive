@@ -1,7 +1,22 @@
 paper_pmcid,panel_id,row_order,target_printed,field,lane_index,annotated,system,verdict
+PMC9283986,1,2,GAPDH,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6","Fibroblast protein extracts from control (6) and FAD (6) individuals (NA1-NA6, AD1-AD6)",
+PMC9283986,1,4,LC3II,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6","Fibroblast protein extracts from control (6) and FAD (6) individuals (NA1-NA6, AD1-AD6)",
+PMC9283986,1,6,Lamp2,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6","Fibroblast protein extracts from control (6) and FAD (6) individuals (NA1-NA6, AD1-AD6)",
+PMC9283986,1,8,CatD •,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6","Fibroblast protein extracts from control (6) and FAD (6) individuals (NA1-NA6, AD1-AD6)",
+PMC9283986,2,1,PAKT (Ser473),protein_identity,,PAKT (Ser473),AKT1,
+PMC9283986,2,1,PAKT (Ser473),cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
+PMC9283986,2,2,AKT total,protein_identity,,AKT total,AKT1,
+PMC9283986,2,2,AKT total,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
+PMC9283986,2,3,GAPDH,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
+Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
 PMC9283986,3,1,ptau (Thr231),cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,3,2,GAPDH,modification_type,,none,total,
 PMC9283986,3,2,GAPDH,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
 PMC9283986,3,3,ptau (Thr181),cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
@@ -10,43 +25,27 @@ PMC9283986,3,4,ptau (Ser396-Ser404),cell_line,,"Control: NA1, NA2, NA3, NA4, NA5
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
 PMC9283986,3,5,ptau (Ser202-Ser205),cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,3,6,total tau,modification_type,,none,total,
 PMC9283986,3,6,total tau,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,3,8,APP,modification_type,,none,total,
 PMC9283986,3,8,APP,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,3,8,APP,band_call,6,absent,present,
-PMC9283986,3,8,APP,band_call,7,absent,present,
-PMC9283986,3,8,APP,band_call,8,absent,present,
-PMC9283986,3,8,APP,band_call,9,absent,present,
-PMC9283986,3,8,APP,band_call,10,absent,present,
-PMC9283986,4,1,HSP90,modification_type,,none,total,
 PMC9283986,4,1,HSP90,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,4,2,GAPDH,modification_type,,none,total,
 PMC9283986,4,2,GAPDH,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
 PMC9283986,4,3,HSP70,protein_identity,,HSP70,HSPA9,
-PMC9283986,4,3,HSP70,modification_type,,none,total,
 PMC9283986,4,3,HSP70,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
-PMC9283986,4,5,HSP60,modification_type,,none,total,
 PMC9283986,4,5,HSP60,cell_line,,"Control: NA1, NA2, NA3, NA4, NA5, NA6
 Treatment: Familial Alzheimer's Disease: AD1, AD2, AD3, AD4, AD5, AD6",fibroblast protein extracts from control (6) and FAD (6) individuals,
 PMC7948984,1,1,AIF,protein_identity,,AIF,AIFM1,
-PMC7948984,1,1,AIF,modification_type,,none,total,
 PMC7948984,1,1,AIF,treatment,,none,staurosporine,
 PMC7948984,1,1,AIF,band_call,1,absent,present,
 PMC7948984,1,1,AIF,band_call,3,absent,present,
 PMC7948984,1,1,AIF,band_call,4,absent,present,
-PMC7948984,1,2,Histone H3,modification_type,,none,total,
 PMC7948984,1,2,Histone H3,treatment,,none,staurosporine,
-PMC7948984,1,3,GAPDH,modification_type,,none,total,
 PMC7948984,1,3,GAPDH,treatment,,none,staurosporine,
-PMC7948984,2,1,PARP1,modification_type,,none,total,
 PMC7948984,2,1,PARP1,treatment,,none,Staurosporine,
-PMC7948984,2,2,casp3,modification_type,,none,total,
 PMC7948984,2,2,casp3,treatment,,none,Staurosporine,
 PMC7948984,2,2,casp3,band_call,1,absent,present,
 PMC7948984,2,2,casp3,band_call,2,absent,present,
@@ -59,15 +58,11 @@ PMC7948984,2,3,c-casp3,treatment,,none,Staurosporine,
 PMC7948984,2,3,c-casp3,band_call,1,present,absent,
 PMC7948984,2,3,c-casp3,band_call,7,present,absent,
 PMC7948984,2,3,c-casp3,band_call,10,present,absent,
-PMC7948984,2,4,GAPDH,modification_type,,none,total,
 PMC7948984,2,4,GAPDH,treatment,,none,Staurosporine,
-PMC7948984,3,1,PARP1,modification_type,,none,total,
 PMC7948984,3,1,PARP1,treatment,,none,Staurosporine,
 PMC7948984,3,1,PARP1,band_call,6,absent,present,
-PMC7948984,3,2,Histone H3,modification_type,,none,total,
 PMC7948984,3,2,Histone H3,treatment,,none,Staurosporine,
 PMC7948984,3,2,Histone H3,band_call,3,absent,present,
-PMC7948984,3,3,GAPDH,modification_type,,none,total,
 PMC7948984,3,3,GAPDH,treatment,,none,Staurosporine,
 PMC7948984,3,3,GAPDH,band_call,3,present,absent,
 PMC7948984,3,3,GAPDH,band_call,4,present,absent,

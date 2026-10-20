@@ -32,7 +32,7 @@ from compare_records import _fstatus, _fv  # noqa: E402  (Evidence Field envelop
 
 FIELDS = ("protein_identity", "modification_type", "phospho_site", "cell_line", "treatment",
           "band_call")
-CATS = ("CORRECT", "INCORRECT", "ABSTAINED", "NOT_FOUND", "CORRECT_SILENCE", "UNSUPPORTED")
+CATS = ("CORRECT", "INCORRECT", "ABSTAINED", "NOT_FOUND", "CORRECT_SILENCE", "UNSUPPORTED", "LANE_COUNT_MISMATCH")
 SILENT = {"not_stated", "none", ""}
 AA = {"tyr": "y", "ser": "s", "thr": "t", "his": "h", "lys": "k", "arg": "r", "asp": "d"}
 GREEK = {"α": "alpha", "β": "beta", "γ": "gamma", "δ": "delta", "κ": "kappa", "µ": "u", "μ": "u"}
@@ -71,7 +71,8 @@ def annotated_mod(cell) -> tuple[str, set[str]]:
         return "NOT_STATED", set()
     kind, _, sites = text.partition(":")
     kind = norm(kind) or "other"
-    kind = {"phosphorylation": "phospho", "cleavage": "cleaved", "unmodified": "total"}.get(kind, kind)
+    kind = {"phosphorylation": "phospho", "cleavage": "cleaved", "proteolyticcleavage": "cleaved",
+            "unmodified": "total", "none": "total", "nomodification": "total"}.get(kind, kind)  # A7: none = total
     found = set()
     for s in sites.split("/"):
         m = re.match(r"\s*([A-Za-z]{1,3})\s*-?\s*(\d+)", s)
@@ -79,6 +80,14 @@ def annotated_mod(cell) -> tuple[str, set[str]]:
             found.add(site_key(m.group(1), m.group(2)))
     return kind, found
 
+
+
+MW_SUFFIX = re.compile(r"[\(\[]?\s*~?\s*\d+(?:\.\d+)?\s*-?\s*k\s*da?\s*[\)\]]?", re.I)
+
+
+def label_key(s) -> str:
+    """Printed label without a molecular-weight tag ('LC3B (14 kDa)' == 'LC3B'), A7."""
+    return norm(MW_SUFFIX.sub(" ", str(s or "")))
 
 # ---------- system values (asserted only when SUPPORTED) ----------
 def sys_field(rec: dict, path: list[str]):
@@ -145,6 +154,10 @@ def score_lanes(lanes: list[dict], rec: dict | None) -> list[tuple[int, str, str
         val, ok = sys_field(b, ["band_state"])
         sys_lanes[int(b.get("lane_index") or 0)] = val if ok and val in ("present", "absent") else None
     out = []
+    if rec is not None and sys_lanes and len({int(l["lane_index"]) for l in lanes}) != len(sys_lanes):
+        # A7: annotator and system counted lanes differently (e.g. 24 physical vs 12 samples); no 1:1 join
+        return [(int(l["lane_index"]), "LANE_COUNT_MISMATCH", l["band_call"].strip().lower(), "")
+                for l in lanes if l["band_call"].strip().lower() in ("present", "absent")]
     for lane in lanes:
         call = lane["band_call"].strip().lower()
         if call not in ("present", "absent"):
@@ -245,7 +258,7 @@ def score_paper(inventory, targets, lanes, cmap_rows, records) -> dict:
                           "lane_index": lane, "annotated": a, "system": s, "verdict": ""})
 
     def printed(r, row):
-        return norm(r["target"].get("raw_target_name")) == norm(row["target_printed"])
+        return label_key(r["target"].get("raw_target_name")) == label_key(row["target_printed"])
 
     def symbol(r, row):
         return symbols_match(sys_field(r, ["target", "canonical_target"])[0], row["gene_symbol"])
@@ -442,6 +455,8 @@ def render(r: dict) -> str:
              f"Duplicate records from overlapping crops (not scored, not counted as errors): {t['duplicate_records']}.",
              f"- Automated time: {t['automated_seconds'] / 60:.1f} min for {t['panels_sent_to_model']} panels sent to the model."
              f" Manual full annotation: {t['manual_full_minutes']:.0f} min for {t['panels_fully_annotated']} panels.",
+             f"- Lane calls unscored because annotator and system counted lanes differently (A7): "
+             f"{r['pooled_metrics_raw'].get('band_call', {}).get('LANE_COUNT_MISMATCH', 0)}.",
              "", f"This is {len(r['papers'])} papers drawn from a deliberately diverse candidate pool. It is not a literature-wide accuracy figure.", ""]
     for label, key in (("Raw", "pooled_metrics_raw"), ("Adjudicated", "pooled_metrics_adjudicated")):
         lines += [f"## Pooled, {label.lower()}", "",
@@ -541,6 +556,8 @@ def self_test() -> None:
     assert metrics(f["protein_identity"])["accuracy"] == "4/5 (80%)"
     assert fig_key("S1", "A") == ("s1", "a") and fig_key("Fig 1", "A") == ("1", "a") and fig_key("Figure S3", "b") == ("s3", "b")
     assert minutes("1:32 hour") == 92 and minutes("31.49 minutes") == 31.49 and minutes("1.5 h") == 90
+    assert label_key("LC3B (14 kDa)") == label_key("LC3B") and label_key("GAPDH 37kD") == "gapdh"
+    assert annotated_mod("none")[0] == "total"
     print("self-test passed")
 
 
