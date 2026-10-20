@@ -683,21 +683,39 @@ async def lookup_live_paper(doi: str) -> dict:
             "paper": None, "results": []}
 
 
+UPLOAD_CROP_HIDDEN = ("Crop hidden for uploaded copy: this figure came from a user-uploaded PDF "
+                      "whose open access is not verified, so the image is not shared.")
+
+
+class UploadCropHidden(Exception):
+    """Crop from a user-uploaded PDF whose open access is not verified."""
+
+
 async def fetch_live_crop(job_id: str | None, filename: str) -> bytes | None:
+    """Crop bytes; raises UploadCropHidden for upload jobs without verified
+    open access (possibly paywalled copies are never redistributed as images)."""
     if not job_id:
         return None
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
-        return await conn.fetchval(
-            "SELECT png FROM ingest_crops WHERE job_id = $1 AND filename = $2", job_id, filename)
+        row = await conn.fetchrow(
+            "SELECT c.png, j.metadata_source, j.access_status FROM ingest_crops c "
+            "LEFT JOIN ingest_jobs j ON j.job_id = c.job_id "
+            "WHERE c.job_id = $1 AND c.filename = $2", job_id, filename)
+    if row is None:
+        return None
+    if row["metadata_source"] == "upload" and row["access_status"] != "open_access":
+        raise UploadCropHidden(UPLOAD_CROP_HIDDEN)
+    return row["png"]
 
 
 async def latest_ingest_job(doi: str) -> dict | None:
     pool = await get_readonly_pool()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT job_id, status FROM ingest_jobs WHERE lower(doi) = $1 "
-            "ORDER BY created_at DESC LIMIT 1", doi)
+            "SELECT job_id, status, metadata_source, "
+            "updated_at > now() - interval '30 minutes' AS fresh "
+            "FROM ingest_jobs WHERE lower(doi) = $1 ORDER BY created_at DESC LIMIT 1", doi)
     return dict(row) if row else None
 
 
@@ -709,6 +727,8 @@ async def list_ingest_jobs(limit: int = 20) -> list[dict]:
         out = []
         for r in rows:
             d = dict(r)
+            for k in UPLOAD_AUDIT_COLS:  # operator-only audit; job lists reach other beta users
+                d.pop(k, None)
             for k in ("created_at", "updated_at", "access_checked_at", "relevance_checked_at"):
                 d[k] = d[k].isoformat() if d.get(k) else None
             out.append(d)
@@ -721,6 +741,11 @@ def _ts(value):
     return datetime.fromisoformat(value) if isinstance(value, str) else value
 
 
+# Migration 012. Written only when present in the job dict (PDF uploads), so
+# ordinary ingest keeps working before the migration is applied.
+UPLOAD_AUDIT_COLS = ("uploaded_by", "uploaded_at", "pdf_sha256")
+
+
 async def upsert_ingest_job(job: dict) -> None:
     pool = await get_ingest_pool()
     cols = (
@@ -730,14 +755,14 @@ async def upsert_ingest_job(job: dict) -> None:
         "access_checked_at", "relevance_status", "relevance_score",
         "relevance_reason", "relevance_checked_at",
         "candidates", "records", "rows", "backend", "error",
-    )
+    ) + tuple(c for c in UPLOAD_AUDIT_COLS if c in job)
     sets = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols[1:])
     async with pool.acquire() as conn:
         await conn.execute(
             f"INSERT INTO ingest_jobs ({', '.join(cols)}, updated_at) "
             f"VALUES ({', '.join(f'${i}' for i in range(1, len(cols) + 1))}, now()) "
             f"ON CONFLICT (job_id) DO UPDATE SET {sets}, updated_at = now()",
-            *[_ts(job.get(c)) if c.endswith("_checked_at") else job.get(c) for c in cols])
+            *[_ts(job.get(c)) if c.endswith("_at") else job.get(c) for c in cols])
 
 
 async def replace_live_rows(doi: str, job_id: str, rows: list[dict],

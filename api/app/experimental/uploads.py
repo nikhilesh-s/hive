@@ -6,8 +6,11 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
+import subprocess
+import sys
 import time
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -18,11 +21,28 @@ from pydantic import BaseModel, Field
 from .. import db
 from ..auth import require_internal_key
 from ..config import settings
+from ..limiter import limiter
 from . import ingest
-from .router import _spend_daily
+from .router import _daily_used, _spend_daily
+
+logger = logging.getLogger("hive.experimental.uploads")
 
 MAX_PDF_BYTES = 50 * 1024 * 1024
+# Work one upload can cause (preprocessing renders every page at 350 DPI).
+MAX_PAGES = 60
+# A2 (0.25 m^2) in PDF points^2: about 47 Mpx / 140 MB per page at 350 DPI.
+# Journal pages are letter/A4, tabloid at most.
+MAX_PAGE_AREA_PT2 = 1191 * 1684
+# Untrusted parsing happens in a child process under these limits.
+CHECK_WALL_SECONDS = 30
+CHECK_CPU_SECONDS = 20
+CHECK_MEMORY_BYTES = 1024 ** 3
+UPLOAD_READ_SECONDS = 180          # whole body; bounds slow-loris uploads
+MAX_UPLOADS_PER_USER_PER_DAY = 10  # attempts that stream a body, accepted or not
+# ponytail: in-process semaphore and counters (single Render instance); move to the DB with a second instance.
+_UPLOAD_SLOTS = asyncio.Semaphore(2)
 _lock = asyncio.Lock()
+UNREADABLE = "Select a readable, unencrypted PDF with at least one page."
 ticket_router = APIRouter(prefix="/experimental", dependencies=[Depends(require_internal_key)])
 router = APIRouter(prefix="/experimental")
 
@@ -32,6 +52,11 @@ def normalize_doi(value: str) -> str:
     if len(value) > 200 or not re.fullmatch(r"10\.\d{4,9}/[^\s?#]+", value):
         raise HTTPException(422, "Enter a valid DOI, such as 10.1234/example.")
     return value
+
+
+def _legacy_upload_on() -> bool:
+    # Same parser as the pipeline that would act on it, so this guard is never looser.
+    return ingest.pipeline._env_bool("WBM_UPLOAD", False)
 
 
 def _signature(payload: str) -> str:
@@ -61,8 +86,14 @@ class Ticket(BaseModel):
     doi: str = Field(min_length=6, max_length=260)
 
 
+def _ticket_user(request: Request) -> str:
+    # The route requires the internal key, so the header comes from our BFF.
+    return "upload-ticket:" + request.headers.get("x-hive-user-id", "")
+
+
 @ticket_router.post("/upload-ticket")
-async def upload_ticket(body: Ticket, x_hive_user_id: str | None = Header(default=None)):
+@limiter.limit("10/minute;60/day", key_func=_ticket_user)
+async def upload_ticket(request: Request, body: Ticket, x_hive_user_id: str | None = Header(default=None)):
     try:
         user = str(UUID(x_hive_user_id or ""))
     except ValueError:
@@ -70,7 +101,7 @@ async def upload_ticket(body: Ticket, x_hive_user_id: str | None = Header(defaul
     doi = normalize_doi(body.doi)
     if not settings.db_ingest_url:
         raise HTTPException(503, "PDF storage is not configured.")
-    if os.environ.get("WBM_UPLOAD", "").lower() in {"1", "true", "yes", "on"}:
+    if _legacy_upload_on():
         raise HTTPException(503, "Disable legacy WBM_UPLOAD before using PDF uploads; uploaded evidence must stay in the live tier.")
     data = {"doi": doi, "user": user, "expires": int(time.time()) + 300}
     payload = base64.urlsafe_b64encode(json.dumps(data).encode()).decode()
@@ -78,6 +109,11 @@ async def upload_ticket(body: Ticket, x_hive_user_id: str | None = Header(defaul
 
 
 async def existing(doi: str) -> dict | None:
+    """Evidence or a live job that should be reused instead of a new upload.
+
+    Failed, stale, or upload-produced empty jobs never block: a wrong or
+    unlucky upload must not stop the real paper from being uploaded later.
+    """
     try:
         stored = await db.lookup_live_paper(doi)
     except Exception:
@@ -92,26 +128,80 @@ async def existing(doi: str) -> dict | None:
         job = await db.latest_ingest_job(doi)
     except Exception:
         raise HTTPException(503, "Could not check extraction status. Please retry; no job was started.") from None
-    if job and job["status"] == "done":
+    if job and job["status"] == "done" and job.get("metadata_source") != "upload":
         return {"doi": doi, "status": "done", "rows": 0,
                 "message": "This PDF was processed without stored Western blot evidence.", "existing": True}
-    if job and job["status"] not in {"done", "failed", "awaiting_full_text"}:
+    if job and job["status"] not in {"done", "failed", "awaiting_full_text"} and job.get("fresh"):
         return {"job_id": job["job_id"], "doi": doi, "status": job["status"],
                 "message": "An extraction already exists for this DOI.", "existing": True}
     return None
 
 
-def validate_pdf(path: Path) -> None:
-    import fitz
+# Runs as `python -I -c` with an empty environment: no credentials, no repo on
+# sys.path. Prints page count, largest page area and early page text as JSON.
+_INSPECT = r"""
+import json, resource, sys
+path, cpu, memory = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+max_pages = int(sys.argv[4])
+resource.setrlimit(resource.RLIMIT_CPU, (cpu, cpu))
+try:
+    resource.setrlimit(resource.RLIMIT_AS, (memory, memory))
+except ValueError:
+    if sys.platform != "darwin":  # macOS refuses RLIMIT_AS; Linux (Render) enforces it
+        raise
+import fitz
+with fitz.open(path) as doc:
+    if not doc.is_pdf or doc.is_encrypted or not doc.page_count:
+        sys.exit(2)
+    out = {"pages": doc.page_count}
+    if doc.page_count <= max_pages:
+        out["max_area"] = max(max(p.rect.get_area(), p.mediabox.get_area()) for p in doc)
+        out["text"] = "\n".join(doc[i].get_text() for i in range(min(3, doc.page_count)))[:200000]
+print(json.dumps(out))
+"""
+
+
+def inspect_pdf(path: Path) -> str:
+    """Validate an untrusted PDF without parsing it in the API process.
+
+    Bounds the work a later 350 DPI render can cause (pages, page area) and
+    returns the text of the first three pages for DOI binding.
+    """
+    with path.open("rb") as source:
+        if not source.read(1024).lstrip().startswith(b"%PDF-"):
+            raise HTTPException(400, UNREADABLE)
     try:
-        with path.open("rb") as source:
-            if not source.read(1024).lstrip().startswith(b"%PDF-"):
-                raise ValueError()
-        with fitz.open(path) as document:
-            if not document.is_pdf or document.is_encrypted or not document.page_count:
-                raise ValueError()
-    except Exception:
-        raise HTTPException(400, "Select a readable, unencrypted PDF with at least one page.") from None
+        done = subprocess.run(
+            [sys.executable, "-I", "-c", _INSPECT, str(path),
+             str(CHECK_CPU_SECONDS), str(CHECK_MEMORY_BYTES), str(MAX_PAGES)],
+            capture_output=True, check=False, timeout=CHECK_WALL_SECONDS, env={"PATH": os.environ.get("PATH", "")})
+    except subprocess.TimeoutExpired:
+        raise HTTPException(400, "This PDF took too long to read. Upload the publisher's PDF of the paper.") from None
+    try:
+        if done.returncode:
+            raise ValueError()
+        facts = json.loads(done.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        raise HTTPException(400, UNREADABLE) from None
+    if facts["pages"] > MAX_PAGES:
+        raise HTTPException(413, f"PDF must have at most {MAX_PAGES} pages; upload the main paper without supplements.")
+    if not 0 < facts["max_area"] <= MAX_PAGE_AREA_PT2:
+        raise HTTPException(413, "PDF page size is outside the supported range (up to A2).")
+    return facts["text"]
+
+
+def check_doi(text: str, doi: str) -> None:
+    """The supplied DOI must be the first DOI printed on the PDF's first pages.
+
+    Page text only: PDF metadata is trivially editable and often stale.
+    """
+    found = ingest.pdf_preprocess._extract_dois(text)
+    if not found:
+        raise HTTPException(422, "No DOI was found in the text of the PDF's first pages, so it cannot be "
+                                 "matched to this paper. Upload the publisher's version.")
+    first = ingest.fulltext.normalize_doi(found[0])
+    if first != doi:
+        raise HTTPException(422, f"This PDF shows DOI {first[:200]}, not {doi}. Check the paper and DOI.")
 
 
 @router.post("/uploads")
@@ -128,8 +218,8 @@ async def upload(request: Request, background: BackgroundTasks,
         raise HTTPException(400, "Invalid file size.") from None
     if length > MAX_PDF_BYTES:
         raise HTTPException(413, "PDF must be 50 MB or smaller.")
-    doi = data["doi"]
-    if os.environ.get("WBM_UPLOAD", "").lower() in {"1", "true", "yes", "on"}:
+    doi, user = data["doi"], data["user"]
+    if _legacy_upload_on():
         raise HTTPException(503, "Disable legacy WBM_UPLOAD before using PDF uploads.")
     if not settings.db_ingest_url:
         raise HTTPException(503, "PDF storage is not configured.")
@@ -139,19 +229,40 @@ async def upload(request: Request, background: BackgroundTasks,
     ok, why = ingest.backend_ready()
     if not ok:
         raise HTTPException(503, why)
+    # Read-only quota checks before accepting a single byte.
+    if _daily_used("extraction") >= settings.daily_ingest_cap:
+        raise HTTPException(429, f"The beta's daily extraction limit ({settings.daily_ingest_cap}) is reached. "
+                                 "It resets at 00:00 UTC.")
+    if _daily_used("upload:" + user) >= MAX_UPLOADS_PER_USER_PER_DAY:
+        raise HTTPException(429, f"You have reached today's upload limit ({MAX_UPLOADS_PER_USER_PER_DAY}). "
+                                 "It resets at 00:00 UTC.")
+    if _UPLOAD_SLOTS.locked():
+        raise HTTPException(503, "Other uploads are being processed. Retry in a minute.")
+    async with _UPLOAD_SLOTS:
+        _spend_daily("upload:" + user, MAX_UPLOADS_PER_USER_PER_DAY)
+        return await _receive(request, background, doi, user)
+
+
+async def _receive(request: Request, background: BackgroundTasks, doi: str, user: str) -> dict:
     directory = ingest.PDF_DIR / "uploads"
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     path = directory / (uuid4().hex + ".pdf")
     accepted = False
     try:
-        size = 0
-        with path.open("xb") as output:
-            async for chunk in request.stream():
-                size += len(chunk)
-                if size > MAX_PDF_BYTES:
-                    raise HTTPException(413, "PDF must be 50 MB or smaller.")
-                output.write(chunk)
-        await asyncio.to_thread(validate_pdf, path)
+        size, digest = 0, hashlib.sha256()
+        try:
+            async with asyncio.timeout(UPLOAD_READ_SECONDS):
+                with path.open("xb") as output:
+                    async for chunk in request.stream():
+                        size += len(chunk)
+                        if size > MAX_PDF_BYTES:
+                            raise HTTPException(413, "PDF must be 50 MB or smaller.")
+                        digest.update(chunk)
+                        await asyncio.to_thread(output.write, chunk)
+        except TimeoutError:
+            raise HTTPException(408, "The upload took too long. Check your connection and retry.") from None
+        text = await asyncio.to_thread(inspect_pdf, path)
+        check_doi(text, doi)
         # Existing runner is single-process: serialize DOI checks and job creation.
         async with _lock:
             found = await existing(doi)
@@ -162,14 +273,17 @@ async def upload(request: Request, background: BackgroundTasks,
             charged_day = _spent["extraction"][0]
             job = ingest.start_job(doi, metadata={"source": "upload"})
             job.doi = doi  # Keep the validated identifier, not citation punctuation heuristics.
+            audit = {"uploaded_by": UUID(user), "uploaded_at": ingest._now(), "pdf_sha256": digest.hexdigest()}
             try:
-                await db.upsert_ingest_job(job.to_dict())
+                await db.upsert_ingest_job({**job.to_dict(), **audit})
             except Exception:
                 ingest.JOBS.pop(job.job_id, None)
                 day, used = _spent["extraction"]
                 if day == charged_day:
                     _spent["extraction"] = (day, max(0, used - 1))
                 raise HTTPException(503, "Could not store the upload job. Please retry.") from None
+            logger.info("pdf upload accepted job=%s doi=%s user=%s sha256=%s bytes=%d",
+                        job.job_id, doi, user, audit["pdf_sha256"], size)
             background.add_task(ingest.run_job, job.job_id, path)
             accepted = True
             return job.to_dict()

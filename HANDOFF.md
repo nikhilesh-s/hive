@@ -7,6 +7,36 @@
 > authoritative; everything under "Historical session log" is chronology and
 > may contain statements that were true only at the time.
 
+## O-2 security review fixed (2026-10-19)
+
+Branch `o-2-pdf-upload` (PR #22), merged with main, review items 1-7 fixed; latest
+commit: `git log -1 --format=%H origin/o-2-pdf-upload`. Srushti unavailable; Nik
+approved finishing it. `western_blot_miner/` is untouched (frozen benchmark).
+
+- Uploads are validated in a `python -I` child with an empty env, a 30 s wall
+  clock and RLIMIT_CPU 20 s / RLIMIT_AS 1 GiB (AS is not enforceable on macOS).
+  Max 60 pages, max page A2 (0.25 m^2); rejected before any job or render.
+- The supplied DOI must be the first DOI in the page text of pages 1-3
+  (metadata ignored). Mismatch or none: 422, no job. Upload-made empty jobs and
+  stale (>30 min) pending jobs no longer block a later upload of the DOI.
+- Quota: daily cap and per-user limit (10 streamed attempts/day) checked before
+  reading the body; 2 concurrent uploads; 180 s body timeout; writes via
+  `to_thread`; tickets 10/minute and 60/day per user. All in-process counters.
+- Audit: `uploaded_by`, `uploaded_at`, `pdf_sha256` on `ingest_jobs` via new
+  **migration 012 (NOT applied)**. Until Nik applies it, uploads fail closed
+  with 503; normal ingest is unaffected. Job listings strip these columns.
+- Upload runs use `PDF_DIR/uploads/<job_id>`, deleted after rows and crops are
+  stored (or on failure). Crops from uploads without verified open access are
+  never served: both crop routes return 403 "Crop hidden for uploaded copy"
+  (the web falls back to its no-crop note). This also hides them from the uploader.
+
+Tests: API 330 passed / 19 skipped (57 upload tests); web tsc, lint, 31 node
+tests and the build pass. The DB matrix test (migration 012, audit, crop gate) runs
+only in CI (no local Postgres). Not done: the 350 DPI render still runs in the
+API process (bounded by the caps, not sandboxed); real OAuth/model checks and
+Srushti's visual check are still pending. Next: Nik reviews PR #22, applies
+migration 012, then merges.
+
 ## Later on 2026-10-18: deploy, rotation, Drive
 
 - **R-5 deployed.**
