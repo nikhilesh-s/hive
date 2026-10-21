@@ -1,6 +1,6 @@
 # HiveBlot
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23491677.svg)](https://doi.org/10.5281/zenodo.23491677)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23491677.svg)](https://doi.org/10.5281/zenodo.23491677) [![Benchmark dataset DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23524346.svg)](https://doi.org/10.5281/zenodo.23524346)
 
 
 Structured, provenance-tracked extraction of Western blot evidence from
@@ -119,3 +119,7 @@ Source code and documentation are released under the [MIT License](LICENSE).
 Figure crops and quoted passages come from published papers and remain under
 their publishers' terms; they are not covered by the MIT license. See
 [`THIRD_PARTY_NOTICE.md`](THIRD_PARTY_NOTICE.md).
+
+## Blind benchmark
+
+A pre-registered blind test on three unseen open-access papers: 92% of the 553 values HiveBlot asserted matched a wet-lab annotator's labels (coverage 57%, 512 of 895). Protocol, annotations, scoring code and results: `eval/blind_2026_10/`, archived at https://doi.org/10.5281/zenodo.23524346.
