@@ -38,3 +38,16 @@ abstract: >-
   search API and a web interface. This is a beta release: the reviewed corpus
   covers three papers, and a pre-registered blind benchmark on unseen papers
   is in progress, so no accuracy figures are reported here.
+references:
+  - type: dataset
+    title: "HiveBlot blind extraction benchmark (October 2026): pre-registration, human annotations and results"
+    doi: "10.5281/zenodo.23524346"
+    authors:
+      - family-names: Suravarjjala
+        given-names: Nikhilesh
+      - family-names: Bharadwaj
+        given-names: Tanvi
+      - family-names: Madhure
+        given-names: Srushti
+      - family-names: Jaladi
+        given-names: Yashvi
