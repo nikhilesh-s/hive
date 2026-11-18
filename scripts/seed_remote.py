@@ -1,5 +1,5 @@
 """Seed a REMOTE Postgres (e.g. the cloud Supabase beta) with the reviewed
-demo Evidence Record rows — closes the DEPLOYMENT.md TODO.
+demo Evidence Record rows — closes the docs/internal/DEPLOYMENT.md TODO.
 
 Usage:
     export SEED_DATABASE_URL='postgresql://…'   # an OWNER/service connection
@@ -50,7 +50,7 @@ async def _main(paths: list[str], check_only: bool) -> int:
             "WHERE table_name='western_blot_records'")}
         if not cols:
             print("Table western_blot_records not found — run api/db/schema.sql "
-                  "and migrations/001, 002 first (see DEPLOYMENT.md).")
+                  "and migrations/001, 002 first (see docs/internal/DEPLOYMENT.md).")
             return 1
         n = await conn.fetchval("SELECT count(*) FROM western_blot_records")
         print(f"remote western_blot_records: {n} rows, {len(cols)} columns")

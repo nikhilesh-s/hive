@@ -1,5 +1,5 @@
 """
-Endpoint-level checks for the properties EXECUTION_PLAN step 6 calls out:
+Endpoint-level checks for the properties docs/internal/EXECUTION_PLAN step 6 calls out:
 auth on both surfaces, no overlap between the internal and agent key sets,
 and independent rate-limit budgets.
 
@@ -8,7 +8,7 @@ itself stubbed out, so they cover the wiring (dependencies, router prefixes,
 limiter registration) rather than re-testing execute_search. The parts of
 step 6 that need live infrastructure - a real OpenAI-generated query getting
 rejected by sql_guard, and hive_readonly's Postgres grants - can't be covered
-here; see EXECUTION_PLAN.
+here; see docs/internal/EXECUTION_PLAN.
 """
 
 import pytest

@@ -1,6 +1,6 @@
 # Agent Instructions — HiveBlot (`/hive`)
 
-**Read [`HANDOFF.md`](HANDOFF.md) first.** It holds the current project state
+**Read `HANDOFF.md` (a maintainer-only file that is not in the public repo) first.** It holds the current project state
 (branch, latest commit, tests, completed work, blockers, and the exact next
 task). This file only enforces process; `HANDOFF.md` holds the changing state.
 

@@ -36,3 +36,17 @@ research/papers/*.pdf
 
 # Release archives (scripts/make_release_archive.sh)
 dist/
+
+# Internal notes kept on the maintainer's disk only (contributor names,
+# outreach, consent records, infrastructure incidents). Not for the public repo.
+/.consent/
+/HANDOFF.md
+/TEAM_HANDOFF.md
+/SUN_SEP_26_MEETING_ACTION_ITEMS.md
+/DEMO.md
+/TanviQuestions.md
+/meeting_notes
+/BETA_EMAIL_WITH_TALLY_AND_BRIEF.md
+/UCSF_BETA_*.md
+/super-based-ticket.md
+/CLAUDE.md

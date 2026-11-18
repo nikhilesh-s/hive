@@ -23,21 +23,15 @@ eval/blind_2026_10/**/*.csv -whitespace
 /HANDOFF.md export-ignore
 /TEAM_HANDOFF.md export-ignore
 /CLAUDE.md export-ignore
-/CLAUDE_RUN_*.md export-ignore
 /.claude export-ignore
 # Deployment, hosting and demo operations (infrastructure identifiers)
-/DEPLOYMENT.md export-ignore
-/HOSTING_STATUS.md export-ignore
-/SMOKE_TEST_REPORT.md export-ignore
-/PAPER_ACCESS_AUDIT.md export-ignore
-/EXECUTION_PLAN.md export-ignore
 /DEMO.md export-ignore
 /TanviQuestions.md export-ignore
 /SUN_SEP_26_MEETING_ACTION_ITEMS.md export-ignore
 /super-based-ticket.md export-ignore
 /BETA_EMAIL_WITH_TALLY_AND_BRIEF.md export-ignore
 /UCSF_BETA_*.md export-ignore
-/README_CASE_STUDY.md export-ignore
+/docs/internal export-ignore
 /render.yaml export-ignore
 /.github export-ignore
 /web/AUTH.md export-ignore
