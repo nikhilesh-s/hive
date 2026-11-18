@@ -4,24 +4,27 @@
     fetch_annotations.py status     # row counts only, no cell contents printed
     fetch_annotations.py pull       # write annotations/tanvi/*.csv and annotations/crop_map.csv
 
-Needs Google credentials for niksuravarjjala@gmail.com (gswitch store, read-only use here).
+Needs a Google OAuth credentials JSON; set HIVE_GOOGLE_CREDS to its path (read-only use).
 Sheet IDs are the ones created on 2026-10-18.
 """
 import csv
 import json
+import os
 import sys
 from pathlib import Path
 
 import requests
 
 HERE = Path(__file__).resolve().parent
-CREDS = Path.home() / ".gswitch/creds/niksuravarjjala@gmail.com.json"
+CREDS = Path(os.environ["HIVE_GOOGLE_CREDS"]) if "HIVE_GOOGLE_CREDS" in os.environ else None
 TANVI_SHEET = "141LXCeDxG2UtvR7smYn6CUkHCuKRYSCIM72ZGY9nqIU"
 CROP_SHEET = "1SDaLkJo4DkYc7mMoP-Yae3x8I4V_dgsPj31oG0bdqes"
 TANVI_TABS = ("panels", "targets", "lanes", "timelog", "ERRATA")
 
 
 def token() -> str:
+    if CREDS is None:
+        sys.exit("set HIVE_GOOGLE_CREDS to your Google OAuth credentials JSON")
     c = json.loads(CREDS.read_text())
     r = requests.post(c.get("token_uri") or "https://oauth2.googleapis.com/token", timeout=30, data={
         "client_id": c["client_id"], "client_secret": c["client_secret"],

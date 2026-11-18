@@ -26,7 +26,7 @@ Protocol, annotations, scoring code and results are in
 
 | Measure | Result |
 |---|---|
-| Correctness | 512 of the 553 values HiveBlot extracted were correct (92%) |
+| Correctness | 512 of the 553 values HiveBlot extracted were correct (92%, counting annotator-confirmed notation fixes). Scored strictly as pre-registered: 78% (222 of 285) |
 | Coverage | 57% of the labeled values (512 of 895) |
 | Time, before review | About 6x faster than hand labeling (19.8 vs 123.5 min) |
 
