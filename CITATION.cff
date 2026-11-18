@@ -7,7 +7,7 @@ date-released: 2026-10-19
 license: MIT
 url: "https://hiveblot-beta.vercel.app"
 doi: "10.5281/zenodo.23491677"
-# repository-code: ""            # add once the repository is public
+repository-code: "https://github.com/nikhilesh-s/hive"
 authors:
   - family-names: Suravarjjala
     given-names: Nikhilesh
@@ -35,11 +35,10 @@ abstract: >-
   the field is flagged as conflicting and left empty instead of guessed. The
   software combines OpenCV panel detection, a vision-language model, and
   deterministic biology and UniProt reconciliation rules, and includes a
-  search API and a web interface. This is a beta release: the reviewed corpus
-  covers three papers, and a pre-registered blind benchmark on unseen papers
-  is in progress, so no accuracy figures are reported here.
+  search API and a web interface. This is a beta release. A pre-registered blind benchmark on three unseen
+  papers is archived separately (see references).
 references:
-  - type: dataset
+  - type: data
     title: "HiveBlot blind extraction benchmark (October 2026): pre-registration, human annotations and results"
     doi: "10.5281/zenodo.23524346"
     authors:
